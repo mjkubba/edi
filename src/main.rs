@@ -40,7 +40,53 @@ fn main() {
     println!("Group Control Number: {}", gs06_group_control_number);
     println!("Responsible Agency: {}", gs07_responsible_agency);
     println!("Version ID: {}", gs08_version_id);
-    
+
+    // find the first occurrence of "ST" segment
+    let st_index = contents.find("ST").unwrap();
+    let st_start = &contents[st_index..];
+    let st_end = st_start.find("~").unwrap();
+    let st_content = &st_start[3..st_end];
+
+    // Print the ST segment
+    println!("ST segment: {}", st_content);
+
+    // Split the st content into parts and set new vars for each segment
+    let st_parts: Vec<&str> = st_content.split("*").collect();
+    let st01_transaction_set_id = st_parts[0];
+    let st02_transaction_set_control_number = st_parts[1];
+
+    // Print the extracted content
+    println!("First ST section");
+    println!("Transaction Set ID: {}", st01_transaction_set_id);
+    println!("Transaction Set Control Number: {}", st02_transaction_set_control_number);
+
+    // find the first occurrence of "BPR" segment
+    let bpr_index = contents.find("BPR").unwrap();
+    let bpr_start = &contents[bpr_index..];
+    let bpr_end = bpr_start.find("~").unwrap();
+    let bpr_content = &bpr_start[4..bpr_end];
+
+    // Print the BPR segment
+    println!("BPR segment: {}", bpr_content);
+
+    // Split the bpr content into parts and set new vars for each segment
+    let bpr_parts: Vec<&str> = bpr_content.split("*").collect();
+    let bpr01_payer_id = bpr_parts[0];
+    let bpr02_payer_name = bpr_parts[1];
+    let bpr03_payer_address = bpr_parts[2];
+    let bpr04_payer_city = bpr_parts[3];
+    let bpr05_payer_state = bpr_parts[4];
+    let bpr06_payer_zip = bpr_parts[5];
+
+    // rint the extracted content
+    println!("BPR segment");
+    println!("Payer ID: {}", bpr01_payer_id);
+    println!("Payer Name: {}", bpr02_payer_name);
+    println!("Payer Address: {}", bpr03_payer_address);
+    println!("Payer City: {}", bpr04_payer_city);
+    println!("Payer State: {}", bpr05_payer_state);
+    println!("Payer Zip: {}", bpr06_payer_zip);
+        
     // find how many nm1 segments are in the file
     let nm1_count = contents.matches("NM1").count();
     println!("Number of NM1 segments: {}", nm1_count);
