@@ -1,176 +1,9 @@
 use std::fs::File;
 use std::io::Read;
 
-#[allow(dead_code)]
-#[derive(Debug)]
-struct ISA {
-    information_qualifier: String,
-    authorization_information: String,
-    security_information_qualifier: String,
-    security_information: String,
-    sender_id_qualifier: String,
-    sender_id: String,
-    receiver_id_qualifier: String,
-    receiver_id: String,
-    date: String,
-    time: String,
-    control_number_identifier: String,
-    control_version_number: String,
-    control_number: String,
-    ack_indicator: String,
-    usage_indicator: String,
-    component_element_separator: String,
-}
+mod edi835;
+use crate::edi835::segments::*;
 
-// function to get the ISA struct
-fn get_isa(isa_content: &str) -> ISA {
-    let isa_parts: Vec<&str> = isa_content.split("*").collect();
-    ISA {
-        information_qualifier: isa_parts[0].to_string(),
-        authorization_information: isa_parts[1].to_string(),
-        security_information_qualifier: isa_parts[2].to_string(),
-        security_information: isa_parts[3].to_string(),
-        sender_id_qualifier: isa_parts[4].to_string(),
-        sender_id: isa_parts[5].to_string(),
-        receiver_id_qualifier: isa_parts[6].to_string(),
-        receiver_id: isa_parts[7].to_string(),
-        date: isa_parts[8].to_string(),
-        time: isa_parts[9].to_string(),
-        control_number_identifier: isa_parts[10].to_string(),
-        control_version_number: isa_parts[11].to_string(),
-        control_number: isa_parts[12].to_string(),
-        ack_indicator: isa_parts[13].to_string(),
-        usage_indicator: isa_parts[14].to_string(),
-        component_element_separator: isa_parts[15].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct GS {
-    functional_id_code: String,
-    app_sender_id: String,
-    app_receiver_id: String,
-    date: String,
-    time: String,
-    group_control_number: String,
-    responsible_agency: String,
-    version_number: String,
-}
-
-fn get_gs(gs_content: &str) -> GS {
-    let gs_parts: Vec<&str> = gs_content.split("*").collect();
-    GS {
-        functional_id_code: gs_parts[0].to_string(),
-        app_sender_id: gs_parts[1].to_string(),
-        app_receiver_id: gs_parts[2].to_string(),
-        date: gs_parts[3].to_string(),
-        time: gs_parts[4].to_string(),
-        group_control_number: gs_parts[5].to_string(),
-        responsible_agency: gs_parts[6].to_string(),
-        version_number: gs_parts[7].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct ST {
-    transaction_set_id: String,
-    transaction_set_control_number: String,
-}
-
-fn get_st(st_content: &str) -> ST {
-    let st_parts: Vec<&str> = st_content.split("*").collect();
-    ST {
-        transaction_set_id: st_parts[0].to_string(),
-        transaction_set_control_number: st_parts[1].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct BPR {
-    payer_id: String,
-    payer_name: String,
-    payer_address: String,
-    payer_city: String,
-    payer_state: String,
-    payer_zip: String,
-}
-
-fn get_bpr(bpr_content: &str) -> BPR {
-    let bpr_parts: Vec<&str> = bpr_content.split("*").collect();
-    BPR {
-        payer_id: bpr_parts[0].to_string(),
-        payer_name: bpr_parts[1].to_string(),
-        payer_address: bpr_parts[2].to_string(),
-        payer_city: bpr_parts[3].to_string(),
-        payer_state: bpr_parts[4].to_string(),
-        payer_zip: bpr_parts[5].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct TRN {
-    trace_type_code: String,
-    reference_id: String,
-    originating_company_id: String,
-}
-
-fn get_trn(trn_content: &str) -> TRN {
-    let trn_parts: Vec<&str> = trn_content.split("*").collect();
-    TRN {
-        trace_type_code: trn_parts[0].to_string(),
-        reference_id: trn_parts[1].to_string(),
-        originating_company_id: trn_parts[2].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct REF{
-    receiver_id_number: String,
-    receiver_reference_id: String,
-
-}
-
-fn get_ref(ref_content: &str) -> REF {
-    let ref_parts: Vec<&str> = ref_content.split("*").collect();
-    REF {
-        receiver_id_number: ref_parts[0].to_string(),
-        receiver_reference_id: ref_parts[1].to_string(),
-    }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct NM1{
-    entity_id: String,
-    entity_type: String,
-    lastname: String,
-    firstname: String,
-    middle_initial: String,
-    suffix: String,
-    title: String,
-    id_code: String,
-    member_number: String,
-}
-
-fn get_nm1(nm1_content: &str) -> NM1 {
-    let nm1_parts: Vec<&str> = nm1_content.split("*").collect();
-    NM1 {
-        entity_id: nm1_parts[0].to_string(),
-        entity_type: nm1_parts[1].to_string(),
-        lastname: nm1_parts[2].to_string(),
-        firstname: nm1_parts[3].to_string(),
-        middle_initial: nm1_parts[4].to_string(),
-        suffix: nm1_parts[5].to_string(),
-        title: nm1_parts[6].to_string(),
-        id_code: nm1_parts[7].to_string(),
-        member_number: nm1_parts[8].to_string(),
-    }
-}
 
 #[allow(unused_variables)]
 fn main() {
@@ -261,22 +94,92 @@ fn main() {
 
     if contents.contains("NM1") {
         // find how many nm1 segments are in the file
-        let nm1_count = contents.matches("NM1").count();
+        let nm1_count= contents.matches("NM1").count();
         println!("Number of NM1 segments: {}", nm1_count);
 
         let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
+        // let nm1arr = [];
+        let mut nm1_vec = Vec::new();
 
         for n in 0..nm1_count {
             let nm1_start = next_segment;
             let nm1_end = nm1_start.find("~").unwrap();
             let nm1_content = &nm1_start[4..nm1_end];
             let nm1_segments = get_nm1(nm1_content);
-            println!("{:?}", nm1_segments);
-            println!("NM1 segment parsed");
-            println!("\n");
+            nm1_vec.push(nm1_segments);
+
             next_segment = &nm1_start[nm1_end+1..]
         }
+        println!("{:?}", nm1_vec);
+        println!("NM1 segment parsed");
+        println!("\n");
     }
-     
+
+    if contents.contains("N1") {
+        println!("N1 segment found");
+        // find the first occurrence of "N1" in the contents of the file and extract the content between "N1" and "~"
+        let n1_index = contents.find("N1").unwrap();
+        let n1_start = &contents[n1_index..];
+        let n1_end = n1_start.find("~").unwrap();
+        let n1_content = &n1_start[3..n1_end];
+        let n1_segments = get_n1(n1_content);
+        println!("{:?}", n1_segments);
+        println!("N1 segment parsed");
+        println!("\n");
+    } 
+
+    if contents.contains("N3") {
+        println!("N3 segment found");
+        // find the first occurrence of "N3" in the contents of the file and extract the content between "N3" and "~"
+        let n3_index = contents.find("N3").unwrap();
+        let n3_start = &contents[n3_index..];
+        let n3_end = n3_start.find("~").unwrap();
+        let n3_content = &n3_start[3..n3_end];
+        let n3_segments = get_n3(n3_content);
+        println!("{:?}", n3_segments);
+        println!("N3 segment parsed");
+        println!("\n");
+    }
+
+    if contents.contains("N4") {
+        println!("N4 segment found");
+        // find the first occurrence of "N4" in the contents of the file and extract the content between "N4" and "~"
+        let n4_index = contents.find("N4").unwrap();
+        let n4_start = &contents[n4_index..];
+        let n4_end = n4_start.find("~").unwrap();
+        let n4_content = &n4_start[3..n4_end];
+        let n4_segments = get_n4(n4_content);
+        println!("{:?}", n4_segments);
+        println!("N4 segment parsed");
+        println!("\n");
+    }
+
+    if contents.contains("LX") {
+        println!("LX segment found");
+        // find the first occurrence of "LX" in the contents of the file and extract the content between "LX" and "~"
+        let lx_index = contents.find("LX").unwrap();
+        let lx_start = &contents[lx_index..];
+        let lx_end = lx_start.find("~").unwrap();
+        let lx_content = &lx_start[3..lx_end];
+        let lx_segments = get_lx(lx_content);
+        println!("{:?}", lx_segments);
+        println!("LX segment parsed");
+        println!("\n");
+    }
+
+    if contents.contains("PER") {
+        println!("PER segment found");
+        // find the first occurrence of "PER" in the contents of the file and extract the content between "PER" and "~"
+        let per_index = contents.find("PER").unwrap();
+        let per_start = &contents[per_index..];
+        let per_end = per_start.find("~").unwrap();
+        let per_content = &per_start[4..per_end];
+        let per_segments = get_per(per_content);
+        println!("{:?}", per_segments);
+        println!("PER segment parsed");
+        println!("\n");
     
+    }
+
+
 }
