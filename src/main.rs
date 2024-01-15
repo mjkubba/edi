@@ -8,6 +8,39 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
+    // TODO: create structs for these segments
+    // find how many gs segments are in the file
+    let gs_count = contents.matches("GS").count();
+    println!("Number of GS segments: {}", gs_count);
+    
+    // find the first occurrence of "GS" in the contents of the file and extract the content between "GS" and "~"
+    let gs_index = contents.find("GS").unwrap();
+    let gs_start = &contents[gs_index..];
+    let gs_end = gs_start.find("~").unwrap();
+    let gs_content = &gs_start[2..gs_end];
+
+    // Split the gs content into parts and set new vars for each segment
+    let gs_parts: Vec<&str> = gs_content.split("*").collect();
+    let gs01_functional_id_code = gs_parts[0];
+    let gs02_app_sender_id = gs_parts[1];
+    let gs03_app_receiver_id = gs_parts[2];
+    let gs04_date = gs_parts[3];
+    let gs05_time = gs_parts[4];
+    let gs06_group_control_number = gs_parts[5];
+    let gs07_responsible_agency = gs_parts[6];
+    let gs08_version_id = gs_parts[7];
+
+    // Print the extracted content
+    println!("First GS section");
+    println!("Functional ID Code: {}", gs01_functional_id_code);
+    println!("Application Sender ID: {}", gs02_app_sender_id);
+    println!("Application Receiver ID: {}", gs03_app_receiver_id);
+    println!("Date: {}", gs04_date);
+    println!("Time: {}", gs05_time);
+    println!("Group Control Number: {}", gs06_group_control_number);
+    println!("Responsible Agency: {}", gs07_responsible_agency);
+    println!("Version ID: {}", gs08_version_id);
+    
     // find how many nm1 segments are in the file
     let nm1_count = contents.matches("NM1").count();
     println!("Number of NM1 segments: {}", nm1_count);
