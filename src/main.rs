@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 mod edi835;
-use edi835::{bpr::*,dtm::*,gs::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,st::*,trn::*};
+use edi835::{bpr::*,clp::*,dtm::*,gs::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,st::*,trn::*};
 
 fn get_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
     let start_skip = key.len() + 1;
@@ -71,28 +71,6 @@ fn main() {
         println!("\n");
     }
 
-    if contents.contains("NM1") {
-        // find how many nm1 segments are in the file
-        let nm1_count= contents.matches("NM1").count();
-        println!("Number of NM1 segments: {}", nm1_count);
-
-        let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
-        let mut nm1_vec = Vec::new();
-
-        for _ in 0..nm1_count {
-            let nm1_start = next_segment;
-            let nm1_end = nm1_start.find("~").unwrap();
-            let nm1_content = &nm1_start[4..nm1_end];
-            let nm1_segments = get_nm1(nm1_content);
-            nm1_vec.push(nm1_segments);
-
-            next_segment = &nm1_start[nm1_end+1..]
-        }
-        println!("{:?}", nm1_vec);
-        println!("NM1 segment parsed");
-        println!("\n");
-    }
-
     if contents.contains("N1") {
         println!("N1 segment found");
         let n1_segments = get_n1(get_segment_contents("N1", &contents));
@@ -117,14 +95,6 @@ fn main() {
         println!("\n");
     }
 
-    if contents.contains("LX") {
-        println!("LX segment found");
-        let lx_segments = get_lx(get_segment_contents("LX", &contents));
-        println!("{:?}", lx_segments);
-        println!("LX segment parsed");
-        println!("\n");
-    }
-
     if contents.contains("PER") {
         println!("PER segment found");
         let per_segments = get_per(get_segment_contents("PER", &contents));
@@ -133,6 +103,37 @@ fn main() {
         println!("\n");
     
     }
+
+    if contents.contains("LX") {
+        println!("LX segment found");
+        let lx_segments = get_lx(get_segment_contents("LX", &contents));
+        println!("{:?}", lx_segments);
+        println!("LX segment parsed");
+        println!("\n");
+    }
+
+    if contents.contains("NM1") {
+        // find how many nm1 segments are in the file
+        let nm1_count= contents.matches("NM1").count();
+        println!("Number of NM1 segments: {}", nm1_count);
+
+        let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
+        let mut nm1_vec = Vec::new();
+
+        for _ in 0..nm1_count {
+            let nm1_start = next_segment;
+            let nm1_end = nm1_start.find("~").unwrap();
+            let nm1_content = &nm1_start[4..nm1_end];
+            let nm1_segments = get_nm1(nm1_content);
+            nm1_vec.push(nm1_segments);
+
+            next_segment = &nm1_start[nm1_end+1..]
+        }
+        println!("{:?}", nm1_vec);
+        println!("NM1 segment parsed");
+        println!("\n");
+    }
+
 
     if contents.contains("DTM") {
         let dtm_count= contents.matches("DTM").count();
@@ -153,5 +154,15 @@ fn main() {
         println!("DTM segment parsed");
         println!("\n");
     }
+
+    // figure out CLP in loop 2100 actual content, hitting conflicting information from documentations and the examples provided by x12.org
+    // if contents.contains("CLP") {
+    //     println!("CLP segment found");
+    //     let clp_segments = get_clp(get_segment_contents("CLP", &contents));
+    //     println!("{:?}", clp_segments);
+    //     println!("CLP segment parsed");
+    //     println!("\n");
+    // }
+
 
 }
