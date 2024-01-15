@@ -1,6 +1,6 @@
 ## Purpose
 Playground to read EDI files, starting with 835 because why not!   
-I'm not new to MMIS systems but wanted to get deeper in the claims processing part, and what a better way to learn a system than building parts of it!
+I'm not new to MMIS systems but wanted to get deeper in the claims processing part, and what a better way to learn a system than building parts of it!   
 First iteration is to read the the file contents and parse it's components, get famililar with the loops and segments Then phase 2 write the file itself from other sources
 
 I'm writing this in rust but in python style, as I'm still learning rust!
