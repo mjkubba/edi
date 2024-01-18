@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 mod edi835;
-use edi835::{bpr::*,clp::*,dtm::*,gs::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,st::*,trn::*};
+use edi835::{amt::*,bpr::*,clp::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,st::*,se::*,trn::*};
 
 fn get_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
     let start_skip = key.len() + 1;
@@ -154,6 +154,41 @@ fn main() {
         println!("DTM segment parsed");
         println!("\n");
     }
+
+    if contents.contains("SE") {
+        println!("SE segment found");
+        let se_segments = get_se(get_segment_contents("SE", &contents));
+        println!("{:?}", se_segments);
+        println!("SE segment parsed");
+        println!("\n");
+    }
+
+    if contents.contains("AMT") {
+        println!("AMT segment found");
+        let amt_segments = get_amt(get_segment_contents("AMT", &contents));
+        println!("{:?}", amt_segments);
+        println!("AMT segment parsed");
+        println!("\n");
+    }
+
+
+    if contents.contains("GE") {
+        println!("GE segment found");
+        let ge_segments = get_ge(get_segment_contents("GE", &contents));
+        println!("{:?}", ge_segments);
+        println!("GE segment parsed");
+        println!("\n");
+    
+    }
+
+    if contents.contains("IEA") {
+        println!("IEA segment found");
+        let iea_segments = get_iea(get_segment_contents("IEA", &contents));
+        println!("{:?}", iea_segments);
+        println!("IEA segment parsed");
+        println!("\n");
+    }
+
 
     // figure out CLP in loop 2100 actual content, hitting conflicting information from documentations and the examples provided by x12.org
     // if contents.contains("CLP") {
