@@ -20,6 +20,10 @@ pub struct BPR {
     date: String,
 }
 
+// if BPR04 is ACH then BPR05 is required
+// if BPR04 is ACH, BOP or FWT then BPR06-BPR10,BPR12-BPR15 are required
+// BPR11 is require when BPR10 is present
+
 pub fn get_bpr(bpr_content: &str) -> BPR {
     let bpr_parts: Vec<&str> = bpr_content.split("*").collect();
     let mut payment_format_code: String ="".to_string();
@@ -37,7 +41,6 @@ pub fn get_bpr(bpr_content: &str) -> BPR {
     if bpr_parts.get(4).is_some() {
         payment_format_code = bpr_parts[4].to_string();
     }
-
     if bpr_parts.get(5).is_some() {
         id_number_qualifier = bpr_parts[5].to_string();
     }
