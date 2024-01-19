@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 mod edi835;
-use edi835::{amt::*,bpr::*,clp::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,st::*,se::*,trn::*};
+use edi835::{amt::*,bpr::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,trn::*};
 
 fn get_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
     let start_skip = key.len() + 1;
@@ -20,95 +20,124 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
-    // TODO: create structs for these segments
-    // find the first occurrence of "ISA" in the contents of the file and extract the content between "ISA" and "~"
+    // Control Segments
+
     if contents.contains("ISA") {
-        println!("ISA segment found");
+        println!("ISA segment found, ");
         let isa_segments = get_isa(get_segment_contents("ISA", &contents));
         println!("{:?}", isa_segments);
         println!("ISA segment parsed");
         println!("\n");
     }
     
-    // find how many gs segments are in the file
     if contents.contains("GS") {
-        println!("GS segment found");
+        print!("GS segment found, ");
         let gs_segments = get_gs(get_segment_contents("GS", &contents));
         println!("{:?}", gs_segments);
         println!("GS segment parsed");
-        println!("\n");
     }
+
+    // Table 1
+    // Start of header loop (ST, BPR, TRN, CUR, REF, REF, DTM)
     
     if contents.contains("ST") {
-        println!("ST segment found");
-        let st_segments = get_st(get_segment_contents("ST", &contents));
-        println!("{:?}", st_segments);
+        print!("ST segment found, ");
+        let _st_segments = get_st(get_segment_contents("ST", &contents));
         println!("ST segment parsed");
-        println!("\n");
     }
 
     if contents.contains("BPR") {
-        println!("BPR segment found");
-        let bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
-        println!("{:?}", bpr_segments);
+        print!("BPR segment found, ");
+        let _bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
         println!("BPR segment parsed");
-        println!("\n");
     }
 
     if contents.contains("TRN") {
-        println!("TRN segment found");
-        let trn_segments = get_trn(get_segment_contents("TRN", &contents));
-        println!("{:?}", trn_segments);
+        print!("TRN segment found, ");
+        let _trn_segments = get_trn(get_segment_contents("TRN", &contents));
         println!("TRN segment parsed");
-        println!("\n");
+    }
+    
+    if contents.contains("CUR") {
+        print!("CUR segment found, ");
+        let _cur_segments = get_cur(get_segment_contents("CUR", &contents));
+        println!("CUR segment parsed");
     }
 
     if contents.contains("REF") {
-        println!("REF segment found");
-        let ref_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("{:?}", ref_segments);
+        print!("REF segment found, ");
+        let _ref_segments = get_ref(get_segment_contents("REF", &contents));
         println!("REF segment parsed");
-        println!("\n");
     }
 
+    if contents.contains("DTM") {
+        let dtm_count= contents.matches("DTM").count();
+        print!("Number of DTM segments: {}, ", dtm_count);
+
+        let mut next_segment =  &contents[contents.find("DTM").unwrap()..];
+        let mut _dtm_vec = Vec::new();
+
+        for _ in 0..dtm_count {
+            let dtm_start = next_segment;
+            let dtm_end = dtm_start.find("~").unwrap();
+            let dtm_content = &dtm_start[4..dtm_end];
+            let dtm_segments = get_dtm(dtm_content);
+            _dtm_vec.push(dtm_segments);
+            next_segment = &dtm_start[dtm_end+1..]
+        }
+        println!("DTM segment parsed");
+    }
+
+    // Loop 1000A Payer Identification (N1, N3, N4, REF, PER, PER, PER)
+
     if contents.contains("N1") {
-        println!("N1 segment found");
-        let n1_segments = get_n1(get_segment_contents("N1", &contents));
-        println!("{:?}", n1_segments);
+        print!("N1 segment found, ");
+        let _n1_segments = get_n1(get_segment_contents("N1", &contents));
         println!("N1 segment parsed");
-        println!("\n");
     } 
 
     if contents.contains("N3") {
-        println!("N3 segment found");
-        let n3_segments = get_n3(get_segment_contents("N3", &contents));
-        println!("{:?}", n3_segments);
-        println!("N3 segment parsed");
-        println!("\n");
+        print!("N3 segment found, ");
+        let _n3_segments = get_n3(get_segment_contents("N3", &contents));
+        println!("N3 segment parsedm");
     }
 
     if contents.contains("N4") {
-        println!("N4 segment found");
-        let n4_segments = get_n4(get_segment_contents("N4", &contents));
-        println!("{:?}", n4_segments);
+        print!("N4 segment found, ");
+        let _n4_segments = get_n4(get_segment_contents("N4", &contents));
         println!("N4 segment parsed");
-        println!("\n");
     }
 
     if contents.contains("PER") {
-        println!("PER segment found");
-        let per_segments = get_per(get_segment_contents("PER", &contents));
-        println!("{:?}", per_segments);
+        print!("PER segment found, ");
+        let _per_segments = get_per(get_segment_contents("PER", &contents));
         println!("PER segment parsed");
-        println!("\n");
-    
     }
 
+    // Loop 1000B Payee Identification (N1, N3, N4, REF, RDM)
+
+    if contents.contains("RDM") {
+        print!("RDM segment found, ");
+        let _rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
+        println!("RDM segment parsed");
+    }
+
+    // Table 2
+    // Loop 2000 Header Number (LX, TS3, TS2)
+
     if contents.contains("LX") {
-        println!("LX segment found");
-        let lx_segments = get_lx(get_segment_contents("LX", &contents));
-        println!("{:?}", lx_segments);
+        print!("LX segment found, ");
+        let _lx_segments = get_lx(get_segment_contents("LX", &contents));
         println!("LX segment parsed");
+    }
+
+    // Loop 2100 Claim Payment Information (CLP, CAS, 7x(NM1), MIA, MOA, REF, REF, 3x(DTM), PER, AMY, QTY)
+
+    if contents.contains("CLP") {
+        println!("CLP segment found");
+        let clp_segments = get_clp(get_segment_contents("CLP", &contents));
+        println!("{:?}", clp_segments);
+        println!("CLP segment parsed");
         println!("\n");
     }
 
@@ -134,26 +163,18 @@ fn main() {
         println!("\n");
     }
 
-
-    if contents.contains("DTM") {
-        let dtm_count= contents.matches("DTM").count();
-        println!("Number of DTM segments: {}", dtm_count);
-
-        let mut next_segment =  &contents[contents.find("DTM").unwrap()..];
-        let mut dtm_vec = Vec::new();
-
-        for _ in 0..dtm_count {
-            let dtm_start = next_segment;
-            let dtm_end = dtm_start.find("~").unwrap();
-            let dtm_content = &dtm_start[4..dtm_end];
-            let dtm_segments = get_dtm(dtm_content);
-            dtm_vec.push(dtm_segments);
-            next_segment = &dtm_start[dtm_end+1..]
-        }
-        println!("{:?}", dtm_vec);
-        println!("DTM segment parsed");
+    if contents.contains("AMT") {
+        println!("AMT segment found");
+        let amt_segments = get_amt(get_segment_contents("AMT", &contents));
+        println!("{:?}", amt_segments);
+        println!("AMT segment parsed");
         println!("\n");
     }
+
+    // Loop 2110 Service Payment Information (SVC, DTM, CAS, 4x(REF), AMY, QTY, LQ)
+
+    // Table 3
+
 
     if contents.contains("SE") {
         println!("SE segment found");
@@ -163,14 +184,7 @@ fn main() {
         println!("\n");
     }
 
-    if contents.contains("AMT") {
-        println!("AMT segment found");
-        let amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        println!("{:?}", amt_segments);
-        println!("AMT segment parsed");
-        println!("\n");
-    }
-
+    // Control Segments
 
     if contents.contains("GE") {
         println!("GE segment found");
@@ -188,16 +202,5 @@ fn main() {
         println!("IEA segment parsed");
         println!("\n");
     }
-
-
-    // figure out CLP in loop 2100 actual content, hitting conflicting information from documentations and the examples provided by x12.org
-    // if contents.contains("CLP") {
-    //     println!("CLP segment found");
-    //     let clp_segments = get_clp(get_segment_contents("CLP", &contents));
-    //     println!("{:?}", clp_segments);
-    //     println!("CLP segment parsed");
-    //     println!("\n");
-    // }
-
 
 }
