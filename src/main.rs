@@ -38,7 +38,22 @@ fn main() {
     }
 
     // Table 1
-    // Start of header loop (ST, BPR, TRN, CUR, REF, REF, DTM)
+    // Notes format: Code(x) Code is the segment name and x is the number if repeats
+    // R: required
+    // S: optional (situational)
+    // Number at end is number of repeats
+
+    // Start of header loop (1)
+    // ST Transaction Set Header R 1
+    // BPR Financial Information R 1
+    // TRN Reassociation Trace Number R 1
+    // CUR Foreign Currency Information S 1
+    // REF Receiver Identification S 1
+    // REF Version Identification S 1
+    // DTM Production Date S 1
+    
+    // Required: ST(1), BPR(1), TRN(1)
+    // Optional: CUR(1), REF(1), REF(1), DTM(1)
     
     if contents.contains("ST") {
         print!("ST segment found, ");
@@ -88,7 +103,21 @@ fn main() {
         println!("DTM segment parsed");
     }
 
-    // Loop 1000A Payer Identification (N1, N3, N4, REF, PER, PER, PER)
+    // Loop 1000A Payer Identification (1)
+
+    // N1 Payer Identification R 1
+    // N3 Payer Address R 1
+    // N4 Payer City, State, ZIP Code R 1
+    // REF Additional Payer Identification S 4
+    // PER Payer Business Contact Information S 1
+    // PER Payer Technical Contact Information R >1
+    // PER Payer WEB Site S 1
+
+    // Required: N1(1), N3(1), N4(1), PER(>1)
+    // Optional: REF(4), PER(1)
+    // PER Payer Business Contact Information: optional
+    // PER Payer Technical Contact Information: required
+    // PER Payer WEB Site: optional
 
     if contents.contains("N1") {
         print!("N1 segment found, ");
@@ -114,7 +143,15 @@ fn main() {
         println!("PER segment parsed");
     }
 
-    // Loop 1000B Payee Identification (N1, N3, N4, REF, RDM)
+    // Loop 1000B Payee Identification (1)
+    // N1 Payee Identification R 1
+    // N3 Payee Address S 1
+    // N4 Payee City, State, ZIP Code R 1
+    // REF Payee Additional Identification S >1
+    // RDM Remittance Delivery Method S 1
+
+    // Required: N1(1), N4(1)
+    // Optional: N3(1), REF(>1), RDM(1)
 
     if contents.contains("RDM") {
         print!("RDM segment found, ");
@@ -122,8 +159,12 @@ fn main() {
         println!("RDM segment parsed");
     }
 
-    // Table 2
-    // Loop 2000 Header Number (LX, TS3, TS2)
+    // Table 2 
+    // Loop 2000 Header Number (>1)
+    // LX Header Number S 1
+    // TS3 Provider Summary Information S 1
+    // TS2 Provider Supplemental Summary Information S 1
+    // Optional LX(1), TS3(1), TS2(1)
 
     if contents.contains("LX") {
         print!("LX segment found, ");
@@ -131,7 +172,31 @@ fn main() {
         println!("LX segment parsed");
     }
 
-    // Loop 2100 Claim Payment Information (CLP, CAS, 7x(NM1), MIA, MOA, REF, REF, 3x(DTM), PER, AMY, QTY)
+    // Loop 2100 Claim Payment Information (>1)
+    // R: required
+    // S: optional (situational)
+    // Number at end is number of repeats
+
+    // CLP Claim Payment Information R 1
+    // CAS Claim Adjustment S 99
+    // NM1 Patient Name R 1
+    // NM1 Insured Name S 1
+    // NM1 Corrected Patient/Insured Name S 1
+    // NM1 Service Provider Name S 1
+    // NM1 Crossover Carrier Name S 1
+    // NM1 Corrected Priority Payer Name S 1
+    // NM1 Other Subscriber Name S 1
+    // MIA Inpatient Adjudication Information S 1
+    // MOA Outpatient Adjudication Information S 1
+    // REF Other Claim Related Identification S 5
+    // REF Rendering Provider Identification S 10
+    // DTM Statement From or To Date S 2
+    // DTM Coverage Expiration Date S 1
+    // DTM Claim Received Date S 1
+    // PER Claim Contact Information S 2
+    // AMT Claim Supplemental Information S 13
+    // QTY Claim Supplemental Information Quantity S 14
+
 
     if contents.contains("CLP") {
         println!("CLP segment found");
@@ -171,10 +236,23 @@ fn main() {
         println!("\n");
     }
 
-    // Loop 2110 Service Payment Information (SVC, DTM, CAS, 4x(REF), AMY, QTY, LQ)
+    // Loop 2110 Service Payment Information (999)
+
+    // SVC Service Payment Information S 1
+    // DTM Service Date S 2
+    // CAS Service Adjustment S 99
+    // REF Service Identification S 8
+    // REF Line Item Control Number S 1
+    // REF Rendering Provider Information S 10
+    // REF HealthCare Policy Identification S 5
+    // AMT Service Supplemental Amount S 9
+    // QTY Service Supplemental Quantity S 6
+    // LQ Health Care Remark Codes S 99
+
 
     // Table 3
-
+    // PLB Provider Adjustment S >1
+    // SE Transaction Set Trailer R 1
 
     if contents.contains("SE") {
         println!("SE segment found");
