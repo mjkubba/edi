@@ -2,41 +2,45 @@ use std::fs::File;
 use std::io::Read;
 
 mod edi835;
-use edi835::{amt::*,bpr::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,trn::*};
+use edi835::{amt::*,bpr::*,cas::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,trn::*};
 
 fn get_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
+    let segment_content = get_full_segment_contents(key,contents);
     let start_skip = key.len() + 1;
-    let index = contents.find(&key).unwrap();
-    let start = &contents[index..];
-    let end = start.find("~").unwrap();
-    let content = &start[start_skip..end];
+    let content = &segment_content[start_skip..];
     content
 }
 
+fn get_full_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
+    let index = contents.find(&key).unwrap();
+    let start = &contents[index..];
+    let end = start.find("~").unwrap();
+    let content = &start[..end];
+    content
+}
 
-fn main() {
-    // Open File and read content
-    let mut file = File::open("./src/edi835-1.edi").unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-
-    // Control Segments
-
-    if contents.contains("ISA") {
-        println!("ISA segment found, ");
-        let isa_segments = get_isa(get_segment_contents("ISA", &contents));
-        println!("{:?}", isa_segments);
+fn get_interchange_control(contents:String){
+        if contents.contains("ISA") {
+        print!("ISA segment found, ");
+        let _isa_segments = get_isa(get_segment_contents("ISA", &contents));
         println!("ISA segment parsed");
-        println!("\n");
+        
     }
-    
-    if contents.contains("GS") {
+        if contents.contains("GS") {
         print!("GS segment found, ");
-        let gs_segments = get_gs(get_segment_contents("GS", &contents));
-        println!("{:?}", gs_segments);
+        let _gs_segments = get_gs(get_segment_contents("GS", &contents));
         println!("GS segment parsed");
     }
+    let mut remaining;
+    remaining = contents.trim_start_matches(get_full_segment_contents("ISA", &contents)).trim_start_matches("~");
+    remaining = remaining.trim().trim_start_matches(get_full_segment_contents("GS", &contents)).trim_start_matches("~");
+    
+    println!("{:?}", remaining);
+    println!("Interchange Control parsed\n");
 
+}
+
+fn get_first_table(contents:String){
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats
     // R: required
@@ -86,22 +90,48 @@ fn main() {
     }
 
     if contents.contains("DTM") {
-        let dtm_count= contents.matches("DTM").count();
-        print!("Number of DTM segments: {}, ", dtm_count);
-
-        let mut next_segment =  &contents[contents.find("DTM").unwrap()..];
-        let mut _dtm_vec = Vec::new();
-
-        for _ in 0..dtm_count {
-            let dtm_start = next_segment;
-            let dtm_end = dtm_start.find("~").unwrap();
-            let dtm_content = &dtm_start[4..dtm_end];
-            let dtm_segments = get_dtm(dtm_content);
-            _dtm_vec.push(dtm_segments);
-            next_segment = &dtm_start[dtm_end+1..]
-        }
+        print!("DTM segment found, ");
+        let _dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
         println!("DTM segment parsed");
     }
+
+    // if contents.contains("DTM") {
+    //     let dtm_count= contents.matches("DTM").count();
+    //     print!("Number of DTM segments: {}, ", dtm_count);
+
+    //     let mut next_segment =  &contents[contents.find("DTM").unwrap()..];
+    //     let mut _dtm_vec = Vec::new();
+
+    //     for _ in 0..dtm_count {
+    //         let dtm_start = next_segment;
+    //         let dtm_end = dtm_start.find("~").unwrap();
+    //         let dtm_content = &dtm_start[4..dtm_end];
+    //         let dtm_segments = get_dtm(dtm_content);
+    //         _dtm_vec.push(dtm_segments);
+    //         next_segment = &dtm_start[dtm_end+1..]
+    //     }
+    //     println!("DTM segment parsed");
+    // }
+
+    println!("Table 1 parsed\n");
+}
+
+fn main() {
+    // Open File and read content
+    let mut file = File::open("./src/edi835-1.edi").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+
+    // Control Segments
+
+    // 2 ideas if the assumption of order is correct then we can trim the contents as we go
+    // the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
+
+    get_interchange_control(contents.clone());
+    get_first_table(contents.clone());
+
+
+    
 
     // Loop 1000A Payer Identification (1)
 
@@ -199,11 +229,18 @@ fn main() {
 
 
     if contents.contains("CLP") {
-        println!("CLP segment found");
+        print!("CLP segment found");
         let clp_segments = get_clp(get_segment_contents("CLP", &contents));
         println!("{:?}", clp_segments);
         println!("CLP segment parsed");
-        println!("\n");
+    }
+
+    
+    if contents.contains("CAS") {
+        print!("CAS segment found");
+        let cas_segments = get_cas(get_segment_contents("CAS", &contents));
+        println!("{:?}", cas_segments);
+        println!("CAS segment parsed");
     }
 
     if contents.contains("NM1") {
