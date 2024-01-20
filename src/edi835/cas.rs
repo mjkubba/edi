@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct CAS{ 
     cas01_claim_adjustsment_group_code: String,

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct NM1{
     entity_id: String,

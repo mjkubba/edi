@@ -21,32 +21,34 @@ fn get_full_segment_contents(key:&str, contents: &str) -> String {
     content.to_string()
 }
 
+fn content_trim(key: &str, contents:String) -> String {
+    contents.trim_start_matches(&get_full_segment_contents(&key, &contents)).trim_start_matches("~").to_string()
+}
 
 
 fn get_interchange_control(mut contents:String) -> (ISA, GS, String) {
     let mut isa_segments = ISA::default();
-    
     let mut gs_segments = GS::default();
-        if contents.contains("ISA") {
+    if contents.contains("ISA") {
         print!("ISA segment found, ");
         isa_segments = get_isa(get_segment_contents("ISA", &contents));
         println!("ISA segment parsed");
 
-        contents = contents.trim_start_matches(&get_full_segment_contents("ISA", &contents)).trim_start_matches("~").to_string();
+        contents = content_trim("ISA", contents);
     }
         if contents.contains("GS") {
         print!("GS segment found, ");
         gs_segments = get_gs(get_segment_contents("GS", &contents));
         println!("GS segment parsed");
  
-        contents = contents.trim().trim_start_matches(&get_full_segment_contents("GS", &contents)).trim_start_matches("~").to_string();
+        contents = content_trim("GS",contents);
     }
     
     println!("Interchange Control parsed\n");
     return (isa_segments, gs_segments, contents)
 }
 
-fn get_first_table(contents:String){
+fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, DTM, String) {
 
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats
@@ -65,41 +67,53 @@ fn get_first_table(contents:String){
     
     // Required: ST(1), BPR(1), TRN(1)
     // Optional: CUR(1), REF(1), REF(1), DTM(1)
-    
+    let mut st_segments = ST::default();
+    let mut bpr_segments = BPR::default();
+    let mut trn_segments = TRN::default();
+    let mut cur_segments = CUR::default();
+    let mut ref_segments = REF::default();
+    let mut dtm_segments = DTM::default();
+
     if contents.contains("ST") {
         print!("ST segment found, ");
-        let _st_segments = get_st(get_segment_contents("ST", &contents));
+        st_segments = get_st(get_segment_contents("ST", &contents));
         println!("ST segment parsed");
+        contents = content_trim("ST",contents);
     }
 
     if contents.contains("BPR") {
         print!("BPR segment found, ");
-        let _bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
+        bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
         println!("BPR segment parsed");
+        contents = content_trim("BPR",contents);
     }
 
     if contents.contains("TRN") {
         print!("TRN segment found, ");
-        let _trn_segments = get_trn(get_segment_contents("TRN", &contents));
+        trn_segments = get_trn(get_segment_contents("TRN", &contents));
         println!("TRN segment parsed");
+        contents = content_trim("TRN",contents);
     }
     
     if contents.contains("CUR") {
         print!("CUR segment found, ");
-        let _cur_segments = get_cur(get_segment_contents("CUR", &contents));
+        cur_segments = get_cur(get_segment_contents("CUR", &contents));
         println!("CUR segment parsed");
+        contents = content_trim("CUR",contents);
     }
 
     if contents.contains("REF") {
         print!("REF segment found, ");
-        let _ref_segments = get_ref(get_segment_contents("REF", &contents));
+        ref_segments = get_ref(get_segment_contents("REF", &contents));
         println!("REF segment parsed");
+        contents = content_trim("REF",contents);
     }
 
     if contents.contains("DTM") {
         print!("DTM segment found, ");
-        let _dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
+        dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
         println!("DTM segment parsed");
+        contents = content_trim("DTM",contents);
     }
 
     // if contents.contains("DTM") {
@@ -119,30 +133,14 @@ fn get_first_table(contents:String){
     //     }
     //     println!("DTM segment parsed");
     // }
-
+    
     println!("Table 1 parsed\n");
+    return (st_segments, bpr_segments, trn_segments, cur_segments, ref_segments, dtm_segments, contents)
 }
 
-fn main() {
-    // Open File and read content
-    let mut file = File::open("./src/edi835-1.edi").unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-
-    // Control Segments
-
-    // 2 ideas if the assumption of order is correct then we can trim the contents as we go
-    // the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
-
-    let (_isa, _gs, contents) = get_interchange_control(contents.clone());
-
-    println!("{:?}", _isa);
+fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, PER, String) {
     
-    get_first_table(contents.clone());
-   
-
     // Loop 1000A Payer Identification (1)
-
     // N1 Payer Identification R 1
     // N3 Payer Address R 1
     // N4 Payer City, State, ZIP Code R 1
@@ -157,30 +155,42 @@ fn main() {
     // PER Payer Technical Contact Information: required
     // PER Payer WEB Site: optional
 
+    let mut n1_segments = N1::default();
+    let mut n3_segments = N3::default();
+    let mut n4_segments = N4::default();
+    let mut per_segments = PER::default();
+
     if contents.contains("N1") {
         print!("N1 segment found, ");
-        let _n1_segments = get_n1(get_segment_contents("N1", &contents));
+        n1_segments = get_n1(get_segment_contents("N1", &contents));
         println!("N1 segment parsed");
+        contents = content_trim("N1",contents);
     } 
 
     if contents.contains("N3") {
         print!("N3 segment found, ");
-        let _n3_segments = get_n3(get_segment_contents("N3", &contents));
+        n3_segments = get_n3(get_segment_contents("N3", &contents));
         println!("N3 segment parsedm");
+        contents = content_trim("N3",contents);
     }
 
     if contents.contains("N4") {
         print!("N4 segment found, ");
-        let _n4_segments = get_n4(get_segment_contents("N4", &contents));
-        println!("N4 segment parsed");
+        n4_segments = get_n4(get_segment_contents("N4", &contents));
+        println!("N4 segment parsed"); 
+        contents = content_trim("N4",contents);
     }
 
     if contents.contains("PER") {
         print!("PER segment found, ");
-        let _per_segments = get_per(get_segment_contents("PER", &contents));
+        per_segments = get_per(get_segment_contents("PER", &contents));
         println!("PER segment parsed");
+        contents = content_trim("PER",contents);
     }
+    return (n1_segments, n3_segments, n4_segments, per_segments, contents)
+}
 
+fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     // Loop 1000B Payee Identification (1)
     // N1 Payee Identification R 1
     // N3 Payee Address S 1
@@ -191,24 +201,84 @@ fn main() {
     // Required: N1(1), N4(1)
     // Optional: N3(1), REF(>1), RDM(1)
 
+    let mut n1_segments = N1::default();
+    let mut n3_segments = N3::default();
+    let mut n4_segments = N4::default();
+    let mut ref_segments = REF::default();
+    let mut rdm_segments = RDM::default();
+
+    if contents.contains("N1") {
+        print!("N1 segment found, ");
+        n1_segments = get_n1(get_segment_contents("N1", &contents));
+        println!("N1 segment parsed");
+        contents = content_trim("N1",contents);
+    }
+    if contents.contains("N3") {
+        print!("N3 segment found, ");
+        n3_segments = get_n3(get_segment_contents("N3", &contents));
+        println!("N3 segment parsed");
+        contents = content_trim("N3",contents);
+    }
+    if contents.contains("N4") {
+        print!("N4 segment found, ");
+        n4_segments = get_n4(get_segment_contents("N4", &contents));
+        println!("N4 segment parsed");
+        contents = content_trim("N4",contents);
+    }
+    if contents.contains("REF") {
+        print!("REF segment found, ");
+        ref_segments = get_ref(get_segment_contents("REF", &contents));
+        println!("REF segment parsed");
+        contents = content_trim("REF",contents);
+    }
     if contents.contains("RDM") {
         print!("RDM segment found, ");
         let _rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
         println!("RDM segment parsed");
+        contents = content_trim("RDM",contents);
     }
+    return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
+}
 
-    // Table 2 
-    // Loop 2000 Header Number (>1)
-    // LX Header Number S 1
-    // TS3 Provider Summary Information S 1
-    // TS2 Provider Supplemental Summary Information S 1
-    // Optional LX(1), TS3(1), TS2(1)
+// fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
+//     // Table 2 
+//     // Loop 2000 Header Number (>1)
+//     // LX Header Number S 1
+//     // TS3 Provider Summary Information S 1
+//     // TS2 Provider Supplemental Summary Information S 1
+//     // Optional LX(1), TS3(1), TS2(1)
 
-    if contents.contains("LX") {
-        print!("LX segment found, ");
-        let _lx_segments = get_lx(get_segment_contents("LX", &contents));
-        println!("LX segment parsed");
-    }
+//     if contents.contains("LX") {
+//         print!("LX segment found, ");
+//         let _lx_segments = get_lx(get_segment_contents("LX", &contents));
+//         println!("LX segment parsed");
+//     }
+
+// }
+
+// make main smol again!
+fn main() {
+    // Open File and read content
+    let mut file = File::open("./src/edi835-1.edi").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+
+    // 2 ideas if the assumption of order is correct then we can trim the contents as we go
+    // the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
+
+    // Control Segments
+    let (_isa, _gs, contents) = get_interchange_control(contents.clone());
+
+    // Table 1
+    let (_st, _bpr, _trn, _cur, _ref, _dtm, contents) = get_first_table_header(contents.clone());
+
+    // Loop 1000A Payer Identification
+    let (_n1, _n3, _n4, _per, contents) = get_loop_1000_a(contents.clone());
+
+    // Loop 1000B Payee Identification
+    let (_n1, _n3, _n4, _ref, _rdm, contents) = get_loop_1000_b(contents.clone());
+
+
 
     // Loop 2100 Claim Payment Information (>1)
     // R: required

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct RDM {
     rdm01_report_transmission_code: String,

@@ -1,5 +1,5 @@
 // EDI 835 CUR segment
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 
 pub struct CUR {

@@ -1,5 +1,5 @@
 // EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct AMT {
     amount_qualifier_code: String,

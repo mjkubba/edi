@@ -1,5 +1,5 @@
 // EDI 835 BPR segment
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct BPR {
     transaction_handling_code: String,
