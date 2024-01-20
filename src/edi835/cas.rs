@@ -22,7 +22,7 @@ pub struct CAS{
     cas19_adjustment_qty: String,
 }
 
-pub fn get_cas(cas_content: &str) -> CAS {
+pub fn get_cas(cas_content: String) -> CAS {
     let cas_parts: Vec<&str> = cas_content.split("*").collect();
     let mut cas04_adjustsment_qty: String ="".to_string();
     let mut cas05_adjustment_reason_code: String ="".to_string();

@@ -11,7 +11,7 @@ pub struct PER {
     per08_contact_number: String,
 }
 
-pub fn get_per(per_content: &str) -> PER {
+pub fn get_per(per_content: String) -> PER {
     let per_parts: Vec<&str> = per_content.split("*").collect();
     let mut contact_name: String ="".to_string();
     let mut per03_contact_number_qualifier: String ="".to_string();

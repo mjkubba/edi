@@ -7,7 +7,7 @@ pub struct TRN {
     trn04_reference_id: String,
 }
 
-pub fn get_trn(trn_content: &str) -> TRN {
+pub fn get_trn(trn_content: String) -> TRN {
     let trn_parts: Vec<&str> = trn_content.split("*").collect();
     let mut trn04_reference_id: String ="".to_string();
     if trn_parts.get(3).is_some()  {

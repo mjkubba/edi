@@ -5,7 +5,7 @@ pub struct ST {
     transaction_set_control_number: String,
 }
 
-pub fn get_st(st_content: &str) -> ST {
+pub fn get_st(st_content: String) -> ST {
     let st_parts: Vec<&str> = st_content.split("*").collect();
     ST {
         transaction_set_id: st_parts[0].to_string(),

@@ -5,7 +5,7 @@ pub struct IEA {
     interchange_control_number: String,
 }
 
-pub fn get_iea(iea_content: &str) -> IEA {
+pub fn get_iea(iea_content: String) -> IEA {
     let iea_parts: Vec<&str> = iea_content.split("*").collect();
     IEA {
         number_of_included_group: iea_parts[0].to_string(),

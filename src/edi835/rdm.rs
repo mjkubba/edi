@@ -10,7 +10,7 @@ pub struct RDM {
 // 2 is needed when rdm01 is BM
 // 3 is needed when rdm01 is EM,FT or OL
 
-pub fn get_rdm(rdm_content: &str) -> RDM {
+pub fn get_rdm(rdm_content: String) -> RDM {
     let rdm_parts: Vec<&str> = rdm_content.split("*").collect();
     let mut rdm02_name: String ="".to_string();
     let mut rdm03_communication_number: String ="".to_string();

@@ -4,43 +4,50 @@ use std::io::Read;
 mod edi835;
 use edi835::{amt::*,bpr::*,cas::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,trn::*};
 
-fn get_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
+
+fn get_segment_contents(key:&str, contents:  &str) -> String {
     let segment_content = get_full_segment_contents(key,contents);
     let start_skip = key.len() + 1;
     let content = &segment_content[start_skip..];
-    content
+    content.to_string()
 }
 
-fn get_full_segment_contents<'a>(key:&str, contents: &'a str) -> &'a str {
-    let index = contents.find(&key).unwrap();
+fn get_full_segment_contents(key:&str, contents: &str) -> String {
+    let nkey = key.to_string() + "*";
+    let index = contents.find(&nkey).unwrap();
     let start = &contents[index..];
     let end = start.find("~").unwrap();
     let content = &start[..end];
-    content
+    content.to_string()
 }
 
-fn get_interchange_control(contents:String){
+
+
+fn get_interchange_control(mut contents:String) -> (ISA, GS, String) {
+    let mut isa_segments = ISA::default();
+    
+    let mut gs_segments = GS::default();
         if contents.contains("ISA") {
         print!("ISA segment found, ");
-        let _isa_segments = get_isa(get_segment_contents("ISA", &contents));
+        isa_segments = get_isa(get_segment_contents("ISA", &contents));
         println!("ISA segment parsed");
-        
+
+        contents = contents.trim_start_matches(&get_full_segment_contents("ISA", &contents)).trim_start_matches("~").to_string();
     }
         if contents.contains("GS") {
         print!("GS segment found, ");
-        let _gs_segments = get_gs(get_segment_contents("GS", &contents));
+        gs_segments = get_gs(get_segment_contents("GS", &contents));
         println!("GS segment parsed");
+ 
+        contents = contents.trim().trim_start_matches(&get_full_segment_contents("GS", &contents)).trim_start_matches("~").to_string();
     }
-    let mut remaining;
-    remaining = contents.trim_start_matches(get_full_segment_contents("ISA", &contents)).trim_start_matches("~");
-    remaining = remaining.trim().trim_start_matches(get_full_segment_contents("GS", &contents)).trim_start_matches("~");
     
-    println!("{:?}", remaining);
     println!("Interchange Control parsed\n");
-
+    return (isa_segments, gs_segments, contents)
 }
 
 fn get_first_table(contents:String){
+
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats
     // R: required
@@ -127,11 +134,12 @@ fn main() {
     // 2 ideas if the assumption of order is correct then we can trim the contents as we go
     // the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
 
-    get_interchange_control(contents.clone());
-    get_first_table(contents.clone());
+    let (_isa, _gs, contents) = get_interchange_control(contents.clone());
 
-
+    println!("{:?}", _isa);
     
+    get_first_table(contents.clone());
+   
 
     // Loop 1000A Payer Identification (1)
 
@@ -243,27 +251,35 @@ fn main() {
         println!("CAS segment parsed");
     }
 
+
     if contents.contains("NM1") {
-        // find how many nm1 segments are in the file
-        let nm1_count= contents.matches("NM1").count();
-        println!("Number of NM1 segments: {}", nm1_count);
-
-        let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
-        let mut nm1_vec = Vec::new();
-
-        for _ in 0..nm1_count {
-            let nm1_start = next_segment;
-            let nm1_end = nm1_start.find("~").unwrap();
-            let nm1_content = &nm1_start[4..nm1_end];
-            let nm1_segments = get_nm1(nm1_content);
-            nm1_vec.push(nm1_segments);
-
-            next_segment = &nm1_start[nm1_end+1..]
-        }
-        println!("{:?}", nm1_vec);
+        print!("NM1 segment found");
+        let nm1_segments = get_nm1(get_segment_contents("NM1", &contents));
+        println!("{:?}", nm1_segments);
         println!("NM1 segment parsed");
-        println!("\n");
     }
+
+    // if contents.contains("NM1") {
+    //     // find how many nm1 segments are in the file
+    //     let nm1_count= contents.matches("NM1").count();
+    //     println!("Number of NM1 segments: {}", nm1_count);
+
+    //     let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
+    //     let mut nm1_vec = Vec::new();
+
+    //     for _ in 0..nm1_count {
+    //         let nm1_start = next_segment;
+    //         let nm1_end = nm1_start.find("~").unwrap();
+    //         let nm1_content = &nm1_start[4..nm1_end];
+    //         let nm1_segments = get_nm1(nm1_content);
+    //         nm1_vec.push(nm1_segments);
+
+    //         next_segment = &nm1_start[nm1_end+1..]
+    //     }
+    //     println!("{:?}", nm1_vec);
+    //     println!("NM1 segment parsed");
+    //     println!("\n");
+    // }
 
     if contents.contains("AMT") {
         println!("AMT segment found");
@@ -303,6 +319,7 @@ fn main() {
 
     if contents.contains("GE") {
         println!("GE segment found");
+        println!("{:?}", get_segment_contents("GE", &contents));
         let ge_segments = get_ge(get_segment_contents("GE", &contents));
         println!("{:?}", ge_segments);
         println!("GE segment parsed");

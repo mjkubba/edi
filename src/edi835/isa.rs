@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ISA {
     information_qualifier: String,
     authorization_information: String,
@@ -20,7 +20,7 @@ pub struct ISA {
 }
 
 // function to get the ISA struct
-pub fn get_isa(isa_content: &str) -> ISA {
+pub fn get_isa(isa_content: String) -> ISA {
     let isa_parts: Vec<&str> = isa_content.split("*").collect();
     ISA {
         information_qualifier: isa_parts[0].to_string(),
@@ -41,3 +41,26 @@ pub fn get_isa(isa_content: &str) -> ISA {
         component_element_separator: isa_parts[15].to_string(),
     }
 }
+
+// impl Default for ISA {
+//     fn default () -> ISA {
+//         ISA{
+//             information_qualifier: String::from(""),
+//             authorization_information: String::from(""),
+//             security_information_qualifier: String::from(""),
+//             security_information: String::from(""),
+//             sender_id_qualifier: String::from(""),
+//             sender_id: String::from(""),
+//             receiver_id_qualifier: String::from(""),
+//             receiver_id: String::from(""),
+//             date: String::from(""),
+//             time: String::from(""),
+//             control_number_identifier: String::from(""),
+//             control_version_number: String::from(""),
+//             control_number: String::from(""),
+//             ack_indicator: String::from(""),
+//             usage_indicator: String::from(""),
+//             component_element_separator: String::from(""),
+//         }
+//     }
+// }

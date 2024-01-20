@@ -6,7 +6,7 @@ pub struct REF{
 
 }
 
-pub fn get_ref(ref_content: &str) -> REF {
+pub fn get_ref(ref_content: String) -> REF {
     let ref_parts: Vec<&str> = ref_content.split("*").collect();
     REF {
         reference_id_number_qualifier: ref_parts[0].to_string(),

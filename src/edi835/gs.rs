@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct GS {
     functional_id_code: String,
@@ -11,7 +11,7 @@ pub struct GS {
     version_number: String,
 }
 
-pub fn get_gs(gs_content: &str) -> GS {
+pub fn get_gs(gs_content: String) -> GS {
     let gs_parts: Vec<&str> = gs_content.split("*").collect();
     GS {
         functional_id_code: gs_parts[0].to_string(),

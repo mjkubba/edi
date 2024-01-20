@@ -8,7 +8,7 @@ pub struct N4{
     payee_country_sub_code: String,
 }
 
-pub fn get_n4(n4_content: &str) -> N4 {
+pub fn get_n4(n4_content: String) -> N4 {
     let n4_parts: Vec<&str> = n4_content.split("*").collect();
     let mut payee_state: String ="".to_string();
     let mut payee_zip: String ="".to_string();

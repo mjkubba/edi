@@ -6,7 +6,7 @@ pub struct SE{
     pub transaction_set_control_number: String,
 }
 
-pub fn get_se(se_content: &str) -> SE {
+pub fn get_se(se_content: String) -> SE {
     let se_parts: Vec<&str> = se_content.split("*").collect();
     SE {
         number_of_segment: se_parts[0].to_string(),

@@ -5,7 +5,7 @@ pub struct DTM {
     date_time: String,
 }
 
-pub fn get_dtm(dtm_content: &str) -> DTM {
+pub fn get_dtm(dtm_content: String) -> DTM {
     let dtm_parts: Vec<&str> = dtm_content.split("*").collect();
     DTM {
         date_time_qualifier: dtm_parts[0].to_string(),

@@ -5,7 +5,7 @@ pub struct N3{
     payee_address2: String,
 }
 
-pub fn get_n3(n3_content: &str) -> N3 {
+pub fn get_n3(n3_content: String) -> N3 {
     let n3_parts: Vec<&str> = n3_content.split("*").collect();
     if n3_parts.len() == 1 {
         N3 {

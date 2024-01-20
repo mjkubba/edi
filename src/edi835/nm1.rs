@@ -12,7 +12,7 @@ pub struct NM1{
     member_number: String,
 }
 
-pub fn get_nm1(nm1_content: &str) -> NM1 {
+pub fn get_nm1(nm1_content: String) -> NM1 {
     let nm1_parts: Vec<&str> = nm1_content.split("*").collect();
     NM1 {
         entity_id: nm1_parts[0].to_string(),

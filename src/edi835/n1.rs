@@ -7,7 +7,7 @@ pub struct N1{
     payee_identification_code: String,
 }
 
-pub fn get_n1(n1_content: &str) -> N1 {
+pub fn get_n1(n1_content: String) -> N1 {
     let n1_parts: Vec<&str> = n1_content.split("*").collect();
     let mut payee_identification_code_qualifier: String ="".to_string();
     let mut payee_identification_code: String ="".to_string();

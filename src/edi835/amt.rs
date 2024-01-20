@@ -6,7 +6,7 @@ pub struct AMT {
     service_line_allowed_amount: String,
 }
 
-pub fn get_amt(amt_content: &str) -> AMT {
+pub fn get_amt(amt_content: String) -> AMT {
     let amt_parts: Vec<&str> = amt_content.split("*").collect();
     AMT {
         amount_qualifier_code: amt_parts[0].to_string(),

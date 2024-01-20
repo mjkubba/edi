@@ -5,7 +5,7 @@ pub struct GE {
     group_control_number: String,
 }
 
-pub fn get_ge(ge_content: &str) -> GE {
+pub fn get_ge(ge_content: String) -> GE {
     let ge_parts: Vec<&str> = ge_content.split("*").collect();
     GE {
         number_of_transitions: ge_parts[0].to_string(),

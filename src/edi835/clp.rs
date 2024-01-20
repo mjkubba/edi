@@ -22,7 +22,7 @@ pub struct CLP{
 // CLP12 same as CLP11
 // CLP13 is optional, when a discharge fraction was applied
 
-pub fn get_clp(bpr_content: &str) -> CLP {
+pub fn get_clp(bpr_content: String) -> CLP {
     let clp_parts: Vec<&str> = bpr_content.split("*").collect();
     let mut clp05_patient_responsibility_amount: String ="".to_string();
     let mut clp08_facility_type_code: String ="".to_string();
