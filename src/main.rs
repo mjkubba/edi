@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 mod edi835;
-use edi835::{amt::*,bpr::*,cas::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,trn::*};
+use edi835::{amt::*,bpr::*,cas::*,clp::*,cur::*,dtm::*,ge::*,gs::*,iea::*,isa::*,lx::*,n1::*,n3::*,n4::*,nm1::*,per::*,r#ref::*,rdm::*,st::*,se::*,ts2::*,ts3::*,trn::*};
 
 
 fn get_segment_contents(key:&str, contents:  &str) -> String {
@@ -233,26 +233,119 @@ fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     }
     if contents.contains("RDM") {
         print!("RDM segment found, ");
-        let _rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
+        let rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
         println!("RDM segment parsed");
         contents = content_trim("RDM",contents);
     }
     return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
 }
 
-// fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
-//     // Table 2 
-//     // Loop 2000 Header Number (>1)
-//     // LX Header Number S 1
-//     // TS3 Provider Summary Information S 1
-//     // TS2 Provider Supplemental Summary Information S 1
-//     // Optional LX(1), TS3(1), TS2(1)
+fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
+    // Table 2 
+    // Loop 2000 Header Number (>1)
+    // LX Header Number S 1
+    // TS3 Provider Summary Information S 1
+    // TS2 Provider Supplemental Summary Information S 1
+    // Optional LX(1), TS3(1), TS2(1)
 
-//     if contents.contains("LX") {
-//         print!("LX segment found, ");
-//         let _lx_segments = get_lx(get_segment_contents("LX", &contents));
-//         println!("LX segment parsed");
+    let mut lx_segments = LX::default();
+    let mut ts3_segments = TS3::default();
+    let mut ts2_segments = TS2::default();
+
+    if contents.contains("LX") {
+        print!("LX segment found, ");
+        let lx_segments = get_lx(get_segment_contents("LX", &contents));
+        println!("LX segment parsed");
+    }
+    if contents.contains("TS3") {
+        print!("TS3 segment found, ");
+        let ts3_segments = get_ts3(get_segment_contents("TS3", &contents));
+        println!("TS3 segment parsed");
+    }
+    if contents.contains("TS2") {
+        print!("TS2 segment found, ");
+        let ts2_segments = get_ts2(get_segment_contents("TS2", &contents));
+        println!("TS2 segment parsed");
+    }
+    return (lx_segments, ts3_segments, ts2_segments, contents)
+}
+
+// fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1, MIA, MOA, REF, DTM, DTM, PER, AMT, QTY, String) {
+//     // Loop 2100 Claim Payment Information (>1)
+//     // R: required
+//     // S: optional (situational)
+//     // Number at end is number of repeats
+
+//     // CLP Claim Payment Information R 1
+//     // CAS Claim Adjustment S 99
+//     // NM1 Patient Name R 1
+//     // NM1 Insured Name S 1
+//     // NM1 Corrected Patient/Insured Name S 1
+//     // NM1 Service Provider Name S 1
+//     // NM1 Crossover Carrier Name S 1
+//     // NM1 Corrected Priority Payer Name S 1
+//     // NM1 Other Subscriber Name S 1
+//     // MIA Inpatient Adjudication Information S 1
+//     // MOA Outpatient Adjudication Information S 1
+//     // REF Other Claim Related Identification S 5
+//     // REF Rendering Provider Identification S 10
+//     // DTM Statement From or To Date S 2
+//     // DTM Coverage Expiration Date S 1
+//     // DTM Claim Received Date S 1
+//     // PER Claim Contact Information S 2
+//     // AMT Claim Supplemental Information S 13
+//     // QTY Claim Supplemental Information Quantity S 14
+
+//     let mut clp_segments = CLP::default();
+//     let mut cas_segments = CAS::default();
+//     let mut nm1_patint_segments = NM1::default();
+//     let mut nm1_insured_segments = NM1::default();
+//     let mut nm1_corrected_patient_segments = NM1::default();
+//     let mut nm1_service_provider_segments = NM1::default();
+//     let mut nm1_crossover_carrier_segments = NM1::default();
+//     let mut nm1_corrected_priority_payer_segments = NM1::default();
+//     let mut nm1_other_subscriber_segments = NM1::default();
+//     let mut mia_segments = MIA::default();
+//     let mut moa_segments = MOA::default();
+//     let mut ref_other_claim_segments = REF::default();
+//     let mut ref_rendering_provider_segments = REF::default();
+//     let mut dtm__statement_from_segments = DTM::default();
+//     let mut dtm_coverage_expiration_segments = DTM::default();
+//     let mut dtm_claim_received_segments = DTM::default();
+//     let mut per_segments = PER::default();
+//     let mut amt_segments = AMT::default();
+//     let mut qty_segments = QTY::default();
+
+//     if contents.contains("CLP") {
+//         print!("CLP segment found");
+//         let clp_segments = get_clp(get_segment_contents("CLP", &contents));
+//         println!("{:?}", clp_segments);
+//         println!("CLP segment parsed");
 //     }
+
+    
+//     if contents.contains("CAS") {
+//         print!("CAS segment found");
+//         let cas_segments = get_cas(get_segment_contents("CAS", &contents));
+//         println!("{:?}", cas_segments);
+//         println!("CAS segment parsed");
+//     }
+
+
+//     if contents.contains("NM1") {
+//         print!("NM1 segment found");
+//         let nm1_segments = get_nm1(get_segment_contents("NM1", &contents));
+//         println!("{:?}", nm1_segments);
+//         println!("NM1 segment parsed");
+//     }
+//     if contents.contains("AMT") {
+//         println!("AMT segment found");
+//         let amt_segments = get_amt(get_segment_contents("AMT", &contents));
+//         println!("{:?}", amt_segments);
+//         println!("AMT segment parsed");
+//         println!("\n");
+//     }
+
 
 // }
 
@@ -279,85 +372,9 @@ fn main() {
     let (_n1, _n3, _n4, _ref, _rdm, contents) = get_loop_1000_b(contents.clone());
 
 
+    // Loop 2000 Header Number
+    let (_lx, _ts3, _ts2, contents) = get_loop_2000(contents.clone());
 
-    // Loop 2100 Claim Payment Information (>1)
-    // R: required
-    // S: optional (situational)
-    // Number at end is number of repeats
-
-    // CLP Claim Payment Information R 1
-    // CAS Claim Adjustment S 99
-    // NM1 Patient Name R 1
-    // NM1 Insured Name S 1
-    // NM1 Corrected Patient/Insured Name S 1
-    // NM1 Service Provider Name S 1
-    // NM1 Crossover Carrier Name S 1
-    // NM1 Corrected Priority Payer Name S 1
-    // NM1 Other Subscriber Name S 1
-    // MIA Inpatient Adjudication Information S 1
-    // MOA Outpatient Adjudication Information S 1
-    // REF Other Claim Related Identification S 5
-    // REF Rendering Provider Identification S 10
-    // DTM Statement From or To Date S 2
-    // DTM Coverage Expiration Date S 1
-    // DTM Claim Received Date S 1
-    // PER Claim Contact Information S 2
-    // AMT Claim Supplemental Information S 13
-    // QTY Claim Supplemental Information Quantity S 14
-
-
-    if contents.contains("CLP") {
-        print!("CLP segment found");
-        let clp_segments = get_clp(get_segment_contents("CLP", &contents));
-        println!("{:?}", clp_segments);
-        println!("CLP segment parsed");
-    }
-
-    
-    if contents.contains("CAS") {
-        print!("CAS segment found");
-        let cas_segments = get_cas(get_segment_contents("CAS", &contents));
-        println!("{:?}", cas_segments);
-        println!("CAS segment parsed");
-    }
-
-
-    if contents.contains("NM1") {
-        print!("NM1 segment found");
-        let nm1_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("{:?}", nm1_segments);
-        println!("NM1 segment parsed");
-    }
-
-    // if contents.contains("NM1") {
-    //     // find how many nm1 segments are in the file
-    //     let nm1_count= contents.matches("NM1").count();
-    //     println!("Number of NM1 segments: {}", nm1_count);
-
-    //     let mut next_segment =  &contents[contents.find("NM1").unwrap()..];
-    //     let mut nm1_vec = Vec::new();
-
-    //     for _ in 0..nm1_count {
-    //         let nm1_start = next_segment;
-    //         let nm1_end = nm1_start.find("~").unwrap();
-    //         let nm1_content = &nm1_start[4..nm1_end];
-    //         let nm1_segments = get_nm1(nm1_content);
-    //         nm1_vec.push(nm1_segments);
-
-    //         next_segment = &nm1_start[nm1_end+1..]
-    //     }
-    //     println!("{:?}", nm1_vec);
-    //     println!("NM1 segment parsed");
-    //     println!("\n");
-    // }
-
-    if contents.contains("AMT") {
-        println!("AMT segment found");
-        let amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        println!("{:?}", amt_segments);
-        println!("AMT segment parsed");
-        println!("\n");
-    }
 
     // Loop 2110 Service Payment Information (999)
 
@@ -389,7 +406,6 @@ fn main() {
 
     if contents.contains("GE") {
         println!("GE segment found");
-        println!("{:?}", get_segment_contents("GE", &contents));
         let ge_segments = get_ge(get_segment_contents("GE", &contents));
         println!("{:?}", ge_segments);
         println!("GE segment parsed");
