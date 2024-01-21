@@ -17,6 +17,7 @@ pub fn get_svc(svc_content: String) -> SVC {
     let svc_parts: Vec<&str> = svc_content.split("*").collect();
     let mut scv04_product_service_id: String ="".to_string();
     let mut svc05_unit_of_service_paid_count: String ="".to_string();
+    let mut svc06_composite_medical_procedure_id: String ="".to_string();
     let mut svc07_original_units_of_service_count: String ="".to_string();
     
     
@@ -25,6 +26,9 @@ pub fn get_svc(svc_content: String) -> SVC {
     }
     if svc_parts.get(4).is_some()  {
         svc05_unit_of_service_paid_count = svc_parts[4].to_string();
+    }
+    if svc_parts.get(5).is_some()  {
+        svc06_composite_medical_procedure_id = svc_parts[5].to_string();
     }
     if svc_parts.get(6).is_some()  {
         svc07_original_units_of_service_count = svc_parts[6].to_string();
@@ -36,7 +40,7 @@ pub fn get_svc(svc_content: String) -> SVC {
         svc03_line_item_provider_payment_amount: svc_parts[2].to_string(),
         scv04_product_service_id,
         svc05_unit_of_service_paid_count,
-        svc06_composite_medical_procedure_id: svc_parts[5].to_string(),
+        svc06_composite_medical_procedure_id,
         svc07_original_units_of_service_count,
     }
 }

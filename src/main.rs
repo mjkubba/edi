@@ -594,10 +594,9 @@ fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String) {
     return (ge_segments,iea_segments, contents)
 }
 
-// make main smol again!
 fn main() {
     // Open File and read content
-    let mut file = File::open("./src/edi835-1.edi").unwrap();
+    let mut file = File::open("./data/X221-claim-specific-negotiated-discount.edi").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
