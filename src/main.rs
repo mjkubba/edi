@@ -600,8 +600,28 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
-    // 2 ideas if the assumption of order is correct then we can trim the contents as we go
-    // the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
+    /*
+    2 ideas if the assumption of order is correct then we can trim the contents as we go
+    the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
+    yup idea 1 didn't work since there might be some loops I didn't count for so the trim start function is not finding
+    the passed in string at the start
+    */
+
+
+    /*
+    TODO:
+        Figure out the looping of the segments,
+        Will ask EDI SMEs what is the best way to figure this out, my first idea is to count the elements and see how many 
+        of a specific unique segment in specific loop is coming required is perferred but some loops are all sitiuational, eg svc in loop 2110.
+        loop 1000 A and B don't repeat
+        loop 2000 have no required segments but LX is there in all my test files
+        loop 2100 can use CLP
+        loop 2110 have no required segments but can use SVC 
+        if no SVC after MN1 in the previous loop '~' and this new loop have SE then it's table 3
+        if there's something else not SE then we are in either another loop of 2100 (check for CLP) 
+        if all this fails then SVC is not a good indicator
+    */
+
 
     // Control Segments
     let (_isa, _gs, contents) = get_interchange_control(contents.clone());
@@ -636,5 +656,5 @@ fn main() {
     // Control Segments
     let (_ge, _iea, _contents) = get_interchange_control_trailer(contents.clone());
         
-        
+    println!("{:?}", _contents);
 }
