@@ -600,16 +600,15 @@ fn main() {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
-    /*
-    2 ideas if the assumption of order is correct then we can trim the contents as we go
-    the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
-    yup idea 1 didn't work since there might be some loops I didn't count for so the trim start function is not finding
-    the passed in string at the start
-    */
-
 
     /*
     TODO:
+        2 ideas:
+        if the assumption of order is correct then we can trim the contents as we go.
+        the 2nd idea safer and need to "extract" the data from the overall string then merge the parts back to one string
+        yup idea 1 didn't work since there might be some loops I didn't count for so the trim start function is not finding
+        the passed in string at the start.
+
         Figure out the looping of the segments,
         Will ask EDI SMEs what is the best way to figure this out, my first idea is to count the elements and see how many 
         of a specific unique segment in specific loop is coming required is perferred but some loops are all sitiuational, eg svc in loop 2110.
