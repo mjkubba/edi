@@ -1,11 +1,11 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct N4{
-    payee_city: String,
-    payee_state: String,
-    payee_zip: String,
-    payee_country_code: String,
-    payee_country_sub_code: String,
+    pub payee_city: String,
+    pub payee_state: String,
+    pub payee_zip: String,
+    pub payee_country_code: String,
+    pub payee_country_sub_code: String,
 }
 
 pub fn get_n4(n4_content: String) -> N4 {

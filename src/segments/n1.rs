@@ -1,10 +1,10 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct N1{
-    payer_id_code: String,
-    payee_name: String,
-    payee_identification_code_qualifier: String,
-    payee_identification_code: String,
+    pub payer_id_code: String,
+    pub payee_name: String,
+    pub payee_identification_code_qualifier: String,
+    pub payee_identification_code: String,
 }
 
 pub fn get_n1(n1_content: String) -> N1 {

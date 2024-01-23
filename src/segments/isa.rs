@@ -1,22 +1,22 @@
 #[allow(dead_code)]
 #[derive(Debug, Default)]
 pub struct ISA {
-    information_qualifier: String,
-    authorization_information: String,
-    security_information_qualifier: String,
-    security_information: String,
-    sender_id_qualifier: String,
-    sender_id: String,
-    receiver_id_qualifier: String,
-    receiver_id: String,
-    date: String,
-    time: String,
-    control_number_identifier: String,
-    control_version_number: String,
-    control_number: String,
-    ack_indicator: String,
-    usage_indicator: String,
-    component_element_separator: String,
+    pub information_qualifier: String,
+    pub authorization_information: String,
+    pub security_information_qualifier: String,
+    pub security_information: String,
+    pub sender_id_qualifier: String,
+    pub sender_id: String,
+    pub receiver_id_qualifier: String,
+    pub receiver_id: String,
+    pub date: String,
+    pub time: String,
+    pub control_number_identifier: String,
+    pub control_version_number: String,
+    pub control_number: String,
+    pub ack_indicator: String,
+    pub usage_indicator: String,
+    pub component_element_separator: String,
 }
 
 // function to get the ISA struct
@@ -41,26 +41,3 @@ pub fn get_isa(isa_content: String) -> ISA {
         component_element_separator: isa_parts[15].to_string(),
     }
 }
-
-// impl Default for ISA {
-//     fn default () -> ISA {
-//         ISA{
-//             information_qualifier: String::from(""),
-//             authorization_information: String::from(""),
-//             security_information_qualifier: String::from(""),
-//             security_information: String::from(""),
-//             sender_id_qualifier: String::from(""),
-//             sender_id: String::from(""),
-//             receiver_id_qualifier: String::from(""),
-//             receiver_id: String::from(""),
-//             date: String::from(""),
-//             time: String::from(""),
-//             control_number_identifier: String::from(""),
-//             control_version_number: String::from(""),
-//             control_number: String::from(""),
-//             ack_indicator: String::from(""),
-//             usage_indicator: String::from(""),
-//             component_element_separator: String::from(""),
-//         }
-//     }
-// }

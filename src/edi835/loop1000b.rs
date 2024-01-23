@@ -56,3 +56,19 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     println!("Loop 1000B parsed\n");
     return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
 }
+
+
+// unit tests
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_loop1000b() {
+        let contents = String::from("N1*PE*BAN DDS LLC*FI*999994703~");
+        let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents.to_string());
+        assert_eq!(n1_segments.payer_id_code, "PE");
+        assert_eq!(n1_segments.payee_name, "BAN DDS LLC");
+    }
+}

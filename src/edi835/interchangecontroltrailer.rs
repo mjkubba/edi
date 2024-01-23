@@ -31,3 +31,22 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
 
     return (ge_segments,iea_segments, contents)
 }
+
+
+
+// unit tests
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_interchange_control_trailer() {
+        let contents = String::from("GE*1*1~IEA*1*000000905~");
+        let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(contents);
+        assert_eq!(ge_segments.group_control_number, "1");
+        assert_eq!(iea_segments.interchange_control_number, "000000905");
+        assert_eq!(contents, "");
+    }
+
+}

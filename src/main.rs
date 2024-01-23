@@ -35,6 +35,8 @@ fn main() {
         if no SVC after MN1 in the previous loop '~' and this new loop have SE then it's table 3
         if there's something else not SE then we are in either another loop of 2100 (check for CLP) 
         if all this fails then SVC is not a good indicator
+
+        println statement is in helper.rs line 3
     */
 
 
@@ -52,15 +54,21 @@ fn main() {
 
 
     // Loop 2000 Header Number
+    let lx_count= contents.matches("LX").count();
+    println!("Number of loops in loop 2000: {:?}",lx_count);
     let (_lx, _ts3, _ts2, contents) = get_loop_2000(contents.clone());
 
     
     // Loop 2100 Claim Payment Information 
+    let clp_count= contents.matches("CLP").count();
+    println!("Number of loops in loop 2100: {:?}",clp_count);
     let (_clp, _cas, _nm1_patient, _nm1_insured, _nm1_corrected_patient, _nm1_service_provider, _nm1_crossover_carrier, _nm1_corrected_priority_payer,
         _nm1_other_subscriber, _mia, _moa, _ref_other_claim, _ref_rendering_provider, _dtm_statement_from, _dtm_coverage_expiration, _dtm_claim_received,
         _per, _amt, _qty, contents) = get_loop_2100(contents.clone());
         
     // Loop 2110 Service Payment Information
+    let svc_count= contents.matches("SVC").count();
+    println!("Number of loops in loop 2100: {:?}",svc_count);
     let (_svc, _dtm, _cas, _ref_service_identification, _ref_line_item_control_number, _ref_rendering_provider_information, _ref_healthcare_policy_identification, _amt, _qty, _lq, contents) =
     get_loop_2110(contents.clone());
     

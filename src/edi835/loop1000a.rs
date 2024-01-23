@@ -57,3 +57,28 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, PER, String) {
     println!("Loop 1000A parsed\n");
     return (n1_segments, n3_segments, n4_segments, per_segments, contents)
 }
+
+
+
+// unit tests
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_loop1000a() {
+        let contents = String::from("N1*PR*DELTA DENTAL OF ABC~N3*225 MAIN STREET~N4*CENTERVILLE*PA*17111~PER*BL*JANE DOE*TE*9005555555~");
+        let (n1_segments, n3_segments, n4_segments, per_segments, contents) = get_loop_1000_a(contents);
+        assert_eq!(n1_segments.payer_id_code, "PR");
+        assert_eq!(n1_segments.payee_name, "DELTA DENTAL OF ABC");
+        assert_eq!(n3_segments.payee_address, "225 MAIN STREET");
+        assert_eq!(n4_segments.payee_city, "CENTERVILLE");
+        assert_eq!(n4_segments.payee_state, "PA");
+        assert_eq!(n4_segments.payee_zip, "17111");
+        assert_eq!(per_segments.per01_contact_function_code, "BL");
+        assert_eq!(per_segments.per02_contact_name, "JANE DOE");
+    }
+
+
+}

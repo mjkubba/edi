@@ -1,14 +1,14 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct GS {
-    functional_id_code: String,
-    app_sender_id: String,
-    app_receiver_id: String,
-    date: String,
-    time: String,
-    group_control_number: String,
-    responsible_agency: String,
-    version_number: String,
+    pub functional_id_code: String,
+    pub app_sender_id: String,
+    pub app_receiver_id: String,
+    pub date: String,
+    pub time: String,
+    pub group_control_number: String,
+    pub responsible_agency: String,
+    pub version_number: String,
 }
 
 pub fn get_gs(gs_content: String) -> GS {

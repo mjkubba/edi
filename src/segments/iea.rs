@@ -1,8 +1,8 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct IEA {
-    number_of_included_group: String,
-    interchange_control_number: String,
+    pub number_of_included_group: String,
+    pub interchange_control_number: String,
 }
 
 pub fn get_iea(iea_content: String) -> IEA {

@@ -1,8 +1,8 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct N3{
-    payee_address: String,
-    payee_address2: String,
+    pub payee_address: String,
+    pub payee_address2: String,
 }
 
 pub fn get_n3(n3_content: String) -> N3 {

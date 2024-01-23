@@ -1,8 +1,8 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct GE {
-    number_of_transitions: String,
-    group_control_number: String,
+    pub number_of_transitions: String,
+    pub group_control_number: String,
 }
 
 pub fn get_ge(ge_content: String) -> GE {
