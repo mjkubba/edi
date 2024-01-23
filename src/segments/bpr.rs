@@ -1,23 +1,23 @@
 // EDI 835 BPR segment
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct BPR {
-    transaction_handling_code: String,
-    monetary_amount: String,
-    credit_debit_flag: String,
-    payment_method_code: String,
-    payment_format_code: String,
-    id_number_qualifier: String,
-    id_number: String,
-    account_number_qualifier: String,
-    account_number: String,
-    originating_company_identifier: String,
-    originating_company_supplemental_code: String,
-    dfi_identification_number_qualifier: String,
-    dfi_identification_number: String,
-    bpr14_account_number_qualifier: String,
-    bpr15_account_number: String,
-    date: String,
+    pub transaction_handling_code: String,
+    pub monetary_amount: String,
+    pub credit_debit_flag: String,
+    pub payment_method_code: String,
+    pub payment_format_code: String,
+    pub id_number_qualifier: String,
+    pub id_number: String,
+    pub account_number_qualifier: String,
+    pub account_number: String,
+    pub originating_company_identifier: String,
+    pub originating_company_supplemental_code: String,
+    pub dfi_identification_number_qualifier: String,
+    pub dfi_identification_number: String,
+    pub bpr14_account_number_qualifier: String,
+    pub bpr15_account_number: String,
+    pub date: String,
 }
 
 // if BPR04 is ACH then BPR05 is required

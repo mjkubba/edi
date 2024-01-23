@@ -27,3 +27,19 @@ pub fn get_table_3(mut contents: String) -> (PLB, SE, String) {
 
     return (plb_segments, se_segments, contents)
 }
+
+
+// unit tests
+
+#[cfg(test)]
+    mod tests {
+        use super::*;
+        #[test]
+        fn test_table3() {
+            let contents = String::from("~SE*22*35681~GE*1*1~IEA*1*000000905~");
+            let (plb_segments, se_segments, contents) = get_table_3(contents);
+            assert_eq!(contents, "GE*1*1~IEA*1*000000905~");
+            assert_eq!(plb_segments, PLB::default());
+            assert_eq!(se_segments.number_of_segment, "22");
+        }
+    }

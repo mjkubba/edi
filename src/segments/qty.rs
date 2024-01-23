@@ -1,8 +1,8 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct QTY {
-    qty01_quantity_qualifier: String,
-    qty02_claim_supplement_information_quantity: String,
+    pub qty01_quantity_qualifier: String,
+    pub qty02_claim_supplement_information_quantity: String,
 }
 
 pub fn get_qty(qty_content: String) -> QTY {

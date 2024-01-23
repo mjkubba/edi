@@ -1,8 +1,8 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct LQ {
-    lq01_code_list_qualifier: String,
-    lq02_remark_code: String,
+    pub lq01_code_list_qualifier: String,
+    pub lq02_remark_code: String,
 }
 
 pub fn get_lq(lq_content: String) -> LQ {

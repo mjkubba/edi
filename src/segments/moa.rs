@@ -1,16 +1,16 @@
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 #[allow(dead_code)]
 pub struct MOA {
-    moa01_reimbursement_rate: String,
-    moa02_claim_hcpcs_payable_amount: String,
-    moa03_claim_payment_remark_code: String,
-    moa04_claim_payment_remark_code: String,
-    moa05_claim_payment_remark_code: String,
-    moa06_claim_payment_remark_code: String,
-    moa07_claim_payment_remark_code: String,
-    moa08_claim_esrd_payment_amount: String,
-    moa09_nonpayable_professional_component_amount: String,
+    pub moa01_reimbursement_rate: String,
+    pub moa02_claim_hcpcs_payable_amount: String,
+    pub moa03_claim_payment_remark_code: String,
+    pub moa04_claim_payment_remark_code: String,
+    pub moa05_claim_payment_remark_code: String,
+    pub moa06_claim_payment_remark_code: String,
+    pub moa07_claim_payment_remark_code: String,
+    pub moa08_claim_esrd_payment_amount: String,
+    pub moa09_nonpayable_professional_component_amount: String,
 }
 
 

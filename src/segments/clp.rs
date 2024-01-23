@@ -1,19 +1,19 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct CLP{
-    clp01_patient_control_number: String,
-    clp02_claim_status_code: String,
-    clp03_total_claim_charge_amount: String,
-    clp04_total_claim_payment_amount: String,
-    clp05_patient_responsibility_amount: String,
-    clp06_claim_filing_indicator_code: String,
-    clp07_payer_claim_control_number: String,
-    clp08_facility_type_code: String,
-    clp09_claim_frequency_code: String,
+    pub clp01_patient_control_number: String,
+    pub clp02_claim_status_code: String,
+    pub clp03_total_claim_charge_amount: String,
+    pub clp04_total_claim_payment_amount: String,
+    pub clp05_patient_responsibility_amount: String,
+    pub clp06_claim_filing_indicator_code: String,
+    pub clp07_payer_claim_control_number: String,
+    pub clp08_facility_type_code: String,
+    pub clp09_claim_frequency_code: String,
     // patient_status_code: String,
-    clp11_diagnosis_related_group: String,
-    clp12_drg_weight: String,
-    clp13_percent_discharge_fraction: String,
+    pub clp11_diagnosis_related_group: String,
+    pub clp12_drg_weight: String,
+    pub clp13_percent_discharge_fraction: String,
 }
 
 // CLP05 is optional, when patient’s responsibility is greater than zero

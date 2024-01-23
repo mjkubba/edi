@@ -183,3 +183,43 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
             per_segments, amt_segments, qty_segments, contents)
 
 }
+
+
+
+
+// unit tests
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_get_loop_2100() {
+        let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~DTM*232*20190303~DTM*233*20190304~AMT*AU*500~");
+        let (clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
+        nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
+        per, amt, qty, contents) = get_loop_2100(contents);
+        assert_eq!(clp.clp03_total_claim_charge_amount, "500");
+        assert_eq!(cas, CAS::default());
+        assert_eq!(nm1_patient.lastname, "TOWNSEND");
+        assert_eq!(nm1_insured.entity_id, "82");
+        assert_eq!(nm1_service_provider, NM1::default());
+        assert_eq!(nm1_crossover_carrier, NM1::default());
+        assert_eq!(nm1_corrected_patient, NM1::default());
+        assert_eq!(nm1_corrected_priority_payer, NM1::default());
+        assert_eq!(nm1_other_subscriber, NM1::default());
+        assert_eq!(mia, MIA::default());
+        assert_eq!(moa, MOA::default());
+        assert_eq!(ref_other_claim, REF::default());
+        assert_eq!(ref_rendering_provider, REF::default());
+        assert_eq!(dtm_statement_from.date_time_qualifier, "232");
+        assert_eq!(dtm_coverage_expiration.date_time, "20190304");
+        assert_eq!(dtm_claim_received, DTM::default());
+        assert_eq!(per, PER::default());
+        assert_eq!(amt.amount_qualifier_code, "AU");
+        assert_eq!(qty, QTY::default());
+        assert_eq!(contents, "");
+
+    }
+}

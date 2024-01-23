@@ -1,20 +1,20 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct PLB {
-    plb01_provider_identifier: String,
-    plb02_fiscal_period_date: String,
-    plb03_provider_adjustment_identifier: String,
-    plb04_provider_adjustment_amount: String,
-    plb05_provider_adjustment_identifier: String,
-    plb06_provider_adjustment_amount: String,
-    plb07_provider_adjustment_identifier: String,
-    plb08_provider_adjustment_amount: String,
-    plb09_provider_adjustment_identifier: String,
-    plb10_provider_adjustment_amount: String,
-    plb11_provider_adjustment_identifier: String,
-    plb12_provider_adjustment_amount: String,
-    plb13_provider_adjustment_identifier: String,
-    plb14_provider_adjustment_amount: String,
+    pub plb01_provider_identifier: String,
+    pub plb02_fiscal_period_date: String,
+    pub plb03_provider_adjustment_identifier: String,
+    pub plb04_provider_adjustment_amount: String,
+    pub plb05_provider_adjustment_identifier: String,
+    pub plb06_provider_adjustment_amount: String,
+    pub plb07_provider_adjustment_identifier: String,
+    pub plb08_provider_adjustment_amount: String,
+    pub plb09_provider_adjustment_identifier: String,
+    pub plb10_provider_adjustment_amount: String,
+    pub plb11_provider_adjustment_identifier: String,
+    pub plb12_provider_adjustment_amount: String,
+    pub plb13_provider_adjustment_identifier: String,
+    pub plb14_provider_adjustment_amount: String,
     
 }
 

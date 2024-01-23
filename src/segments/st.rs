@@ -1,8 +1,8 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct ST {
-    transaction_set_id: String,
-    transaction_set_control_number: String,
+    pub transaction_set_id: String,
+    pub transaction_set_control_number: String,
 }
 
 pub fn get_st(st_content: String) -> ST {

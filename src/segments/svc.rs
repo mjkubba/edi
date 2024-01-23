@@ -1,13 +1,13 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct SVC {
-    svc01_1_product_or_service_is_qualifier: String,
-    svc02_line_item_charge_amount: String,
-    svc03_line_item_provider_payment_amount: String,
-    scv04_product_service_id: String,
-    svc05_unit_of_service_paid_count: String,
-    svc06_composite_medical_procedure_id: String,
-    svc07_original_units_of_service_count: String,
+    pub svc01_1_product_or_service_is_qualifier: String,
+    pub svc02_line_item_charge_amount: String,
+    pub svc03_line_item_provider_payment_amount: String,
+    pub scv04_product_service_id: String,
+    pub svc05_unit_of_service_paid_count: String,
+    pub svc06_composite_medical_procedure_id: String,
+    pub svc07_original_units_of_service_count: String,
 
 
 

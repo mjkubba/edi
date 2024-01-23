@@ -1,15 +1,15 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct NM1{
-    entity_id: String,
-    entity_type: String,
-    lastname: String,
-    firstname: String,
-    middle_initial: String,
-    suffix: String,
-    title: String,
-    id_code: String,
-    member_number: String,
+    pub entity_id: String,
+    pub entity_type: String,
+    pub lastname: String,
+    pub firstname: String,
+    pub middle_initial: String,
+    pub suffix: String,
+    pub title: String,
+    pub id_code: String,
+    pub member_number: String,
 }
 
 pub fn get_nm1(nm1_content: String) -> NM1 {

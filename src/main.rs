@@ -81,3 +81,14 @@ fn main() {
         
     println!("{:?}", _contents);
 }
+
+
+// unit test
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_interchange_control() {
+        main();
+    }
+}

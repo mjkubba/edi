@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 #[allow(dead_code)]
 pub struct PER {
     pub per01_contact_function_code: String,

@@ -1,10 +1,10 @@
 #[derive(Debug, Default)]
 #[allow(dead_code)]
 pub struct TRN {
-    trace_type_code: String,
-    reference_id: String,
-    originating_company_id: String,
-    trn04_reference_id: String,
+    pub trace_type_code: String,
+    pub reference_id: String,
+    pub originating_company_id: String,
+    pub trn04_reference_id: String,
 }
 
 pub fn get_trn(trn_content: String) -> TRN {

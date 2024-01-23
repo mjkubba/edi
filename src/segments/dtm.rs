@@ -1,8 +1,8 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct DTM {
-    date_time_qualifier: String,
-    date_time: String,
+    pub date_time_qualifier: String,
+    pub date_time: String,
 }
 
 pub fn get_dtm(dtm_content: String) -> DTM {

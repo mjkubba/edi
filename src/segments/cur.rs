@@ -1,10 +1,10 @@
 // EDI 835 CUR segment
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 
 pub struct CUR {
-    identity_identifier_code: String,
-    currency_code: String,
+    pub identity_identifier_code: String,
+    pub currency_code: String,
 }
 
 pub fn get_cur(cur_content: String) -> CUR {
