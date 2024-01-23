@@ -42,5 +42,4 @@ mod tests {
         assert_eq!(gs_segments.app_receiver_id, "RECEIVER CODE");
         assert_eq!(contents, "");
     }
-
 }

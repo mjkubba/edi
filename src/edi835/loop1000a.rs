@@ -78,6 +78,7 @@ mod tests {
         assert_eq!(n4_segments.payee_zip, "17111");
         assert_eq!(per_segments.per01_contact_function_code, "BL");
         assert_eq!(per_segments.per02_contact_name, "JANE DOE");
+        assert_eq!(contents, "");
     }
 
 

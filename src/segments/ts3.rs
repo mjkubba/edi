@@ -1,5 +1,5 @@
 // EDI 835 TS3 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 #[allow(dead_code)]
 pub struct TS3 {
     ts301_provider_identifier : String,

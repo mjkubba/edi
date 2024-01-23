@@ -1,9 +1,9 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct RDM {
-    rdm01_report_transmission_code: String,
-    rdm02_name: String,
-    rdm03_communication_number: String,
+    pub rdm01_report_transmission_code: String,
+    pub rdm02_name: String,
+    pub rdm03_communication_number: String,
 }
 
 // both rdm02 and 03 are optional, 

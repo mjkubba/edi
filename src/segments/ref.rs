@@ -1,8 +1,8 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq)]
 #[allow(dead_code)]
 pub struct REF{
-    reference_id_number_qualifier: String,
-    reference_id_number: String,
+    pub reference_id_number_qualifier: String,
+    pub reference_id_number: String,
 
 }
 

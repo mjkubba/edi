@@ -1,5 +1,5 @@
 // EDI 835 TS2 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 #[allow(dead_code)]
 pub struct TS2 {
     ts201_total_drg_amount: String,

@@ -38,3 +38,22 @@ pub fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
     println!("Loop 2000 parsed\n");
     return (lx_segments, ts3_segments, ts2_segments, contents)
 }
+
+
+// unit tests
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_get_loop_2000() {
+        let contents = String::from("LX*1~CLP*EXAMPLE3*2*500*100**12*05090256390*11*1~CAS*OA*23*600**94*-200~");
+        let (lx_segments, ts3_segments, ts2_segments, contents) = get_loop_2000(contents);
+        assert_eq!(lx_segments.lx01_claim_sequence_number, "1");
+        assert_eq!(contents, "CLP*EXAMPLE3*2*500*100**12*05090256390*11*1~CAS*OA*23*600**94*-200~");
+        assert_eq!(ts2_segments, TS2::default());
+        assert_eq!(ts3_segments, TS3::default());
+    }
+}
