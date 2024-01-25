@@ -1,4 +1,4 @@
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct LX {
     pub lx01_claim_sequence_number: String,

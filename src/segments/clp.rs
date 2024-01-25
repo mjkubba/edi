@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct CLP{
     pub clp01_patient_control_number: String,
@@ -63,5 +63,30 @@ pub fn get_clp(bpr_content: String) -> CLP {
         clp11_diagnosis_related_group,
         clp12_drg_weight,
         clp13_percent_discharge_fraction,
+    }
+}
+
+// unit test
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_clp() {
+        let bpr_content = "EXAMPLE9*3*500*100**12*05090256390*11*1".to_string();
+        let clp = get_clp(bpr_content);
+        assert_eq!(clp.clp01_patient_control_number, "EXAMPLE9");
+        assert_eq!(clp.clp02_claim_status_code, "3");
+        assert_eq!(clp.clp03_total_claim_charge_amount, "500");
+        assert_eq!(clp.clp04_total_claim_payment_amount, "100");
+        assert_eq!(clp.clp05_patient_responsibility_amount, "");
+        assert_eq!(clp.clp06_claim_filing_indicator_code, "12");
+        assert_eq!(clp.clp07_payer_claim_control_number, "05090256390");
+        assert_eq!(clp.clp08_facility_type_code, "11");
+        assert_eq!(clp.clp09_claim_frequency_code, "1");
+        assert_eq!(clp.clp11_diagnosis_related_group, "");
+        assert_eq!(clp.clp12_drg_weight, "");
+        assert_eq!(clp.clp13_percent_discharge_fraction, "");
     }
 }

@@ -1,5 +1,4 @@
-#[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 pub struct ISA {
     pub information_qualifier: String,
     pub authorization_information: String,

@@ -11,6 +11,28 @@ use crate::segments::qty::*;
 use crate::helper::helper::*;
 
 
+// #[derive(Debug,Clone)]
+pub struct Loop2100 {
+    pub clp_segments: CLP,
+    pub cas_segments: CAS,
+    pub nm1_patint_segments: NM1,
+    pub nm1_insured_segments: NM1,
+    pub nm1_corrected_patient_segments: NM1,
+    pub nm1_service_provider_segments: NM1,
+    pub nm1_crossover_carrier_segments: NM1,
+    pub nm1_corrected_priority_payer_segments: NM1,
+    pub nm1_other_subscriber_segments: NM1,
+    pub mia_segments: MIA,
+    pub moa_segments: MOA,
+    pub ref_other_claim_segments: REF,
+    pub ref_rendering_provider_segments: REF,
+    pub dtm_statement_from_segments: DTM,
+    pub dtm_coverage_expiration_segments: DTM,
+    pub dtm_claim_received_segments: DTM,
+    pub per_segments: PER,
+    pub amt_segments: AMT,
+    pub qty_segments: QTY,
+}
 
 
 
@@ -184,7 +206,34 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
 
 }
 
+//CLP, CAS, NM1, NM1, NM1, NM1, NM1, NM1, NM1, MIA, MOA, REF, REF, DTM, DTM, DTM, PER, AMT, QTY,
 
+pub fn get_loop_2100s(clp_segments: CLP, cas_segments:CAS, nm1_patint_segments: NM1, nm1_insured_segments: NM1, nm1_corrected_patient_segments: NM1, nm1_service_provider_segments: NM1, nm1_crossover_carrier_segments: NM1, 
+            nm1_corrected_priority_payer_segments: NM1, nm1_other_subscriber_segments: NM1, mia_segments: MIA, moa_segments: MOA, ref_other_claim_segments: REF, ref_rendering_provider_segments: REF, dtm_statement_from_segments: DTM, 
+            dtm_coverage_expiration_segments: DTM, dtm_claim_received_segments: DTM, per_segments: PER, amt_segments: AMT, qty_segments: QTY) -> Loop2100 {
+    let loop2000 = Loop2100 {
+        clp_segments,
+        cas_segments,
+        nm1_patint_segments,
+        nm1_insured_segments,
+        nm1_corrected_patient_segments,
+        nm1_service_provider_segments,
+        nm1_crossover_carrier_segments,
+        nm1_corrected_priority_payer_segments,
+        nm1_other_subscriber_segments,
+        mia_segments,
+        moa_segments,
+        ref_other_claim_segments,
+        ref_rendering_provider_segments,
+        dtm_statement_from_segments,
+        dtm_coverage_expiration_segments,
+        dtm_claim_received_segments,
+        per_segments,
+        amt_segments,
+        qty_segments,
+    };
+    loop2000
+}
 
 
 // unit tests
@@ -196,7 +245,7 @@ mod tests {
     
     #[test]
     fn test_get_loop_2100() {
-        let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~DTM*232*20190303~DTM*233*20190304~AMT*AU*500~");
+        let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~NM1**3*ACME*****XX*98765432111~NM1*11*3*ACME*****XX*91~NM1*21*31*ACME*John****XX*91~DTM*232*20190303~DTM*233*20190304~AMT*AU*500~");
         let (clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
         nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
         per, amt, qty, contents) = get_loop_2100(contents);
@@ -204,9 +253,9 @@ mod tests {
         assert_eq!(cas, CAS::default());
         assert_eq!(nm1_patient.lastname, "TOWNSEND");
         assert_eq!(nm1_insured.entity_id, "82");
-        assert_eq!(nm1_service_provider, NM1::default());
-        assert_eq!(nm1_crossover_carrier, NM1::default());
-        assert_eq!(nm1_corrected_patient, NM1::default());
+        assert_eq!(nm1_corrected_patient.member_number, "98765432111");
+        assert_eq!(nm1_service_provider.entity_type, "3");
+        assert_eq!(nm1_crossover_carrier.firstname, "John");
         assert_eq!(nm1_corrected_priority_payer, NM1::default());
         assert_eq!(nm1_other_subscriber, NM1::default());
         assert_eq!(mia, MIA::default());
@@ -217,9 +266,23 @@ mod tests {
         assert_eq!(dtm_coverage_expiration.date_time, "20190304");
         assert_eq!(dtm_claim_received, DTM::default());
         assert_eq!(per, PER::default());
-        assert_eq!(amt.amount_qualifier_code, "AU");
+        assert_eq!(amt.amt01_amount_qualifier_code, "AU");
         assert_eq!(qty, QTY::default());
         assert_eq!(contents, "");
 
     }
+    // test get_loop_2100s
+    #[test]
+    fn test_get_loop_2100s() {
+        let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~DTM*232*20190303~DTM*233*20190304~AMT*AU*500~");
+        let (clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
+        nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
+        per, amt, qty, _contents) = get_loop_2100(contents);
+        let loop2100 = get_loop_2100s(clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
+            nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
+            per, amt, qty);
+            assert_eq!(loop2100.clp_segments.clp03_total_claim_charge_amount, "500");
+            assert_eq!(loop2100.cas_segments, CAS::default());
+            assert_eq!(loop2100.nm1_patint_segments.lastname, "TOWNSEND");
+        }
 }

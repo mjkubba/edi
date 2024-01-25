@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct N4{
     pub payee_city: String,
@@ -33,5 +33,21 @@ pub fn get_n4(n4_content: String) -> N4 {
         payee_zip,
         payee_country_code,
         payee_country_sub_code,
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_n4() {
+        let n4_content = "BOSTON*MA*02111*US*US".to_string();
+        let n4 = get_n4(n4_content);
+        assert_eq!(n4.payee_city, "BOSTON");
+        assert_eq!(n4.payee_state, "MA");
+        assert_eq!(n4.payee_zip, "02111");
+        assert_eq!(n4.payee_country_code, "US");
+        assert_eq!(n4.payee_country_sub_code, "US");
     }
 }

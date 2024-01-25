@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct TRN {
     pub trace_type_code: String,
@@ -18,5 +18,19 @@ pub fn get_trn(trn_content: String) -> TRN {
         reference_id: trn_parts[1].to_string(),
         originating_company_id: trn_parts[2].to_string(),
         trn04_reference_id,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_trn() {
+        let trn_content = "TRN*123456789*ABC*123456789".to_string();
+        let trn = get_trn(trn_content);
+        assert_eq!(trn.trace_type_code, "TRN");
+        assert_eq!(trn.reference_id, "123456789");
+        assert_eq!(trn.originating_company_id, "ABC");
+        assert_eq!(trn.trn04_reference_id, "123456789");
     }
 }

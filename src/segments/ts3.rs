@@ -1,21 +1,21 @@
 // EDI 835 TS3 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct TS3 {
-    ts301_provider_identifier : String,
-    ts302_facility_type_code : String,
-    ts303_fiscal_period_date : String,
-    ts304_total_claim_count : String,
-    ts305_total_claim_charge_amount : String,
-    ts313_total_msp_payer_amount : String,
-    ts315_total_non_lab_charge_amount : String,
-    ts317_total_hcpcs_reported_charge_amount : String,
-    ts318_total_hcpcs_payable_amount : String,
-    ts320_total_professional_component_amount : String,
-    ts321_total_msp_patient_liability_met_amount : String,
-    ts322_total_patient_reimbursement_amount : String,  
-    ts323_total_pip_claim_count : String,
-    ts324_total_pip_adjustment_amount : String,
+    pub ts301_provider_identifier : String,
+    pub ts302_facility_type_code : String,
+    pub ts303_fiscal_period_date : String,
+    pub ts304_total_claim_count : String,
+    pub ts305_total_claim_charge_amount : String,
+    pub ts313_total_msp_payer_amount : String,
+    pub ts315_total_non_lab_charge_amount : String,
+    pub ts317_total_hcpcs_reported_charge_amount : String,
+    pub ts318_total_hcpcs_payable_amount : String,
+    pub ts320_total_professional_component_amount : String,
+    pub ts321_total_msp_patient_liability_met_amount : String,
+    pub ts322_total_patient_reimbursement_amount : String,  
+    pub ts323_total_pip_claim_count : String,
+    pub ts324_total_pip_adjustment_amount : String,
     
 }
 
@@ -33,32 +33,32 @@ pub fn get_ts3(ts3_content: String) -> TS3 {
     let mut ts323_total_pip_claim_count: String ="".to_string();
     let mut ts324_total_pip_adjustment_amount: String ="".to_string();
 
+    if ts3_parts.get(5).is_some() {
+        ts313_total_msp_payer_amount = ts3_parts[5].to_string();
+    }
+    if ts3_parts.get(6).is_some() {
+        ts315_total_non_lab_charge_amount = ts3_parts[6].to_string();
+    }
+    if ts3_parts.get(7).is_some() {
+        ts317_total_hcpcs_reported_charge_amount = ts3_parts[7].to_string();
+    }
+    if ts3_parts.get(8).is_some() {
+        ts318_total_hcpcs_payable_amount = ts3_parts[8].to_string();
+    }
+    if ts3_parts.get(9).is_some() {
+        ts320_total_professional_component_amount = ts3_parts[9].to_string();
+    }
+    if ts3_parts.get(10).is_some() {
+        ts321_total_msp_patient_liability_met_amount = ts3_parts[10].to_string();
+    }
+    if ts3_parts.get(11).is_some() {
+        ts322_total_patient_reimbursement_amount = ts3_parts[11].to_string();
+    }
     if ts3_parts.get(12).is_some() {
-        ts313_total_msp_payer_amount = ts3_parts[12].to_string();
+        ts323_total_pip_claim_count = ts3_parts[12].to_string();
     }
-    if ts3_parts.get(14).is_some() {
-        ts315_total_non_lab_charge_amount = ts3_parts[14].to_string();
-    }
-    if ts3_parts.get(16).is_some() {
-        ts317_total_hcpcs_reported_charge_amount = ts3_parts[16].to_string();
-    }
-    if ts3_parts.get(17).is_some() {
-        ts318_total_hcpcs_payable_amount = ts3_parts[17].to_string();
-    }
-    if ts3_parts.get(19).is_some() {
-        ts320_total_professional_component_amount = ts3_parts[19].to_string();
-    }
-    if ts3_parts.get(20).is_some() {
-        ts321_total_msp_patient_liability_met_amount = ts3_parts[20].to_string();
-    }
-    if ts3_parts.get(21).is_some() {
-        ts322_total_patient_reimbursement_amount = ts3_parts[21].to_string();
-    }
-    if ts3_parts.get(22).is_some() {
-        ts323_total_pip_claim_count = ts3_parts[22].to_string();
-    }
-    if ts3_parts.get(23).is_some() {
-        ts324_total_pip_adjustment_amount = ts3_parts[23].to_string();
+    if ts3_parts.get(13).is_some() {
+        ts324_total_pip_adjustment_amount = ts3_parts[13].to_string();
     }
     TS3 {
         ts301_provider_identifier: ts3_parts.get(0).unwrap().to_string(),
@@ -78,4 +78,34 @@ pub fn get_ts3(ts3_content: String) -> TS3 {
         
     }
 
+}
+
+
+
+// unit test
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_ts3() {
+        let ts3_content = "1*1*202206*1*2*3*4*5*6*7*8*9*10*11".to_string();
+        let ts3 = get_ts3(ts3_content);
+        assert_eq!(ts3.ts301_provider_identifier, "1");
+        assert_eq!(ts3.ts302_facility_type_code, "1");
+        assert_eq!(ts3.ts303_fiscal_period_date, "202206");
+        assert_eq!(ts3.ts304_total_claim_count, "1");
+        assert_eq!(ts3.ts305_total_claim_charge_amount, "2");
+        assert_eq!(ts3.ts313_total_msp_payer_amount, "3");
+        assert_eq!(ts3.ts315_total_non_lab_charge_amount, "4");
+        assert_eq!(ts3.ts317_total_hcpcs_reported_charge_amount, "5");
+        assert_eq!(ts3.ts318_total_hcpcs_payable_amount, "6");
+        assert_eq!(ts3.ts320_total_professional_component_amount, "7");
+        assert_eq!(ts3.ts321_total_msp_patient_liability_met_amount, "8");
+        assert_eq!(ts3.ts322_total_patient_reimbursement_amount, "9");
+        assert_eq!(ts3.ts323_total_pip_claim_count, "10");
+        assert_eq!(ts3.ts324_total_pip_adjustment_amount, "11");
+    }
 }

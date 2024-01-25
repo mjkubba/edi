@@ -50,28 +50,82 @@ fn main() {
     let (_n1, _n3, _n4, _per, contents) = get_loop_1000_a(contents.clone());
 
     // Loop 1000B Payee Identification
-    let (_n1, _n3, _n4, _ref, _rdm, contents) = get_loop_1000_b(contents.clone());
+    let (_n1, _n3, _n4, _ref, _rdm, mut contents) = get_loop_1000_b(contents.clone());
 
 
     // Loop 2000 Header Number
     let lx_count= contents.matches("LX").count();
+    let mut loop_2000_array = vec![];
     println!("Number of loops in loop 2000: {:?}",lx_count);
-    let (_lx, _ts3, _ts2, contents) = get_loop_2000(contents.clone());
+    let mut lx;
+    let mut ts2;
+    let mut ts3;
+
+    for _ in 0..lx_count {
+        (lx, ts3, ts2, contents) = get_loop_2000(contents.clone());
+        let _loop2000 = get_loop_2000s(lx,ts3,ts2);
+        loop_2000_array.push(_loop2000);
+    }
+
 
     
     // Loop 2100 Claim Payment Information 
     let clp_count= contents.matches("CLP").count();
+    let mut loop_2100_array = vec![];
     println!("Number of loops in loop 2100: {:?}",clp_count);
-    let (_clp, _cas, _nm1_patient, _nm1_insured, _nm1_corrected_patient, _nm1_service_provider, _nm1_crossover_carrier, _nm1_corrected_priority_payer,
-        _nm1_other_subscriber, _mia, _moa, _ref_other_claim, _ref_rendering_provider, _dtm_statement_from, _dtm_coverage_expiration, _dtm_claim_received,
-        _per, _amt, _qty, contents) = get_loop_2100(contents.clone());
-        
+    let mut clp;
+    let mut claim_adjustment;
+    let mut nm1_patient;
+    let mut nm1_insured;
+    let mut nm1_corrected_patient;
+    let mut nm1_service_provider;
+    let mut nm1_crossover_carrier;
+    let mut nm1_corrected_priority_payer;
+    let mut nm1_other_subscriber;
+    let mut mia;
+    let mut moa;
+    let mut ref_other_claim;
+    let mut ref_rendering_provider;
+    let mut dtm_statement_from;
+    let mut dtm_coverage_expiration;
+    let mut dtm_claim_received;
+    let mut per;
+    let mut amt;
+    let mut qty;
+
+    for _ in 0..clp_count {
+        (clp, claim_adjustment, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
+            nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
+            per, amt, qty, contents) = get_loop_2100(contents.clone());
+        let _loop2100 = get_loop_2100s(clp,claim_adjustment,nm1_patient,nm1_insured,nm1_corrected_patient,nm1_service_provider,nm1_crossover_carrier,nm1_corrected_priority_payer,
+            nm1_other_subscriber,mia,moa,ref_other_claim,ref_rendering_provider,dtm_statement_from,dtm_coverage_expiration,dtm_claim_received,
+            per,amt,qty);
+            loop_2100_array.push(_loop2100);
+    }
+
+
     // Loop 2110 Service Payment Information
     let svc_count= contents.matches("SVC").count();
+    let mut loop_2110_array = vec![];
     println!("Number of loops in loop 2100: {:?}",svc_count);
-    let (_svc, _dtm, _cas, _ref_service_identification, _ref_line_item_control_number, _ref_rendering_provider_information, _ref_healthcare_policy_identification, _amt, _qty, _lq, contents) =
-    get_loop_2110(contents.clone());
-    
+    let mut svc;
+    let mut dtm;
+    let mut cas;
+    let mut ref_service_identification;
+    let mut ref_line_item_control_number;
+    let mut ref_rendering_provider_information;
+    let mut ref_healthcare_policy_identification;
+    let mut amt;
+    let mut qty;
+    let mut lq;
+
+    for _ in 0..svc_count {
+        (svc, dtm, cas, ref_service_identification, ref_line_item_control_number, ref_rendering_provider_information, ref_healthcare_policy_identification, amt, qty, lq, contents) =
+        get_loop_2110(contents.clone());
+        let loop2110 = get_loop_2110s(svc,dtm,cas,ref_service_identification,ref_line_item_control_number,ref_rendering_provider_information,ref_healthcare_policy_identification,amt,qty,lq);
+        loop_2110_array.push(loop2110);
+    }
+
         
     // Table 3
     let (_plb, _se, contents) = get_table_3(contents.clone());
@@ -88,7 +142,7 @@ fn main() {
 mod tests {
     use super::*;
     #[test]
-    fn test_get_interchange_control() {
+    fn test_main() {
         main();
     }
 }

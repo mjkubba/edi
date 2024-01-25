@@ -1,4 +1,4 @@
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct CAS{ 
     pub cas01_claim_adjustsment_group_code: String,
@@ -109,5 +109,24 @@ pub fn get_cas(cas_content: String) -> CAS {
         cas17_adjustment_reason_code,
         cas18_adjustment_amt,
         cas19_adjustment_qty,
+    }
+}
+
+
+// unit test
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_cas() {
+        let cas_content = "CAS*P*1*10.00*1*20.00*2*30.00*3*40.00*4*50.00*5*60.00*6*70.00*7*80.00*8*90.00*9*100.00*10*110.00*11*120.00*12*130.00*13*140.00*14*150.00*15*160.00*16*170.00*17*180.00*18*190.00*19*200.00".to_string();
+        let cas = get_cas(cas_content);
+        assert_eq!(cas.cas01_claim_adjustsment_group_code, "CAS".to_string());
+        assert_eq!(cas.cas02_adjustsment_reason_code, "P".to_string());
+        assert_eq!(cas.cas03_adjustsment_amt, "1".to_string());
+        assert_eq!(cas.cas04_adjustsment_qty, "10.00".to_string());
+        assert_eq!(cas.cas05_adjustment_reason_code, "1".to_string());
     }
 }

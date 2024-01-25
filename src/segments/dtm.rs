@@ -1,4 +1,4 @@
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct DTM {
     pub date_time_qualifier: String,

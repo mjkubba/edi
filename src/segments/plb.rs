@@ -1,4 +1,4 @@
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct PLB {
     pub plb01_provider_identifier: String,
@@ -81,5 +81,26 @@ pub fn get_plb(plb_content: String) -> PLB {
         plb12_provider_adjustment_amount,
         plb13_provider_adjustment_identifier,
         plb14_provider_adjustment_amount,
+    }
+}
+
+
+// unit test
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_plb() {
+        let plb_content = "PLB*202208*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*".to_string();
+        let plb = get_plb(plb_content);
+        assert_eq!(plb.plb01_provider_identifier, "PLB".to_string());
+        assert_eq!(plb.plb02_fiscal_period_date, "202208".to_string());
+        assert_eq!(plb.plb03_provider_adjustment_identifier, "PLB".to_string());
+        assert_eq!(plb.plb04_provider_adjustment_amount, "0.00".to_string());
+        assert_eq!(plb.plb05_provider_adjustment_identifier, "PLB".to_string());
+        assert_eq!(plb.plb06_provider_adjustment_amount, "0.00".to_string());
     }
 }

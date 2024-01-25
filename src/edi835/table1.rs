@@ -75,24 +75,7 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
         contents = content_trim("DTM",contents);
     }
 
-    // if contents.contains("DTM") {
-    //     let dtm_count= contents.matches("DTM").count();
-    //     print!("Number of DTM segments: {}, ", dtm_count);
 
-    //     let mut next_segment =  &contents[contents.find("DTM").unwrap()..];
-    //     let mut _dtm_vec = Vec::new();
-
-    //     for _ in 0..dtm_count {
-    //         let dtm_start = next_segment;
-    //         let dtm_end = dtm_start.find("~").unwrap();
-    //         let dtm_content = &dtm_start[4..dtm_end];
-    //         let dtm_segments = get_dtm(dtm_content);
-    //         _dtm_vec.push(dtm_segments);
-    //         next_segment = &dtm_start[dtm_end+1..]
-    //     }
-    //     println!("DTM segment parsed");
-    // }
-    
     println!("Table 1 parsed\n");
     return (st_segments, bpr_segments, trn_segments, cur_segments, ref_segments, dtm_segments, contents)
 }
@@ -109,7 +92,7 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
             let (st_segments, bpr_segments, trn_segments, cur_segments, ref_segments, dtm_segments, contents) = get_first_table_header(contents);
             assert_eq!(st_segments.transaction_set_id, "835");
             assert_eq!(trn_segments.reference_id, "12345");
-            assert_eq!(bpr_segments.transaction_handling_code, "I");
+            assert_eq!(bpr_segments.bpr01_transaction_handling_code, "I");
             assert_eq!(cur_segments, CUR::default());
             assert_eq!(ref_segments.reference_id_number_qualifier, "EV");
             assert_eq!(dtm_segments, DTM::default());

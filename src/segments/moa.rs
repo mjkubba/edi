@@ -1,5 +1,5 @@
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct MOA {
     pub moa01_reimbursement_rate: String,
@@ -68,7 +68,28 @@ pub fn get_moa(moa_content: String) -> MOA {
 }
 
 
+// unit test
 
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_moa() {
+        let moa_content = "0.00*0.00*0*0*0*0*0.00*0.00*1".to_string();
+        let moa = get_moa(moa_content);
+        assert_eq!(moa.moa01_reimbursement_rate, "0.00");
+        assert_eq!(moa.moa02_claim_hcpcs_payable_amount, "0.00");
+        assert_eq!(moa.moa03_claim_payment_remark_code, "0");
+        assert_eq!(moa.moa04_claim_payment_remark_code, "0");
+        assert_eq!(moa.moa05_claim_payment_remark_code, "0");
+        assert_eq!(moa.moa06_claim_payment_remark_code, "0");
+        assert_eq!(moa.moa07_claim_payment_remark_code, "0.00");
+        assert_eq!(moa.moa08_claim_esrd_payment_amount, "0.00");
+        assert_eq!(moa.moa09_nonpayable_professional_component_amount, "1");
+    }
+}
 
 
 

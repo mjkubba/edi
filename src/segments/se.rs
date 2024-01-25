@@ -1,5 +1,5 @@
 // EDI 835 SE segment
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct SE{
     pub number_of_segment: String,

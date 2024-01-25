@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct GS {
     pub functional_id_code: String,

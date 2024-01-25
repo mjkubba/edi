@@ -1,5 +1,5 @@
 // EDI 835 MSI - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct MIA {
     pub mia01_covered_days_or_visits_count: String,
@@ -148,5 +148,25 @@ pub fn get_mia(mia_content: String) -> MIA {
         mia22_claim_payment_remark_code,
         mia23_claim_payment_remark_code,
         mia24_pps_capital_exception_amount,
+    }
+}
+
+
+// unit test
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_mia() {
+        let mia_content = "1*2*3*4*5*6*7*8*9*10*11*12*13*14*15*16*17*18*19*20*21*22*23*24".to_string();
+        let mia = get_mia(mia_content);
+        assert_eq!(mia.mia01_covered_days_or_visits_count, "1".to_string());
+        assert_eq!(mia.mia02_pps_operating_outlier_amount, "2".to_string());
+        assert_eq!(mia.mia03_lifetime_psychiatric_days_count, "3".to_string());
+        assert_eq!(mia.mia04_claim_drg_amount, "4".to_string());
+        assert_eq!(mia.mia05_claim_payment_remark_code, "5".to_string());
     }
 }

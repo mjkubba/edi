@@ -1,4 +1,4 @@
-#[derive(Debug, Default,PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct SVC {
     pub svc01_1_product_or_service_is_qualifier: String,
@@ -42,5 +42,24 @@ pub fn get_svc(svc_content: String) -> SVC {
         svc05_unit_of_service_paid_count,
         svc06_composite_medical_procedure_id,
         svc07_original_units_of_service_count,
+    }
+}
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_svc() {
+        let svc_content = "100*200*3*4*5*6*7";
+        let svc = get_svc(svc_content.to_string());
+        assert_eq!(svc.svc01_1_product_or_service_is_qualifier, "100");
+        assert_eq!(svc.svc02_line_item_charge_amount, "200");
+        assert_eq!(svc.svc03_line_item_provider_payment_amount, "3");
+        assert_eq!(svc.scv04_product_service_id, "4");
+        assert_eq!(svc.svc05_unit_of_service_paid_count, "5");
+        assert_eq!(svc.svc06_composite_medical_procedure_id, "6");
+        assert_eq!(svc.svc07_original_units_of_service_count, "7");
     }
 }

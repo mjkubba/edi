@@ -1,4 +1,4 @@
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default,PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct PER {
     pub per01_contact_function_code: String,
@@ -51,5 +51,24 @@ pub fn get_per(per_content: String) -> PER {
         per06_contact_number,
         per07_contact_number_qualifier,
         per08_contact_number,        
+    }
+}
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_per() {
+        let per_content = "PER*PER02*PER03*PER04*PER05*PER06*PER07*PER08";
+        let per = get_per(per_content.to_string());
+        assert_eq!(per.per01_contact_function_code, "PER");
+        assert_eq!(per.per02_contact_name, "PER02");
+        assert_eq!(per.per03_contact_number_qualifier, "PER03");
+        assert_eq!(per.per04_contact_number, "PER04");
+        assert_eq!(per.per05_contact_number_qualifier, "PER05");
+        assert_eq!(per.per06_contact_number, "PER06");
+        assert_eq!(per.per07_contact_number_qualifier, "PER07");
+        assert_eq!(per.per08_contact_number, "PER08");
     }
 }

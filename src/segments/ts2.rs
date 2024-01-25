@@ -1,26 +1,26 @@
 // EDI 835 TS2 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, PartialEq,Clone)]
 #[allow(dead_code)]
 pub struct TS2 {
-    ts201_total_drg_amount: String,
-    ts202_total_fed_spec_amount: String,
-    ts203_total_hosp_spec_amount: String,
-    ts204_total_disproportionate_share_amount: String,
-    ts205_total_capital_amount: String,
-    ts206_total_indirect_medical_education_amount: String,
-    ts207_total_outlier_day_count: String,
-    ts208_total_day_outlier_amount: String,
-    ts209_total_cost_outlier_amount: String,
-    ts210_average_drg_length_of_stay: String,
-    ts211_total_discharge_count: String,
-    ts212_total_cost_report_day_count: String,
-    ts213_total_covered_day_count: String,
-    ts214_total_noncovered_day_count: String,
-    ts215_total_msp_pass_through_amount: String,
-    ts216_average_drg_weight: String,
-    ts217_total_pps_capital_fs_drg_amount: String,
-    ts218_total_pps_capital_hs_drg_amount: String,
-    ts219_total_pps_dsh_drg_amount: String,
+    pub ts201_total_drg_amount: String,
+    pub ts202_total_fed_spec_amount: String,
+    pub ts203_total_hosp_spec_amount: String,
+    pub ts204_total_disproportionate_share_amount: String,
+    pub ts205_total_capital_amount: String,
+    pub ts206_total_indirect_medical_education_amount: String,
+    pub ts207_total_outlier_day_count: String,
+    pub ts208_total_day_outlier_amount: String,
+    pub ts209_total_cost_outlier_amount: String,
+    pub ts210_average_drg_length_of_stay: String,
+    pub ts211_total_discharge_count: String,
+    pub ts212_total_cost_report_day_count: String,
+    pub ts213_total_covered_day_count: String,
+    pub ts214_total_noncovered_day_count: String,
+    pub ts215_total_msp_pass_through_amount: String,
+    pub ts216_average_drg_weight: String,
+    pub ts217_total_pps_capital_fs_drg_amount: String,
+    pub ts218_total_pps_capital_hs_drg_amount: String,
+    pub ts219_total_pps_dsh_drg_amount: String,
 }
 
 pub fn get_ts2(ts2_content: String) -> TS2 {
@@ -124,4 +124,22 @@ pub fn get_ts2(ts2_content: String) -> TS2 {
         ts219_total_pps_dsh_drg_amount,
     }
 
+}
+
+// unit test
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_get_ts2() {
+        let ts2_content = "1*2*3*4*5*6*7*8*9*10*11*12*13*14*15*16*17*18*19*20*".to_string();
+        let ts2 = get_ts2(ts2_content);
+        assert_eq!(ts2.ts201_total_drg_amount, "1");
+        assert_eq!(ts2.ts202_total_fed_spec_amount, "2");
+        assert_eq!(ts2.ts203_total_hosp_spec_amount, "3");
+        assert_eq!(ts2.ts204_total_disproportionate_share_amount, "4");
+    }
 }
