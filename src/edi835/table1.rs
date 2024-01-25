@@ -7,7 +7,7 @@ use crate::segments::dtm::*;
 use crate::helper::helper::*;
 
 
-pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, DTM, String) {
+pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, REF, DTM, String) {
 
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats
@@ -30,7 +30,8 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
     let mut bpr_segments = BPR::default();
     let mut trn_segments = TRN::default();
     let mut cur_segments = CUR::default();
-    let mut ref_segments = REF::default();
+    let mut ref_receiver_segments = REF::default();
+    let mut ref_version_segments = REF::default();
     let mut dtm_segments = DTM::default();
 
     if contents.contains("ST") {
@@ -63,7 +64,14 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
 
     if contents.contains("REF") {
         print!("REF segment found, ");
-        ref_segments = get_ref(get_segment_contents("REF", &contents));
+        ref_receiver_segments = get_ref(get_segment_contents("REF", &contents));
+        println!("REF segment parsed");
+        contents = content_trim("REF",contents);
+    }
+
+    if contents.contains("REF") {
+        print!("REF segment found, ");
+        ref_version_segments = get_ref(get_segment_contents("REF", &contents));
         println!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
@@ -77,7 +85,7 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
 
 
     println!("Table 1 parsed\n");
-    return (st_segments, bpr_segments, trn_segments, cur_segments, ref_segments, dtm_segments, contents)
+    return (st_segments, bpr_segments, trn_segments, cur_segments, ref_receiver_segments, ref_version_segments, dtm_segments, contents)
 }
 
 
@@ -89,12 +97,12 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, D
         #[test]
         fn test_table1_header() {
             let contents = String::from("ISA*00*          *00*          *ZZ*SUBMITTERS ID  *ZZ*RECEIVERS ID   *200101*1253*^*00501*000000905*0*T*|~GS*HP*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X221A1~ST*835*35681~BPR*I*100.00*C*CHK************20190331~TRN*1*12345*1512345678~REF*EV*CLEARINGHOUSE~");
-            let (st_segments, bpr_segments, trn_segments, cur_segments, ref_segments, dtm_segments, contents) = get_first_table_header(contents);
+            let (st_segments, bpr_segments, trn_segments, cur_segments, ref_receiver_segments, ref_version_segments, dtm_segments, contents) = get_first_table_header(contents);
             assert_eq!(st_segments.transaction_set_id, "835");
             assert_eq!(trn_segments.reference_id, "12345");
             assert_eq!(bpr_segments.bpr01_transaction_handling_code, "I");
             assert_eq!(cur_segments, CUR::default());
-            assert_eq!(ref_segments.reference_id_number_qualifier, "EV");
+            assert_eq!(ref_receiver_segments.reference_id_number_qualifier, "EV");
             assert_eq!(dtm_segments, DTM::default());
             assert_eq!(contents, "ISA*00*          *00*          *ZZ*SUBMITTERS ID  *ZZ*RECEIVERS ID   *200101*1253*^*00501*000000905*0*T*|~GS*HP*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X221A1~");
         }

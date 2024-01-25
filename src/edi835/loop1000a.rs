@@ -2,9 +2,11 @@ use crate::segments::n1::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
 use crate::segments::per::*;
+use crate::segments::r#ref::*;
 use crate::helper::helper::*;
 
-pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, PER, String) {
+
+pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, String) {
     
     // Loop 1000A Payer Identification (1)
     // N1 Payer Identification R 1
@@ -24,7 +26,10 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, PER, String) {
     let mut n1_segments = N1::default();
     let mut n3_segments = N3::default();
     let mut n4_segments = N4::default();
-    let mut per_segments = PER::default();
+    let mut ref_segments = REF::default();
+    let mut per_payer_business = PER::default();
+    let mut per_technical_contact = PER::default();
+    let mut per_web_site = PER::default();
 
     if contents.contains("N1") {
         print!("N1 segment found, ");
@@ -47,15 +52,79 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, PER, String) {
         contents = content_trim("N4",contents);
     }
 
+    if contents.contains("REF") {
+        print!("REF segment found, ");
+        ref_segments = get_ref(get_segment_contents("REF", &contents));
+        println!("REF segment parsed");
+        contents = content_trim("REF",contents);
+    }
+
     if contents.contains("PER") {
         print!("PER segment found, ");
-        per_segments = get_per(get_segment_contents("PER", &contents));
+        let per_segment = get_per(get_segment_contents("PER", &contents));
+        match &per_technical_contact.per01_contact_function_code as &str{
+            "CX" => {
+                per_payer_business = per_segment.clone();
+            },
+            "BL" => {
+                per_technical_contact = per_segment.clone();
+            },
+            "IC" => {
+                per_technical_contact = per_segment.clone();;
+            },
+            _ => {
+                per_technical_contact = per_segment.clone();
+            }
+        }
         println!("PER segment parsed");
         contents = content_trim("PER",contents);
     }
 
+    if contents.contains("PER") {
+        print!("PER segment found, ");
+        let per_segment = get_per(get_segment_contents("PER", &contents));
+        match &per_technical_contact.per01_contact_function_code as &str{
+            "CX" => {
+                per_payer_business = per_segment.clone();
+            },
+            "BL" => {
+                per_technical_contact = per_segment.clone();
+            },
+            "IC" => {
+                per_technical_contact = per_segment.clone();;
+            },
+            _ => {
+                per_technical_contact = per_segment.clone();
+            }
+        }
+        println!("PER segment parsed");
+        contents = content_trim("PER",contents);
+    }
+
+    if contents.contains("PER") {
+        print!("PER segment found, ");
+        let per_segment = get_per(get_segment_contents("PER", &contents));
+        match &per_technical_contact.per01_contact_function_code as &str{
+            "CX" => {
+                per_payer_business = per_segment.clone();
+            },
+            "BL" => {
+                per_technical_contact = per_segment.clone();
+            },
+            "IC" => {
+                per_technical_contact = per_segment.clone();;
+            },
+            _ => {
+                per_technical_contact = per_segment.clone();
+            }
+        }
+        println!("PER segment parsed");
+        contents = content_trim("PER",contents);
+    }
+
+
     println!("Loop 1000A parsed\n");
-    return (n1_segments, n3_segments, n4_segments, per_segments, contents)
+    return (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents)
 }
 
 
@@ -69,7 +138,7 @@ mod tests {
     #[test]
     fn test_loop1000a() {
         let contents = String::from("N1*PR*DELTA DENTAL OF ABC~N3*225 MAIN STREET~N4*CENTERVILLE*PA*17111~PER*BL*JANE DOE*TE*9005555555~");
-        let (n1_segments, n3_segments, n4_segments, per_segments, contents) = get_loop_1000_a(contents);
+        let (n1_segments, n3_segments, n4_segments,  ref_segments, per_technical_contact, per_payer_business, per_web_site, contents) = get_loop_1000_a(contents);
         assert_eq!(n1_segments.payer_id_code, "PR");
         assert_eq!(n1_segments.payee_name, "DELTA DENTAL OF ABC");
         assert_eq!(n3_segments.payee_address, "225 MAIN STREET");

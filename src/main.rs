@@ -11,7 +11,7 @@ mod segments;
 fn main() {
 
     // Open File and read content
-    let mut file = File::open("./data/X221-claim-specific-negotiated-discount.edi").unwrap();
+    let mut file = File::open("./data/X221-multiple-claims-single-check.edi").unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 
@@ -21,6 +21,12 @@ fn main() {
         implement logger
         make it safer when something does not exist
         println statement is in helper.rs line 3
+
+
+        Check against the guide how many of each segment is in each loop, 
+        finding some mismatches between the standard and the implementation of EDI835!!!
+
+        Table 1: there are 3 PERs, 2 are optional and the required one may come in the middle
     */
 
 
@@ -28,10 +34,10 @@ fn main() {
     let (_isa, _gs, contents) = get_interchange_control(contents.clone());
 
     // Table 1
-    let (_st, _bpr, _trn, _cur, _ref, _dtm, contents) = get_first_table_header(contents.clone());
+    let (_st, _bpr, _trn, _cur, _ref, _ref2, _dtm, contents) = get_first_table_header(contents.clone());
 
     // Loop 1000A Payer Identification
-    let (_n1, _n3, _n4, _per, contents) = get_loop_1000_a(contents.clone());
+    let (_n1, _n3, _n4, _ref, _per, _per2, _per3, contents) = get_loop_1000_a(contents.clone());
 
     // Loop 1000B Payee Identification
     let (_n1, _n3, _n4, _ref, _rdm, mut contents) = get_loop_1000_b(contents.clone());
@@ -73,7 +79,7 @@ fn main() {
     // Loop 2110 Service Payment Information
     let svc_count= contents.matches("SVC").count();
     let mut loop_2110_array = vec![];
-    println!("Number of loops in loop 2100: {:?}",svc_count);
+    println!("Number of loops in loop 2110: {:?}",svc_count);
     let (mut svc, mut dtm, mut cas, mut ref_service_identification, mut ref_line_item_control_number, 
          mut ref_rendering_provider_information, mut ref_healthcare_policy_identification, mut amt, mut qty, mut lq);
 
