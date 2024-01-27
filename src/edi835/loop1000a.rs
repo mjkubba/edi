@@ -5,6 +5,16 @@ use crate::segments::per::*;
 use crate::segments::r#ref::*;
 use crate::helper::helper::*;
 
+#[derive(Debug, Default,PartialEq,Clone)]
+pub struct Loop1000as {
+    pub n1_segments: N1,
+    pub n3_segments: N3,
+    pub n4_segments: N4,
+    pub ref_segments: REF,
+    pub per_payer_business: PER,
+    pub per_technical_contact: PER,
+    pub per_web_site: PER,
+}
 
 pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, String) {
     
@@ -127,7 +137,19 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
     return (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents)
 }
 
-
+pub fn get_1000as(contents:String) -> (Loop1000as, String) {
+    let (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents) = get_loop_1000_a(contents);
+    let header  = Loop1000as {
+        n1_segments,
+        n3_segments,
+        n4_segments,
+        ref_segments,
+        per_payer_business,
+        per_technical_contact,
+        per_web_site,
+    };
+    return (header,contents)
+}
 
 // unit tests
 

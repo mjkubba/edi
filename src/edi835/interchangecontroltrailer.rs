@@ -2,6 +2,11 @@ use crate::segments::iea::*;
 use crate::segments::ge::*;
 use crate::helper::helper::*;
 
+#[derive(Debug, Default,PartialEq,Clone)]
+pub struct InterchangeTrailer {
+    pub ge_segments: GE,
+    pub iea_segments: IEA,
+}
 
 
 pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String) {
@@ -32,7 +37,14 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
     return (ge_segments,iea_segments, contents)
 }
 
-
+pub fn get_interchange_trailer(contents:String) -> (InterchangeTrailer, String) {
+    let (ge_segments,iea_segments, contents) = get_interchange_control_trailer(contents);
+    let header = InterchangeTrailer {
+        ge_segments,
+        iea_segments,
+    };
+    return (header, contents)
+}
 
 // unit tests
 

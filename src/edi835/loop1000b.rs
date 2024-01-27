@@ -5,6 +5,16 @@ use crate::segments::r#ref::*;
 use crate::segments::rdm::*;
 use crate::helper::helper::*;
 
+#[derive(Debug, Default,PartialEq,Clone)]
+pub struct Loop1000bs {
+    pub n1_segments: N1,
+    pub n3_segments: N3,
+    pub n4_segments: N4,
+    pub ref_segments: REF,
+    pub rdm_segments: RDM,
+}
+
+
 pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     // Loop 1000B Payee Identification (1)
     // N1 Payee Identification R 1
@@ -57,6 +67,18 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
 }
 
+
+pub fn get_1000bs(contents:String) -> (Loop1000bs, String) {
+    let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents);
+    let header  = Loop1000bs {
+        n1_segments,
+        n3_segments,
+        n4_segments,
+        ref_segments,
+        rdm_segments,
+    };
+    return (header,contents)
+}
 
 // unit tests
 

@@ -6,6 +6,17 @@ use crate::segments::r#ref::*;
 use crate::segments::dtm::*;
 use crate::helper::helper::*;
 
+#[derive(Debug, Default,PartialEq,Clone)]
+pub struct Table1s {
+    pub st_segments: ST,
+    pub bpr_segments: BPR,
+    pub trn_segments: TRN,
+    pub cur_segments: CUR,
+    pub ref_receiver_segments: REF,
+    pub ref_version_segments: REF,
+    pub dtm_segments: DTM,    
+}
+
 
 pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, REF, DTM, String) {
 
@@ -86,6 +97,21 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, R
 
     println!("Table 1 parsed\n");
     return (st_segments, bpr_segments, trn_segments, cur_segments, ref_receiver_segments, ref_version_segments, dtm_segments, contents)
+}
+
+
+pub fn get_table1s(contents:String) -> (Table1s, String) {
+    let (st_segments, bpr_segments, trn_segments, cur_segments, ref_receiver_segments, ref_version_segments, dtm_segments, contents) = get_first_table_header(contents);
+    let header  = Table1s {
+        st_segments,
+        bpr_segments,
+        trn_segments,
+        cur_segments,
+        ref_receiver_segments,
+        ref_version_segments,
+        dtm_segments,
+    };
+    return (header,contents)
 }
 
 

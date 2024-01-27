@@ -2,6 +2,13 @@ use crate::segments::plb::*;
 use crate::segments::se::*;
 use crate::helper::helper::*;
 
+#[derive(Debug, Default,PartialEq,Clone)]
+pub struct Table3s {
+    pub plb_segments: PLB,
+    pub se_segments: SE,
+}
+
+
 pub fn get_table_3(mut contents: String) -> (PLB, SE, String) {
     // Table 3
     // PLB Provider Adjustment S >1
@@ -28,6 +35,14 @@ pub fn get_table_3(mut contents: String) -> (PLB, SE, String) {
     return (plb_segments, se_segments, contents)
 }
 
+pub fn get_table3s(contents:String) -> (Table3s, String) {
+    let (plb_segments, se_segments, contents) = get_table_3(contents);
+    let header = Table3s {
+        plb_segments,
+        se_segments,
+    };
+    return (header, contents)
+}
 
 // unit tests
 
