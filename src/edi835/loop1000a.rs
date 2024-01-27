@@ -70,7 +70,7 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
                 per_technical_contact = per_segment.clone();
             },
             "IC" => {
-                per_technical_contact = per_segment.clone();;
+                per_web_site = per_segment.clone();
             },
             _ => {
                 per_technical_contact = per_segment.clone();
@@ -91,7 +91,7 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
                 per_technical_contact = per_segment.clone();
             },
             "IC" => {
-                per_technical_contact = per_segment.clone();;
+                per_web_site = per_segment.clone();
             },
             _ => {
                 per_technical_contact = per_segment.clone();
@@ -112,7 +112,7 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
                 per_technical_contact = per_segment.clone();
             },
             "IC" => {
-                per_technical_contact = per_segment.clone();;
+                per_web_site = per_segment.clone();
             },
             _ => {
                 per_technical_contact = per_segment.clone();
@@ -145,8 +145,11 @@ mod tests {
         assert_eq!(n4_segments.payee_city, "CENTERVILLE");
         assert_eq!(n4_segments.payee_state, "PA");
         assert_eq!(n4_segments.payee_zip, "17111");
-        assert_eq!(per_segments.per01_contact_function_code, "BL");
-        assert_eq!(per_segments.per02_contact_name, "JANE DOE");
+        assert_eq!(per_technical_contact.per01_contact_function_code, "BL");
+        assert_eq!(per_technical_contact.per02_contact_name, "JANE DOE");
+        assert_eq!(per_payer_business, PER::default());
+        assert_eq!(per_web_site, PER::default());
+        assert_eq!(ref_segments, REF::default());
         assert_eq!(contents, "");
     }
 

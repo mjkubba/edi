@@ -15,13 +15,6 @@ pub fn get_full_segment_contents(key:&str, contents: &str) -> String {
     content.to_string()
 }
 
-// pub fn content_trim(key: &str, contents:String) -> String {
-//     contents.trim_start_matches(&get_full_segment_contents(&key, &contents)).trim_start_matches("~").to_string()
-// }
-
-// pub fn content_trim(key: &str, contents:String) -> String {
-//     contents.replace(&get_full_segment_contents(&key, &contents), "").trim_start_matches("~").to_string()
-// }
 
 pub fn content_trim(key: &str, contents:String) -> String {
     let to_remove = get_full_segment_contents(&key, &contents)+"~";

@@ -1,5 +1,8 @@
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
+use std::env;
+
 
 mod edi835;
 use edi835::{interchangecontrol::*,table1::*,loop1000a::*,loop1000b::*,loop2000::*,loop2100::*,loop2110::*,table3::*,interchangecontroltrailer::*};
@@ -9,9 +12,24 @@ mod segments;
 
 
 fn main() {
-
+    let mut file_path;
     // Open File and read content
-    let mut file = File::open("./data/X221-multiple-claims-single-check.edi").unwrap();
+    let args: Vec<String> = env::args().collect();
+    println!("{:?}", args);
+    if args.get(1).is_some() {
+        file_path = Path::new(&args[1]);
+    } else {
+        file_path = Path::new("./data/edi835-1.edi");
+    }
+
+    if file_path.exists() {
+        println!("File exists");
+    } else {
+        println!("File does not exist");
+        println!("Loading default demo file edi835-1.edi");
+        file_path = Path::new("./data/edi835-1.edi");
+    }
+    let mut file = File::open(file_path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
 

@@ -103,6 +103,7 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, R
             assert_eq!(bpr_segments.bpr01_transaction_handling_code, "I");
             assert_eq!(cur_segments, CUR::default());
             assert_eq!(ref_receiver_segments.reference_id_number_qualifier, "EV");
+            assert_eq!(ref_version_segments, REF::default());
             assert_eq!(dtm_segments, DTM::default());
             assert_eq!(contents, "ISA*00*          *00*          *ZZ*SUBMITTERS ID  *ZZ*RECEIVERS ID   *200101*1253*^*00501*000000905*0*T*|~GS*HP*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X221A1~");
         }
