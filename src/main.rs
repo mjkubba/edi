@@ -15,11 +15,10 @@ fn main() {
     let mut file_path;
     // Open File and read content
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
     if args.get(1).is_some() {
         file_path = Path::new(&args[1]);
     } else {
-        file_path = Path::new("./data/edi835-1.edi");
+        file_path = Path::new("./demo/edi835-1.edi");
     }
 
     if file_path.exists() {
@@ -27,7 +26,7 @@ fn main() {
     } else {
         println!("File does not exist");
         println!("Loading default demo file edi835-1.edi");
-        file_path = Path::new("./data/edi835-1.edi");
+        file_path = Path::new("./demo/edi835-1.edi");
     }
     let mut file = File::open(file_path).unwrap();
     let mut contents = String::new();

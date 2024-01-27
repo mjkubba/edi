@@ -22,7 +22,8 @@ All harcoded for now!
 
 ### Local testing:
 to start locally:    
-`cargo run`
+`cargo run <edifilepath>` to read your edi file    
+`cargo run` will attempt to run a demo file
 
 ### TODO:
 everything!!!
