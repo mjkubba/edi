@@ -15,7 +15,7 @@ Used example file from https://x12.org/examples/005010x221 located at the src di
 
 ### Inputs
 ...
-All harcoded for now!
+The file name after `cargo run <edifilepath>` or the compiled version `./edi <edifilepath>` for *nix and `.\edi.exe <edifilepath>` for Windows
 
 ### Outputs:
 ...
