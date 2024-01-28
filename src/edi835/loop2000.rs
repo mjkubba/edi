@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::lx::*;
 use crate::segments::ts3::*;
 use crate::segments::ts2::*;
@@ -24,25 +26,25 @@ pub fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
     let mut ts2_segments = TS2::default();
 
     if contents.contains("LX") {
-        print!("LX segment found, ");
+        info!("LX segment found, ");
         lx_segments = get_lx(get_segment_contents("LX", &contents));
-        println!("LX segment parsed");
+        info!("LX segment parsed");
         contents = content_trim("LX",contents);
     }
     if contents.contains("TS3") {
-        print!("TS3 segment found, ");
+        info!("TS3 segment found, ");
         ts3_segments = get_ts3(get_segment_contents("TS3", &contents));
-        println!("TS3 segment parsed");
+        info!("TS3 segment parsed");
         contents = content_trim("TS3",contents);
     }
     if contents.contains("TS2") {
-        print!("TS2 segment found, ");
+        info!("TS2 segment found, ");
         ts2_segments = get_ts2(get_segment_contents("TS2", &contents));
-        println!("TS2 segment parsed");
+        info!("TS2 segment parsed");
         contents = content_trim("TS2",contents);
     }
 
-    println!("Loop 2000 parsed\n");
+    info!("Loop 2000 parsed\n");
     return (lx_segments, ts3_segments, ts2_segments, contents)
 }
 
@@ -50,7 +52,7 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000s>, String) {
 
     let lx_count= contents.matches("LX").count();
     let mut loop_2000_array = vec![];
-    println!("Number of loops in loop 2000: {:?}",lx_count);
+    info!("Number of loops in loop 2000: {:?}",lx_count);
     for _ in 0..lx_count {
         let (lx, ts3, ts2);
         (lx, ts3, ts2, contents) = get_loop_2000(contents.clone());

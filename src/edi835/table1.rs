@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::st::*;
 use crate::segments::bpr::*;
 use crate::segments::trn::*;
@@ -46,56 +48,56 @@ pub fn get_first_table_header(mut contents:String) -> (ST, BPR, TRN, CUR, REF, R
     let mut dtm_segments = DTM::default();
 
     if contents.contains("ST") {
-        print!("ST segment found, ");
+        info!("ST segment found, ");
         st_segments = get_st(get_segment_contents("ST", &contents));
-        println!("ST segment parsed");
+        info!("ST segment parsed");
         contents = content_trim("ST",contents);
     }
 
     if contents.contains("BPR") {
-        print!("BPR segment found, ");
+        info!("BPR segment found, ");
         bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
-        println!("BPR segment parsed");
+        info!("BPR segment parsed");
         contents = content_trim("BPR",contents);
     }
 
     if contents.contains("TRN") {
-        print!("TRN segment found, ");
+        info!("TRN segment found, ");
         trn_segments = get_trn(get_segment_contents("TRN", &contents));
-        println!("TRN segment parsed");
+        info!("TRN segment parsed");
         contents = content_trim("TRN",contents);
     }
     
     if contents.contains("CUR") {
-        print!("CUR segment found, ");
+        info!("CUR segment found, ");
         cur_segments = get_cur(get_segment_contents("CUR", &contents));
-        println!("CUR segment parsed");
+        info!("CUR segment parsed");
         contents = content_trim("CUR",contents);
     }
 
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_receiver_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
 
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_version_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
 
     if contents.contains("DTM") {
-        print!("DTM segment found, ");
+        info!("DTM segment found, ");
         dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
-        println!("DTM segment parsed");
+        info!("DTM segment parsed");
         contents = content_trim("DTM",contents);
     }
 
 
-    println!("Table 1 parsed\n");
+    info!("Table 1 parsed\n");
     return (st_segments, bpr_segments, trn_segments, cur_segments, ref_receiver_segments, ref_version_segments, dtm_segments, contents)
 }
 

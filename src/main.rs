@@ -2,16 +2,16 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::env;
-
+use log::{info, warn};
 
 mod edi835;
-// use edi835::{interchangecontrol::*,table1::*,loop1000a::*,loop1000b::*,loop2000::*,loop2100::*,loop2110::*,table3::*,interchangecontroltrailer::*};
 use edi835::controller::*;
 mod helper;
 mod segments;
 
 
 fn main() {
+    env_logger::init();
     let mut file_path;
     // Open File and read content
     let args: Vec<String> = env::args().collect();
@@ -22,10 +22,10 @@ fn main() {
     }
 
     if file_path.exists() {
-        println!("File exists");
+        info!("File exists");
     } else {
-        println!("File does not exist");
-        println!("Loading default demo file edi835-1.edi");
+        warn!("File does not exist");
+        info!("Loading default demo file edi835-1.edi");
         file_path = Path::new("./demo/edi835-1.edi");
     }
     let mut file = File::open(file_path).unwrap();
@@ -35,7 +35,7 @@ fn main() {
 
     /*
     TODO:
-        implement logger
+        ~implement logger~
         make it safer when something does not exist
 
         Check against the guide how many of each segment is in each loop, 
@@ -47,10 +47,10 @@ fn main() {
     */
 
     if contents.contains("~ST*835*"){
-        println!("File is 835");
-        get_835(contents.clone());
+        info!("File is 835");
+        let _edi835 = get_835(contents.clone());
     } else {
-        println!("File is not 835, other types not implemeted yet");
+        warn!("File is not 835, other types not implemeted yet");
     }
     
 

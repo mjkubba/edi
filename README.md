@@ -24,6 +24,8 @@ All harcoded for now!
 to start locally:    
 `cargo run <edifilepath>` to read your edi file    
 `cargo run` will attempt to run a demo file
+`RUST_LOG=info cargo run ./data/X221-claim-adjustment-reason-code-45.edi` example of passing in a file and setting log level   
+
 
 ### TODO:
 everything!!!

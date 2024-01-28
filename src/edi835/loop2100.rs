@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::clp::*;
 use crate::segments::cas::*;
 use crate::segments::nm1::*;
@@ -84,121 +86,121 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
     let mut qty_segments = QTY::default();
 
     if contents.contains("CLP") {
-        print!("CLP segment found, ");
+        info!("CLP segment found, ");
         clp_segments = get_clp(get_segment_contents("CLP", &contents));
-        println!("CLP segment parsed");
+        info!("CLP segment parsed");
         contents = content_trim("CLP",contents);
     }
     if contents.contains("CAS") {
-        print!("CAS segment found, ");
+        info!("CAS segment found, ");
         cas_segments = get_cas(get_segment_contents("CAS", &contents));
-        println!("CAS segment parsed");
+        info!("CAS segment parsed");
         contents = content_trim("CAS",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_patint_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_insured_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_corrected_patient_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     } 
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_service_provider_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_crossover_carrier_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_corrected_priority_payer_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("NM1") {
-        print!("NM1 segment found, ");
+        info!("NM1 segment found, ");
         nm1_other_subscriber_segments = get_nm1(get_segment_contents("NM1", &contents));
-        println!("NM1 segment parsed");
+        info!("NM1 segment parsed");
         contents = content_trim("NM1",contents);
     }
     if contents.contains("MIA") {
-        print!("MIA segment found, ");
+        info!("MIA segment found, ");
         mia_segments = get_mia(get_segment_contents("MIA", &contents));
-        println!("MIA segment parsed");
+        info!("MIA segment parsed");
         contents = content_trim("MIA",contents);
     }
     if contents.contains("MOA") {
-        print!("MOA segment found, ");
+        info!("MOA segment found, ");
         moa_segments = get_moa(get_segment_contents("MOA", &contents));
-        println!("MOA segment parsed");
+        info!("MOA segment parsed");
         contents = content_trim("MOA",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_other_claim_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_rendering_provider_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("DTM") {
-        print!("DTM segment found, ");
+        info!("DTM segment found, ");
         dtm_statement_from_segments = get_dtm(get_segment_contents("DTM", &contents));
-        println!("DTM segment parsed");
+        info!("DTM segment parsed");
         contents = content_trim("DTM",contents);
     }
     if contents.contains("DTM") {
-        print!("DTM segment found, ");
+        info!("DTM segment found, ");
         dtm_coverage_expiration_segments = get_dtm(get_segment_contents("DTM", &contents));
-        println!("DTM segment parsed");
+        info!("DTM segment parsed");
         contents = content_trim("DTM",contents);
     }
     if contents.contains("DTM") {
-        print!("DTM segment found, ");
+        info!("DTM segment found, ");
         dtm_claim_received_segments = get_dtm(get_segment_contents("DTM", &contents));
-        println!("DTM segment parsed");
+        info!("DTM segment parsed");
         contents = content_trim("DTM",contents);
     }
     if contents.contains("PER") {
-        print!("PER segment found, ");
+        info!("PER segment found, ");
         per_segments = get_per(get_segment_contents("PER", &contents));
-        println!("PER segment parsed");
+        info!("PER segment parsed");
         contents = content_trim("PER",contents);
     }
     if contents.contains("AMT") {
-        print!("AMT segment found, ");
+        info!("AMT segment found, ");
         amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        println!("AMT segment parsed");
+        info!("AMT segment parsed");
         contents = content_trim("AMT",contents);
     }
     if contents.contains("QTY") {
-        print!("QTY segment found, ");
+        info!("QTY segment found, ");
         qty_segments = get_qty(get_segment_contents("QTY", &contents));
-        println!("QTY segment parsed");
+        info!("QTY segment parsed");
         contents = content_trim("QTY",contents);
     }
 
-    println!("Loop 2100 parsed\n");
+    info!("Loop 2100 parsed\n");
 
     return (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments,
             nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, 
@@ -209,7 +211,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
 pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
     let clp_count= contents.matches("CLP").count();
     let mut loop_2100_array = vec![];
-    println!("Number of loops in loop 2100: {:?}",clp_count);
+    info!("Number of loops in loop 2100: {:?}",clp_count);
     for _ in 0..clp_count {
         let (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, 
             nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments, nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, 

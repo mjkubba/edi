@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::svc::*;
 use crate::segments::dtm::*;
 use crate::segments::cas::*;
@@ -50,67 +52,67 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, DTM, CAS, REF, REF, REF, REF
     let mut lq_segments = LQ::default();
 
     if contents.contains("SVC") {
-        print!("SVC segment found, ");
+        info!("SVC segment found, ");
         svc_segments = get_svc(get_segment_contents("SVC", &contents));
-        println!("SVC segment parsed");
+        info!("SVC segment parsed");
         contents = content_trim("SVC",contents);
     }
     if contents.contains("DTM") {
-        print!("DTM segment found, ");
+        info!("DTM segment found, ");
         dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
-        println!("DTM segment parsed");
+        info!("DTM segment parsed");
         contents = content_trim("DTM",contents);
     }
     if contents.contains("CAS") {
-        print!("CAS segment found, ");
+        info!("CAS segment found, ");
         cas_segments = get_cas(get_segment_contents("CAS", &contents));
-        println!("CAS segment parsed");
+        info!("CAS segment parsed");
         contents = content_trim("CAS",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_service_identification = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_line_item_control_number = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_rendering_provider_information = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_healthcare_policy_identification = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("AMT") {
-        print!("AMT segment found, ");
+        info!("AMT segment found, ");
         amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        println!("AMT segment parsed");
+        info!("AMT segment parsed");
         contents = content_trim("AMT",contents);
     }
     if contents.contains("QTY") {
-        print!("QTY segment found, ");
+        info!("QTY segment found, ");
         qty_segments = get_qty(get_segment_contents("QTY", &contents));
-        println!("QTY segment parsed");
+        info!("QTY segment parsed");
         contents = content_trim("QTY",contents);
     }
     if contents.contains("LQ") {
-        print!("LQ segment found, ");
+        info!("LQ segment found, ");
         lq_segments = get_lq(get_segment_contents("LQ", &contents));
-        println!("LQ segment parsed");
+        info!("LQ segment parsed");
         contents = content_trim("LQ",contents);
     }
 
-    println!("Loop 2110 parsed\n");
+    info!("Loop 2110 parsed\n");
 
     return (svc_segments, dtm_segments, cas_segments, ref_service_identification, ref_line_item_control_number, ref_rendering_provider_information, ref_healthcare_policy_identification, amt_segments, 
             qty_segments, lq_segments, contents)
@@ -119,7 +121,7 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, DTM, CAS, REF, REF, REF, REF
     // // Loop 2110 Service Payment Information
     // let svc_count= contents.matches("SVC").count();
     // let mut loop_2110_array = vec![];
-    // println!("Number of loops in loop 2110: {:?}",svc_count);
+    // info!("Number of loops in loop 2110: {:?}",svc_count);
     // let (mut svc, mut dtm, mut cas, mut ref_service_identification, mut ref_line_item_control_number, 
     //      mut ref_rendering_provider_information, mut ref_healthcare_policy_identification, mut amt, mut qty, mut lq);
 
@@ -134,7 +136,7 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
 
     let svc_count= contents.matches("SVC").count();
     let mut loop_2110_array = vec![];
-    println!("Number of loops in loop 2110: {:?}",svc_count);
+    info!("Number of loops in loop 2110: {:?}",svc_count);
     
     for _ in 0..svc_count {
         let ( svc_segments,  dtm_segments,  cas_segments,  ref_service_identification,  ref_line_item_control_number,  ref_rendering_provider_information, 

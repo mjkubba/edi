@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::n1::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
@@ -33,37 +35,37 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     let mut rdm_segments = RDM::default();
 
     if contents.contains("N1") {
-        print!("N1 segment found, ");
+        info!("N1 segment found, ");
         n1_segments = get_n1(get_segment_contents("N1", &contents));
-        println!("N1 segment parsed");
+        info!("N1 segment parsed");
         contents = content_trim("N1",contents);
     }
     if contents.contains("N3") {
-        print!("N3 segment found, ");
+        info!("N3 segment found, ");
         n3_segments = get_n3(get_segment_contents("N3", &contents));
-        println!("N3 segment parsed");
+        info!("N3 segment parsed");
         contents = content_trim("N3",contents);
     }
     if contents.contains("N4") {
-        print!("N4 segment found, ");
+        info!("N4 segment found, ");
         n4_segments = get_n4(get_segment_contents("N4", &contents));
-        println!("N4 segment parsed");
+        info!("N4 segment parsed");
         contents = content_trim("N4",contents);
     }
     if contents.contains("REF") {
-        print!("REF segment found, ");
+        info!("REF segment found, ");
         ref_segments = get_ref(get_segment_contents("REF", &contents));
-        println!("REF segment parsed");
+        info!("REF segment parsed");
         contents = content_trim("REF",contents);
     }
     if contents.contains("RDM") {
-        print!("RDM segment found, ");
+        info!("RDM segment found, ");
         rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
-        println!("RDM segment parsed");
+        info!("RDM segment parsed");
         contents = content_trim("RDM",contents);
     }
 
-    println!("Loop 1000B parsed\n");
+    info!("Loop 1000B parsed\n");
     return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
 }
 

@@ -1,6 +1,8 @@
+use log::info;
+
 pub fn get_segment_contents(key:&str, contents:  &str) -> String {
     let segment_content = get_full_segment_contents(key,contents);
-    println!("segment_content: {}",segment_content);
+    info!("segment_content: {}",segment_content);
     let start_skip = key.len() + 1;
     let content = &segment_content[start_skip..];
     content.to_string()

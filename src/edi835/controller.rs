@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::edi835::interchangecontrol::*;
 use crate::edi835::table1::*;
 use crate::edi835::loop1000a::*;
@@ -75,6 +77,6 @@ pub fn get_835(mut contents: String) -> Edi835 {
     };
     
 
-    println!("{:?}", contents);
+    info!("Unprocessed segments: {:?}", contents);
     edi835
 }

@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::segments::iea::*;
 use crate::segments::ge::*;
 use crate::helper::helper::*;
@@ -19,20 +21,20 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
     let mut ge_segments = GE::default();
 
     if contents.contains("GE") {
-        print!("GE segment found, ");
+        info!("GE segment found, ");
         ge_segments = get_ge(get_segment_contents("GE", &contents));
-        println!("GE segment parsed");
+        info!("GE segment parsed");
         contents = content_trim("GE",contents);
     }
 
     if contents.contains("IEA") {
-        print!("IEA segment found, ");
+        info!("IEA segment found, ");
         iea_segments = get_iea(get_segment_contents("IEA", &contents));
-        println!("IEA segment parsed");
+        info!("IEA segment parsed");
         contents = content_trim("IEA",contents);
     }
 
-    println!("Interchange Control Trailer parsed\n");
+    info!("Interchange Control Trailer parsed\n");
 
     return (ge_segments,iea_segments, contents)
 }
