@@ -13,12 +13,12 @@ I'm using Amazon CodeWhisperer to help me with this new endeavour if there are a
 ### Artifacts and Components:
 Used example file from https://x12.org/examples/005010x221 located at the src dir, will not be included in the repo (gitignored)
 
-### Inputs
-...
-The file name after `cargo run <edifilepath>` or the compiled version `./edi <edifilepath>` for *nix and `.\edi.exe <edifilepath>` for Windows
+### Inputs   
+The file name after `cargo run`:    
+`cargo run <edifilepath>` or the compiled version `./edi <edifilepath>` for *nix and `.\edi.exe <edifilepath>` for Windows.   
 
-### Outputs:
-...
+### Outputs:   
+screen dump of the EDI file in semi-json format < still working on final format.
 
 ### Local testing:
 to start locally:    
