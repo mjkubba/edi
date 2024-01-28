@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 // EDI 835 TS2 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default, PartialEq,Clone)]
+#[derive(Debug, Default, PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct TS2 {
     pub ts201_total_drg_amount: String,

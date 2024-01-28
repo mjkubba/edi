@@ -1,4 +1,6 @@
-#[derive(Debug, Default,PartialEq,Clone)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct IEA {
     pub number_of_included_group: String,

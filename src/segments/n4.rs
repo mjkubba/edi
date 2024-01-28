@@ -1,4 +1,6 @@
-#[derive(Debug, Default,PartialEq,Clone)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct N4{
     pub payee_city: String,

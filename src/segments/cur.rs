@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 // EDI 835 CUR segment
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 
 pub struct CUR {

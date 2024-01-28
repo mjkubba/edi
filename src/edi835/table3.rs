@@ -1,10 +1,11 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::plb::*;
 use crate::segments::se::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table3s {
     pub plb_segments: PLB,
     pub se_segments: SE,

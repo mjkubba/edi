@@ -1,4 +1,6 @@
-#[derive(Debug, Default,PartialEq,Clone)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct SVC {
     pub svc01_1_product_or_service_is_qualifier: String,

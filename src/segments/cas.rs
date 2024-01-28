@@ -1,4 +1,6 @@
-#[derive(Debug, Default,PartialEq,Clone)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct CAS{ 
     pub cas01_claim_adjustsment_group_code: String,

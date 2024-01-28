@@ -1,4 +1,5 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::clp::*;
 use crate::segments::cas::*;
@@ -13,7 +14,7 @@ use crate::segments::qty::*;
 use crate::helper::helper::*;
 
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2100s {
     pub clp_segments: CLP,
     pub cas_segments: CAS,

@@ -1,10 +1,11 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::isa::*;
 use crate::segments::gs::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct InterchangeHeader {
     pub isa_segments: ISA,
     pub gs_segments: GS,

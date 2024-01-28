@@ -1,10 +1,11 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::iea::*;
 use crate::segments::ge::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct InterchangeTrailer {
     pub ge_segments: GE,
     pub iea_segments: IEA,

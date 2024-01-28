@@ -1,4 +1,5 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::n1::*;
 use crate::segments::n3::*;
@@ -7,7 +8,7 @@ use crate::segments::r#ref::*;
 use crate::segments::rdm::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop1000bs {
     pub n1_segments: N1,
     pub n3_segments: N3,

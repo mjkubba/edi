@@ -1,11 +1,12 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::lx::*;
 use crate::segments::ts3::*;
 use crate::segments::ts2::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2000s {
     pub lx_segments: LX,
     pub ts3_segments: TS3,

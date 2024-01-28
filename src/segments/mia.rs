@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 // EDI 835 MSI - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct MIA {
     pub mia01_covered_days_or_visits_count: String,

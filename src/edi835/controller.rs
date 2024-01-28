@@ -1,5 +1,7 @@
 use log::info;
 
+use serde::{Serialize, Deserialize};
+
 use crate::edi835::interchangecontrol::*;
 use crate::edi835::table1::*;
 use crate::edi835::loop1000a::*;
@@ -11,7 +13,7 @@ use crate::edi835::table3::*;
 use crate::edi835::interchangecontroltrailer::*;
 
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Edi835{
     interchange_header: InterchangeHeader,
     table1s: Table1s,

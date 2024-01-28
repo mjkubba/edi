@@ -1,4 +1,5 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::svc::*;
 use crate::segments::dtm::*;
@@ -12,7 +13,7 @@ use crate::helper::helper::*;
 
 
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2110s {
     pub svc_segments: SVC,
     pub dtm_segments: DTM,

@@ -1,4 +1,5 @@
 use log::info;
+use serde::{Serialize, Deserialize};
 
 use crate::segments::st::*;
 use crate::segments::bpr::*;
@@ -8,7 +9,7 @@ use crate::segments::r#ref::*;
 use crate::segments::dtm::*;
 use crate::helper::helper::*;
 
-#[derive(Debug, Default,PartialEq,Clone)]
+#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table1s {
     pub st_segments: ST,
     pub bpr_segments: BPR,
