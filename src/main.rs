@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Read;
+use std::io::Write;
 use std::path::Path;
 use std::env;
 use log::{info, warn};
@@ -9,28 +10,56 @@ use edi835::controller::*;
 mod helper;
 mod segments;
 
+fn set_logger(){
+    env_logger::builder()
+    .filter_level(log::LevelFilter::Warn)
+    .format_target(false)
+    .format_timestamp(None)
+    .init();
+}
+
+fn write_to_file(write_contents: String) {
+    // setting up write file functionality
+    let write_file_path;
+    let args: Vec<String> = env::args().collect();
+    if args.get(2).is_some() {
+        write_file_path = Path::new(&args[2]);
+    } else {
+        warn!("No File provided, Writing to default file out.json");
+        write_file_path = Path::new("./out.json");
+    }
+    // write_file_path = Path::new("./out.json");
+    let mut write_file = File::create(write_file_path).unwrap();
+    write_file.write_all(write_contents.as_bytes()).unwrap();
+}
 
 fn main() {
-    env_logger::init();
+    // env_logger::init();
+    set_logger();
     let mut file_path;
     // Open File and read content
     let args: Vec<String> = env::args().collect();
     if args.get(1).is_some() {
         file_path = Path::new(&args[1]);
     } else {
+        warn!("No File provided, Loading default demo file edi835-1.edi");
         file_path = Path::new("./demo/edi835-1.edi");
     }
 
     if file_path.exists() {
         info!("File exists");
     } else {
-        warn!("File does not exist");
-        info!("Loading default demo file edi835-1.edi");
+        warn!("File does not exist, Loading default demo file edi835-1.edi");
         file_path = Path::new("./demo/edi835-1.edi");
     }
     let mut file = File::open(file_path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
+
+
+
+
+
 
 
     /*
@@ -50,7 +79,8 @@ fn main() {
         info!("File is 835");
         let edi835 = get_835(contents.clone());
         let serialized_edi = serde_json::to_string(&edi835).unwrap();
-        println!("{}", serialized_edi);
+        // println!("{}", serialized_edi);
+        write_to_file(serialized_edi);
     } else {
         warn!("File is not 835, other types not implemeted yet");
     }
