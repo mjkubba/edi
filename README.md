@@ -18,7 +18,9 @@ The file name after `cargo run`:
 `cargo run <edifilepath>` or the compiled version `./edi <edifilepath>` for *nix and `.\edi.exe <edifilepath>` for Windows.   
 
 ### Outputs:   
-screen dump of the EDI file in semi-json format < still working on final format.
+If file path is provided in the 2nd place after the file name it will be used to dump the json,     
+otherwise json output will be written in out.json file
+`cargo run <edifilepath> <outputfile>`
 
 ### Local testing:
 to start locally:    
@@ -28,4 +30,12 @@ to start locally:
 
 
 ### TODO:
-everything!!!
+* ~~implement logger~~
+* ~~check if the file passed is 835, this can be read from ~ST*835*~~
+* make it safer when something does not exist
+* Check against the guide how many of each segment is in each loop, 
+* finding some mismatches between the standard and the implementation of EDI835!!!
+* ~~Table 1: there are 3 PERs, 2 are optional and the required one may come in the middle~~
+* Adding parameterized input, -f for file -o for output etc.
+* Adding Write EDI 835 functionality
+* More cool things
