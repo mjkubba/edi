@@ -31,7 +31,7 @@ to start locally:
 
 ### TODO:
 * ~~implement logger~~
-* ~~check if the file passed is 835, this can be read from ST*835* ~~
+* ~~check if the file passed is 835, this can be read from ST*835*~~
 * make it safer when something does not exist
 * Check against the guide how many of each segment is in each loop, 
 * finding some mismatches between the standard and the implementation of EDI835!!!
