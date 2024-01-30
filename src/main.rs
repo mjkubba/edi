@@ -10,6 +10,12 @@ use edi835::controller::*;
 mod helper;
 mod segments;
 
+#[derive(Debug, Default)]
+struct Args {
+    input_file: String,
+    output_file: String,
+}
+
 fn set_logger(){
     env_logger::builder()
     .filter_level(log::LevelFilter::Warn)
@@ -18,12 +24,11 @@ fn set_logger(){
     .init();
 }
 
-fn write_to_file(write_contents: String) {
+fn write_to_file(write_contents: String, write_file: String) {
     // setting up write file functionality
     let write_file_path;
-    let args: Vec<String> = env::args().collect();
-    if args.get(2).is_some() {
-        write_file_path = Path::new(&args[2]);
+    if write_file != "" {
+        write_file_path = Path::new(&write_file);
     } else {
         warn!("No File provided, Writing to default file out.json");
         write_file_path = Path::new("./out.json");
@@ -33,14 +38,33 @@ fn write_to_file(write_contents: String) {
     write_file.write_all(write_contents.as_bytes()).unwrap();
 }
 
+fn process_args() -> Args {
+    let mut args_out = Args::default();
+    let args: Vec<String> = env::args().collect();
+    if args.contains(&String::from("-f")){
+        info!("-f provided");
+        let f_index = args.iter().position(|r| r == "-f").unwrap();
+        info!("{:?}", args[f_index+1]);
+        args_out.input_file = args[f_index+1].clone();
+    }
+    if args.contains(&String::from("-o")){
+        info!("-o provided");
+        let o_index = args.iter().position(|r| r == "-o").unwrap();
+        info!("{:?}", args[o_index+1]);
+        args_out.output_file = args[o_index+1].clone();
+    }
+    args_out
+}
+
 fn main() {
+    let args = process_args();
+    println!("{:?}", args);
     // env_logger::init();
     set_logger();
     let mut file_path;
     // Open File and read content
-    let args: Vec<String> = env::args().collect();
-    if args.get(1).is_some() {
-        file_path = Path::new(&args[1]);
+    if args.input_file != "" {
+        file_path = Path::new(&args.input_file);
     } else {
         warn!("No File provided, Loading default demo file edi835-1.edi");
         file_path = Path::new("./demo/edi835-1.edi");
@@ -80,7 +104,7 @@ fn main() {
         let edi835 = get_835(contents.clone());
         let serialized_edi = serde_json::to_string(&edi835).unwrap();
         // println!("{}", serialized_edi);
-        write_to_file(serialized_edi);
+        write_to_file(serialized_edi, args.output_file);
     } else {
         warn!("File is not 835, other types not implemeted yet");
     }
