@@ -1,6 +1,5 @@
 use std::fs::File;
-use std::io::Read;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::Path;
 use std::env;
 use log::{info, warn};
@@ -52,6 +51,12 @@ fn process_args() -> Args {
         let o_index = args.iter().position(|r| r == "-o").unwrap();
         info!("{:?}", args[o_index+1]);
         args_out.output_file = args[o_index+1].clone();
+    }
+    if args.contains(&String::from("-h")) || args.contains(&String::from("--help")) {
+        info!("--help provided");
+        println!("To provide EDI file use '-f'"); 
+        println!("To specify the output file use '-o'"); 
+        std::process::exit(0);
     }
     args_out
 }
