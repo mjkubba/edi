@@ -1,4 +1,15 @@
-use log::info;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::Path;
+use std::env;
+use log::{info, warn};
+
+
+#[derive(Debug, Default,Clone)]
+pub struct Args {
+    pub input_file: String,
+    pub output_file: String,
+}
 
 pub fn get_segment_contents(key:&str, contents:  &str) -> String {
     let segment_content = get_full_segment_contents(key,contents);
@@ -21,6 +32,80 @@ pub fn get_full_segment_contents(key:&str, contents: &str) -> String {
 pub fn content_trim(key: &str, contents:String) -> String {
     let to_remove = get_full_segment_contents(&key, &contents)+"~";
     contents.replace(&to_remove, "").trim_start_matches("~").to_string()
+}
+
+
+pub fn set_logger(){
+    env_logger::builder()
+    .filter_level(log::LevelFilter::Info)
+    .format_target(false)
+    .format_timestamp(None)
+    .init();
+}
+
+
+pub fn process_args() -> Args {
+    let mut args_out = Args::default();
+    let args: Vec<String> = env::args().collect();
+    if args.contains(&String::from("-f")){
+        info!("-f provided");
+        let f_index = args.iter().position(|r| r == "-f").unwrap();
+        if args.get(f_index+1).is_some() {
+            info!("{:?}", args[f_index+1]);
+            args_out.input_file = args[f_index+1].clone();
+        } else {
+            warn!("No File provided, please pass in the file name after -f");
+            std::process::exit(1);
+        }
+    } else {
+        warn!("No File provided, please use -f to pass in the file name.");
+        std::process::exit(1);
+    }
+    if args.contains(&String::from("-o")){
+        info!("-o provided");
+        let o_index = args.iter().position(|r| r == "-o").unwrap();
+        info!("{:?}", args[o_index+1]);
+        args_out.output_file = args[o_index+1].clone();
+    }
+    if args.contains(&String::from("-h")) || args.contains(&String::from("--help")) {
+        info!("--help provided");
+        println!("To provide EDI file use '-f'"); 
+        println!("To specify the output file use '-o'"); 
+        std::process::exit(0);
+    }
+    args_out
+}
+
+pub fn get_file_contents(args: Args) -> String {
+    let mut contents = String::new();
+    let file_path = Path::new(&args.input_file);
+    
+    
+    if file_path.exists() {
+        info!("File exists");
+        let mut file = File::open(file_path).unwrap();
+        file.read_to_string(&mut contents).unwrap();
+    } else {
+        warn!("File does not exist, please use -f to pass in the file name");
+        std::process::exit(1);
+    }
+    contents
+}
+
+
+
+pub fn write_to_file(write_contents: String, write_file: String) {
+    // setting up write file functionality
+    let write_file_path;
+    if write_file != "" {
+        write_file_path = Path::new(&write_file);
+    } else {
+        warn!("No File provided, Writing to default file out.json");
+        write_file_path = Path::new("./out.json");
+    }
+    // write_file_path = Path::new("./out.json");
+    let mut write_file = File::create(write_file_path).unwrap();
+    write_file.write_all(write_contents.as_bytes()).unwrap();
 }
 
 
