@@ -91,11 +91,19 @@ pub fn write_edi(contents: String) -> String {
     let new_t1 = write_table1(edi_json.table1s.clone());
     let new_l1a = write_loop1000a(edi_json.loop1000as.clone());
     let new_l1b = write_loop1000b(edi_json.loop1000bs.clone());
+    let new_l2 = write_loop2000(edi_json.loop2000s.clone());
+    let new_l21 = write_loop2100(edi_json.loop2100s.clone());
+    let new_l211 = write_loop2110(edi_json.loop2110s.clone());
+    let new_t3 = write_table3(edi_json.table3s.clone());
     let new_ict = write_interchange_trailer(edi_json.interchange_trailer.clone());
     new_edi.push_str(&new_ich);
     new_edi.push_str(&new_t1);
     new_edi.push_str(&new_l1a);
     new_edi.push_str(&new_l1b);
+    new_edi.push_str(&new_l2);
+    new_edi.push_str(&new_l21);
+    new_edi.push_str(&new_l211);
+    new_edi.push_str(&new_t3);
     new_edi.push_str(&new_ict);
     println!("{:?}", new_edi.clone());
     new_edi

@@ -28,3 +28,28 @@ pub fn get_nm1(nm1_content: String) -> NM1 {
         member_number: nm1_parts[8].to_string(),
     }
 }
+
+pub fn write_nm1(nm1:NM1) -> String {
+    let mut nm1_content: String = String::new();
+    nm1_content.push_str("NM1*");
+    nm1_content.push_str(&nm1.entity_id);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.entity_type);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.lastname);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.firstname);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.middle_initial);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.suffix);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.title);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.id_code);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.member_number);
+    nm1_content.push_str("~");
+    nm1_content
+    
+}

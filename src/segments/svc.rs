@@ -47,6 +47,26 @@ pub fn get_svc(svc_content: String) -> SVC {
     }
 }
 
+pub fn write_svc(svc: SVC) -> String {
+    let mut svc_string = String::new();
+    svc_string.push_str("SVC*");
+    svc_string.push_str(&svc.svc01_1_product_or_service_is_qualifier);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.svc02_line_item_charge_amount);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.svc03_line_item_provider_payment_amount);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.scv04_product_service_id);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.svc05_unit_of_service_paid_count);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.svc06_composite_medical_procedure_id);
+    svc_string.push_str("*");
+    svc_string.push_str(&svc.svc07_original_units_of_service_count);
+    svc_string.push_str("~");
+    svc_string
+}
+
 
 #[cfg(test)]
 

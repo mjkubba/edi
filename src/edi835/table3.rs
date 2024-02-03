@@ -47,6 +47,15 @@ pub fn get_table3s(contents:String) -> (Table3s, String) {
     return (header, contents)
 }
 
+pub fn write_table3(table3:Table3s) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_plb(table3.plb_segments));
+    contents.push_str(&write_se(table3.se_segments));
+    return contents
+}
+
+
+
 // unit tests
 
 #[cfg(test)]

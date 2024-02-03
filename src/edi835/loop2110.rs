@@ -162,6 +162,22 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
     return (loop_2110_array, contents);
 }
 
+pub fn write_loop2110(loop2110:Vec<Loop2110s>) -> String {
+    let mut contents = String::new();
+    for loop2110 in loop2110 {
+        contents.push_str(&write_svc(loop2110.svc_segments));
+        contents.push_str(&write_dtm(loop2110.dtm_segments));
+        contents.push_str(&write_cas(loop2110.cas_segments));
+        contents.push_str(&write_ref(loop2110.ref_service_identification));
+        contents.push_str(&write_ref(loop2110.ref_line_item_control_number));
+        contents.push_str(&write_ref(loop2110.ref_rendering_provider_information));
+        contents.push_str(&write_ref(loop2110.ref_healthcare_policy_identification));
+        contents.push_str(&write_amt(loop2110.amt_segments));
+        contents.push_str(&write_qty(loop2110.qty_segments));
+        contents.push_str(&write_lq(loop2110.lq_segments));
+    }
+    return contents;
+}
 
 // unit tests
 

@@ -86,6 +86,40 @@ pub fn get_plb(plb_content: String) -> PLB {
     }
 }
 
+pub fn write_plb(plb: PLB) -> String {
+    let mut plb_string = String::new();
+    plb_string.push_str("PLB*");
+    plb_string.push_str(&plb.plb01_provider_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb02_fiscal_period_date);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb03_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb04_provider_adjustment_amount);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb05_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb06_provider_adjustment_amount);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb07_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb08_provider_adjustment_amount);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb09_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb10_provider_adjustment_amount);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb11_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb12_provider_adjustment_amount);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb13_provider_adjustment_identifier);
+    plb_string.push_str("*");
+    plb_string.push_str(&plb.plb14_provider_adjustment_amount);
+    plb_string.push_str("~");
+    plb_string
+    
+}
 
 // unit test
 

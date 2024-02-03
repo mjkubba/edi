@@ -249,6 +249,32 @@ pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
     (loop_2100_array, contents)
 }
 
+pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
+    let mut contents = String::new();
+    for loop2100 in loop2100 {
+        contents.push_str(&write_clp(loop2100.clp_segments));
+        contents.push_str(&write_cas(loop2100.cas_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_patint_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_insured_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_corrected_patient_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_service_provider_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_crossover_carrier_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_corrected_priority_payer_segments));
+        contents.push_str(&write_nm1(loop2100.nm1_other_subscriber_segments));
+        contents.push_str(&write_mia(loop2100.mia_segments));
+        contents.push_str(&write_moa(loop2100.moa_segments));
+        contents.push_str(&write_ref(loop2100.ref_other_claim_segments));
+        contents.push_str(&write_ref(loop2100.ref_rendering_provider_segments));
+        contents.push_str(&write_dtm(loop2100.dtm_statement_from_segments));
+        contents.push_str(&write_dtm(loop2100.dtm_coverage_expiration_segments));
+        contents.push_str(&write_dtm(loop2100.dtm_claim_received_segments));
+        contents.push_str(&write_per(loop2100.per_segments));
+        contents.push_str(&write_amt(loop2100.amt_segments));
+        contents.push_str(&write_qty(loop2100.qty_segments));
+    }
+    return contents;
+}
+
 
 // unit tests
 

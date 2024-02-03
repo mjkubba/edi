@@ -15,6 +15,16 @@ pub fn get_qty(qty_content: String) -> QTY {
     }
 }
 
+pub fn write_qty(qty:QTY) -> String {
+    let mut qty_content: String = String::new();
+    qty_content.push_str("QTY*");
+    qty_content.push_str(&qty.qty01_quantity_qualifier);
+    qty_content.push_str("*");
+    qty_content.push_str(&qty.qty02_claim_supplement_information_quantity);
+    qty_content.push_str("~");
+    qty_content
+}
+
 // unit test
 
 

@@ -68,6 +68,17 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000s>, String) {
     return (loop_2000_array, contents)
 }
 
+pub fn write_loop2000(loop2000:Vec<Loop2000s>) -> String {
+    let mut contents = String::new();
+    for loop2000 in loop2000 {
+        contents.push_str(&write_lx(loop2000.lx_segments));
+        contents.push_str(&write_ts3(loop2000.ts3_segments));
+        contents.push_str(&write_ts2(loop2000.ts2_segments));
+    }
+    return contents;
+}
+
+
 
 // unit tests
 

@@ -14,3 +14,13 @@ pub fn get_se(se_content: String) -> SE {
         transaction_set_control_number: se_parts[1].to_string(),
     }
 }
+
+pub fn write_se(se: SE) -> String {
+    let mut se_string = String::new();
+    se_string.push_str("SE*");
+    se_string.push_str(&se.number_of_segment);
+    se_string.push_str("*");
+    se_string.push_str(&se.transaction_set_control_number);
+    se_string.push_str("~");
+    se_string
+}

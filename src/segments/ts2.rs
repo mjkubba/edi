@@ -128,6 +128,51 @@ pub fn get_ts2(ts2_content: String) -> TS2 {
 
 }
 
+
+pub fn write_ts2(ts2:TS2) -> String {
+    let mut ts2_content: String = String::new();
+    ts2_content.push_str("TS2*");
+    ts2_content.push_str(&ts2.ts201_total_drg_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts202_total_fed_spec_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts203_total_hosp_spec_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts204_total_disproportionate_share_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts205_total_capital_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts206_total_indirect_medical_education_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts207_total_outlier_day_count);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts208_total_day_outlier_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts209_total_cost_outlier_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts210_average_drg_length_of_stay);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts211_total_discharge_count);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts212_total_cost_report_day_count);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts213_total_covered_day_count);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts214_total_noncovered_day_count);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts215_total_msp_pass_through_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts216_average_drg_weight);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts217_total_pps_capital_fs_drg_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts218_total_pps_capital_hs_drg_amount);
+    ts2_content.push_str("*");
+    ts2_content.push_str(&ts2.ts219_total_pps_dsh_drg_amount);
+    ts2_content.push_str("~");
+    ts2_content
+}
+
 // unit test
 
 
