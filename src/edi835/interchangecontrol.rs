@@ -43,6 +43,13 @@ pub fn get_interchange_header(contents:String) -> (InterchangeHeader, String) {
     return (header, contents)
 }
 
+pub fn write_interchange_control(header:InterchangeHeader) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_isa(header.isa_segments));
+    contents.push_str(&write_gs(header.gs_segments));
+    return contents
+}
+
 // unit tests
 
 #[cfg(test)]

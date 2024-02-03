@@ -11,9 +11,7 @@ fn main() {
     set_logger();
 
     let args = process_args();
-    println!("{:?}", args);
     let contents = get_file_contents(args.clone());
-
 
 
     /*
@@ -29,15 +27,23 @@ fn main() {
 
     */
 
-    if contents.contains("~ST*835*"){
-        info!("File is 835");
-        let edi835 = get_835(contents.clone());
-        let serialized_edi = serde_json::to_string(&edi835).unwrap();
-        // println!("{}", serialized_edi);
-        write_to_file(serialized_edi, args.output_file);
-    } else {
-        warn!("File is not 835, other types not implemeted yet");
+    if args.operation == "write" {
+        info!("Write EDI Operation");
+        let new_edi = write_edi(contents.clone());
+        write_to_file(new_edi, args.output_file);
+    } else if args.operation == "read" {
+        if contents.contains("~ST*835*"){
+            info!("File is 835");
+            let edi835 = get_835(contents.clone());
+            let serialized_edi = serde_json::to_string(&edi835).unwrap();
+            // write_to_file(serialized_edi, args.output_file);
+            write_to_file(serialized_edi.clone(), args.output_file);
+        } else {
+            warn!("File is not 835, other types not implemeted yet");
+        }
     }
+
+    
     
 
 }

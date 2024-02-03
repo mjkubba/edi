@@ -14,3 +14,14 @@ pub fn get_dtm(dtm_content: String) -> DTM {
         date_time: dtm_parts[1].to_string(),
     }
 }
+
+pub fn write_dtm(dtm:DTM) -> String {
+    let mut dtm_content = String::new();
+    dtm_content.push_str("DTM*");
+    dtm_content.push_str(&dtm.date_time_qualifier);
+    dtm_content.push_str("*");
+    dtm_content.push_str(&dtm.date_time);
+    dtm_content.push_str("~");
+    dtm_content
+}
+ 

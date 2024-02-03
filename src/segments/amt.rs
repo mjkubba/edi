@@ -16,6 +16,17 @@ pub fn get_amt(amt_content: String) -> AMT {
     }
 }
 
+pub fn write_amt(amt:AMT) -> String {
+    let mut amt_content = String::new();
+    amt_content.push_str("AMT*");
+    amt_content.push_str(&amt.amt01_amount_qualifier_code);
+    amt_content.push_str("*");
+    amt_content.push_str(&amt.amt02_service_line_allowed_amount);
+    amt_content.push_str("~");
+    amt_content
+}
+
+
 // unit test
 
 #[cfg(test)]

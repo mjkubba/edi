@@ -154,6 +154,18 @@ pub fn get_1000as(contents:String) -> (Loop1000as, String) {
     return (header,contents)
 }
 
+pub fn write_loop1000a(loop1000a:Loop1000as) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_n1(loop1000a.n1_segments));
+    contents.push_str(&write_n3(loop1000a.n3_segments));
+    contents.push_str(&write_n4(loop1000a.n4_segments));
+    contents.push_str(&write_ref(loop1000a.ref_segments));
+    contents.push_str(&write_per(loop1000a.per_payer_business));
+    contents.push_str(&write_per(loop1000a.per_technical_contact));
+    contents.push_str(&write_per(loop1000a.per_web_site));
+    return contents;
+}
+
 // unit tests
 
 #[cfg(test)]

@@ -83,6 +83,18 @@ pub fn get_1000bs(contents:String) -> (Loop1000bs, String) {
     return (header,contents)
 }
 
+pub fn write_loop1000b(loop1000b:Loop1000bs) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_n1(loop1000b.n1_segments));
+    contents.push_str(&write_n3(loop1000b.n3_segments));
+    contents.push_str(&write_n4(loop1000b.n4_segments));
+    contents.push_str(&write_ref(loop1000b.ref_segments));
+    contents.push_str(&write_rdm(loop1000b.rdm_segments));
+    return contents;
+}
+
+
+
 // unit tests
 
 #[cfg(test)]

@@ -23,6 +23,20 @@ pub fn get_trn(trn_content: String) -> TRN {
     }
 }
 
+pub fn write_trn(trn: TRN) -> String {
+    let mut trn_string = String::new();
+    trn_string.push_str("TRN*");
+    trn_string.push_str(&trn.trace_type_code);
+    trn_string.push_str("*");
+    trn_string.push_str(&trn.reference_id);
+    trn_string.push_str("*");
+    trn_string.push_str(&trn.originating_company_id);
+    trn_string.push_str("*");
+    trn_string.push_str(&trn.trn04_reference_id);
+    trn_string.push_str("~");
+    trn_string
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

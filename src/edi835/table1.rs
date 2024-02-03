@@ -117,6 +117,18 @@ pub fn get_table1s(contents:String) -> (Table1s, String) {
     return (header,contents)
 }
 
+pub fn write_table1(table1:Table1s) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_st(table1.st_segments));
+    contents.push_str(&write_bpr(table1.bpr_segments));
+    contents.push_str(&write_trn(table1.trn_segments));
+    contents.push_str(&write_cur(table1.cur_segments));
+    contents.push_str(&write_ref(table1.ref_receiver_segments));
+    contents.push_str(&write_ref(table1.ref_version_segments));
+    contents.push_str(&write_dtm(table1.dtm_segments));
+    return contents;
+}
+
 
 // unit tests
 

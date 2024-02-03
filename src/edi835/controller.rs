@@ -15,15 +15,15 @@ use crate::edi835::interchangecontroltrailer::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Edi835{
-    interchange_header: InterchangeHeader,
-    table1s: Table1s,
-    loop1000as: Loop1000as,
-    loop1000bs: Loop1000bs,
-    loop2000s: Vec<Loop2000s>,
-    loop2100s: Vec<Loop2100s>,
-    loop2110s: Vec<Loop2110s>,
-    table3s: Table3s,
-    interchange_trailer: InterchangeTrailer,
+    pub interchange_header: InterchangeHeader,
+    pub table1s: Table1s,
+    pub loop1000as: Loop1000as,
+    pub loop1000bs: Loop1000bs,
+    pub loop2000s: Vec<Loop2000s>,
+    pub loop2100s: Vec<Loop2100s>,
+    pub loop2110s: Vec<Loop2110s>,
+    pub table3s: Table3s,
+    pub interchange_trailer: InterchangeTrailer,
 }
 
 
@@ -81,4 +81,22 @@ pub fn get_835(mut contents: String) -> Edi835 {
 
     info!("Unprocessed segments: {:?}", contents);
     edi835
+}
+
+
+pub fn write_edi(contents: String) -> String {
+    let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
+    let mut new_edi = String::new();
+    let new_ich = write_interchange_control(edi_json.interchange_header.clone());
+    let new_t1 = write_table1(edi_json.table1s.clone());
+    let new_l1a = write_loop1000a(edi_json.loop1000as.clone());
+    let new_l1b = write_loop1000b(edi_json.loop1000bs.clone());
+    let new_ict = write_interchange_trailer(edi_json.interchange_trailer.clone());
+    new_edi.push_str(&new_ich);
+    new_edi.push_str(&new_t1);
+    new_edi.push_str(&new_l1a);
+    new_edi.push_str(&new_l1b);
+    new_edi.push_str(&new_ict);
+    println!("{:?}", new_edi.clone());
+    new_edi
 }

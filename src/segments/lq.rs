@@ -15,6 +15,16 @@ pub fn get_lq(lq_content: String) -> LQ {
     }
 }
 
+pub fn write_lq(lq:LQ) -> String {
+    let mut lq_content: String = String::new();
+    lq_content.push_str("LQ*");
+    lq_content.push_str(&lq.lq01_code_list_qualifier);
+    lq_content.push_str("*");
+    lq_content.push_str(&lq.lq02_remark_code);
+    lq_content.push_str("~");
+    lq_content
+}
+
 // unit test
 
 

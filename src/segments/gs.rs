@@ -26,3 +26,25 @@ pub fn get_gs(gs_content: String) -> GS {
         version_number: gs_parts[7].to_string(),
     }
 }
+
+pub fn write_gs(gs:GS) -> String {
+    let mut gs_content = String::new();
+    gs_content.push_str("GS*");
+    gs_content.push_str(&gs.functional_id_code);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.app_sender_id);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.app_receiver_id);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.date);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.time);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.group_control_number);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.responsible_agency);
+    gs_content.push_str("*");
+    gs_content.push_str(&gs.version_number);
+    gs_content.push_str("~");
+    gs_content
+}

@@ -42,3 +42,41 @@ pub fn get_isa(isa_content: String) -> ISA {
         component_element_separator: isa_parts[15].to_string(),
     }
 }
+
+pub fn write_isa(isa: ISA) -> String {
+    let mut isa_content = String::new();
+    isa_content.push_str("ISA*");
+    isa_content.push_str(&isa.information_qualifier);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.authorization_information);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.security_information_qualifier);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.security_information);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.sender_id_qualifier);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.sender_id);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.receiver_id_qualifier);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.receiver_id);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.date);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.time);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.control_number_identifier);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.control_version_number);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.control_number);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.ack_indicator);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.usage_indicator);
+    isa_content.push_str("*");
+    isa_content.push_str(&isa.component_element_separator);
+    isa_content.push_str("~");
+    isa_content
+}

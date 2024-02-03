@@ -14,3 +14,13 @@ pub fn get_st(st_content: String) -> ST {
         transaction_set_control_number: st_parts[1].to_string(),
     }
 }
+
+pub fn write_st(st: ST) -> String {
+    let mut st_string = String::new();
+    st_string.push_str("ST*");
+    st_string.push_str(&st.transaction_set_id);
+    st_string.push_str("*");
+    st_string.push_str(&st.transaction_set_control_number);
+    st_string.push_str("~");
+    st_string
+}

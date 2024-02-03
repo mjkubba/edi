@@ -49,6 +49,13 @@ pub fn get_interchange_trailer(contents:String) -> (InterchangeTrailer, String) 
     return (header, contents)
 }
 
+pub fn write_interchange_trailer(trailer:InterchangeTrailer) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_ge(trailer.ge_segments));
+    contents.push_str(&write_iea(trailer.iea_segments));
+    return contents
+}
+
 // unit tests
 
 #[cfg(test)]

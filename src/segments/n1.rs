@@ -26,3 +26,17 @@ pub fn get_n1(n1_content: String) -> N1 {
         payee_identification_code,
     }
 }
+
+pub fn write_n1(n1:N1) -> String {
+    let mut n1_content: String = String::new();
+    n1_content.push_str("N1*");
+    n1_content.push_str(&n1.payer_id_code);
+    n1_content.push_str("*");
+    n1_content.push_str(&n1.payee_name);
+    n1_content.push_str("*");
+    n1_content.push_str(&n1.payee_identification_code_qualifier);
+    n1_content.push_str("*");
+    n1_content.push_str(&n1.payee_identification_code);
+    n1_content.push_str("~");
+    n1_content
+}

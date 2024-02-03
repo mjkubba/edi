@@ -38,6 +38,20 @@ pub fn get_n4(n4_content: String) -> N4 {
     }
 }
 
+pub fn write_n4(n4:N4) -> String {
+    let mut n4_content: String = String::new();
+    n4_content.push_str("N4*");
+    n4_content.push_str(&n4.payee_city);
+    n4_content.push_str("*");
+    n4_content.push_str(&n4.payee_state);
+    n4_content.push_str("*");
+    n4_content.push_str(&n4.payee_zip);
+    n4_content.push_str("*");
+    n4_content.push_str(&n4.payee_country_code);
+    n4_content.push_str("~");
+    n4_content
+}
+
 
 #[cfg(test)]
 mod tests {

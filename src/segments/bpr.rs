@@ -94,6 +94,44 @@ pub fn get_bpr(bpr_content: String) -> BPR {
     }
 }
 
+pub fn write_bpr(bpr: BPR) -> String {
+    let mut bpr_string = String::new();
+    bpr_string.push_str("BPR*");
+    bpr_string.push_str(&bpr.bpr01_transaction_handling_code);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr02_monetary_amount);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr03_credit_debit_flag);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr04_payment_method_code);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr05_payment_format_code);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr06_id_number_qualifier);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr07_id_number);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr08_account_number_qualifier);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr09_account_number);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr10_originating_company_identifier);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr11_originating_company_supplemental_code);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr12_dfi_identification_number_qualifier);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr13_dfi_identification_number);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr14_account_number_qualifier);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr15_account_number);
+    bpr_string.push_str("*");
+    bpr_string.push_str(&bpr.bpr16_date);
+    bpr_string.push_str("~");
+    bpr_string
+}
+
 // unit test
 
 

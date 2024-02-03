@@ -68,6 +68,39 @@ pub fn get_clp(bpr_content: String) -> CLP {
     }
 }
 
+pub fn write_clp(clp:CLP) -> String {
+    let mut clp_content: String = String::new();
+    clp_content.push_str("CLP*");
+    clp_content.push_str(&clp.clp01_patient_control_number);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp02_claim_status_code);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp03_total_claim_charge_amount);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp04_total_claim_payment_amount);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp05_patient_responsibility_amount);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp06_claim_filing_indicator_code);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp07_payer_claim_control_number);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp08_facility_type_code);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp09_claim_frequency_code);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp11_diagnosis_related_group);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp12_drg_weight);
+    clp_content.push_str("*");
+    clp_content.push_str(&clp.clp13_percent_discharge_fraction);
+    clp_content.push_str("~");
+    clp_content
+}
+
+
+
+
 // unit test
 
 #[cfg(test)]

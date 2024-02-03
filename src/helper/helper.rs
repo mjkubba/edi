@@ -9,6 +9,7 @@ use log::{info, warn};
 pub struct Args {
     pub input_file: String,
     pub output_file: String,
+    pub operation: String,
 }
 
 pub fn get_segment_contents(key:&str, contents:  &str) -> String {
@@ -47,6 +48,13 @@ pub fn set_logger(){
 pub fn process_args() -> Args {
     let mut args_out = Args::default();
     let args: Vec<String> = env::args().collect();
+    if args.contains(&String::from("-h")) || args.contains(&String::from("--help")) || args.len() == 1 {
+        println!("Usage:");
+        println!();
+        println!("To provide EDI file use '-f'"); 
+        println!("To specify the output file use '-o'"); 
+        std::process::exit(0);
+    }
     if args.contains(&String::from("-f")){
         info!("-f provided");
         let f_index = args.iter().position(|r| r == "-f").unwrap();
@@ -64,15 +72,33 @@ pub fn process_args() -> Args {
     if args.contains(&String::from("-o")){
         info!("-o provided");
         let o_index = args.iter().position(|r| r == "-o").unwrap();
-        info!("{:?}", args[o_index+1]);
-        args_out.output_file = args[o_index+1].clone();
+        if args.get(o_index+1).is_some() {
+            info!("{:?}", args[o_index+1]);
+            args_out.output_file = args[o_index+1].clone();
+        } else {
+            warn!("No File provided, please pass in the file name after -o");
+            std::process::exit(1);
+        }
+    
+    } else {
+        info!("Using the default output file 'out.json'");
     }
-    if args.contains(&String::from("-h")) || args.contains(&String::from("--help")) {
-        info!("--help provided");
-        println!("To provide EDI file use '-f'"); 
-        println!("To specify the output file use '-o'"); 
-        std::process::exit(0);
+        if args.contains(&String::from("-x")){
+        info!("-x provided");
+        let x_index = args.iter().position(|r| r == "-x").unwrap();
+        if args.get(x_index+1).is_some() {
+            info!("{:?}", args[x_index+1]);
+            args_out.operation = args[x_index+1].clone();
+        } else {
+            warn!("No File Operation, please pass in the action after -x");
+            std::process::exit(1);
+        }
+    
+    } else {
+        args_out.operation = String::from("read");
+        info!("Using the default operation: Create JSON from EDI");
     }
+    
     args_out
 }
 
@@ -100,7 +126,7 @@ pub fn write_to_file(write_contents: String, write_file: String) {
     if write_file != "" {
         write_file_path = Path::new(&write_file);
     } else {
-        warn!("No File provided, Writing to default file out.json");
+        info!("No File provided, Writing to default file out.json");
         write_file_path = Path::new("./out.json");
     }
     // write_file_path = Path::new("./out.json");

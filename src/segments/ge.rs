@@ -14,3 +14,14 @@ pub fn get_ge(ge_content: String) -> GE {
         group_control_number: ge_parts[1].to_string(),
     }
 }
+
+
+pub fn write_ge(ge:GE) -> String {
+    let mut ge_string = String::new();
+    ge_string.push_str("GE*");
+    ge_string.push_str(&ge.number_of_transitions);
+    ge_string.push_str("*");
+    ge_string.push_str(&ge.group_control_number);
+    ge_string.push_str("~");
+    ge_string
+}

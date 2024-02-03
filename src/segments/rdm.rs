@@ -30,6 +30,19 @@ pub fn get_rdm(rdm_content: String) -> RDM {
     }
 }
 
+pub fn write_rdm(rdm:RDM) -> String {
+    let mut rdm_content: String = String::new();
+    rdm_content.push_str("RDM*");
+    rdm_content.push_str(&rdm.rdm01_report_transmission_code);
+    rdm_content.push_str("*");
+    rdm_content.push_str(&rdm.rdm02_name);
+    rdm_content.push_str("*");
+    rdm_content.push_str(&rdm.rdm03_communication_number);
+    rdm_content.push_str("~");
+    rdm_content
+    
+}
+
 // unit test
 
 

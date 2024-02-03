@@ -15,3 +15,14 @@ pub fn get_ref(ref_content: String) -> REF {
         reference_id_number: ref_parts[1].to_string(),
     }
 }
+
+pub fn write_ref(rref:REF) -> String {
+    let mut ref_content = String::new();
+    ref_content.push_str("REF*");
+    ref_content.push_str(&rref.reference_id_number_qualifier);
+    ref_content.push_str("*");
+    ref_content.push_str(&rref.reference_id_number);
+    ref_content.push_str("~");
+    ref_content
+}
+    
