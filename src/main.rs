@@ -29,6 +29,12 @@ fn main() {
         Created a function: get_loop_content in helper takes the content and start and finish of the loop, then only provide that to the get_xyz
         need to change the trimming and other thing already there, look at table1 as an example
 
+        The method I was going with is also unsafe, if you look at table 2, few of these loops and segements are all situational!
+        Need to rethink this
+        Maybe have a table of all the loops and segments and send the function the part we are looking for, eg table2-loop2000 and the 
+        function will return the content of that loop based on the table lookup.
+
+
     */
 
     if args.operation == "write" {

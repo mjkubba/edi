@@ -18,7 +18,7 @@ pub struct Loop1000bs {
 }
 
 
-pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
+pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM) {
     // Loop 1000B Payee Identification (1)
     // N1 Payee Identification R 1
     // N3 Payee Address S 1
@@ -39,40 +39,37 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
         info!("N1 segment found, ");
         n1_segments = get_n1(get_segment_contents("N1", &contents));
         info!("N1 segment parsed");
-        contents = content_trim("N1",contents);
     }
     if contents.contains("N3") {
         info!("N3 segment found, ");
         n3_segments = get_n3(get_segment_contents("N3", &contents));
         info!("N3 segment parsed");
-        contents = content_trim("N3",contents);
     }
     if contents.contains("N4") {
         info!("N4 segment found, ");
         n4_segments = get_n4(get_segment_contents("N4", &contents));
         info!("N4 segment parsed");
-        contents = content_trim("N4",contents);
     }
     if contents.contains("REF") {
         info!("REF segment found, ");
         ref_segments = get_ref(get_segment_contents("REF", &contents));
         info!("REF segment parsed");
-        contents = content_trim("REF",contents);
     }
     if contents.contains("RDM") {
         info!("RDM segment found, ");
         rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
         info!("RDM segment parsed");
-        contents = content_trim("RDM",contents);
     }
 
     info!("Loop 1000B parsed\n");
-    return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
+    return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments)
 }
 
 
-pub fn get_1000bs(contents:String) -> (Loop1000bs, String) {
-    let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents);
+pub fn get_1000bs(mut contents:String) -> (Loop1000bs, String) {
+    let loop_content = get_loop_content(contents.clone(), "N1", "LX");
+    let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments) = get_loop_1000_b(loop_content.clone());
+    contents = contents.replace(&loop_content, "");
     let header  = Loop1000bs {
         n1_segments,
         n3_segments,
