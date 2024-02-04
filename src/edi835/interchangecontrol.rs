@@ -12,30 +12,28 @@ pub struct InterchangeHeader {
 }
 
 
-pub fn get_interchange_control(mut contents:String) -> (ISA, GS, String) {
+pub fn get_interchange_control(contents:String) -> (ISA, GS) {
     let mut isa_segments = ISA::default();
     let mut gs_segments = GS::default();
     if contents.contains("ISA") {
         info!("ISA segment found, ");
         isa_segments = get_isa(get_segment_contents("ISA", &contents));
         info!("ISA segment parsed");
-
-        contents = content_trim("ISA", contents);
     }
         if contents.contains("GS") {
         info!("GS segment found, ");
         gs_segments = get_gs(get_segment_contents("GS", &contents));
         info!("GS segment parsed");
- 
-        contents = content_trim("GS",contents);
     }
     
     info!("Interchange Control parsed\n");
-    return (isa_segments, gs_segments, contents)
+    return (isa_segments, gs_segments)
 }
 
-pub fn get_interchange_header(contents:String) -> (InterchangeHeader, String) {
-    let (isa_segments, gs_segments, contents) = get_interchange_control(contents);
+pub fn get_interchange_header(mut contents:String) -> (InterchangeHeader, String) {
+    let loop_content = get_loop_content(contents.clone(), "ISA", "ST");
+    let (isa_segments, gs_segments) = get_interchange_control(loop_content.clone());
+    contents = contents.replace(&loop_content, "");
     let header = InterchangeHeader {
         isa_segments,
         gs_segments,
