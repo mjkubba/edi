@@ -17,6 +17,9 @@ pub fn get_ref(ref_content: String) -> REF {
 }
 
 pub fn write_ref(rref:REF) -> String {
+    if rref.reference_id_number_qualifier.is_empty() {
+        return String::new();
+    }
     let mut ref_content = String::new();
     ref_content.push_str("REF*");
     ref_content.push_str(&rref.reference_id_number_qualifier);

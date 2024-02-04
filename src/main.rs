@@ -25,6 +25,10 @@ fn main() {
 
         Table 1: there are 3 PERs, 2 are optional and the required one may come in the middle
 
+        also noticed DTM is getting processed earlier, need to trim content based on loop segments and only send that part for processing.
+        Created a function: get_loop_content in helper takes the content and start and finish of the loop, then only provide that to the get_xyz
+        need to change the trimming and other thing already there, look at table1 as an example
+
     */
 
     if args.operation == "write" {

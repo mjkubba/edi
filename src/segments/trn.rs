@@ -1,4 +1,6 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
+
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -31,11 +33,12 @@ pub fn write_trn(trn: TRN) -> String {
     trn_string.push_str(&trn.reference_id);
     trn_string.push_str("*");
     trn_string.push_str(&trn.originating_company_id);
-    trn_string.push_str("*");
-    trn_string.push_str(&trn.trn04_reference_id);
+    trn_string.push_str(&stiuational_element(trn.trn04_reference_id));
     trn_string.push_str("~");
     trn_string
 }
+
+
 
 #[cfg(test)]
 mod tests {

@@ -18,6 +18,9 @@ pub fn get_cur(cur_content: String) -> CUR {
 }
 
 pub fn write_cur(cur:CUR) -> String {
+    if cur.identity_identifier_code.is_empty() {
+        return String::new();
+    }
     let mut cur_content = String::new();
     cur_content.push_str("CUR*");
     cur_content.push_str(&cur.identity_identifier_code);

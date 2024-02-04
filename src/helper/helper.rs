@@ -118,6 +118,12 @@ pub fn get_file_contents(args: Args) -> String {
     contents
 }
 
+pub fn get_loop_content(contents: String, start: &str, end: &str) -> String {
+    let start_found = contents.find(start).unwrap();
+    let end_found = contents.find(end).unwrap();
+    let content = contents[start_found..end_found].to_string();
+    content
+}
 
 
 pub fn write_to_file(write_contents: String, write_file: String) {
@@ -133,6 +139,42 @@ pub fn write_to_file(write_contents: String, write_file: String) {
     let mut write_file = File::create(write_file_path).unwrap();
     write_file.write_all(write_contents.as_bytes()).unwrap();
 }
+
+pub fn stiuational_element(value: String) -> String {
+    if !value.is_empty() {
+        let mut to_return = String::from("*");
+        to_return.push_str(&value);
+        return to_return;
+    } else {
+        return "".to_string();
+    }
+}
+
+
+// pub fn stiuational_segment(value: String) -> String {
+//     if !value.is_empty() {
+//         let mut to_return = String::from("*");
+//         to_return.push_str(&value);
+//         return to_return;
+//     } else {
+//         return "".to_string();
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #[cfg(test)]

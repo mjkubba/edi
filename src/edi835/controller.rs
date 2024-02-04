@@ -27,6 +27,7 @@ pub struct Edi835{
 }
 
 
+
 pub fn get_835(mut contents: String) -> Edi835 {
     let interchange_header;
     let table1s;
@@ -40,7 +41,6 @@ pub fn get_835(mut contents: String) -> Edi835 {
 
     // Control Segments
     (interchange_header, contents) = get_interchange_header(contents.clone());
-
 
     // Table 1
     (table1s, contents) = get_table1s(contents.clone());
