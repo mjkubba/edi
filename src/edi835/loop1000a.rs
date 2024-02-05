@@ -19,7 +19,7 @@ pub struct Loop1000as {
     pub per_web_site: PER,
 }
 
-pub fn get_loop_1000_a(contents:String) -> (N1, N3, N4, REF, PER, PER, PER) {
+pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, String) {
     
     // Loop 1000A Payer Identification (1)
     // N1 Payer Identification R 1
@@ -48,24 +48,28 @@ pub fn get_loop_1000_a(contents:String) -> (N1, N3, N4, REF, PER, PER, PER) {
         info!("N1 segment found, ");
         n1_segments = get_n1(get_segment_contents("N1", &contents));
         info!("N1 segment parsed");
+        contents = content_trim("N1",contents);
     } 
 
     if contents.contains("N3") {
         info!("N3 segment found, ");
         n3_segments = get_n3(get_segment_contents("N3", &contents));
         info!("N3 segment parsedm");
+        contents = content_trim("N3",contents);
     }
 
     if contents.contains("N4") {
         info!("N4 segment found, ");
         n4_segments = get_n4(get_segment_contents("N4", &contents));
         info!("N4 segment parsed"); 
+        contents = content_trim("N4",contents);
     }
 
     if contents.contains("REF") {
         info!("REF segment found, ");
         ref_segments = get_ref(get_segment_contents("REF", &contents));
         info!("REF segment parsed");
+        contents = content_trim("REF",contents);
     }
 
     if contents.contains("PER") {
@@ -86,6 +90,7 @@ pub fn get_loop_1000_a(contents:String) -> (N1, N3, N4, REF, PER, PER, PER) {
             }
         }
         info!("PER segment parsed");
+        contents = content_trim("PER",contents);
     }
 
     if contents.contains("PER") {
@@ -106,6 +111,7 @@ pub fn get_loop_1000_a(contents:String) -> (N1, N3, N4, REF, PER, PER, PER) {
             }
         }
         info!("PER segment parsed");
+        contents = content_trim("PER",contents);
     }
 
     if contents.contains("PER") {
@@ -126,17 +132,16 @@ pub fn get_loop_1000_a(contents:String) -> (N1, N3, N4, REF, PER, PER, PER) {
             }
         }
         info!("PER segment parsed");
+        contents = content_trim("PER",contents);
     }
 
 
     info!("Loop 1000A parsed\n");
-    return (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site)
+    return (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents)
 }
 
-pub fn get_1000as(mut contents:String) -> (Loop1000as, String) {
-    let loop_content = get_loop_content(contents.clone(), "N1", "N1");
-    let (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site) = get_loop_1000_a(loop_content.clone());
-    contents = contents.replace(&loop_content, "");
+pub fn get_1000as(contents:String) -> (Loop1000as, String) {
+    let (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents) = get_loop_1000_a(contents);
     let header  = Loop1000as {
         n1_segments,
         n3_segments,

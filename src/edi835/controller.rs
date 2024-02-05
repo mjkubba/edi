@@ -26,8 +26,6 @@ pub struct Edi835{
     pub interchange_trailer: InterchangeTrailer,
 }
 
-
-
 pub fn get_835(mut contents: String) -> Edi835 {
     let interchange_header;
     let table1s;

@@ -12,6 +12,10 @@ pub struct Args {
     pub operation: String,
 }
 
+
+
+
+
 pub fn get_segment_contents(key:&str, contents:  &str) -> String {
     let segment_content = get_full_segment_contents(key,contents);
     info!("segment_content: {}",segment_content);
@@ -116,29 +120,6 @@ pub fn get_file_contents(args: Args) -> String {
         std::process::exit(1);
     }
     contents
-}
-
-pub fn get_loop_content(contents: String, start: &str, end: &str) -> String {
-    // Note why we are doing this: in some loop the start and end are the same N1 as an example as it's the start of loop 1000a and loop 1000b
-    // making it safer and skipping the start and account for the skip
-    let start_found = contents.find(start).unwrap();
-    let skip_start = &contents[start_found+start.len()..];
-    println!("******************************************************");
-    println!("{}-{}",start,end);
-    println!("{:?}", skip_start);
-    println!("******************************************************");
-    let content;
-    if end == "~~" {
-        content = contents[start_found..].to_string();
-    } else {
-        let end_found = skip_start.find(end).unwrap();
-        content = contents[start_found..end_found+start.len()].to_string();
-        // let end_found = contents.find(end).unwrap();
-        // content = skip_start[start_found..end_found].to_string();
-        println!("{:?}", end_found);
-        println!("Content: {:?}", content);
-    }
-    content
 }
 
 
