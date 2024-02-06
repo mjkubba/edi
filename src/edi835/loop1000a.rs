@@ -66,10 +66,12 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
     }
 
     if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_segments = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+            info!("REF segment found, ");
+            ref_segments = get_ref(get_segment_contents("REF", &contents));
+            info!("REF segment parsed");
+            contents = content_trim("REF",contents);
+        }
     }
 
     if contents.contains("PER") {

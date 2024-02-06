@@ -34,6 +34,15 @@ fn main() {
         Maybe have a table of all the loops and segments and send the function the part we are looking for, eg table2-loop2000 and the 
         function will return the content of that loop based on the table lookup.
 
+        check_if_segement_in_loop might need to be changed a bit or add another function to check against expected codes
+        eg DTM in loop table 1 comes with code 405 but not in the other loops
+        the current function is a simple way to check, but table 2 loop 2110 all situational and have no real anchor
+
+        I was warned this might be not good for my mental health but I never listened!!!!!
+        Another issue I just encountered, the segment repeats, I knew it exists but never noticed it in sample files
+        need more input!!!
+        an Idea here is to count the segment like DTM, see loop over all and assign variable based on the expected codes
+        mix of the idea of match in loop 1000a and check_for_expected_codes() in helper
 
     */
 

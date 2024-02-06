@@ -148,6 +148,23 @@ pub fn stiuational_element(value: String) -> String {
 }
 
 
+pub fn check_if_segement_in_loop(segment: &str, anchor: &str, contents:String) -> bool {
+    let segment_pos = contents.find(&segment);
+    let anchor_pos = contents.find(&anchor);
+    if segment_pos < anchor_pos {
+        return true;
+    }
+    return false;
+}
+
+pub fn check_for_expected_codes(codes: &str ,content:String) -> bool {
+    if codes.contains(&content) {
+        return true;
+    }
+    return false;
+}
+
+
 // pub fn stiuational_segment(value: String) -> String {
 //     if !value.is_empty() {
 //         let mut to_return = String::from("*");

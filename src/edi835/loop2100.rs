@@ -93,10 +93,12 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
         contents = content_trim("CLP",contents);
     }
     if contents.contains("CAS") {
-        info!("CAS segment found, ");
-        cas_segments = get_cas(get_segment_contents("CAS", &contents));
-        info!("CAS segment parsed");
-        contents = content_trim("CAS",contents);
+        if check_if_segement_in_loop("CAS", "NM1", contents.clone()) {
+            info!("CAS segment found, ");
+            cas_segments = get_cas(get_segment_contents("CAS", &contents));
+            info!("CAS segment parsed");
+            contents = content_trim("CAS",contents);
+        }
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
@@ -155,32 +157,42 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
     if contents.contains("REF") {
         info!("REF segment found, ");
         ref_other_claim_segments = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        if check_for_expected_codes("1L,1W,28,6P,9A,9C,BB,CE,EA,F8,G1,G3,IG,SY", ref_other_claim_segments.reference_id_number_qualifier.clone()) {
+            info!("REF segment parsed");
+            contents = content_trim("REF",contents);
+        }
     }
     if contents.contains("REF") {
         info!("REF segment found, ");
         ref_rendering_provider_segments = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,,1J,D3,G2,LU", ref_rendering_provider_segments.reference_id_number_qualifier.clone()) {
+            contents = content_trim("REF",contents);
+            info!("REF segment parsed");
+        }
     }
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_statement_from_segments = get_dtm(get_segment_contents("DTM", &contents));
-        info!("DTM segment parsed");
-        contents = content_trim("DTM",contents);
+         if check_for_expected_codes("232,233", dtm_statement_from_segments.date_time_qualifier.clone()) {
+            info!("DTM segment parsed");
+            contents = content_trim("DTM",contents);
+         }
     }
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_coverage_expiration_segments = get_dtm(get_segment_contents("DTM", &contents));
-        info!("DTM segment parsed");
-        contents = content_trim("DTM",contents);
+        if check_for_expected_codes("232,233", dtm_coverage_expiration_segments.date_time_qualifier.clone()) {
+            info!("DTM segment parsed");
+            contents = content_trim("DTM",contents);
+        }
     }
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_claim_received_segments = get_dtm(get_segment_contents("DTM", &contents));
-        info!("DTM segment parsed");
-        contents = content_trim("DTM",contents);
+        if check_for_expected_codes("232,233", dtm_claim_received_segments.date_time_qualifier.clone()) {
+             info!("DTM segment parsed");
+             contents = content_trim("DTM",contents);
+        }
     }
     if contents.contains("PER") {
         info!("PER segment found, ");
@@ -191,14 +203,19 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
     if contents.contains("AMT") {
         info!("AMT segment found, ");
         amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        info!("AMT segment parsed");
-        contents = content_trim("AMT",contents);
+        if check_for_expected_codes("AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
+            info!("AMT segment parsed");
+            contents = content_trim("AMT",contents);
+
+        }
     }
     if contents.contains("QTY") {
         info!("QTY segment found, ");
         qty_segments = get_qty(get_segment_contents("QTY", &contents));
-        info!("QTY segment parsed");
-        contents = content_trim("QTY",contents);
+        if check_for_expected_codes("CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
+            info!("QTY segment parsed");
+            contents = content_trim("QTY",contents);
+        }
     }
 
     info!("Loop 2100 parsed\n");

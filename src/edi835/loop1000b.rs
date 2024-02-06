@@ -54,10 +54,12 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
         contents = content_trim("N4",contents);
     }
     if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_segments = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        if check_if_segement_in_loop("REF", "CLP", contents.clone()) {
+            info!("REF segment found, ");
+            ref_segments = get_ref(get_segment_contents("REF", &contents));
+            info!("REF segment parsed");
+            contents = content_trim("REF",contents);
+        }
     }
     if contents.contains("RDM") {
         info!("RDM segment found, ");
