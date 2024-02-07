@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -58,23 +59,33 @@ pub fn get_per(per_content: String) -> PER {
 
 
 pub fn write_per(per:PER) -> String {
+    if per.per01_contact_function_code.is_empty() {
+        return String::new();
+    }
     let mut per_content: String = String::new();
     per_content.push_str("PER*");
     per_content.push_str(&per.per01_contact_function_code);
-    per_content.push_str("*");
-    per_content.push_str(&per.per02_contact_name);
-    per_content.push_str("*");
-    per_content.push_str(&per.per03_contact_number_qualifier);
-    per_content.push_str("*");
-    per_content.push_str(&per.per04_contact_number);
-    per_content.push_str("*");
-    per_content.push_str(&per.per05_contact_number_qualifier);
-    per_content.push_str("*");
-    per_content.push_str(&per.per06_contact_number);
-    per_content.push_str("*");
-    per_content.push_str(&per.per07_contact_number_qualifier);
-    per_content.push_str("*");
-    per_content.push_str(&per.per08_contact_number);
+    per_content.push_str(&stiuational_element(per.per02_contact_name));
+    per_content.push_str(&stiuational_element(per.per03_contact_number_qualifier));
+    per_content.push_str(&stiuational_element(per.per04_contact_number));
+    per_content.push_str(&stiuational_element(per.per05_contact_number_qualifier));
+    per_content.push_str(&stiuational_element(per.per06_contact_number));
+    per_content.push_str(&stiuational_element(per.per07_contact_number_qualifier));
+    per_content.push_str(&stiuational_element(per.per08_contact_number));
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per02_contact_name);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per03_contact_number_qualifier);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per04_contact_number);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per05_contact_number_qualifier);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per06_contact_number);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per07_contact_number_qualifier);
+    // per_content.push_str("*");
+    // per_content.push_str(&per.per08_contact_number);
     per_content.push_str("~");
     per_content
 }

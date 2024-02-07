@@ -44,6 +44,16 @@ fn main() {
         an Idea here is to count the segment like DTM, see loop over all and assign variable based on the expected codes
         mix of the idea of match in loop 1000a and check_for_expected_codes() in helper
 
+        Where I left:
+        Writing functionality inside each segment, 
+        adding 
+            use crate::helper::helper::stiuational_element;
+            if ts3.ts301_provider_identifier.is_empty() {
+                return String::new();
+            }
+            and 
+            ts2_content.push_str(&stiuational_element(ts2.ts215_total_msp_pass_through_amount));
+
     */
 
     if args.operation == "write" {

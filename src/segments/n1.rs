@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -33,10 +34,13 @@ pub fn write_n1(n1:N1) -> String {
     n1_content.push_str(&n1.payer_id_code);
     n1_content.push_str("*");
     n1_content.push_str(&n1.payee_name);
-    n1_content.push_str("*");
-    n1_content.push_str(&n1.payee_identification_code_qualifier);
-    n1_content.push_str("*");
-    n1_content.push_str(&n1.payee_identification_code);
+    n1_content.push_str(&stiuational_element(n1.payee_identification_code_qualifier));
+    n1_content.push_str(&stiuational_element(n1.payee_identification_code));
+
+    // n1_content.push_str("*");
+    // n1_content.push_str(&n1.payee_identification_code_qualifier);
+    // n1_content.push_str("*");
+    // n1_content.push_str(&n1.payee_identification_code);
     n1_content.push_str("~");
     n1_content
 }

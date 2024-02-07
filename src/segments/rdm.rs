@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -31,13 +32,19 @@ pub fn get_rdm(rdm_content: String) -> RDM {
 }
 
 pub fn write_rdm(rdm:RDM) -> String {
+    if rdm.rdm01_report_transmission_code.is_empty() {
+        return String::new();
+    }
     let mut rdm_content: String = String::new();
     rdm_content.push_str("RDM*");
     rdm_content.push_str(&rdm.rdm01_report_transmission_code);
-    rdm_content.push_str("*");
-    rdm_content.push_str(&rdm.rdm02_name);
-    rdm_content.push_str("*");
-    rdm_content.push_str(&rdm.rdm03_communication_number);
+    rdm_content.push_str(&stiuational_element(rdm.rdm02_name));
+    rdm_content.push_str(&stiuational_element(rdm.rdm03_communication_number));
+
+    // rdm_content.push_str("*");
+    // rdm_content.push_str(&rdm.rdm02_name);
+    // rdm_content.push_str("*");
+    // rdm_content.push_str(&rdm.rdm03_communication_number);
     rdm_content.push_str("~");
     rdm_content
     

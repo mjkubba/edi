@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 // EDI 835 TS3 - PROVIDER SUMMARY INFORMATION
 #[derive(Debug, Default, PartialEq,Clone,Serialize, Deserialize)]
@@ -85,6 +86,9 @@ pub fn get_ts3(ts3_content: String) -> TS3 {
 
 
 pub fn write_ts3(ts3:TS3) -> String {
+    if ts3.ts301_provider_identifier.is_empty() {
+        return String::new();
+    }
     let mut ts3_content: String = String::new();
     ts3_content.push_str("TS3*");
     ts3_content.push_str(&ts3.ts301_provider_identifier);
@@ -96,24 +100,24 @@ pub fn write_ts3(ts3:TS3) -> String {
     ts3_content.push_str(&ts3.ts304_total_claim_count);
     ts3_content.push_str("*");
     ts3_content.push_str(&ts3.ts305_total_claim_charge_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts313_total_msp_payer_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts315_total_non_lab_charge_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts317_total_hcpcs_reported_charge_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts318_total_hcpcs_payable_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts320_total_professional_component_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts321_total_msp_patient_liability_met_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts322_total_patient_reimbursement_amount);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts323_total_pip_claim_count);
-    ts3_content.push_str("*");
-    ts3_content.push_str(&ts3.ts324_total_pip_adjustment_amount);
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts313_total_msp_payer_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts315_total_non_lab_charge_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts317_total_hcpcs_reported_charge_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts318_total_hcpcs_payable_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts320_total_professional_component_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts321_total_msp_patient_liability_met_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts322_total_patient_reimbursement_amount));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts323_total_pip_claim_count));
+    // ts3_content.push_str("*");
+    ts3_content.push_str(&stiuational_element(ts3.ts324_total_pip_adjustment_amount));
     ts3_content.push_str("~");
     ts3_content
     

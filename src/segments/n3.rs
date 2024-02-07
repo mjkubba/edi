@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -23,11 +24,16 @@ pub fn get_n3(n3_content: String) -> N3 {
 }
 
 pub fn write_n3(n3:N3) -> String {
+    if n3.payee_address.is_empty() {
+        return String::new();
+    }
     let mut n3_content: String = String::new();
     n3_content.push_str("N3*");
     n3_content.push_str(&n3.payee_address);
-    n3_content.push_str("*");
-    n3_content.push_str(&n3.payee_address2);
+    n3_content.push_str(&stiuational_element(n3.payee_address2));
+
+    // n3_content.push_str("*");
+    // n3_content.push_str(&n3.payee_address2);
     n3_content.push_str("~");
     n3_content
 }
