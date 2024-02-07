@@ -7,25 +7,36 @@ use crate::helper::helper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table3s {
-    pub plb_segments: PLB,
+    pub plb_segments: Vec<PLB>,
     pub se_segments: SE,
 }
 
 
-pub fn get_table_3(mut contents: String) -> (PLB, SE, String) {
+pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
     // Table 3
     // PLB Provider Adjustment S >1
     // SE Transaction Set Trailer R 1
 
-    let mut plb_segments = PLB::default();
+    let mut plb_segments = vec![];
     let mut se_segments = SE::default();
 
     if contents.contains("PLB") {
-        info!("PLB segment found, ");
-        plb_segments = get_plb(get_segment_contents("PLB", &contents));
-        info!("PLB segment parsed");
-        contents = content_trim("PLB",contents);
+        let plb_count = contents.matches("PLB").count();
+        for _ in 0..plb_count {
+            info!("PLB segment found, ");
+            plb_segments.push(get_plb(get_segment_contents("PLB", &contents)));
+            info!("PLB segment parsed");
+            contents = content_trim("PLB",contents);
+
+        }
     }
+
+    // if contents.contains("PLB") {
+    //     info!("PLB segment found, ");
+    //     plb_segments = get_plb(get_segment_contents("PLB", &contents));
+    //     info!("PLB segment parsed");
+    //     contents = content_trim("PLB",contents);
+    // }
     if contents.contains("SE") {
         info!("SE segment found, ");
         se_segments = get_se(get_segment_contents("SE", &contents));
@@ -49,7 +60,10 @@ pub fn get_table3s(contents:String) -> (Table3s, String) {
 
 pub fn write_table3(table3:Table3s) -> String {
     let mut contents = String::new();
-    contents.push_str(&write_plb(table3.plb_segments));
+    for n in 0..table3.plb_segments.len() {
+        contents.push_str(&write_plb(table3.plb_segments[n].clone()));
+    }
+    // contents.push_str(&write_plb(table3.plb_segments));
     contents.push_str(&write_se(table3.se_segments));
     return contents
 }

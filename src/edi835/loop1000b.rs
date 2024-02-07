@@ -13,12 +13,12 @@ pub struct Loop1000bs {
     pub n1_segments: N1,
     pub n3_segments: N3,
     pub n4_segments: N4,
-    pub ref_segments: REF,
+    pub ref_segments: Vec<REF>,
     pub rdm_segments: RDM,
 }
 
 
-pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
+pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, Vec<REF>, RDM, String) {
     // Loop 1000B Payee Identification (1)
     // N1 Payee Identification R 1
     // N3 Payee Address S 1
@@ -32,7 +32,7 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
     let mut n1_segments = N1::default();
     let mut n3_segments = N3::default();
     let mut n4_segments = N4::default();
-    let mut ref_segments = REF::default();
+    let mut ref_segments = vec![];
     let mut rdm_segments = RDM::default();
 
     if contents.contains("N1") {
@@ -53,12 +53,16 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, REF, RDM, String) {
         info!("N4 segment parsed");
         contents = content_trim("N4",contents);
     }
+
     if contents.contains("REF") {
-        if check_if_segement_in_loop("REF", "CLP", contents.clone()) {
-            info!("REF segment found, ");
-            ref_segments = get_ref(get_segment_contents("REF", &contents));
-            info!("REF segment parsed");
-            contents = content_trim("REF",contents);
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            if check_if_segement_in_loop("REF", "CLP", contents.clone()) {
+                info!("REF segment found, ");
+                ref_segments.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
         }
     }
     if contents.contains("RDM") {
@@ -90,7 +94,9 @@ pub fn write_loop1000b(loop1000b:Loop1000bs) -> String {
     contents.push_str(&write_n1(loop1000b.n1_segments));
     contents.push_str(&write_n3(loop1000b.n3_segments));
     contents.push_str(&write_n4(loop1000b.n4_segments));
-    contents.push_str(&write_ref(loop1000b.ref_segments));
+    for n in 0..loop1000b.ref_segments.len() {
+        contents.push_str(&write_ref(loop1000b.ref_segments[n].clone()));
+    }
     contents.push_str(&write_rdm(loop1000b.rdm_segments));
     return contents;
 }

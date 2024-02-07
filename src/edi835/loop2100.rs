@@ -17,7 +17,7 @@ use crate::helper::helper::*;
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2100s {
     pub clp_segments: CLP,
-    pub cas_segments: CAS,
+    pub cas_segments: Vec<CAS>,
     pub nm1_patint_segments: NM1,
     pub nm1_insured_segments: NM1,
     pub nm1_corrected_patient_segments: NM1,
@@ -27,20 +27,20 @@ pub struct Loop2100s {
     pub nm1_other_subscriber_segments: NM1,
     pub mia_segments: MIA,
     pub moa_segments: MOA,
-    pub ref_other_claim_segments: REF,
-    pub ref_rendering_provider_segments: REF,
-    pub dtm_statement_from_segments: DTM,
+    pub ref_other_claim_segments: Vec<REF>,
+    pub ref_rendering_provider_segments: Vec<REF>,
+    pub dtm_statement_from_segments: Vec<DTM>,
     pub dtm_coverage_expiration_segments: DTM,
     pub dtm_claim_received_segments: DTM,
-    pub per_segments: PER,
-    pub amt_segments: AMT,
-    pub qty_segments: QTY,
+    pub per_segments: Vec<PER>,
+    pub amt_segments: Vec<AMT>,
+    pub qty_segments: Vec<QTY>,
 }
 
 
 
 
-pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1, NM1, NM1, MIA, MOA, REF, REF, DTM, DTM, DTM, PER, AMT, QTY, String) {
+pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1, NM1, NM1, NM1, MIA, MOA, Vec<REF>, Vec<REF>, Vec<DTM>, DTM, DTM, Vec<PER>, Vec<AMT>, Vec<QTY>, String) {
     // Loop 2100 Claim Payment Information (>1)
     // R: required
     // S: optional (situational)
@@ -67,7 +67,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
     // QTY Claim Supplemental Information Quantity S 14
 
     let mut clp_segments = CLP::default();
-    let mut cas_segments = CAS::default();
+    let mut cas_segments = vec![];
     let mut nm1_patint_segments = NM1::default();
     let mut nm1_insured_segments = NM1::default();
     let mut nm1_corrected_patient_segments = NM1::default();
@@ -77,14 +77,14 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
     let mut nm1_other_subscriber_segments = NM1::default();
     let mut mia_segments = MIA::default();
     let mut moa_segments = MOA::default();
-    let mut ref_other_claim_segments = REF::default();
-    let mut ref_rendering_provider_segments = REF::default();
-    let mut dtm_statement_from_segments = DTM::default();
+    let mut ref_other_claim_segments = vec![];
+    let mut ref_rendering_provider_segments = vec![];
+    let mut dtm_statement_from_segments = vec![];
     let mut dtm_coverage_expiration_segments = DTM::default();
     let mut dtm_claim_received_segments = DTM::default();
-    let mut per_segments = PER::default();
-    let mut amt_segments = AMT::default();
-    let mut qty_segments = QTY::default();
+    let mut per_segments = vec![];
+    let mut amt_segments = vec![];
+    let mut qty_segments = vec![];
 
     if contents.contains("CLP") {
         info!("CLP segment found, ");
@@ -92,14 +92,20 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
         info!("CLP segment parsed");
         contents = content_trim("CLP",contents);
     }
+
+
     if contents.contains("CAS") {
-        if check_if_segement_in_loop("CAS", "NM1", contents.clone()) {
-            info!("CAS segment found, ");
-            cas_segments = get_cas(get_segment_contents("CAS", &contents));
-            info!("CAS segment parsed");
-            contents = content_trim("CAS",contents);
+        let ref_count = contents.matches("CAS").count();
+        for _ in 0..ref_count {
+            if check_if_segement_in_loop("CAS", "NM1", contents.clone()) {
+                info!("CAS segment found, ");
+                cas_segments.push(get_cas(get_segment_contents("CAS", &contents)));
+                info!("CAS segment parsed");
+                contents = content_trim("CAS",contents);
+            }
         }
     }
+
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_patint_segments = get_nm1(get_segment_contents("NM1", &contents));
@@ -155,29 +161,53 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
         contents = content_trim("MOA",contents);
     }
     if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_other_claim_segments = get_ref(get_segment_contents("REF", &contents));
-        if check_for_expected_codes("1L,1W,28,6P,9A,9C,BB,CE,EA,F8,G1,G3,IG,SY", ref_other_claim_segments.reference_id_number_qualifier.clone()) {
-            info!("REF segment parsed");
-            contents = content_trim("REF",contents);
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+            if check_for_expected_codes("1L,1W,28,6P,9A,9C,BB,CE,EA,F8,G1,G3,IG,SY", ref_tmp.reference_id_number_qualifier.clone()) {
+                info!("REF segment found, ");
+                ref_other_claim_segments.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
         }
     }
+
+
     if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_rendering_provider_segments = get_ref(get_segment_contents("REF", &contents));
-        if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,,1J,D3,G2,LU", ref_rendering_provider_segments.reference_id_number_qualifier.clone()) {
-            contents = content_trim("REF",contents);
-            info!("REF segment parsed");
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+            if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,,1J,D3,G2,LU", ref_tmp.reference_id_number_qualifier.clone()) {
+                info!("REF segment found, ");
+                ref_rendering_provider_segments.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
         }
     }
+
     if contents.contains("DTM") {
-        info!("DTM segment found, ");
-        dtm_statement_from_segments = get_dtm(get_segment_contents("DTM", &contents));
-         if check_for_expected_codes("232,233", dtm_statement_from_segments.date_time_qualifier.clone()) {
-            info!("DTM segment parsed");
-            contents = content_trim("DTM",contents);
-         }
+        let dtm_count = contents.matches("DTM").count();
+        for _ in 0..dtm_count {
+            let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
+            if check_for_expected_codes("232,233", dtm_tmp.date_time_qualifier.clone()) {
+                info!("DTM segment found, ");
+                dtm_statement_from_segments.push(dtm_tmp);
+                info!("DTM segment parsed");
+                contents = content_trim("DTM",contents);
+            }
+        }
     }
+
+    // if contents.contains("DTM") {
+    //     info!("DTM segment found, ");
+    //     dtm_statement_from_segments = get_dtm(get_segment_contents("DTM", &contents));
+    //      if check_for_expected_codes("232,233", dtm_statement_from_segments.date_time_qualifier.clone()) {
+    //         info!("DTM segment parsed");
+    //         contents = content_trim("DTM",contents);
+    //      }
+    // }
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_coverage_expiration_segments = get_dtm(get_segment_contents("DTM", &contents));
@@ -195,28 +225,61 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, CAS, NM1, NM1, NM1, NM1, NM1,
         }
     }
     if contents.contains("PER") {
-        info!("PER segment found, ");
-        per_segments = get_per(get_segment_contents("PER", &contents));
-        info!("PER segment parsed");
-        contents = content_trim("PER",contents);
+        let per_count = contents.matches("PER").count();
+        for _ in 0..per_count {
+            let per_tmp = get_per(get_segment_contents("PER", &contents));
+            info!("PER segment found, ");
+            per_segments.push(per_tmp);
+            info!("PER segment parsed");
+            contents = content_trim("PER",contents);
+        }
     }
+    // if contents.contains("PER") {
+    //     info!("PER segment found, ");
+    //     per_segments = get_per(get_segment_contents("PER", &contents));
+    //     info!("PER segment parsed");
+    //     contents = content_trim("PER",contents);
+    // }
     if contents.contains("AMT") {
-        info!("AMT segment found, ");
-        amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        if check_for_expected_codes("AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
-            info!("AMT segment parsed");
-            contents = content_trim("AMT",contents);
-
+        let amt_count = contents.matches("AMT").count();
+        for _ in 0..amt_count {
+            let amt_tmp = get_amt(get_segment_contents("AMT", &contents));
+            if check_for_expected_codes("AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO", amt_tmp.amt01_amount_qualifier_code.clone()) {
+                info!("AMT segment found, ");
+                amt_segments.push(amt_tmp);
+                info!("AMT segment parsed");
+                contents = content_trim("AMT",contents);
+            }
         }
     }
+    // if contents.contains("AMT") {
+    //     info!("AMT segment found, ");
+    //     amt_segments = get_amt(get_segment_contents("AMT", &contents));
+    //     if check_for_expected_codes("AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
+    //         info!("AMT segment parsed");
+    //         contents = content_trim("AMT",contents);
+    //     }
+    // }
     if contents.contains("QTY") {
-        info!("QTY segment found, ");
-        qty_segments = get_qty(get_segment_contents("QTY", &contents));
-        if check_for_expected_codes("CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
-            info!("QTY segment parsed");
-            contents = content_trim("QTY",contents);
+        let qty_count = contents.matches("QTY").count();
+        for _ in 0..qty_count {
+            let qty = get_qty(get_segment_contents("QTY", &contents));
+            if check_for_expected_codes("CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO", qty.qty01_quantity_qualifier.clone()) {
+                info!("QTY segment found, ");
+                qty_segments.push(qty);
+                info!("QTY segment parsed");
+                contents = content_trim("QTY",contents);
+            }
         }
     }
+    // if contents.contains("QTY") {
+    //     info!("QTY segment found, ");
+    //     qty_segments = get_qty(get_segment_contents("QTY", &contents));
+    //     if check_for_expected_codes("CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO", amt_segments.amt01_amount_qualifier_code.clone()) {
+    //         info!("QTY segment parsed");
+    //         contents = content_trim("QTY",contents);
+    //     }
+    // }
 
     info!("Loop 2100 parsed\n");
 
@@ -270,7 +333,9 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
     let mut contents = String::new();
     for loop2100 in loop2100 {
         contents.push_str(&write_clp(loop2100.clp_segments));
-        contents.push_str(&write_cas(loop2100.cas_segments));
+        for n in 0..loop2100.cas_segments.len() {
+            contents.push_str(&write_cas(loop2100.cas_segments[n].clone()));
+        }
         contents.push_str(&write_nm1(loop2100.nm1_patint_segments));
         contents.push_str(&write_nm1(loop2100.nm1_insured_segments));
         contents.push_str(&write_nm1(loop2100.nm1_corrected_patient_segments));
@@ -280,14 +345,30 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
         contents.push_str(&write_nm1(loop2100.nm1_other_subscriber_segments));
         contents.push_str(&write_mia(loop2100.mia_segments));
         contents.push_str(&write_moa(loop2100.moa_segments));
-        contents.push_str(&write_ref(loop2100.ref_other_claim_segments));
-        contents.push_str(&write_ref(loop2100.ref_rendering_provider_segments));
-        contents.push_str(&write_dtm(loop2100.dtm_statement_from_segments));
+        for n in 0..loop2100.ref_other_claim_segments.len() {
+            contents.push_str(&write_ref(loop2100.ref_other_claim_segments[n].clone()));
+        }
+        for n in 0..loop2100.ref_rendering_provider_segments.len() {
+            contents.push_str(&write_ref(loop2100.ref_rendering_provider_segments[n].clone()));
+        }
+        for n in 0..loop2100.dtm_statement_from_segments.len() {
+            contents.push_str(&write_dtm(loop2100.dtm_statement_from_segments[n].clone()));
+        }
+        // contents.push_str(&write_dtm(loop2100.dtm_statement_from_segments));
         contents.push_str(&write_dtm(loop2100.dtm_coverage_expiration_segments));
         contents.push_str(&write_dtm(loop2100.dtm_claim_received_segments));
-        contents.push_str(&write_per(loop2100.per_segments));
-        contents.push_str(&write_amt(loop2100.amt_segments));
-        contents.push_str(&write_qty(loop2100.qty_segments));
+        for n in 0..loop2100.per_segments.len() {
+            contents.push_str(&write_per(loop2100.per_segments[n].clone()));
+        }
+        for n in 0..loop2100.amt_segments.len() {
+            contents.push_str(&write_amt(loop2100.amt_segments[n].clone()));
+        }
+        for n in 0..loop2100.qty_segments.len() {
+            contents.push_str(&write_qty(loop2100.qty_segments[n].clone()));
+        }
+        // contents.push_str(&write_per(loop2100.per_segments));
+        // contents.push_str(&write_amt(loop2100.amt_segments));
+        // contents.push_str(&write_qty(loop2100.qty_segments));
     }
     return contents;
 }

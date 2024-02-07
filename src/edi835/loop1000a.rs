@@ -13,13 +13,13 @@ pub struct Loop1000as {
     pub n1_segments: N1,
     pub n3_segments: N3,
     pub n4_segments: N4,
-    pub ref_segments: REF,
+    pub ref_segments: Vec<REF>,
     pub per_payer_business: PER,
-    pub per_technical_contact: PER,
+    pub per_technical_contact: Vec<PER>,
     pub per_web_site: PER,
 }
 
-pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, String) {
+pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<PER>, PER, String) {
     
     // Loop 1000A Payer Identification (1)
     // N1 Payer Identification R 1
@@ -39,9 +39,9 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
     let mut n1_segments = N1::default();
     let mut n3_segments = N3::default();
     let mut n4_segments = N4::default();
-    let mut ref_segments = REF::default();
+    let mut ref_segments: Vec<REF>  = vec![];
     let mut per_payer_business = PER::default();
-    let mut per_technical_contact = PER::default();
+    let mut per_technical_contact: Vec<PER> = vec![];
     let mut per_web_site = PER::default();
 
     if contents.contains("N1") {
@@ -66,84 +66,56 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, REF, PER, PER, PER, 
     }
 
     if contents.contains("REF") {
-        if check_if_segement_in_loop("REF", "N1", contents.clone()) {
-            info!("REF segment found, ");
-            ref_segments = get_ref(get_segment_contents("REF", &contents));
-            info!("REF segment parsed");
-            contents = content_trim("REF",contents);
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+                info!("REF segment found, ");
+                ref_segments.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
         }
     }
 
-    if contents.contains("PER") {
-        info!("PER segment found, ");
-        let per_segment = get_per(get_segment_contents("PER", &contents));
-        match &per_technical_contact.per01_contact_function_code as &str{
-            "CX" => {
-                per_payer_business = per_segment.clone();
-            },
-            "BL" => {
-                per_technical_contact = per_segment.clone();
-            },
-            "IC" => {
-                per_web_site = per_segment.clone();
-            },
-            _ => {
-                per_technical_contact = per_segment.clone();
-            }
-        }
-        info!("PER segment parsed");
-        contents = content_trim("PER",contents);
-    }
 
     if contents.contains("PER") {
+        let per_count = contents.matches("PER").count();
         info!("PER segment found, ");
-        let per_segment = get_per(get_segment_contents("PER", &contents));
-        match &per_technical_contact.per01_contact_function_code as &str{
-            "CX" => {
-                per_payer_business = per_segment.clone();
-            },
-            "BL" => {
-                per_technical_contact = per_segment.clone();
-            },
-            "IC" => {
-                per_web_site = per_segment.clone();
-            },
-            _ => {
-                per_technical_contact = per_segment.clone();
+        for _ in 0..per_count {
+            if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+                let per_segment = get_per(get_segment_contents("PER", &contents));
+                match &per_segment.per01_contact_function_code as &str{
+                    "CX" => {
+                        per_payer_business = per_segment.clone();
+                        contents = content_trim("PER",contents);
+                        info!("PER segment parsed");
+                    },
+                    "BL" => {
+                        per_technical_contact.push(per_segment.clone());
+                        contents = content_trim("PER",contents);
+                        info!("PER segment parsed");
+                    },
+                    "IC" => {
+                        per_web_site = per_segment.clone();
+                        contents = content_trim("PER",contents);
+                        info!("PER segment parsed");
+                    },
+                    _ => {
+                        info!("PER segment parsed, no matches found for expected codes in this loop");
+                    }
+                }
             }
         }
-        info!("PER segment parsed");
-        contents = content_trim("PER",contents);
     }
 
-    if contents.contains("PER") {
-        info!("PER segment found, ");
-        let per_segment = get_per(get_segment_contents("PER", &contents));
-        match &per_technical_contact.per01_contact_function_code as &str{
-            "CX" => {
-                per_payer_business = per_segment.clone();
-            },
-            "BL" => {
-                per_technical_contact = per_segment.clone();
-            },
-            "IC" => {
-                per_web_site = per_segment.clone();
-            },
-            _ => {
-                per_technical_contact = per_segment.clone();
-            }
-        }
-        info!("PER segment parsed");
-        contents = content_trim("PER",contents);
-    }
 
 
     info!("Loop 1000A parsed\n");
-    return (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents)
+    return (n1_segments, n3_segments, n4_segments, ref_segments, per_payer_business, per_technical_contact, per_web_site, contents)
 }
 
 pub fn get_1000as(contents:String) -> (Loop1000as, String) {
-    let (n1_segments, n3_segments, n4_segments, ref_segments, per_technical_contact, per_payer_business, per_web_site, contents) = get_loop_1000_a(contents);
+    let (n1_segments, n3_segments, n4_segments, ref_segments, per_payer_business, per_technical_contact, per_web_site, contents) = get_loop_1000_a(contents);
     let header  = Loop1000as {
         n1_segments,
         n3_segments,
@@ -161,9 +133,13 @@ pub fn write_loop1000a(loop1000a:Loop1000as) -> String {
     contents.push_str(&write_n1(loop1000a.n1_segments));
     contents.push_str(&write_n3(loop1000a.n3_segments));
     contents.push_str(&write_n4(loop1000a.n4_segments));
-    contents.push_str(&write_ref(loop1000a.ref_segments));
+    for n in 0..loop1000a.ref_segments.len() {
+        contents.push_str(&write_ref(loop1000a.ref_segments[n].clone()));
+    }
     contents.push_str(&write_per(loop1000a.per_payer_business));
-    contents.push_str(&write_per(loop1000a.per_technical_contact));
+    for n in 0..loop1000a.per_technical_contact.len() {
+        contents.push_str(&write_per(loop1000a.per_technical_contact[n].clone()));
+    }
     contents.push_str(&write_per(loop1000a.per_web_site));
     return contents;
 }
