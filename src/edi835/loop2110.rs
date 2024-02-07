@@ -16,18 +16,18 @@ use crate::helper::helper::*;
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2110s {
     pub svc_segments: SVC,
-    pub dtm_segments: DTM,
-    pub cas_segments: CAS,
-    pub ref_service_identification: REF,
+    pub dtm_segments: Vec<DTM>,
+    pub cas_segments: Vec<CAS>,
+    pub ref_service_identification: Vec<REF>,
     pub ref_line_item_control_number: REF,
-    pub ref_rendering_provider_information: REF,
-    pub ref_healthcare_policy_identification: REF,
-    pub amt_segments: AMT,
-    pub qty_segments: QTY,
-    pub lq_segments: LQ,
+    pub ref_rendering_provider_information: Vec<REF>,
+    pub ref_healthcare_policy_identification: Vec<REF>,
+    pub amt_segments: Vec<AMT>,
+    pub qty_segments: Vec<QTY>,
+    pub lq_segments: Vec<LQ>,
 }
 
-pub fn get_loop_2110(mut contents: String) -> (SVC, DTM, CAS, REF, REF, REF, REF, AMT, QTY, LQ, String) {
+pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>, REF, Vec<REF>, Vec<REF>, Vec<AMT>, Vec<QTY>, Vec<LQ>, String) {
     
     // Loop 2110 Service Payment Information (999)
     // SVC Service Payment Information S 1
@@ -42,15 +42,15 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, DTM, CAS, REF, REF, REF, REF
     // LQ Health Care Remark Codes S 99
 
     let mut svc_segments = SVC::default();
-    let mut dtm_segments = DTM::default();
-    let mut cas_segments = CAS::default();
-    let mut ref_service_identification = REF::default();
+    let mut dtm_segments = vec![];
+    let mut cas_segments = vec![];
+    let mut ref_service_identification = vec![];
     let mut ref_line_item_control_number = REF::default();
-    let mut ref_rendering_provider_information = REF::default();
-    let mut ref_healthcare_policy_identification = REF::default();
-    let mut amt_segments = AMT::default();
-    let mut qty_segments = QTY::default();
-    let mut lq_segments = LQ::default();
+    let mut ref_rendering_provider_information = vec![];
+    let mut ref_healthcare_policy_identification = vec![];
+    let mut amt_segments = vec![];
+    let mut qty_segments = vec![];
+    let mut lq_segments = vec![];
 
     if contents.contains("SVC") {
         info!("SVC segment found, ");
@@ -59,58 +59,151 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, DTM, CAS, REF, REF, REF, REF
         contents = content_trim("SVC",contents);
     }
     if contents.contains("DTM") {
-        info!("DTM segment found, ");
-        dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
-        info!("DTM segment parsed");
-        contents = content_trim("DTM",contents);
+        let dtm_count = contents.matches("DTM").count();
+        for _ in 0..dtm_count {
+            let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
+            info!("DTM segment found, ");
+            dtm_segments.push(dtm_tmp);
+            info!("DTM segment parsed");
+            contents = content_trim("DTM",contents);
+        }
     }
+    // if contents.contains("DTM") {
+    //     info!("DTM segment found, ");
+    //     dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
+    //     info!("DTM segment parsed");
+    //     contents = content_trim("DTM",contents);
+    // }
     if contents.contains("CAS") {
-        info!("CAS segment found, ");
-        cas_segments = get_cas(get_segment_contents("CAS", &contents));
-        info!("CAS segment parsed");
-        contents = content_trim("CAS",contents);
+        let cas_count = contents.matches("CAS").count();
+        for _ in 0..cas_count {
+            let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
+            info!("CAS segment found, ");
+            cas_segments.push(cas_tmp);
+            info!("CAS segment parsed");
+            contents = content_trim("CAS",contents);
+        }
+    }
+    // if contents.contains("CAS") {
+    //     info!("CAS segment found, ");
+    //     cas_segments = get_cas(get_segment_contents("CAS", &contents));
+    //     info!("CAS segment parsed");
+    //     contents = content_trim("CAS",contents);
+    // }
+
+    /*
+    TODO: we need to get the expected codes in the REF segments
+    */ 
+
+    if contents.contains("REF") {
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+            if check_for_expected_codes("1S,APC,BB,E9,G1,G3,LU,RB", ref_tmp.reference_id_number_qualifier.clone()) {
+                info!("REF segment found, ");
+                ref_service_identification.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
+        }
     }
     if contents.contains("REF") {
         info!("REF segment found, ");
-        ref_service_identification = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+        if check_for_expected_codes("6R", ref_tmp.reference_id_number_qualifier.clone()) {
+            ref_line_item_control_number = ref_tmp;
+            info!("REF segment parsed");
+            contents = content_trim("REF",contents);
+        }
+    }
+
+    if contents.contains("REF") {
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+            if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,1J,D3,G2,HPI,SY,TJ", ref_tmp.reference_id_number_qualifier.clone()) {
+                info!("REF segment found, ");
+                ref_rendering_provider_information.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
+        }
     }
     if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_line_item_control_number = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
+        let ref_count = contents.matches("REF").count();
+        for _ in 0..ref_count {
+            let ref_tmp = get_ref(get_segment_contents("REF", &contents));
+            if check_for_expected_codes("0K", ref_tmp.reference_id_number_qualifier.clone()) {
+                info!("REF segment found, ");
+                ref_healthcare_policy_identification.push(get_ref(get_segment_contents("REF", &contents)));
+                info!("REF segment parsed");
+                contents = content_trim("REF",contents);
+            }
+        }
     }
-    if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_rendering_provider_information = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
-    }
-    if contents.contains("REF") {
-        info!("REF segment found, ");
-        ref_healthcare_policy_identification = get_ref(get_segment_contents("REF", &contents));
-        info!("REF segment parsed");
-        contents = content_trim("REF",contents);
-    }
+    // if contents.contains("REF") {
+    //     info!("REF segment found, ");
+    //     ref_line_item_control_number = get_ref(get_segment_contents("REF", &contents));
+    //     info!("REF segment parsed");
+    //     contents = content_trim("REF",contents);
+    // }
+    // if contents.contains("REF") {
+    //     info!("REF segment found, ");
+    //     ref_rendering_provider_information = get_ref(get_segment_contents("REF", &contents));
+    //     info!("REF segment parsed");
+    //     contents = content_trim("REF",contents);
+    // }
+    // if contents.contains("REF") {
+    //     info!("REF segment found, ");
+    //     ref_healthcare_policy_identification = get_ref(get_segment_contents("REF", &contents));
+    //     info!("REF segment parsed");
+    //     contents = content_trim("REF",contents);
+    // }
+
+    // if contents.contains("AMT") {
+    //     info!("AMT segment found, ");
+    //     amt_segments = get_amt(get_segment_contents("AMT", &contents));
+    //     info!("AMT segment parsed");
+    //     contents = content_trim("AMT",contents);
+    // }
     if contents.contains("AMT") {
-        info!("AMT segment found, ");
-        amt_segments = get_amt(get_segment_contents("AMT", &contents));
-        info!("AMT segment parsed");
-        contents = content_trim("AMT",contents);
+        let amt_count = contents.matches("AMT").count();
+        for _ in 0..amt_count {
+            info!("AMT segment found, ");
+            amt_segments.push(get_amt(get_segment_contents("AMT", &contents)));
+            info!("AMT segment parsed");
+            contents = content_trim("AMT",contents);
+        }
     }
+    // if contents.contains("QTY") {
+    //     info!("QTY segment found, ");
+    //     qty_segments = get_qty(get_segment_contents("QTY", &contents));
+    //     info!("QTY segment parsed");
+    //     contents = content_trim("QTY",contents);
+    // }
     if contents.contains("QTY") {
-        info!("QTY segment found, ");
-        qty_segments = get_qty(get_segment_contents("QTY", &contents));
-        info!("QTY segment parsed");
-        contents = content_trim("QTY",contents);
+        let qty_count = contents.matches("QTY").count();
+        for _ in 0..qty_count {
+            info!("QTY segment found, ");
+            qty_segments.push(get_qty(get_segment_contents("QTY", &contents)));
+            info!("QTY segment parsed");
+            contents = content_trim("QTY",contents);
+        }
     }
+    // if contents.contains("LQ") {
+    //     info!("LQ segment found, ");
+    //     lq_segments = get_lq(get_segment_contents("LQ", &contents));
+    //     info!("LQ segment parsed");
+    //     contents = content_trim("LQ",contents);
+    // }
     if contents.contains("LQ") {
-        info!("LQ segment found, ");
-        lq_segments = get_lq(get_segment_contents("LQ", &contents));
-        info!("LQ segment parsed");
-        contents = content_trim("LQ",contents);
+        let lq_count = contents.matches("LQ").count();
+        for _ in 0..lq_count {
+            info!("LQ segment found, ");
+            lq_segments.push(get_lq(get_segment_contents("LQ", &contents)));
+            info!("LQ segment parsed");
+            contents = content_trim("LQ",contents);
+        }
     }
 
     info!("Loop 2110 parsed\n");
@@ -166,15 +259,40 @@ pub fn write_loop2110(loop2110:Vec<Loop2110s>) -> String {
     let mut contents = String::new();
     for loop2110 in loop2110 {
         contents.push_str(&write_svc(loop2110.svc_segments));
-        contents.push_str(&write_dtm(loop2110.dtm_segments));
-        contents.push_str(&write_cas(loop2110.cas_segments));
-        contents.push_str(&write_ref(loop2110.ref_service_identification));
+        for n in 0..loop2110.dtm_segments.len() {
+            contents.push_str(&write_dtm(loop2110.dtm_segments[n].clone()));
+        }
+        // contents.push_str(&write_dtm(loop2110.dtm_segments));
+        for n in 0..loop2110.cas_segments.len() {
+            contents.push_str(&write_cas(loop2110.cas_segments[n].clone()));
+        }
+        // contents.push_str(&write_cas(loop2110.cas_segments));
+        for n in 0..loop2110.ref_service_identification.len() {
+            contents.push_str(&write_ref(loop2110.ref_service_identification[n].clone()));
+        }
+        // contents.push_str(&write_ref(loop2110.ref_service_identification));
         contents.push_str(&write_ref(loop2110.ref_line_item_control_number));
-        contents.push_str(&write_ref(loop2110.ref_rendering_provider_information));
-        contents.push_str(&write_ref(loop2110.ref_healthcare_policy_identification));
-        contents.push_str(&write_amt(loop2110.amt_segments));
-        contents.push_str(&write_qty(loop2110.qty_segments));
-        contents.push_str(&write_lq(loop2110.lq_segments));
+
+        for n in 0..loop2110.ref_rendering_provider_information.len() {
+            contents.push_str(&write_ref(loop2110.ref_rendering_provider_information[n].clone()));
+        }
+        for n in 0..loop2110.ref_healthcare_policy_identification.len() {
+            contents.push_str(&write_ref(loop2110.ref_healthcare_policy_identification[n].clone()));
+        }
+        // contents.push_str(&write_ref(loop2110.ref_rendering_provider_information));
+        // contents.push_str(&write_ref(loop2110.ref_healthcare_policy_identification));
+        for n in 0..loop2110.amt_segments.len() {
+            contents.push_str(&write_amt(loop2110.amt_segments[n].clone()));
+        }
+        for n in 0..loop2110.qty_segments.len() {
+            contents.push_str(&write_qty(loop2110.qty_segments[n].clone()));
+        }
+        for n in 0..loop2110.lq_segments.len() {
+            contents.push_str(&write_lq(loop2110.lq_segments[n].clone()));
+        }
+        // contents.push_str(&write_amt(loop2110.amt_segments));
+        // contents.push_str(&write_qty(loop2110.qty_segments));
+        // contents.push_str(&write_lq(loop2110.lq_segments));
     }
     return contents;
 }
