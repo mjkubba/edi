@@ -190,9 +190,10 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
     if contents.contains("DTM") {
         let dtm_count = contents.matches("DTM").count();
         for _ in 0..dtm_count {
+            info!("DTM segment found, ");
             let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
             if check_for_expected_codes("232,233", dtm_tmp.date_time_qualifier.clone()) {
-                info!("DTM segment found, ");
+                info!("DTM segment found, and in the correct loop");
                 dtm_statement_from_segments.push(dtm_tmp);
                 info!("DTM segment parsed");
                 contents = content_trim("DTM",contents);
@@ -211,7 +212,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_coverage_expiration_segments = get_dtm(get_segment_contents("DTM", &contents));
-        if check_for_expected_codes("232,233", dtm_coverage_expiration_segments.date_time_qualifier.clone()) {
+        if check_for_expected_codes("036", dtm_coverage_expiration_segments.date_time_qualifier.clone()) {
             info!("DTM segment parsed");
             contents = content_trim("DTM",contents);
         }
@@ -219,7 +220,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
     if contents.contains("DTM") {
         info!("DTM segment found, ");
         dtm_claim_received_segments = get_dtm(get_segment_contents("DTM", &contents));
-        if check_for_expected_codes("232,233", dtm_claim_received_segments.date_time_qualifier.clone()) {
+        if check_for_expected_codes("050", dtm_claim_received_segments.date_time_qualifier.clone()) {
              info!("DTM segment parsed");
              contents = content_trim("DTM",contents);
         }

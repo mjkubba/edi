@@ -58,14 +58,19 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>
         info!("SVC segment parsed");
         contents = content_trim("SVC",contents);
     }
+
     if contents.contains("DTM") {
+        info!("DTM segment found, ");
         let dtm_count = contents.matches("DTM").count();
         for _ in 0..dtm_count {
             let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
-            info!("DTM segment found, ");
-            dtm_segments.push(dtm_tmp);
-            info!("DTM segment parsed");
-            contents = content_trim("DTM",contents);
+            if check_for_expected_codes("150,151,472", dtm_tmp.date_time_qualifier.clone()) {
+            // if check_if_segement_in_loop("DTM", "SVC", contents.clone()) {
+                info!("DTM segment found, in the correct loop");
+                dtm_segments.push(dtm_tmp);
+                info!("DTM segment parsed");
+                contents = content_trim("DTM",contents);
+            }
         }
     }
     // if contents.contains("DTM") {
@@ -96,11 +101,12 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>
     */ 
 
     if contents.contains("REF") {
+        info!("REF segment found, ");
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
             if check_for_expected_codes("1S,APC,BB,E9,G1,G3,LU,RB", ref_tmp.reference_id_number_qualifier.clone()) {
-                info!("REF segment found, ");
+                info!("REF segment found, in the right loop");
                 ref_service_identification.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
                 contents = content_trim("REF",contents);
@@ -118,11 +124,12 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>
     }
 
     if contents.contains("REF") {
+        info!("REF segment found, ");
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
             if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,1J,D3,G2,HPI,SY,TJ", ref_tmp.reference_id_number_qualifier.clone()) {
-                info!("REF segment found, ");
+                info!("REF segment found, in the right loop");
                 ref_rendering_provider_information.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
                 contents = content_trim("REF",contents);
@@ -130,11 +137,12 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>
         }
     }
     if contents.contains("REF") {
+        info!("REF segment found, ");
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
             if check_for_expected_codes("0K", ref_tmp.reference_id_number_qualifier.clone()) {
-                info!("REF segment found, ");
+                info!("REF segment found, in the right loop");
                 ref_healthcare_policy_identification.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
                 contents = content_trim("REF",contents);
@@ -231,12 +239,18 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
     let svc_count= contents.matches("SVC").count();
     let mut loop_2110_array = vec![];
     info!("Number of loops in loop 2110: {:?}",svc_count);
-    
     for _ in 0..svc_count {
+        let mut tmp_contents= contents.clone();
+        let remaining_svc_count= contents.matches("SVC").count();
+        if remaining_svc_count > 1 {
+            let skipped_content = &contents[3..];
+            let foundsvc = skipped_content.find("SVC").unwrap();
+            tmp_contents = contents[..foundsvc+3].to_string();
+        }
         let ( svc_segments,  dtm_segments,  cas_segments,  ref_service_identification,  ref_line_item_control_number,  ref_rendering_provider_information, 
-             ref_healthcare_policy_identification,  amt_segments,  qty_segments,  lq_segments);
+             ref_healthcare_policy_identification,  amt_segments,  qty_segments,  lq_segments, rem_contents);
         (svc_segments, dtm_segments, cas_segments, ref_service_identification, ref_line_item_control_number, ref_rendering_provider_information, ref_healthcare_policy_identification, amt_segments, 
-         qty_segments, lq_segments, contents) = get_loop_2110(contents.clone());
+         qty_segments, lq_segments, rem_contents) = get_loop_2110(tmp_contents.clone());
     
         let loop2110 = Loop2110s {
             svc_segments,
@@ -250,6 +264,8 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
             qty_segments,
             lq_segments,
         };
+        contents = contents.replacen(&tmp_contents, "",1);
+        contents.push_str(&rem_contents);
         loop_2110_array.push(loop2110);
     }
     return (loop_2110_array, contents);

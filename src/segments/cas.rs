@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -115,6 +116,9 @@ pub fn get_cas(cas_content: String) -> CAS {
 }
 
 pub fn write_cas(cas: CAS) -> String {
+    if cas.cas01_claim_adjustsment_group_code.is_empty() {
+        return String::new();
+    }
     let mut cas_content =  String::new();
     cas_content.push_str("CAS*");
     cas_content.push_str(&cas.cas01_claim_adjustsment_group_code);
@@ -122,38 +126,22 @@ pub fn write_cas(cas: CAS) -> String {
     cas_content.push_str(&cas.cas02_adjustsment_reason_code);
     cas_content.push_str("*");
     cas_content.push_str(&cas.cas03_adjustsment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas04_adjustsment_qty);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas05_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas06_adjustment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas07_adjustment_qty);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas08_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas09_adjustment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas10_adjustment_qty);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas11_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas12_adjustment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas13_adjustment_qty);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas14_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas15_adjustment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas16_adjustment_qty);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas17_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas18_adjustment_amt);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas19_adjustment_qty);
+    cas_content.push_str(&stiuational_element(cas.cas04_adjustsment_qty));
+    cas_content.push_str(&stiuational_element(cas.cas05_adjustment_reason_code));
+    cas_content.push_str(&stiuational_element(cas.cas06_adjustment_amt));
+    cas_content.push_str(&stiuational_element(cas.cas07_adjustment_qty));
+    cas_content.push_str(&stiuational_element(cas.cas08_adjustment_reason_code));
+    cas_content.push_str(&stiuational_element(cas.cas09_adjustment_amt));
+    cas_content.push_str(&stiuational_element(cas.cas10_adjustment_qty));
+    cas_content.push_str(&stiuational_element(cas.cas11_adjustment_reason_code));
+    cas_content.push_str(&stiuational_element(cas.cas12_adjustment_amt));
+    cas_content.push_str(&stiuational_element(cas.cas13_adjustment_qty));
+    cas_content.push_str(&stiuational_element(cas.cas14_adjustment_reason_code));
+    cas_content.push_str(&stiuational_element(cas.cas15_adjustment_amt));
+    cas_content.push_str(&stiuational_element(cas.cas16_adjustment_qty));
+    cas_content.push_str(&stiuational_element(cas.cas17_adjustment_reason_code));
+    cas_content.push_str(&stiuational_element(cas.cas18_adjustment_amt));
+    cas_content.push_str(&stiuational_element(cas.cas19_adjustment_qty));
     cas_content.push_str("~");
     cas_content
 }

@@ -1,4 +1,6 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
+
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
@@ -70,25 +72,20 @@ pub fn get_moa(moa_content: String) -> MOA {
 }
 
 pub fn write_moa(moa:MOA) -> String {
+    if moa.moa01_reimbursement_rate.is_empty() {
+        return String::new();
+    }
     let mut moa_content: String = String::new();
-    moa_content.push_str("MOA*");
-    moa_content.push_str(&moa.moa01_reimbursement_rate);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa02_claim_hcpcs_payable_amount);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa03_claim_payment_remark_code);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa04_claim_payment_remark_code);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa05_claim_payment_remark_code);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa06_claim_payment_remark_code);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa07_claim_payment_remark_code);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa08_claim_esrd_payment_amount);
-    moa_content.push_str("*");
-    moa_content.push_str(&moa.moa09_nonpayable_professional_component_amount);
+    moa_content.push_str("MOA");
+    moa_content.push_str(&stiuational_element(moa.moa01_reimbursement_rate));
+    moa_content.push_str(&stiuational_element(moa.moa02_claim_hcpcs_payable_amount));
+    moa_content.push_str(&stiuational_element(moa.moa03_claim_payment_remark_code));
+    moa_content.push_str(&stiuational_element(moa.moa04_claim_payment_remark_code));
+    moa_content.push_str(&stiuational_element(moa.moa05_claim_payment_remark_code));
+    moa_content.push_str(&stiuational_element(moa.moa06_claim_payment_remark_code));
+    moa_content.push_str(&stiuational_element(moa.moa07_claim_payment_remark_code));
+    moa_content.push_str(&stiuational_element(moa.moa08_claim_esrd_payment_amount));
+    moa_content.push_str(&stiuational_element(moa.moa09_nonpayable_professional_component_amount));
     moa_content.push_str("~");
     moa_content
 

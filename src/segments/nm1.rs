@@ -30,6 +30,9 @@ pub fn get_nm1(nm1_content: String) -> NM1 {
 }
 
 pub fn write_nm1(nm1:NM1) -> String {
+    if nm1.entity_id.is_empty() {
+        return String::new();
+    }
     let mut nm1_content: String = String::new();
     nm1_content.push_str("NM1*");
     nm1_content.push_str(&nm1.entity_id);

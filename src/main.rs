@@ -45,14 +45,9 @@ fn main() {
         mix of the idea of match in loop 1000a and check_for_expected_codes() in helper
 
         Where I left:
-        Writing functionality inside each segment, 
-        adding 
-            use crate::helper::helper::stiuational_element;
-            if ts3.ts301_provider_identifier.is_empty() {
-                return String::new();
-            }
-            and 
-            ts2_content.push_str(&stiuational_element(ts2.ts215_total_msp_pass_through_amount));
+        in each loop, specifically the 2110 is having issues where the loops repeats, it will parse some of the segments from the 2nd loop ahead of time.
+        Need to trim loops and process one at a time.
+        2110 have a solution, looks weak to me, but best I can think of as of now, need to fix it and move it to helper or implement it as is in the other loops
 
     */
 

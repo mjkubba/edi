@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -69,6 +70,9 @@ pub fn get_clp(bpr_content: String) -> CLP {
 }
 
 pub fn write_clp(clp:CLP) -> String {
+    if clp.clp01_patient_control_number.is_empty() {
+        return String::new();
+    }
     let mut clp_content: String = String::new();
     clp_content.push_str("CLP*");
     clp_content.push_str(&clp.clp01_patient_control_number);
@@ -84,16 +88,11 @@ pub fn write_clp(clp:CLP) -> String {
     clp_content.push_str(&clp.clp06_claim_filing_indicator_code);
     clp_content.push_str("*");
     clp_content.push_str(&clp.clp07_payer_claim_control_number);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp08_facility_type_code);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp09_claim_frequency_code);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp11_diagnosis_related_group);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp12_drg_weight);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp13_percent_discharge_fraction);
+    clp_content.push_str(&stiuational_element(clp.clp08_facility_type_code));
+    clp_content.push_str(&stiuational_element(clp.clp09_claim_frequency_code));
+    clp_content.push_str(&stiuational_element(clp.clp11_diagnosis_related_group));
+    clp_content.push_str(&stiuational_element(clp.clp12_drg_weight));
+    clp_content.push_str(&stiuational_element(clp.clp13_percent_discharge_fraction));
     clp_content.push_str("~");
     clp_content
 }

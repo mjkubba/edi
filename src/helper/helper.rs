@@ -36,7 +36,7 @@ pub fn get_full_segment_contents(key:&str, contents: &str) -> String {
 
 pub fn content_trim(key: &str, contents:String) -> String {
     let to_remove = get_full_segment_contents(&key, &contents)+"~";
-    contents.replace(&to_remove, "").trim_start_matches("~").to_string()
+    contents.replacen(&to_remove, "", 1).trim_start_matches("~").to_string()
 }
 
 
@@ -164,16 +164,6 @@ pub fn check_for_expected_codes(codes: &str ,content:String) -> bool {
     return false;
 }
 
-
-// pub fn stiuational_segment(value: String) -> String {
-//     if !value.is_empty() {
-//         let mut to_return = String::from("*");
-//         to_return.push_str(&value);
-//         return to_return;
-//     } else {
-//         return "".to_string();
-//     }
-// }
 
 
 
