@@ -55,13 +55,16 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000s>, String) {
     let mut loop_2000_array = vec![];
     info!("Number of loops in loop 2000: {:?}",lx_count);
     for _ in 0..lx_count {
-        let (lx, ts3, ts2);
-        (lx, ts3, ts2, contents) = get_loop_2000(contents.clone());
+        let tmp_contents = get_loop_contents("LX", "CLP", contents.clone());
+        let (lx, ts3, ts2, rem_contents);
+        (lx, ts3, ts2, rem_contents) = get_loop_2000(tmp_contents.clone());
         let loop2000s = Loop2000s {
             lx_segments: lx,
             ts3_segments: ts3,
             ts2_segments: ts2,
         };
+        contents = contents.replacen(&tmp_contents, "",1);
+        contents.push_str(&rem_contents);        
         loop_2000_array.push(loop2000s);
     }
 

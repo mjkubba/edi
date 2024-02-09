@@ -295,12 +295,14 @@ pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
     let mut loop_2100_array = vec![];
     info!("Number of loops in loop 2100: {:?}",clp_count);
     for _ in 0..clp_count {
+        let tmp_contents = get_loop_contents("CLP", "SVC", contents.clone());
         let (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, 
             nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments, nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, 
-            ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, per_segments, amt_segments, qty_segments);
+            ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, per_segments, 
+            amt_segments, qty_segments, rem_contents);
         (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments,
         nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, 
-        per_segments, amt_segments, qty_segments, contents) = get_loop_2100(contents.clone());
+        per_segments, amt_segments, qty_segments, rem_contents) = get_loop_2100(tmp_contents.clone());
         
 
         let loop2100 = Loop2100s {
@@ -324,6 +326,8 @@ pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
             amt_segments,
             qty_segments,
         };
+        contents = contents.replacen(&tmp_contents, "",1);
+        contents.push_str(&rem_contents);
         loop_2100_array.push(loop2100);
     }
 

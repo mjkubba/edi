@@ -240,13 +240,8 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
     let mut loop_2110_array = vec![];
     info!("Number of loops in loop 2110: {:?}",svc_count);
     for _ in 0..svc_count {
-        let mut tmp_contents= contents.clone();
-        let remaining_svc_count= contents.matches("SVC").count();
-        if remaining_svc_count > 1 {
-            let skipped_content = &contents[3..];
-            let foundsvc = skipped_content.find("SVC").unwrap();
-            tmp_contents = contents[..foundsvc+3].to_string();
-        }
+        let tmp_contents = get_loop_contents("SVC", "SVC", contents.clone());
+        
         let ( svc_segments,  dtm_segments,  cas_segments,  ref_service_identification,  ref_line_item_control_number,  ref_rendering_provider_information, 
              ref_healthcare_policy_identification,  amt_segments,  qty_segments,  lq_segments, rem_contents);
         (svc_segments, dtm_segments, cas_segments, ref_service_identification, ref_line_item_control_number, ref_rendering_provider_information, ref_healthcare_policy_identification, amt_segments, 
