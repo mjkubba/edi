@@ -7,8 +7,6 @@ use crate::edi835::table1::*;
 use crate::edi835::loop1000a::*;
 use crate::edi835::loop1000b::*;
 use crate::edi835::loop2000::*;
-// use crate::edi835::loop2100::*;
-// use crate::edi835::loop2110::*;
 use crate::edi835::table3::*;
 use crate::edi835::interchangecontroltrailer::*;
 
@@ -19,9 +17,7 @@ pub struct Edi835{
     pub table1s: Table1s,
     pub loop1000as: Loop1000as,
     pub loop1000bs: Loop1000bs,
-    pub loop2000s: Vec<Loop2000s>,
-    // pub loop2100s: Vec<Loop2100s>,
-    // pub loop2110s: Vec<Loop2110s>,
+    pub loop2000s: Vec<Table2>,
     pub table3s: Table3s,
     pub interchange_trailer: InterchangeTrailer,
 }
@@ -32,8 +28,6 @@ pub fn get_835(mut contents: String) -> Edi835 {
     let loop1000as;
     let loop1000bs;
     let loop2000s;
-    // let loop2100s;
-    // let loop2110s;
     let table3s;
     let interchange_trailer;
 
@@ -52,12 +46,6 @@ pub fn get_835(mut contents: String) -> Edi835 {
     // loop 2000
     (loop2000s, contents) = get_loop_2000s(contents.clone());
 
-    // loop 2100
-    // (loop2100s, contents) = get_loop_2100s(contents.clone());
-
-    // loop 2110
-    // (loop2110s, contents) = get_loop_2110s(contents.clone());
-
     // Table 3
     (table3s, contents) = get_table3s(contents.clone());
 
@@ -70,8 +58,6 @@ pub fn get_835(mut contents: String) -> Edi835 {
         loop1000as,
         loop1000bs,
         loop2000s,
-        // loop2100s,
-        // loop2110s,
         table3s,
         interchange_trailer,
     };
@@ -90,8 +76,6 @@ pub fn write_edi(contents: String) -> String {
     let new_l1a = write_loop1000a(edi_json.loop1000as.clone());
     let new_l1b = write_loop1000b(edi_json.loop1000bs.clone());
     let new_l2 = write_loop2000(edi_json.loop2000s.clone());
-    // let new_l21 = write_loop2100(edi_json.loop2100s.clone());
-    // let new_l211 = write_loop2110(edi_json.loop2110s.clone());
     let new_t3 = write_table3(edi_json.table3s.clone());
     let new_ict = write_interchange_trailer(edi_json.interchange_trailer.clone());
     new_edi.push_str(&new_ich);
@@ -99,8 +83,6 @@ pub fn write_edi(contents: String) -> String {
     new_edi.push_str(&new_l1a);
     new_edi.push_str(&new_l1b);
     new_edi.push_str(&new_l2);
-    // new_edi.push_str(&new_l21);
-    // new_edi.push_str(&new_l211);
     new_edi.push_str(&new_t3);
     new_edi.push_str(&new_ict);
     println!("{:?}", new_edi.clone());

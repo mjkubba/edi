@@ -31,12 +31,6 @@ pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
         }
     }
 
-    // if contents.contains("PLB") {
-    //     info!("PLB segment found, ");
-    //     plb_segments = get_plb(get_segment_contents("PLB", &contents));
-    //     info!("PLB segment parsed");
-    //     contents = content_trim("PLB",contents);
-    // }
     if contents.contains("SE") {
         info!("SE segment found, ");
         se_segments = get_se(get_segment_contents("SE", &contents));
@@ -63,7 +57,6 @@ pub fn write_table3(table3:Table3s) -> String {
     for n in 0..table3.plb_segments.len() {
         contents.push_str(&write_plb(table3.plb_segments[n].clone()));
     }
-    // contents.push_str(&write_plb(table3.plb_segments));
     contents.push_str(&write_se(table3.se_segments));
     return contents
 }
