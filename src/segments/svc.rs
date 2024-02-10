@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::helper::helper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -55,14 +56,10 @@ pub fn write_svc(svc: SVC) -> String {
     svc_string.push_str(&svc.svc02_line_item_charge_amount);
     svc_string.push_str("*");
     svc_string.push_str(&svc.svc03_line_item_provider_payment_amount);
-    svc_string.push_str("*");
-    svc_string.push_str(&svc.scv04_product_service_id);
-    svc_string.push_str("*");
-    svc_string.push_str(&svc.svc05_unit_of_service_paid_count);
-    svc_string.push_str("*");
-    svc_string.push_str(&svc.svc06_composite_medical_procedure_id);
-    svc_string.push_str("*");
-    svc_string.push_str(&svc.svc07_original_units_of_service_count);
+    svc_string.push_str(&stiuational_element(svc.scv04_product_service_id));
+    svc_string.push_str(&stiuational_element(svc.svc05_unit_of_service_paid_count));
+    svc_string.push_str(&stiuational_element(svc.svc06_composite_medical_procedure_id));
+    svc_string.push_str(&stiuational_element(svc.svc07_original_units_of_service_count));
     svc_string.push_str("~");
     svc_string
 }

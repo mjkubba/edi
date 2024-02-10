@@ -4,6 +4,7 @@ use serde::{Serialize, Deserialize};
 use crate::segments::lx::*;
 use crate::segments::ts3::*;
 use crate::segments::ts2::*;
+use crate::edi835::loop2100::*;
 use crate::helper::helper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
@@ -11,6 +12,7 @@ pub struct Loop2000s {
     pub lx_segments: LX,
     pub ts3_segments: TS3,
     pub ts2_segments: TS2,
+    pub loop2100s: Vec<Loop2100s>,
 }
 
 
@@ -52,19 +54,37 @@ pub fn get_loop_2000(mut contents:String) -> (LX, TS3, TS2, String) {
 pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000s>, String) {
 
     let lx_count= contents.matches("LX").count();
+
+    /* 
+    Check if there are multiple LX, TS3, TS2 segments then make that the loop,
+    Get the content between LX and the other LX
+
+    else
+    Check for CLP and get the content between CLP and the other CLP
+    */
+
     let mut loop_2000_array = vec![];
     info!("Number of loops in loop 2000: {:?}",lx_count);
+
+
+
     for _ in 0..lx_count {
-        let tmp_contents = get_loop_contents("LX", "CLP", contents.clone());
-        let (lx, ts3, ts2, rem_contents);
-        (lx, ts3, ts2, rem_contents) = get_loop_2000(tmp_contents.clone());
+        // let tmp_contents = get_loop_contents("LX", "CLP", contents.clone());
+        let (lx, ts3, ts2, loop2100s);
+        (lx, ts3, ts2, contents) = get_loop_2000(contents.clone());
+        (loop2100s, contents) = get_loop_2100s(contents.clone());
+
         let loop2000s = Loop2000s {
             lx_segments: lx,
             ts3_segments: ts3,
             ts2_segments: ts2,
+            loop2100s,
         };
-        contents = contents.replacen(&tmp_contents, "",1);
-        contents.push_str(&rem_contents);        
+
+        
+        // contents = contents.replacen(&tmp_contents, "",1);
+        // println!("contents after: {:?}",contents);
+        // contents.push_str(&rem_contents);        
         loop_2000_array.push(loop2000s);
     }
 
@@ -77,6 +97,10 @@ pub fn write_loop2000(loop2000:Vec<Loop2000s>) -> String {
         contents.push_str(&write_lx(loop2000.lx_segments));
         contents.push_str(&write_ts3(loop2000.ts3_segments));
         contents.push_str(&write_ts2(loop2000.ts2_segments));
+        contents.push_str(&write_loop2100(loop2000.loop2100s));
+        // for loop2100 in loop2000.loop2100s {
+        // }
+
     }
     return contents;
 }

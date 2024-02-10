@@ -52,6 +52,11 @@ fn main() {
         another thingy, the loops are nested, so 2110 is part of 2100 and 2100 is part of 2000 so if 2100 is repeated then 2110 is inside each of 2100 repeat...
         this mean I need to rewrite the controller to reflect that and maybe few otherparts of these loops.
 
+        Need to fix Write after figuring out the proper loops of table 2
+
+        Need to refactor loop2000 into table2
+
+
     */
 
     if args.operation == "write" {

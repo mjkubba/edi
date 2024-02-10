@@ -2,6 +2,7 @@ pub mod interchangecontrol;
 pub mod table1;
 pub mod loop1000a;
 pub mod loop1000b;
+pub mod table2;
 pub mod loop2000;
 pub mod loop2100;
 pub mod loop2110;

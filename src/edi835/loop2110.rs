@@ -83,10 +83,12 @@ pub fn get_loop_2110(mut contents: String) -> (SVC, Vec<DTM>, Vec<CAS>, Vec<REF>
         let cas_count = contents.matches("CAS").count();
         for _ in 0..cas_count {
             let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
-            info!("CAS segment found, ");
-            cas_segments.push(cas_tmp);
-            info!("CAS segment parsed");
-            contents = content_trim("CAS",contents);
+            if check_for_expected_codes("CO,OA,PI,PR", cas_tmp.cas01_claim_adjustsment_group_code.clone()) {
+                info!("CAS segment found, ");
+                cas_segments.push(cas_tmp);
+                info!("CAS segment parsed");
+                contents = content_trim("CAS",contents);
+            }
         }
     }
     // if contents.contains("CAS") {

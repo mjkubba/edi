@@ -167,17 +167,26 @@ pub fn check_for_expected_codes(codes: &str ,content:String) -> bool {
 
 pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: String) -> String {
     let mut tmp_contents= contents.clone();
-    let remaining_svc_count= contents.matches(segment_start).count();
-    if remaining_svc_count > 1 {
+    let remaining_loop_count= contents.matches(segment_start).count();
+    if remaining_loop_count > 1 {
         let skipped_content = &contents[3..];
-        let foundsvc = skipped_content.find(anchor).unwrap();
-        tmp_contents = contents[..foundsvc+3].to_string();
+        let foundanchor = skipped_content.find(anchor).unwrap();
+        tmp_contents = contents[..foundanchor+3].to_string();
     }
     tmp_contents
 }
 
 
-
+pub fn get_table2(contents:String) -> String {
+    let mut tmp_contents= contents.clone();
+    let remaining_clp_count= contents.matches("CLP").count();
+    if remaining_clp_count > 1 {
+        let skipped_content = &contents[3..];
+        let foundclp = skipped_content.find("CLP").unwrap();
+        tmp_contents = contents[..foundclp+3].to_string();
+    }
+    tmp_contents
+}
 
 
 
