@@ -49,6 +49,9 @@ fn main() {
         Need to trim loops and process one at a time.
         2110 have a solution, looks weak to me, but best I can think of as of now, need to fix it and move it to helper or implement it as is in the other loops
 
+        another thingy, the loops are nested, so 2110 is part of 2100 and 2100 is part of 2000 so if 2100 is repeated then 2110 is inside each of 2100 repeat...
+        this mean I need to rewrite the controller to reflect that and maybe few otherparts of these loops.
+
     */
 
     if args.operation == "write" {

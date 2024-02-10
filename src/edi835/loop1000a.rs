@@ -82,7 +82,11 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<P
         let per_count = contents.matches("PER").count();
         info!("PER segment found, ");
         for _ in 0..per_count {
-            if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+            println!("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            println!("{:?} {:?}",per_count, contents);
+            println!("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            if check_if_segement_in_loop("PER", "N1", contents.clone()) {
+                println!("##############################################");
                 let per_segment = get_per(get_segment_contents("PER", &contents));
                 match &per_segment.per01_contact_function_code as &str{
                     "CX" => {
