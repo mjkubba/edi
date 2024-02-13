@@ -247,20 +247,21 @@ mod tests {
     
     #[test]
     fn test_get_loop_2110() {
-        let contents = String::from("~SVC*HC|99213*500*100**1~DTM*472*20191001~CAS*OA*23*400~REF*6R*1~AMT*B6*450~SE*22*35681~GE*1*1~IEA*1*000000905~");
+        let contents = String::from("~SVC*HC|99213*500*100**1~DTM*472*20191001~CAS*OA*23*400~REF*BB*1~AMT*B6*450~SE*22*35681~GE*1*1~IEA*1*000000905~");
         let (svc, dtm, cas, ref_service_identification, ref_line_item_control_number, ref_rendering_provider_information, ref_healthcare_policy_identification, amt, qty, lq, contents) = get_loop_2110(contents
             );
         assert_eq!(contents, "SE*22*35681~GE*1*1~IEA*1*000000905~");
         assert_eq!(svc.svc01_1_product_or_service_is_qualifier, "HC|99213");
-        assert_eq!(dtm.date_time_qualifier, "472");
-        assert_eq!(cas.cas01_claim_adjustsment_group_code, "OA");
-        assert_eq!(ref_service_identification.reference_id_number_qualifier, "6R");
+        assert_eq!(dtm[0].date_time_qualifier, "472");
+        assert_eq!(cas[0].cas01_claim_adjustsment_group_code, "OA");
+        assert_eq!(ref_service_identification.len(), 1);
+        assert_eq!(ref_service_identification[0].reference_id_number_qualifier, "BB");
         assert_eq!(ref_line_item_control_number, REF::default());
-        assert_eq!(ref_rendering_provider_information, REF::default());
-        assert_eq!(ref_healthcare_policy_identification, REF::default());
-        assert_eq!(amt.amt01_amount_qualifier_code, "B6");
-        assert_eq!(qty, QTY::default());
-        assert_eq!(lq, LQ::default());
+        assert_eq!(ref_rendering_provider_information, vec![]);
+        assert_eq!(ref_healthcare_policy_identification, vec![]);
+        assert_eq!(amt[0].amt01_amount_qualifier_code, "B6");
+        assert_eq!(qty, vec![]);
+        assert_eq!(lq, vec![]);
 
     }
     // #[test]

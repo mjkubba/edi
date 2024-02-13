@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_loop1000b() {
-        let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD~N4*ANY CITY*CA*12211~REF*TJ*123456789~");
+        let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD~N4*ANY CITY*CA*12211~REF*TJ*123456789~CLP*");
         let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents.to_string());
         assert_eq!(n1_segments.payer_id_code, "PE");
         assert_eq!(n1_segments.payee_name, "PROVIDER");
@@ -121,19 +121,19 @@ mod tests {
         assert_eq!(n4_segments.payee_city, "ANY CITY");
         assert_eq!(n4_segments.payee_state, "CA");
         assert_eq!(n4_segments.payee_zip, "12211");
-        assert_eq!(ref_segments.reference_id_number_qualifier, "TJ");
-        assert_eq!(ref_segments.reference_id_number, "123456789");
+        assert_eq!(ref_segments[0].reference_id_number_qualifier, "TJ");
+        assert_eq!(ref_segments[0].reference_id_number, "123456789");
         assert_eq!(rdm_segments, RDM::default());
-        assert_eq!(contents, "");
+        assert_eq!(contents, "CLP*");
     }
 
     #[test]
     fn test_loop1000b2() {
-        let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD*unit 500~N4*ANY CITY*CA*12211~REF*TJ*123456789~RDM*BM~");
+        let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD*unit 500~N4*ANY CITY*CA*12211~REF*TJ*123456789~RDM*BM~CLP*");
         let (_n1_segments, n3_segments, _n4_segments, _ref_segments, rdm_segments, contents) = get_loop_1000_b(contents.to_string());
         assert_eq!(n3_segments.payee_address, "2255 ANY ROAD");
         assert_eq!(n3_segments.payee_address2, "unit 500");
         assert_eq!(rdm_segments.rdm01_report_transmission_code, "BM");
-        assert_eq!(contents, "");
+        assert_eq!(contents, "CLP*");
     }
 }

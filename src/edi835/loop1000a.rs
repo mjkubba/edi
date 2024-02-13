@@ -152,20 +152,21 @@ mod tests {
 
     #[test]
     fn test_loop1000a() {
-        let contents = String::from("N1*PR*DELTA DENTAL OF ABC~N3*225 MAIN STREET~N4*CENTERVILLE*PA*17111~PER*BL*JANE DOE*TE*9005555555~");
-        let (n1_segments, n3_segments, n4_segments,  ref_segments, per_technical_contact, per_payer_business, per_web_site, contents) = get_loop_1000_a(contents);
+        let contents = String::from("N1*PR*DELTA DENTAL OF ABC~N3*225 MAIN STREET~N4*CENTERVILLE*PA*17111~PER*BL*JANE DOE*TE*9005555555~N1*");
+        let (n1_segments, n3_segments, n4_segments,  ref_segments, per_payer_business, per_technical_contact, per_web_site, contents) = get_loop_1000_a(contents);
         assert_eq!(n1_segments.payer_id_code, "PR");
         assert_eq!(n1_segments.payee_name, "DELTA DENTAL OF ABC");
         assert_eq!(n3_segments.payee_address, "225 MAIN STREET");
         assert_eq!(n4_segments.payee_city, "CENTERVILLE");
         assert_eq!(n4_segments.payee_state, "PA");
         assert_eq!(n4_segments.payee_zip, "17111");
-        assert_eq!(per_technical_contact.per01_contact_function_code, "BL");
-        assert_eq!(per_technical_contact.per02_contact_name, "JANE DOE");
+        assert_eq!(per_technical_contact.len(), 1);
+        assert_eq!(per_technical_contact[0].per01_contact_function_code, "BL");
+        assert_eq!(per_technical_contact[0].per02_contact_name, "JANE DOE");
         assert_eq!(per_payer_business, PER::default());
         assert_eq!(per_web_site, PER::default());
-        assert_eq!(ref_segments, REF::default());
-        assert_eq!(contents, "");
+        assert_eq!(ref_segments, vec![]);
+        assert_eq!(contents, "N1*");
     }
 
 

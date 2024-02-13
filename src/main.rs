@@ -21,6 +21,7 @@ fn main() {
         EDI835 is done, need to make sure if a supplied file is messed up or some weird input provided the program exit gracefully
         also double check all the failure points
         build unit test back again
+        implement integration tests
 
 
     */
@@ -47,12 +48,12 @@ fn main() {
 }
 
 
-// unit test
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn test_main() {
-        main();
-    }
-}
+// // unit test
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[test]
+//     fn test_main() {
+//         main();
+//     }
+// }

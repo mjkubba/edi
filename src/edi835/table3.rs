@@ -73,7 +73,7 @@ pub fn write_table3(table3:Table3s) -> String {
             let contents = String::from("~SE*22*35681~GE*1*1~IEA*1*000000905~");
             let (plb_segments, se_segments, contents) = get_table_3(contents);
             assert_eq!(contents, "GE*1*1~IEA*1*000000905~");
-            assert_eq!(plb_segments, PLB::default());
+            assert_eq!(plb_segments, vec![]);
             assert_eq!(se_segments.number_of_segment, "22");
         }
     }
