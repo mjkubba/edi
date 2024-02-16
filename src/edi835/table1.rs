@@ -7,7 +7,7 @@ use crate::segments::trn::*;
 use crate::segments::cur::*;
 use crate::segments::r#ref::*;
 use crate::segments::dtm::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table1s {

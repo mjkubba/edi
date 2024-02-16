@@ -37,7 +37,7 @@ to start locally:
 * ~~Check against the guide how many of each segment is in each loop~~
 * ~~Table 1: there are 3 PERs, 2 are optional and the required one may come in the middle~~
 * ~~Adding parameterized input, -f for file -o for output etc.~~
+* ~~Adding Write EDI 835 functionality~~
+* ~~Finding some mismatches between the standard and the implementation of EDI835!!!~~
 * Make it safer when something does not exist
-* Finding some mismatches between the standard and the implementation of EDI835!!!
-* Adding Write EDI 835 functionality
 * More cool things

@@ -35,7 +35,6 @@ fn main() {
             info!("File is 835");
             let edi835 = get_835(contents.clone());
             let serialized_edi = serde_json::to_string(&edi835).unwrap();
-            // write_to_file(serialized_edi, args.output_file);
             write_to_file(serialized_edi.clone(), args.output_file);
         } else {
             warn!("File is not 835, other types not implemeted yet");
@@ -46,14 +45,3 @@ fn main() {
     
 
 }
-
-
-// // unit test
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     #[test]
-//     fn test_main() {
-//         main();
-//     }
-// }

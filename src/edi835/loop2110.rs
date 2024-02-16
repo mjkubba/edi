@@ -8,7 +8,7 @@ use crate::segments::r#ref::*;
 use crate::segments::amt::*;
 use crate::segments::qty::*;
 use crate::segments::lq::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
 
 
 

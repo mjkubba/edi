@@ -5,7 +5,7 @@ use crate::segments::lx::*;
 use crate::segments::ts3::*;
 use crate::segments::ts2::*;
 use crate::edi835::loop2100::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table2 {

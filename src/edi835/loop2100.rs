@@ -11,7 +11,7 @@ use crate::segments::dtm::*;
 use crate::segments::per::*;
 use crate::segments::amt::*;
 use crate::segments::qty::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
 use crate::edi835::loop2110::*;
 
 

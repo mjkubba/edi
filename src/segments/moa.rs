@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use crate::helper::helper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION

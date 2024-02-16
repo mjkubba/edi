@@ -3,7 +3,8 @@ use serde::{Serialize, Deserialize};
 
 use crate::segments::iea::*;
 use crate::segments::ge::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
+
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct InterchangeTrailer {

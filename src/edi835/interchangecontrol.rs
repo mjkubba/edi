@@ -3,7 +3,8 @@ use serde::{Serialize, Deserialize};
 
 use crate::segments::isa::*;
 use crate::segments::gs::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
+
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct InterchangeHeader {

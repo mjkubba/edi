@@ -3,7 +3,8 @@ use serde::{Serialize, Deserialize};
 
 use crate::segments::plb::*;
 use crate::segments::se::*;
-use crate::helper::helper::*;
+use crate::helper::edihelper::*;
+
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Table3s {
