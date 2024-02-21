@@ -1,3 +1,4 @@
+pub mod ak1;
 pub mod amt;
 pub mod bpr;
 pub mod cas;
@@ -24,6 +25,7 @@ pub mod se;
 pub mod svc;
 pub mod r#ref;
 pub mod rdm;
+pub mod ta1;
 pub mod ts2;
 pub mod ts3;
 pub mod trn;
