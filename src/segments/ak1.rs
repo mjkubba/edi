@@ -1,6 +1,5 @@
 use serde::{Serialize, Deserialize};
 
-// EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct AK1 {

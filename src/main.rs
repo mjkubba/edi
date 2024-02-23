@@ -2,6 +2,8 @@ use log::{info, warn};
 
 mod edi835;
 use edi835::controller::*;
+mod edi999;
+use edi999::controller::*;
 mod helper;
 use crate::helper::helper::{set_logger, write_to_file, process_args, get_file_contents};
 mod segments;
@@ -26,15 +28,25 @@ fn main() {
 
     */
 
-    if args.operation == "write" {
+    if args.operation == "write" && contents.contains("CLP"){
         info!("Write EDI Operation");
         let new_edi = write_edi(contents.clone());
         write_to_file(new_edi, args.output_file);
+    } else if args.operation == "write" && contents.contains("AK2") {
+        info!("Write EDI Operation");
+        let new_edi = write_999(contents.clone());
+        write_to_file(new_edi, args.output_file);
+
     } else if args.operation == "read" {
         if contents.contains("~ST*835*"){
             info!("File is 835");
             let edi835 = get_835(contents.clone());
             let serialized_edi = serde_json::to_string(&edi835).unwrap();
+            write_to_file(serialized_edi.clone(), args.output_file);
+        } else if contents.contains("~ST*999*") {
+            info!("File is 999");
+            let edi999 = get_999(contents.clone());
+            let serialized_edi = serde_json::to_string(&edi999).unwrap();
             write_to_file(serialized_edi.clone(), args.output_file);
         } else {
             warn!("File is not 835, other types not implemeted yet");
