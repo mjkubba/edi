@@ -39,5 +39,6 @@ to start locally:
 * ~~Adding parameterized input, -f for file -o for output etc.~~
 * ~~Adding Write EDI 835 functionality~~
 * ~~Finding some mismatches between the standard and the implementation of EDI835!!!~~
+* 999 have segment loops, similar to 835, need to write the logic for these.
 * Make it safer when something does not exist
 * More cool things

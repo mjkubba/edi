@@ -25,6 +25,7 @@ fn main() {
         build unit test back again
         implement integration tests
 
+        999 have segment loops, similar to 835, need to write the logic for these.
 
     */
 
