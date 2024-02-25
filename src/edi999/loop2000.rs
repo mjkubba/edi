@@ -2,6 +2,7 @@ use log::info;
 use serde::{Serialize, Deserialize};
 
 use crate::segments::ak2::*;
+use crate::edi999::loop2100::*;
 use crate::helper::edihelper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
@@ -36,13 +37,19 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000>, String) {
 
 
     for _ in 0..ak2_count {
-        let (ak2);
-        (ak2, contents) = get_loop_2000(contents.clone());
-        // (loop2100s, contents) = get_loop_2100s(contents.clone());
+        let tmp_contents = get_999_2000(contents.clone());
+        println!("THE AK2 LOOP SEGMENT: {:?}", tmp_contents);
+        let (ak2, loop2100s, rem_contents, inner_rem_contents);
+
+        (ak2, rem_contents) = get_loop_2000(tmp_contents.clone());
+        (loop2100s, inner_rem_contents) = get_loop_2100s(rem_contents.clone());
 
         let loop2000s = Loop2000 {
             ak2_segments: ak2,
         };
+
+        contents = contents.replacen(&tmp_contents, "",1);
+        contents.push_str(&inner_rem_contents);
 
         loop_2000_array.push(loop2000s);
     }

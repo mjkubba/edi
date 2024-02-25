@@ -51,6 +51,17 @@ pub fn get_table2(contents:String) -> String {
     tmp_contents
 }
 
+pub fn get_999_2000(contents:String) -> String {
+    let mut tmp_contents= contents.clone();
+    let remaining_clp_count= contents.matches("AK2").count();
+    if remaining_clp_count > 1 {
+        let skipped_content = &contents[3..];
+        let foundclp = skipped_content.find("AK2").unwrap();
+        tmp_contents = contents[..foundclp+3].to_string();
+    }
+    tmp_contents
+}
+
 
 
 pub fn get_segment_contents(key:&str, contents:  &str) -> String {

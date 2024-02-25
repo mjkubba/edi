@@ -32,7 +32,6 @@ pub fn get_999(mut contents: String) -> Edi999 {
     let interchange_trailer;
 
     contents = contents.trim_start_matches("\u{feff}").to_string();
-    println!("{:?}", contents.clone());
 
     // Control Segments
     (interchange_header, contents) = get_interchange_header(contents.clone());

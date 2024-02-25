@@ -9,6 +9,7 @@ pub mod dtm;
 pub mod gs;
 pub mod ge;
 pub mod iea;
+pub mod ik3;
 pub mod isa;
 pub mod lq;
 pub mod lx;
