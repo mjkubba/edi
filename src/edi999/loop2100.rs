@@ -1,19 +1,26 @@
 use log::info;
 use serde::{Serialize, Deserialize};
 
+use crate::segments::ctx;
 use crate::segments::ik3::*;
-// use crate::edi999::loop2110::*;
+use crate::segments::ctx::*;
+use crate::edi999::loop2110::*;
 use crate::helper::edihelper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2100 {
     pub ik3_segments: IK3,
+    pub ctx_segment_context: CTX,
+    pub ctx_business_unit_id: CTX,
+    pub loop2110s: Vec<Loop2110>,
 }
 
 
-pub fn get_loop_2100(mut contents:String) -> (IK3, String) {
+pub fn get_loop_2100(mut contents:String) -> (IK3, CTX, CTX, String) {
 
     let mut ik3_segments = IK3::default();
+    let mut ctx_segment_context = CTX::default();
+    let mut ctx_business_unit_id = CTX::default();
   
 
     if contents.contains("IK3") {
@@ -21,11 +28,31 @@ pub fn get_loop_2100(mut contents:String) -> (IK3, String) {
         ik3_segments = get_ik3(get_segment_contents("IK3", &contents));
         info!("IK3 segment parsed");
         contents = content_trim("IK3",contents);
+    
     }
 
+    if contents.contains("CTX") {
+        let ctx_count = contents.matches("CTX").count();
+        info!("CTX segment found, ");
+        for _ in 0..ctx_count {
+            let ctx_segment = get_ctx(get_segment_contents("CTX", &contents));
+            match &ctx_segment.ctx01_context_id as &str{
+                "SITUATIONAL TRIGGER" => {
+                    ctx_segment_context = ctx_segment.clone();
+                    contents = content_trim("CTX", contents);
+                    info!("CTX segment parsed");
+                },
+                _ => {
+                    ctx_business_unit_id = ctx_segment.clone();
+                    contents = content_trim("CTX", contents);
+                    info!("CTX segment parsed");
+                }
+            }
+        }
+    }
 
     info!("Loop 2100 parsed\n");
-    return (ik3_segments, contents)
+    return (ik3_segments, ctx_segment_context, ctx_business_unit_id, contents)
 }
 
 pub fn get_loop_2100s(mut contents: String) ->  (Vec<Loop2100>, String) {
@@ -37,12 +64,15 @@ pub fn get_loop_2100s(mut contents: String) ->  (Vec<Loop2100>, String) {
 
 
     for _ in 0..ik3_count {
-        let ik3;
-        (ik3, contents) = get_loop_2100(contents.clone());
-        // (loop2100s, contents) = get_loop_2110s(contents.clone());
+        let (ik3, ctx_segment_context, ctx_business_unit_id, loop2110s);
+        (ik3, ctx_segment_context, ctx_business_unit_id, contents) = get_loop_2100(contents.clone());
+        (loop2110s, contents) = get_loop_2110s(contents.clone());
 
         let loop2100s = Loop2100 {
             ik3_segments: ik3,
+            ctx_segment_context,
+            ctx_business_unit_id,
+            loop2110s,
         };
 
         loop_2100_array.push(loop2100s);

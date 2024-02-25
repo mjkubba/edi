@@ -2,18 +2,22 @@ use log::info;
 use serde::{Serialize, Deserialize};
 
 use crate::segments::ak2::*;
+use crate::segments::ik5::*;
 use crate::edi999::loop2100::*;
 use crate::helper::edihelper::*;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2000 {
     pub ak2_segments: AK2,
+    pub ik5_segments: IK5,
+    pub loop2100: Vec<Loop2100>,
 }
 
 
-pub fn get_loop_2000(mut contents:String) -> (AK2, String) {
+pub fn get_loop_2000(mut contents:String) -> (AK2, IK5, String) {
 
     let mut ak2_segments = AK2::default();
+    let mut ik5_segments = IK5::default();
   
 
     if contents.contains("AK2") {
@@ -22,10 +26,16 @@ pub fn get_loop_2000(mut contents:String) -> (AK2, String) {
         info!("AK2 segment parsed");
         contents = content_trim("AK2",contents);
     }
+    if contents.contains("IK5") {
+        info!("IK5 segment found, ");
+        ik5_segments = get_ik5(get_segment_contents("IK5", &contents));
+        info!("IK5 segment parsed");
+        contents = content_trim("IK5",contents);
+    }
 
 
     info!("Loop 2000 parsed\n");
-    return (ak2_segments, contents)
+    return (ak2_segments, ik5_segments, contents)
 }
 
 pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000>, String) {
@@ -38,14 +48,15 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000>, String) {
 
     for _ in 0..ak2_count {
         let tmp_contents = get_999_2000(contents.clone());
-        println!("THE AK2 LOOP SEGMENT: {:?}", tmp_contents);
-        let (ak2, loop2100s, rem_contents, inner_rem_contents);
+        let (ak2, ik5, loop2100, rem_contents, inner_rem_contents);
 
-        (ak2, rem_contents) = get_loop_2000(tmp_contents.clone());
-        (loop2100s, inner_rem_contents) = get_loop_2100s(rem_contents.clone());
+        (ak2, ik5, rem_contents) = get_loop_2000(tmp_contents.clone());
+        (loop2100, inner_rem_contents) = get_loop_2100s(rem_contents.clone());
 
         let loop2000s = Loop2000 {
             ak2_segments: ak2,
+            loop2100,
+            ik5_segments: ik5,
         };
 
         contents = contents.replacen(&tmp_contents, "",1);
