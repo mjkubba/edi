@@ -74,8 +74,8 @@ mod tests {
     #[test]
     fn test_ak1() {
         let ctx_content = "A*1*2~".to_string();
-        let ak1 = get_ak1(ctx_content);
-        assert_eq!(ak1.ak01_functional_id_group, "A");
-        assert_eq!(ak1.ak02_group_control_numbner, "1");
+        let ctx = get_ctx(ctx_content);
+        assert_eq!(ctx.ctx01_context_id, "A");
+        assert_eq!(ctx.ctx02_segment_id_code, "1");
     }
 }

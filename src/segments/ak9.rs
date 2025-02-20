@@ -65,8 +65,8 @@ mod tests {
     use super::*;
     #[test]
     fn test_ak1() {
-        let ak1_content = "A*1*2~".to_string();
-        let ak1 = get_ak1(ak1_content);
+        let ak9_content = "A*1*2~".to_string();
+        let ak9 = get_ak9(ak9_content);
 
     }
 }
