@@ -5,7 +5,7 @@ use edi835::controller::*;
 mod edi999;
 use edi999::controller::*;
 mod helper;
-use crate::helper::helper::{set_logger, write_to_file, process_args, get_file_contents};
+use crate::helper::helper::{set_logger, write_to_file, process_args, get_file_contents, clean_contents};
 mod segments;
 
 
@@ -14,6 +14,7 @@ fn main() {
 
     let args = process_args();
     let contents = get_file_contents(args.clone());
+    let contents = clean_contents(contents.clone());
 
 
     /*
@@ -39,6 +40,7 @@ fn main() {
         write_to_file(new_edi, args.output_file);
 
     } else if args.operation == "read" {
+        println!("{:?}",contents.clone());
         if contents.contains("~ST*835*"){
             info!("File is 835");
             let edi835 = get_835(contents.clone());
