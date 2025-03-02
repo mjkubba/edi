@@ -97,8 +97,8 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
 
 
     if contents.contains("CAS") {
-        let ref_count = contents.matches("CAS").count();
-        for _ in 0..ref_count {
+        let cas_count = contents.matches("CAS").count();
+        for _ in 0..cas_count {
             if check_if_segement_in_loop("CAS", "NM1", contents.clone()) {
                 let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
                 info!("CAS segment found, ");

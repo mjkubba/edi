@@ -1,7 +1,6 @@
 use log::info;
 use serde::{Serialize, Deserialize};
 
-use crate::segments::ctx;
 use crate::segments::ik4::*;
 use crate::segments::ctx::*;
 use crate::helper::edihelper::*;
@@ -46,7 +45,6 @@ pub fn get_loop_2110s(mut contents: String) ->  (Vec<Loop2110>, String) {
     info!("Number of loops in loop 2110: {:?}",ik4_count);
 
 
-
     for _ in 0..ik4_count {
         let (ik4, ctx_element_context);
         (ik4, ctx_element_context, contents) = get_loop_2110(contents.clone());
@@ -63,13 +61,13 @@ pub fn get_loop_2110s(mut contents: String) ->  (Vec<Loop2110>, String) {
     return (loop_2110_array, contents)
 }
 
-pub fn write_loop2110(loop2110:Vec<Loop2110>) -> String {
-    let mut contents = String::new();
-    for loop2110 in loop2110 {
-        contents.push_str(&write_ik4(loop2110.ik4_segments));
-    }
-    return contents;
-}
+// pub fn write_loop2110(loop2110:Vec<Loop2110>) -> String {
+//     let mut contents = String::new();
+//     for loop2110 in loop2110 {
+//         contents.push_str(&write_ik4(loop2110.ik4_segments));
+//     }
+//     return contents;
+// }
 
 
 
