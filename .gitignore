@@ -3,5 +3,5 @@
 /data
 notes.md
 *.profraw
-out.json
+out*.json
 *.edi
