@@ -95,6 +95,14 @@ pub fn get_file_contents(args: Args) -> String {
     contents
 }
 
+pub fn clean_contents(contents: String) -> String {
+    let mut clean_contents = contents.replace("\r\n", "");
+    clean_contents = clean_contents.replace("\r", "");
+    clean_contents = clean_contents.replace("\n", "");
+    clean_contents = clean_contents.replace("~ ", "~");
+    clean_contents
+}
+
 
 pub fn write_to_file(write_contents: String, write_file: String) {
     // setting up write file functionality
