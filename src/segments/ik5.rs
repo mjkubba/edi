@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use crate::helper::edihelper::stiuational_element;
+// use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -47,18 +47,18 @@ pub fn get_ik5(ik5_content: String) -> IK5 {
     }
 }
 
-pub fn write_ik5(ik5:IK5) -> String {
-    let mut ik5_content = String::new();
-    ik5_content.push_str("IK5*");
-    ik5_content.push_str(&ik5.ik501_ts_ack_code);
-    ik5_content.push_str(&stiuational_element(ik5.ik502_imp_ts_syn_er_code));
-    ik5_content.push_str(&stiuational_element(ik5.ik503_imp_ts_syn_er_code));
-    ik5_content.push_str(&stiuational_element(ik5.ik504_imp_ts_syn_er_code));
-    ik5_content.push_str(&stiuational_element(ik5.ik505_imp_ts_syn_er_code));
-    ik5_content.push_str(&stiuational_element(ik5.ik506_imp_ts_syn_er_code));
-    ik5_content.push_str("~");
-    ik5_content
-}
+// pub fn write_ik5(ik5:IK5) -> String {
+//     let mut ik5_content = String::new();
+//     ik5_content.push_str("IK5*");
+//     ik5_content.push_str(&ik5.ik501_ts_ack_code);
+//     ik5_content.push_str(&stiuational_element(ik5.ik502_imp_ts_syn_er_code));
+//     ik5_content.push_str(&stiuational_element(ik5.ik503_imp_ts_syn_er_code));
+//     ik5_content.push_str(&stiuational_element(ik5.ik504_imp_ts_syn_er_code));
+//     ik5_content.push_str(&stiuational_element(ik5.ik505_imp_ts_syn_er_code));
+//     ik5_content.push_str(&stiuational_element(ik5.ik506_imp_ts_syn_er_code));
+//     ik5_content.push_str("~");
+//     ik5_content
+// }
 
 
 // unit test

@@ -50,13 +50,13 @@ pub fn get_table1s(contents:String) -> (Table1s, String) {
     return (header,contents)
 }
 
-pub fn write_table1(table1:Table1s) -> String {
-    let mut contents = String::new();
-    contents.push_str(&write_st(table1.st_segments));
-    contents.push_str(&write_ak1(table1.ak1_segments));
+// pub fn write_table1(table1:Table1s) -> String {
+//     let mut contents = String::new();
+//     contents.push_str(&write_st(table1.st_segments));
+//     contents.push_str(&write_ak1(table1.ak1_segments));
 
-    return contents;
-}
+//     return contents;
+// }
 
 
 // unit tests

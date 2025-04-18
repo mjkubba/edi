@@ -19,17 +19,17 @@ pub fn get_ak1(ak1_content: String) -> AK1 {
  
 
 
-pub fn write_ak1(amt:AK1) -> String {
-    let mut ak1_content = String::new();
-    ak1_content.push_str("AK1*");
-    ak1_content.push_str(&amt.ak01_functional_id_group);
-    ak1_content.push_str("*");
-    ak1_content.push_str(&amt.ak02_group_control_numbner);
-    ak1_content.push_str("*");
-    ak1_content.push_str(&amt.ak03_ver_release_id_code);
-    ak1_content.push_str("~");
-    ak1_content
-}
+// pub fn write_ak1(amt:AK1) -> String {
+//     let mut ak1_content = String::new();
+//     ak1_content.push_str("AK1*");
+//     ak1_content.push_str(&amt.ak01_functional_id_group);
+//     ak1_content.push_str("*");
+//     ak1_content.push_str(&amt.ak02_group_control_numbner);
+//     ak1_content.push_str("*");
+//     ak1_content.push_str(&amt.ak03_ver_release_id_code);
+//     ak1_content.push_str("~");
+//     ak1_content
+// }
 
 // unit test
 
