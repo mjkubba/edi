@@ -61,13 +61,14 @@ pub fn get_loop_2110s(mut contents: String) ->  (Vec<Loop2110>, String) {
     return (loop_2110_array, contents)
 }
 
-// pub fn write_loop2110(loop2110:Vec<Loop2110>) -> String {
-//     let mut contents = String::new();
-//     for loop2110 in loop2110 {
-//         contents.push_str(&write_ik4(loop2110.ik4_segments));
-//     }
-//     return contents;
-// }
+pub fn write_loop2110(loop2110:Vec<Loop2110>) -> String {
+    let mut contents = String::new();
+    for loop2110 in loop2110 {
+        contents.push_str(&write_ik4(loop2110.ik4_segments));
+        contents.push_str(&write_ctx(loop2110.ctx_element_context));
+    }
+    return contents;
+}
 
 
 

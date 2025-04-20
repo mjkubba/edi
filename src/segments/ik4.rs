@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-// use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -31,16 +31,16 @@ pub fn get_ik4(ik4_content: String) -> IK4 {
     }
 }
 
-// pub fn write_ik4(ik4:IK4) -> String {
-//     let mut ik4_content = String::new();
-//     ik4_content.push_str("IK4*");
-//     ik4_content.push_str(&ik4.ik401_pos_in_segment);
-//     ik4_content.push_str(&stiuational_element(ik4.ik402_data_elemnt_ref_num));
-//     ik4_content.push_str(&stiuational_element(ik4.ik403_impl_data_syntax_error_code));
-//     ik4_content.push_str(&stiuational_element(ik4.ik404_copy_of_bad_data_elemnt));
-//     ik4_content.push_str("~");
-//     ik4_content
-// }
+pub fn write_ik4(ik4:IK4) -> String {
+    let mut ik4_content = String::new();
+    ik4_content.push_str("IK4*");
+    ik4_content.push_str(&ik4.ik401_pos_in_segment);
+    ik4_content.push_str(&stiuational_element(ik4.ik402_data_elemnt_ref_num));
+    ik4_content.push_str(&stiuational_element(ik4.ik403_impl_data_syntax_error_code));
+    ik4_content.push_str(&stiuational_element(ik4.ik404_copy_of_bad_data_elemnt));
+    ik4_content.push_str("~");
+    ik4_content
+}
 
 
 // unit test

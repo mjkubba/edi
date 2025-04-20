@@ -103,6 +103,7 @@ Component interactions:
 * ~~Adding Write EDI 835 functionality~~
 * ~~Finding some mismatches between the standard and the implementation of EDI835!!!~~
 * 999 have segment loops, similar to 835, need to write the logic for these.
+     * Where I left: fixing CTX, need time to debug this against the standards to see if I coded CTX to 999 standards or something else, what is required and what is situational, it's failing in writing all parts.
 * Make it safer when something does not exist
 * More cool things
 

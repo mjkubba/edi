@@ -1,4 +1,4 @@
-// use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
@@ -51,20 +51,21 @@ pub fn get_ctx(ctx_content: String) -> CTX {
  
 
 
-// pub fn write_ctx(ctx:CTX) -> String {
-//     let mut ctx_content = String::new();
-//     ctx_content.push_str("CTX*");
-//     ctx_content.push_str(&ctx.ctx01_context_id);
-//     ctx_content.push_str("*");
-//     ctx_content.push_str(&ctx.ctx02_segment_id_code);
-//     ctx_content.push_str("*");
-//     ctx_content.push_str(&ctx.ctx03_segment_position_in_transaction);
-//     ctx_content.push_str(&stiuational_element(ctx.ctx04_loop_id_code));
-//     ctx_content.push_str(&stiuational_element(ctx.ctx05_position_in_segment));
-//     ctx_content.push_str(&stiuational_element(ctx.ctx06_ref_in_segment));
-//     ctx_content.push_str("~");
-//     ctx_content
-// }
+pub fn write_ctx(ctx:CTX) -> String {
+    let mut ctx_content = String::new();
+    println!("Writing CTX segment: {:?}", ctx);
+    ctx_content.push_str("CTX*");
+    ctx_content.push_str(&ctx.ctx01_context_id);
+    ctx_content.push_str("*");
+    ctx_content.push_str(&ctx.ctx02_segment_id_code);
+    ctx_content.push_str("*");
+    ctx_content.push_str(&ctx.ctx03_segment_position_in_transaction);
+    ctx_content.push_str(&stiuational_element(ctx.ctx04_loop_id_code));
+    ctx_content.push_str(&stiuational_element(ctx.ctx05_position_in_segment));
+    ctx_content.push_str(&stiuational_element(ctx.ctx06_ref_in_segment));
+    ctx_content.push_str("~");
+    ctx_content
+}
 
 // unit test
 

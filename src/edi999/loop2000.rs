@@ -72,6 +72,8 @@ pub fn write_loop2000(loop2000:Vec<Loop2000>) -> String {
     let mut contents = String::new();
     for loop2000 in loop2000 {
         contents.push_str(&write_ak2(loop2000.ak2_segments));
+        contents.push_str(&write_loop2100(loop2000.loop2100));
+        contents.push_str(&write_ik5(loop2000.ik5_segments));
     }
     return contents;
 }

@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-// use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -31,17 +31,17 @@ pub fn get_ik3(ik3_content: String) -> IK3 {
     }
 }
 
-// pub fn write_ik3(ik3:IK3) -> String {
-//     let mut ik3_content = String::new();
-//     ik3_content.push_str("IK3*");
-//     ik3_content.push_str(&ik3.ik301_segment_id_code);
-//     ik3_content.push_str("*");
-//     ik3_content.push_str(&ik3.ik302_segment_position_in_ts);
-//     ik3_content.push_str(&stiuational_element(ik3.ik303_loop_identifier));
-//     ik3_content.push_str(&stiuational_element(ik3.ik304_impl_segment_syntax_error_code));
-//     ik3_content.push_str("~");
-//     ik3_content
-// }
+pub fn write_ik3(ik3:IK3) -> String {
+    let mut ik3_content = String::new();
+    ik3_content.push_str("IK3*");
+    ik3_content.push_str(&ik3.ik301_segment_id_code);
+    ik3_content.push_str("*");
+    ik3_content.push_str(&ik3.ik302_segment_position_in_ts);
+    ik3_content.push_str(&stiuational_element(ik3.ik303_loop_identifier));
+    ik3_content.push_str(&stiuational_element(ik3.ik304_impl_segment_syntax_error_code));
+    ik3_content.push_str("~");
+    ik3_content
+}
 
 
 // unit test

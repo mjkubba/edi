@@ -85,16 +85,17 @@ pub fn get_loop_2100s(mut contents: String) ->  (Vec<Loop2100>, String) {
     return (loop_2100_array, contents)
 }
 
-// pub fn write_loop2100(loop2100:Vec<Loop2100>) -> String {
-//     let mut contents = String::new();
-//     for loop2100 in loop2100 {
-//         contents.push_str(&write_ik3(loop2100.ik3_segments));
-//         // for n in 0..loop2100.ctx_segment_context.len() {
-//         //     contents.push_str(&write_ctx(loop2100.ctx_segment_context[n].clone()));
-//         // }
-//     }
-//     return contents;
-// }
+pub fn write_loop2100(loop2100:Vec<Loop2100>) -> String {
+    let mut contents = String::new();
+    for loop2100 in loop2100 {
+        contents.push_str(&write_ik3(loop2100.ik3_segments));
+        for n in 0..loop2100.ctx_segment_context.len() {
+            contents.push_str(&write_ctx(loop2100.ctx_segment_context[n].clone()));
+        }
+        contents.push_str(&write_loop2110(loop2100.loop2110s));
+    }
+    return contents;
+}
 
 
 
