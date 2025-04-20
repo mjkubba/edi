@@ -50,13 +50,13 @@ pub fn get_table1trailer(contents:String) -> (Table1trailer, String) {
     return (header,contents)
 }
 
-// pub fn write_table1trailer(table1:Table1trailer) -> String {
-//     let mut contents = String::new();
-//     contents.push_str(&write_se(table1.se_segments));
-//     contents.push_str(&write_ak9(table1.ak9_segments));
+pub fn write_table1trailer(table1:Table1trailer) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_se(table1.se_segments));
+    contents.push_str(&write_ak9(table1.ak9_segments));
 
-//     return contents;
-// }
+    return contents;
+}
 
 
 // unit tests

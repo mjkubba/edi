@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-// use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -26,16 +26,16 @@ pub fn get_ak2(ak2_content: String) -> AK2 {
  
 
 
-// pub fn write_ak2(ak2:AK2) -> String {
-//     let mut ak2_content = String::new();
-//     ak2_content.push_str("AK2*");
-//     ak2_content.push_str(&ak2.ak201_ts_id_code);
-//     ak2_content.push_str("*");
-//     ak2_content.push_str(&ak2.ak202_ts_control_numbner);
-//     ak2_content.push_str(&stiuational_element(ak2.ak203_imple_conven_ref));
-//     ak2_content.push_str("~");
-//     ak2_content
-// }
+pub fn write_ak2(ak2:AK2) -> String {
+    let mut ak2_content = String::new();
+    ak2_content.push_str("AK2*");
+    ak2_content.push_str(&ak2.ak201_ts_id_code);
+    ak2_content.push_str("*");
+    ak2_content.push_str(&ak2.ak202_ts_control_numbner);
+    ak2_content.push_str(&stiuational_element(ak2.ak203_imple_conven_ref));
+    ak2_content.push_str("~");
+    ak2_content
+}
 
 // unit test
 

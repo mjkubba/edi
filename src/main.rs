@@ -30,11 +30,11 @@ fn main() {
 
     */
 
-    if args.operation == "write" && contents.contains("CLP"){
+        if args.operation == "write" && (contents.contains("CLP") || contents.contains("clp")){
         info!("Write EDI Operation");
         let new_edi = write_edi(contents.clone());
         write_to_file(new_edi, args.output_file);
-    } else if args.operation == "write" && contents.contains("AK2") {
+    } else if args.operation == "write" && (contents.contains("AK2") || contents.contains("ak2") ){
         info!("Write EDI Operation");
         let new_edi = write_999(contents.clone());
         write_to_file(new_edi, args.output_file);

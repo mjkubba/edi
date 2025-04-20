@@ -68,13 +68,13 @@ pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000>, String) {
     return (loop_2000_array, contents)
 }
 
-// pub fn write_loop2000(loop2000:Vec<Loop2000>) -> String {
-//     let mut contents = String::new();
-//     for loop2000 in loop2000 {
-//         contents.push_str(&write_ak2(loop2000.ak2_segments));
-//     }
-//     return contents;
-// }
+pub fn write_loop2000(loop2000:Vec<Loop2000>) -> String {
+    let mut contents = String::new();
+    for loop2000 in loop2000 {
+        contents.push_str(&write_ak2(loop2000.ak2_segments));
+    }
+    return contents;
+}
 
 
 

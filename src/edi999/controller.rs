@@ -75,19 +75,14 @@ pub fn write_999(contents: String) -> String {
     let edi_json: Edi999 = serde_json::from_str(&contents.clone()).unwrap();
     let mut new_edi = String::new();
     let new_ich = write_interchange_control(edi_json.interchange_header.clone());
-    // let new_t1 = write_table1(edi_json.table1s.clone());
-    // let new_l1a = write_loop1000a(edi_json.loop1000as.clone());
-    // let new_l1b = write_loop1000b(edi_json.loop1000bs.clone());
-    // let new_l2 = write_loop2000(edi_json.loop2000s.clone());
-    // let new_t1t = write_table1trailer(edi_json.table1trailer.clone());
-    // let new_t3 = write_table3(edi_json.table3s.clone());
+    let new_table1s = write_table1(edi_json.table1_combined.table1.clone());
+    let new_loop2000s = write_loop2000(edi_json.table1_combined.loop2000s.clone());
+    let new_table1trailer = write_table1trailer(edi_json.table1_combined.table1trailer.clone());
     let new_ict = write_interchange_trailer(edi_json.interchange_trailer.clone());
     new_edi.push_str(&new_ich);
-    // new_edi.push_str(&new_t1);
-    // new_edi.push_str(&new_l1a);
-    // new_edi.push_str(&new_l1b);
-    // new_edi.push_str(&new_l2);
-    // new_edi.push_str(&new_t1t);
+    new_edi.push_str(&new_table1s);
+    new_edi.push_str(&new_loop2000s);
+    new_edi.push_str(&new_table1trailer);
     new_edi.push_str(&new_ict);
     println!("{:?}", new_edi.clone());
     new_edi

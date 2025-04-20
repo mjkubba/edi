@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-// use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -39,24 +39,24 @@ pub fn get_ak9(ak9_content: String) -> AK9 {
  
 
 
-// pub fn write_ak9(ak9:AK9) -> String {
-//     let mut ak9_content = String::new();
-//     ak9_content.push_str("AK9*");
-//     ak9_content.push_str(&ak9.ak901_functional_ack_code);
-//     ak9_content.push_str("*");
-//     ak9_content.push_str(&ak9.ak902_num_of_ts_incl);
-//     ak9_content.push_str("*");
-//     ak9_content.push_str(&ak9.ak903_num_of_recv_ts);
-//     ak9_content.push_str("*");
-//     ak9_content.push_str(&ak9.ak904_num_of_accepted_ts);
-//     ak9_content.push_str(&stiuational_element(ak9.ak905_fn_group_err_code));
-//     ak9_content.push_str(&stiuational_element(ak9.ak906_fn_group_err_code));
-//     ak9_content.push_str(&stiuational_element(ak9.ak907_fn_group_err_code));
-//     ak9_content.push_str(&stiuational_element(ak9.ak908_fn_group_err_code));
-//     ak9_content.push_str(&stiuational_element(ak9.ak909_fn_group_err_code));
-//     ak9_content.push_str("~");
-//     ak9_content
-// }
+pub fn write_ak9(ak9:AK9) -> String {
+    let mut ak9_content = String::new();
+    ak9_content.push_str("AK9*");
+    ak9_content.push_str(&ak9.ak901_functional_ack_code);
+    ak9_content.push_str("*");
+    ak9_content.push_str(&ak9.ak902_num_of_ts_incl);
+    ak9_content.push_str("*");
+    ak9_content.push_str(&ak9.ak903_num_of_recv_ts);
+    ak9_content.push_str("*");
+    ak9_content.push_str(&ak9.ak904_num_of_accepted_ts);
+    ak9_content.push_str(&stiuational_element(ak9.ak905_fn_group_err_code));
+    ak9_content.push_str(&stiuational_element(ak9.ak906_fn_group_err_code));
+    ak9_content.push_str(&stiuational_element(ak9.ak907_fn_group_err_code));
+    ak9_content.push_str(&stiuational_element(ak9.ak908_fn_group_err_code));
+    ak9_content.push_str(&stiuational_element(ak9.ak909_fn_group_err_code));
+    ak9_content.push_str("~");
+    ak9_content
+}
 
 // unit test
 
