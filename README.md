@@ -16,13 +16,27 @@ edi/
 ├── src/                          # Source code directory
 │   ├── edi835/                  # Healthcare Claim Payment/Advice format implementation
 │   │   ├── controller.rs        # Main control logic for 835 processing
-│   │   ├── loop*.rs            # Implementation of various 835 loops (1000A, 1000B, 2000, etc.)
-│   │   └── table*.rs           # Table definitions for 835 format
+│   │   ├── interchangecontrol.rs # Interchange control handling
+│   │   ├── interchangecontroltrailer.rs # Trailer handling
+│   │   ├── loop1000a.rs        # Implementation of 1000A loop
+│   │   ├── loop1000b.rs        # Implementation of 1000B loop
+│   │   ├── loop2000.rs         # Implementation of 2000 loop
+│   │   ├── loop2100.rs         # Implementation of 2100 loop
+│   │   ├── loop2110.rs         # Implementation of 2110 loop
+│   │   ├── table1.rs           # Table 1 definitions
+│   │   └── table3.rs           # Table 3 definitions
 │   ├── edi999/                  # Functional Acknowledgment format implementation
 │   │   ├── controller.rs        # Main control logic for 999 processing
-│   │   └── loop*.rs            # Implementation of 999 specific loops
+│   │   ├── interchangecontrol.rs # Interchange control handling
+│   │   ├── interchangecontroltrailer.rs # Trailer handling
+│   │   ├── loop2000.rs         # Implementation of 999 2000 loop
+│   │   ├── loop2100.rs         # Implementation of 999 2100 loop
+│   │   ├── loop2110.rs         # Implementation of 999 2110 loop
+│   │   ├── table1.rs           # Table 1 definitions
+│   │   └── table1trailer.rs     # Table 1 trailer definitions
 │   ├── helper/                  # Utility functions and shared helpers
-│   │   └── edihelper.rs        # Common EDI processing functions
+│   │   ├── edihelper.rs        # Common EDI processing functions
+│   │   └── helper.rs           # General helper functions
 │   ├── segments/               # EDI segment definitions and processors
 │   │   ├── isa.rs             # Interchange Control Header
 │   │   ├── gs.rs              # Functional Group Header
