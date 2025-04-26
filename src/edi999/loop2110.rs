@@ -18,7 +18,8 @@ pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
     // Process IK4 segment (required)
     if contents.contains("IK4") {
         info!("IK4 segment found");
-        loop2110.ik4_segments = get_ik4(get_segment_contents("IK4", &contents));
+        let ik4_content = get_segment_contents("IK4", &contents);
+        loop2110.ik4_segments = get_ik4(ik4_content);
         info!("IK4 segment parsed");
         contents = content_trim("IK4", contents);
     } else {
@@ -28,7 +29,8 @@ pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
     // Process CTX segments (situational, can be multiple)
     while contents.starts_with("CTX") {
         info!("CTX segment found");
-        let ctx = get_ctx(get_segment_contents("CTX", &contents));
+        let ctx_content = get_segment_contents("CTX", &contents);
+        let ctx = get_ctx(ctx_content);
         info!("CTX segment parsed: {:?}", ctx);
         ctx_segments.push(ctx);
         contents = content_trim("CTX", contents);

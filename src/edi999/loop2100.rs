@@ -20,7 +20,8 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
     // Process IK3 segment (required)
     if contents.contains("IK3") {
         info!("IK3 segment found");
-        loop2100.ik3_segments = get_ik3(get_segment_contents("IK3", &contents));
+        let ik3_content = get_segment_contents("IK3", &contents);
+        loop2100.ik3_segments = get_ik3(ik3_content);
         info!("IK3 segment parsed");
         contents = content_trim("IK3", contents);
     } else {
@@ -30,7 +31,8 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
     // Process CTX segments (situational, can be multiple)
     while contents.starts_with("CTX") {
         info!("CTX segment found");
-        let ctx = get_ctx(get_segment_contents("CTX", &contents));
+        let ctx_content = get_segment_contents("CTX", &contents);
+        let ctx = get_ctx(ctx_content);
         info!("CTX segment parsed: {:?}", ctx);
         ctx_segments.push(ctx);
         contents = content_trim("CTX", contents);

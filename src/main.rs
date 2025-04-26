@@ -7,6 +7,10 @@ use edi999::controller::*;
 mod helper;
 use crate::helper::helper::{set_logger, write_to_file, process_args, get_file_contents, clean_contents};
 mod segments;
+mod error;
+mod transaction_processor;
+mod segment_config;
+mod loop_processor;
 
 
 fn main() {
@@ -34,13 +38,15 @@ fn main() {
         // Check if the content is JSON for 835 format
         if contents.contains("\"transaction_set_id\":\"835\"") || contents.contains("\"bpr_segments\":") {
             info!("Writing 835 format");
+            let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
             let new_edi = write_edi(contents.clone());
             write_to_file(new_edi, args.output_file);
         } 
         // Check if the content is JSON for 999 format
         else if contents.contains("\"transaction_set_id\":\"999\"") || contents.contains("\"ak1_segments\":") {
             info!("Writing 999 format");
-            let new_edi = write_999(contents.clone());
+            let edi_json: Edi999 = serde_json::from_str(&contents.clone()).unwrap();
+            let new_edi = write_999(&edi_json);
             write_to_file(new_edi, args.output_file);
         }
         // Check if the content is raw EDI for 835 format
@@ -52,7 +58,8 @@ fn main() {
         // Check if the content is raw EDI for 999 format
         else if contents.contains("AK2") || contents.contains("ak2") {
             info!("Writing 999 format from raw EDI");
-            let new_edi = write_999(contents.clone());
+            let edi999 = get_999(contents.clone());
+            let new_edi = write_999(&edi999.0);
             write_to_file(new_edi, args.output_file);
         }
         else {
@@ -69,7 +76,7 @@ fn main() {
         } else if contents.contains("~ST*999*") || contents.contains("ST*999*") {
             info!("File is 999");
             let edi999 = get_999(contents.clone());
-            let serialized_edi = serde_json::to_string(&edi999).unwrap();
+            let serialized_edi = serde_json::to_string(&edi999.0).unwrap();
             write_to_file(serialized_edi.clone(), args.output_file);
         } else {
             warn!("File format not recognized. Currently supporting 835 and 999 formats.");

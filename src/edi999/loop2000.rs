@@ -19,7 +19,8 @@ pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
     // Process AK2 segment (required)
     if contents.contains("AK2") {
         info!("AK2 segment found");
-        loop2000.ak2_segments = get_ak2(get_segment_contents("AK2", &contents));
+        let ak2_content = get_segment_contents("AK2", &contents);
+        loop2000.ak2_segments = get_ak2(ak2_content);
         info!("AK2 segment parsed");
         contents = content_trim("AK2", contents);
     } else {
@@ -34,7 +35,8 @@ pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
     // Process IK5 segment (required)
     if contents.contains("IK5") {
         info!("IK5 segment found");
-        loop2000.ik5_segments = get_ik5(get_segment_contents("IK5", &contents));
+        let ik5_content = get_segment_contents("IK5", &contents);
+        loop2000.ik5_segments = get_ik5(ik5_content);
         info!("IK5 segment parsed");
         contents = content_trim("IK5", contents);
     } else {
