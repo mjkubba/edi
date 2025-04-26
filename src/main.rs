@@ -16,7 +16,6 @@ fn main() {
     let contents = get_file_contents(args.clone());
     let contents = clean_contents(contents.clone());
 
-
     /*
     TODO:
         refactor helper to keep generic thingies there and move specific 835 functions to another file or the controller.        
@@ -27,36 +26,53 @@ fn main() {
         implement integration tests
 
         999 have segment loops, similar to 835, need to write the logic for these.
-
     */
 
-        if args.operation == "write" && (contents.contains("CLP") || contents.contains("clp")){
+    if args.operation == "write" {
         info!("Write EDI Operation");
-        let new_edi = write_edi(contents.clone());
-        write_to_file(new_edi, args.output_file);
-    } else if args.operation == "write" && (contents.contains("AK2") || contents.contains("ak2") ){
-        info!("Write EDI Operation");
-        let new_edi = write_999(contents.clone());
-        write_to_file(new_edi, args.output_file);
-
+        
+        // Check if the content is JSON for 835 format
+        if contents.contains("\"transaction_set_id\":\"835\"") || contents.contains("\"bpr_segments\":") {
+            info!("Writing 835 format");
+            let new_edi = write_edi(contents.clone());
+            write_to_file(new_edi, args.output_file);
+        } 
+        // Check if the content is JSON for 999 format
+        else if contents.contains("\"transaction_set_id\":\"999\"") || contents.contains("\"ak1_segments\":") {
+            info!("Writing 999 format");
+            let new_edi = write_999(contents.clone());
+            write_to_file(new_edi, args.output_file);
+        }
+        // Check if the content is raw EDI for 835 format
+        else if contents.contains("CLP") || contents.contains("clp") {
+            info!("Writing 835 format from raw EDI");
+            let new_edi = write_edi(contents.clone());
+            write_to_file(new_edi, args.output_file);
+        } 
+        // Check if the content is raw EDI for 999 format
+        else if contents.contains("AK2") || contents.contains("ak2") {
+            info!("Writing 999 format from raw EDI");
+            let new_edi = write_999(contents.clone());
+            write_to_file(new_edi, args.output_file);
+        }
+        else {
+            warn!("Unknown format for writing");
+        }
     } else if args.operation == "read" {
-        println!("{:?}",contents.clone());
-        if contents.contains("~ST*835*"){
+        info!("Read EDI Operation");
+        
+        if contents.contains("~ST*835*") || contents.contains("ST*835*") {
             info!("File is 835");
             let edi835 = get_835(contents.clone());
             let serialized_edi = serde_json::to_string(&edi835).unwrap();
             write_to_file(serialized_edi.clone(), args.output_file);
-        } else if contents.contains("~ST*999*") {
+        } else if contents.contains("~ST*999*") || contents.contains("ST*999*") {
             info!("File is 999");
             let edi999 = get_999(contents.clone());
             let serialized_edi = serde_json::to_string(&edi999).unwrap();
             write_to_file(serialized_edi.clone(), args.output_file);
         } else {
-            warn!("File is not 835, other types not implemeted yet");
+            warn!("File format not recognized. Currently supporting 835 and 999 formats.");
         }
     }
-
-    
-    // currently we have issue in 999 and possibly in the 835, we need to place the table 1 content inside that table
-
 }

@@ -1,58 +1,110 @@
+use log::info;
 use serde::{Serialize, Deserialize};
-use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct IK4 {
-    pub ik401_pos_in_segment: String,
-    pub ik402_data_elemnt_ref_num: String,
-    pub ik403_impl_data_syntax_error_code: String,
-    pub ik404_copy_of_bad_data_elemnt: String,
+    pub ik401_position_in_segment: String,
+    pub ik402_data_element_reference_number: String,
+    pub ik403_implementation_data_element_syntax_error_code: String,
+    pub ik404_copy_of_bad_data_element: String,
 }
-
 
 pub fn get_ik4(ik4_content: String) -> IK4 {
     let ik4_parts: Vec<&str> = ik4_content.split("*").collect();
-    let mut ik402_data_elemnt_ref_num = String::new();
-    let mut ik404_copy_of_bad_data_elemnt = String::new();
+    let mut ik401_position_in_segment = String::new();
+    let mut ik402_data_element_reference_number = String::new();
+    let mut ik403_implementation_data_element_syntax_error_code = String::new();
+    let mut ik404_copy_of_bad_data_element = String::new();
 
-    if ik4_parts.get(2).is_some() {
-        ik402_data_elemnt_ref_num = ik4_parts[2].to_string();
+    // IK401 - Position in Segment (Required)
+    if ik4_parts.len() > 0 && !ik4_parts[0].is_empty() {
+        ik401_position_in_segment = ik4_parts[0].to_string();
     }
-    if ik4_parts.get(3).is_some() {
-        ik404_copy_of_bad_data_elemnt = ik4_parts[3].to_string();
+
+    // IK402 - Data Element Reference Number (Required)
+    if ik4_parts.len() > 1 && !ik4_parts[1].is_empty() {
+        ik402_data_element_reference_number = ik4_parts[1].to_string();
     }
+
+    // IK403 - Implementation Data Element Syntax Error Code (Required)
+    if ik4_parts.len() > 2 && !ik4_parts[2].is_empty() {
+        ik403_implementation_data_element_syntax_error_code = ik4_parts[2].to_string();
+    }
+
+    // IK404 - Copy of Bad Data Element (Situational)
+    if ik4_parts.len() > 3 && !ik4_parts[3].is_empty() {
+        ik404_copy_of_bad_data_element = ik4_parts[3].to_string();
+    }
+
+    info!("Parsed IK4 segment: {:?}", ik4_parts);
 
     IK4 {
-        ik401_pos_in_segment: ik4_parts[1].to_string(),
-        ik402_data_elemnt_ref_num,
-        ik403_impl_data_syntax_error_code: ik4_parts[2].to_string(),
-        ik404_copy_of_bad_data_elemnt,
+        ik401_position_in_segment,
+        ik402_data_element_reference_number,
+        ik403_implementation_data_element_syntax_error_code,
+        ik404_copy_of_bad_data_element,
     }
 }
 
-pub fn write_ik4(ik4:IK4) -> String {
+pub fn write_ik4(ik4: IK4) -> String {
     let mut ik4_content = String::new();
+    info!("Writing IK4 segment: {:?}", ik4);
+    
     ik4_content.push_str("IK4*");
-    ik4_content.push_str(&ik4.ik401_pos_in_segment);
-    ik4_content.push_str(&stiuational_element(ik4.ik402_data_elemnt_ref_num));
-    ik4_content.push_str(&stiuational_element(ik4.ik403_impl_data_syntax_error_code));
-    ik4_content.push_str(&stiuational_element(ik4.ik404_copy_of_bad_data_elemnt));
+    ik4_content.push_str(&ik4.ik401_position_in_segment);
+    ik4_content.push_str("*");
+    ik4_content.push_str(&ik4.ik402_data_element_reference_number);
+    ik4_content.push_str("*");
+    ik4_content.push_str(&ik4.ik403_implementation_data_element_syntax_error_code);
+    
+    // Only include non-empty fields
+    if !ik4.ik404_copy_of_bad_data_element.is_empty() {
+        ik4_content.push_str("*");
+        ik4_content.push_str(&ik4.ik404_copy_of_bad_data_element);
+    }
+    
     ik4_content.push_str("~");
     ik4_content
 }
 
-
-// unit test
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     #[test]
-//     fn test_ak2() {
-//         let ak2_content = "A*1*2~".to_string();
-//         let ak2 = get_ak2(ak2_content);
-//         assert_eq!(ak1.ak01_functional_id_group, "A");
-//         assert_eq!(ak1.ak02_group_control_numbner, "1");
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_ik4() {
+        let ik4_content = "1*66*1*123~".to_string();
+        let ik4 = get_ik4(ik4_content);
+        assert_eq!(ik4.ik401_position_in_segment, "1");
+        assert_eq!(ik4.ik402_data_element_reference_number, "66");
+        assert_eq!(ik4.ik403_implementation_data_element_syntax_error_code, "1");
+        assert_eq!(ik4.ik404_copy_of_bad_data_element, "123");
+    }
+    
+    #[test]
+    fn test_write_ik4() {
+        let ik4 = IK4 {
+            ik401_position_in_segment: "1".to_string(),
+            ik402_data_element_reference_number: "66".to_string(),
+            ik403_implementation_data_element_syntax_error_code: "1".to_string(),
+            ik404_copy_of_bad_data_element: "123".to_string(),
+        };
+        
+        let ik4_content = write_ik4(ik4);
+        assert_eq!(ik4_content, "IK4*1*66*1*123~");
+    }
+    
+    #[test]
+    fn test_write_ik4_without_optional() {
+        let ik4 = IK4 {
+            ik401_position_in_segment: "1".to_string(),
+            ik402_data_element_reference_number: "66".to_string(),
+            ik403_implementation_data_element_syntax_error_code: "1".to_string(),
+            ik404_copy_of_bad_data_element: "".to_string(),
+        };
+        
+        let ik4_content = write_ik4(ik4);
+        assert_eq!(ik4_content, "IK4*1*66*1~");
+    }
+}

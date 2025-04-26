@@ -7,9 +7,10 @@ use log::{info, warn};
 
 #[derive(Debug, Default,Clone)]
 pub struct Args {
-    pub input_file: String,
+    pub file_path: String,
     pub output_file: String,
     pub operation: String,
+    pub is_json: bool,
 }
 
 
@@ -23,73 +24,88 @@ pub fn set_logger(){
 
 
 pub fn process_args() -> Args {
-    let mut args_out = Args::default();
-    let args: Vec<String> = env::args().collect();
-    if args.contains(&String::from("-h")) || args.contains(&String::from("--help")) || args.len() == 1 {
-        println!("Usage:");
-        println!();
-        println!("To provide EDI file use '-f'"); 
-        println!("To specify the output file use '-o'"); 
-        std::process::exit(0);
-    }
-    if args.contains(&String::from("-f")){
-        info!("-f provided");
-        let f_index = args.iter().position(|r| r == "-f").unwrap();
-        if args.get(f_index+1).is_some() {
-            info!("{:?}", args[f_index+1]);
-            args_out.input_file = args[f_index+1].clone();
-        } else {
-            warn!("No File provided, please pass in the file name after -f");
-            std::process::exit(1);
+    let mut args = Args::default();
+    let mut args_iter = std::env::args().skip(1);
+    let mut operation = String::from("read");
+    
+    while let Some(arg) = args_iter.next() {
+        match arg.as_str() {
+            "-f" => {
+                info!("-f provided");
+                if let Some(file_path) = args_iter.next() {
+                    info!("{:?}", file_path);
+                    args.file_path = file_path;
+                } else {
+                    warn!("No file provided after -f");
+                    std::process::exit(1);
+                }
+            }
+            "-o" => {
+                info!("-o provided");
+                if let Some(output_file) = args_iter.next() {
+                    info!("{:?}", output_file);
+                    args.output_file = output_file;
+                } else {
+                    warn!("No file provided after -o");
+                    std::process::exit(1);
+                }
+            }
+            "-w" => {
+                info!("-w provided");
+                operation = String::from("write");
+            }
+            "-j" => {
+                info!("-j provided");
+                args.is_json = true;
+            }
+            "-h" | "--help" => {
+                println!("Usage:");
+                println!();
+                println!("To provide EDI file use '-f'"); 
+                println!("To specify the output file use '-o'");
+                println!("To write EDI from JSON use '-w'");
+                println!("To specify input is JSON use '-j'");
+                std::process::exit(0);
+            }
+            _ => {}
         }
+    }
+    
+    args.operation = operation;
+    
+    if args.operation == "write" {
+        info!("Using operation: Write EDI from JSON");
     } else {
-        warn!("No File provided, please use -f to pass in the file name.");
+        info!("Using operation: Create JSON from EDI");
+    }
+    
+    if args.file_path.is_empty() {
+        warn!("No file provided, please use -f to pass in the file name");
         std::process::exit(1);
     }
-    if args.contains(&String::from("-o")){
-        info!("-o provided");
-        let o_index = args.iter().position(|r| r == "-o").unwrap();
-        if args.get(o_index+1).is_some() {
-            info!("{:?}", args[o_index+1]);
-            args_out.output_file = args[o_index+1].clone();
-        } else {
-            warn!("No File provided, please pass in the file name after -o");
-            std::process::exit(1);
-        }
     
-    } else {
-        info!("Using the default output file 'out.json'");
-    }
-        if args.contains(&String::from("-x")){
-        info!("-x provided");
-        let x_index = args.iter().position(|r| r == "-x").unwrap();
-        if args.get(x_index+1).is_some() {
-            info!("{:?}", args[x_index+1]);
-            args_out.operation = args[x_index+1].clone();
+    if args.output_file.is_empty() {
+        if args.operation == "read" {
+            args.output_file = String::from("out.json");
         } else {
-            warn!("No File Operation, please pass in the action after -x");
-            std::process::exit(1);
+            args.output_file = String::from("out.edi");
         }
-    
-    } else {
-        args_out.operation = String::from("read");
-        info!("Using the default operation: Create JSON from EDI");
+        info!("Using default output file: {}", args.output_file);
     }
     
-    args_out
+    args
 }
 
 pub fn get_file_contents(args: Args) -> String {
     let mut contents = String::new();
-    let file_path = Path::new(&args.input_file);
-    
+    let file_path = Path::new(&args.file_path);
     
     if file_path.exists() {
         info!("File exists");
         let mut file = File::open(file_path).unwrap();
         file.read_to_string(&mut contents).unwrap();
     } else {
-        warn!("File does not exist, please use -f to pass in the file name");
+        warn!("File does not exist: {}", args.file_path);
         std::process::exit(1);
     }
     contents
@@ -103,17 +119,25 @@ pub fn clean_contents(contents: String) -> String {
     clean_contents
 }
 
-
 pub fn write_to_file(write_contents: String, write_file: String) {
-    // setting up write file functionality
-    let write_file_path;
-    if write_file != "" {
-        write_file_path = Path::new(&write_file);
+    let write_file_path = if write_file.is_empty() {
+        info!("No output file specified, writing to default file");
+        Path::new("./out.json")
     } else {
-        info!("No File provided, Writing to default file out.json");
-        write_file_path = Path::new("./out.json");
+        Path::new(&write_file)
+    };
+    
+    match File::create(write_file_path) {
+        Ok(mut file) => {
+            if let Err(e) = file.write_all(write_contents.as_bytes()) {
+                warn!("Failed to write to file: {}", e);
+                std::process::exit(1);
+            }
+            info!("Successfully wrote to file: {:?}", write_file_path);
+        },
+        Err(e) => {
+            warn!("Failed to create file: {}", e);
+            std::process::exit(1);
+        }
     }
-    // write_file_path = Path::new("./out.json");
-    let mut write_file = File::create(write_file_path).unwrap();
-    write_file.write_all(write_contents.as_bytes()).unwrap();
 }

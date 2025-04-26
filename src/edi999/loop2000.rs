@@ -9,92 +9,163 @@ use crate::helper::edihelper::*;
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 pub struct Loop2000 {
     pub ak2_segments: AK2,
+    pub loop2100s: Vec<Loop2100>,
     pub ik5_segments: IK5,
-    pub loop2100: Vec<Loop2100>,
 }
 
+pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
+    let mut loop2000 = Loop2000::default();
 
-pub fn get_loop_2000(mut contents:String) -> (AK2, IK5, String) {
-
-    let mut ak2_segments = AK2::default();
-    let mut ik5_segments = IK5::default();
-  
-
+    // Process AK2 segment (required)
     if contents.contains("AK2") {
-        info!("AK2 segment found, ");
-        ak2_segments = get_ak2(get_segment_contents("AK2", &contents));
+        info!("AK2 segment found");
+        loop2000.ak2_segments = get_ak2(get_segment_contents("AK2", &contents));
         info!("AK2 segment parsed");
-        contents = content_trim("AK2",contents);
+        contents = content_trim("AK2", contents);
+    } else {
+        info!("Warning: Required AK2 segment not found in Loop 2000");
     }
+
+    // Process Loop 2100 segments
+    let (loop2100s, new_contents) = get_loop_2100s(contents);
+    loop2000.loop2100s = loop2100s;
+    contents = new_contents;
+
+    // Process IK5 segment (required)
     if contents.contains("IK5") {
-        info!("IK5 segment found, ");
-        ik5_segments = get_ik5(get_segment_contents("IK5", &contents));
+        info!("IK5 segment found");
+        loop2000.ik5_segments = get_ik5(get_segment_contents("IK5", &contents));
         info!("IK5 segment parsed");
-        contents = content_trim("IK5",contents);
+        contents = content_trim("IK5", contents);
+    } else {
+        info!("Warning: Required IK5 segment not found in Loop 2000");
     }
 
-
-    info!("Loop 2000 parsed\n");
-    return (ak2_segments, ik5_segments, contents)
+    info!("Loop 2000 parsed");
+    
+    (loop2000, contents)
 }
 
-pub fn get_loop_2000s(mut contents: String) ->  (Vec<Loop2000>, String) {
-
-    let ak2_count= contents.matches("AK2").count();
+pub fn get_loop_2000s(mut contents: String) -> (Vec<Loop2000>, String) {
+    let ak2_count = contents.matches("AK2").count();
     let mut loop_2000_array = vec![];
-    info!("Number of loops in loop 2000: {:?}",ak2_count);
-
-
+    info!("Number of loops in loop 2000: {:?}", ak2_count);
 
     for _ in 0..ak2_count {
         let tmp_contents = get_999_2000(contents.clone());
-        let (ak2, ik5, loop2100, rem_contents, inner_rem_contents);
-
-        (ak2, ik5, rem_contents) = get_loop_2000(tmp_contents.clone());
-        (loop2100, inner_rem_contents) = get_loop_2100s(rem_contents.clone());
-
-        let loop2000s = Loop2000 {
-            ak2_segments: ak2,
-            loop2100,
-            ik5_segments: ik5,
-        };
-
-        contents = contents.replacen(&tmp_contents, "",1);
+        let (loop2000, inner_rem_contents) = get_loop_2000(tmp_contents.clone());
+        
+        loop_2000_array.push(loop2000);
+        
+        contents = contents.replacen(&tmp_contents, "", 1);
         contents.push_str(&inner_rem_contents);
-
-        loop_2000_array.push(loop2000s);
     }
 
-    return (loop_2000_array, contents)
+    (loop_2000_array, contents)
 }
 
-pub fn write_loop2000(loop2000:Vec<Loop2000>) -> String {
+pub fn write_loop2000(loop2000s: Vec<Loop2000>) -> String {
     let mut contents = String::new();
-    for loop2000 in loop2000 {
+    
+    for loop2000 in loop2000s {
+        // Write AK2 segment
         contents.push_str(&write_ak2(loop2000.ak2_segments));
-        contents.push_str(&write_loop2100(loop2000.loop2100));
+        
+        // Write all Loop 2100 segments
+        contents.push_str(&write_loop2100(loop2000.loop2100s));
+        
+        // Write IK5 segment
         contents.push_str(&write_ik5(loop2000.ik5_segments));
     }
-    return contents;
+    
+    contents
 }
 
-
-
-// unit tests
-
-// #[cfg(test)]
-
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
     
-//     #[test]
-//     fn test_get_loop_2000() {
-//         let contents = String::from("LX*1~TS3*6543210903*11*20021231*1*211366.97********138018.4**73348.57~TS2*2178.45*1919.71**56.82*197.69*4.23~CLP*EXAMPLE3*2*500*100**12*05090256390*11*1~CAS*OA*23*600**94*-200~");
-//         let (lx_segments, ts3_segments, ts2_segments, contents) = get_loop_2000(contents);
-//         assert_eq!(lx_segments.lx01_claim_sequence_number, "1");
-//         assert_eq!(contents, "CLP*EXAMPLE3*2*500*100**12*05090256390*11*1~CAS*OA*23*600**94*-200~");
-//         assert_eq!(ts2_segments.ts201_total_drg_amount, "2178.45");
-//         assert_eq!(ts3_segments.ts301_provider_identifier, "6543210903");
-//     }
+    #[test]
+    fn test_get_loop_2000() {
+        let contents = "AK2*837*000000001~IK3*NM1*1*8~CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~IK4*1*66*1*123~CTX*ELEMENT*IK4*1*2110*2~IK5*A~".to_string();
+        let (loop2000, remaining) = get_loop_2000(contents);
+        
+        assert_eq!(loop2000.ak2_segments.ak201_transaction_set_identifier_code, "837");
+        assert_eq!(loop2000.ak2_segments.ak202_transaction_set_control_number, "000000001");
+        assert_eq!(loop2000.loop2100s.len(), 1);
+        assert_eq!(loop2000.ik5_segments.ik501_transaction_set_acknowledgment_code, "A");
+        assert_eq!(remaining, "");
+    }
     
-// }
+    #[test]
+    fn test_write_loop2000() {
+        let mut loop2000 = Loop2000::default();
+        
+        // Set up AK2
+        loop2000.ak2_segments = AK2 {
+            ak201_transaction_set_identifier_code: "837".to_string(),
+            ak202_transaction_set_control_number: "000000001".to_string(),
+            ak203_implementation_convention_reference: "".to_string(),
+        };
+        
+        // Set up Loop 2100
+        let mut loop2100 = Loop2100::default();
+        loop2100.ik3_segments = IK3 {
+            ik301_segment_id_code: "NM1".to_string(),
+            ik302_segment_position_in_transaction_set: "1".to_string(),
+            ik303_loop_identifier_code: "8".to_string(),
+            ik304_implementation_segment_syntax_error_code: "".to_string(),
+        };
+        
+        let ctx = CTX {
+            ctx01_context_name: "SITUATIONAL TRIGGER".to_string(),
+            ctx02_segment_id_code: "IK3".to_string(),
+            ctx03_segment_position_in_transaction: "1".to_string(),
+            ctx04_loop_id_code: "2100".to_string(),
+            ctx05_position_in_segment: "1".to_string(),
+            ctx06_reference_in_segment: "".to_string(),
+        };
+        
+        loop2100.ctx_segments.push(ctx);
+        
+        // Add Loop 2110
+        let mut loop2110 = Loop2110::default();
+        loop2110.ik4_segments = IK4 {
+            ik401_position_in_segment: "1".to_string(),
+            ik402_data_element_reference_number: "66".to_string(),
+            ik403_implementation_data_element_syntax_error_code: "1".to_string(),
+            ik404_copy_of_bad_data_element: "123".to_string(),
+        };
+        
+        let ctx2110 = CTX {
+            ctx01_context_name: "ELEMENT".to_string(),
+            ctx02_segment_id_code: "IK4".to_string(),
+            ctx03_segment_position_in_transaction: "1".to_string(),
+            ctx04_loop_id_code: "2110".to_string(),
+            ctx05_position_in_segment: "2".to_string(),
+            ctx06_reference_in_segment: "".to_string(),
+        };
+        
+        loop2110.ctx_segments.push(ctx2110);
+        loop2100.loop2110s.push(loop2110);
+        loop2000.loop2100s.push(loop2100);
+        
+        // Set up IK5
+        loop2000.ik5_segments = IK5 {
+            ik501_transaction_set_acknowledgment_code: "A".to_string(),
+            ik502_implementation_transaction_set_syntax_error_code: "".to_string(),
+            ik503_implementation_transaction_set_syntax_error_code: "".to_string(),
+            ik504_implementation_transaction_set_syntax_error_code: "".to_string(),
+            ik505_implementation_transaction_set_syntax_error_code: "".to_string(),
+            ik506_implementation_transaction_set_syntax_error_code: "".to_string(),
+        };
+        
+        let result = write_loop2000(vec![loop2000]);
+        assert!(result.contains("AK2*837*000000001~"));
+        assert!(result.contains("IK3*NM1*1*8~"));
+        assert!(result.contains("CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~"));
+        assert!(result.contains("IK4*1*66*1*123~"));
+        assert!(result.contains("CTX*ELEMENT*IK4*1*2110*2~"));
+        assert!(result.contains("IK5*A~"));
+    }
+}
