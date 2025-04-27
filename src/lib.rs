@@ -20,7 +20,7 @@ pub use edi270::controller::Edi270;
 pub use edi271::controller::Edi271;
 
 // Re-export transaction set functions
-pub use edi835::controller::{get_835, write_edi};
+pub use edi835::controller::{get_835, write_835};
 pub use edi999::controller::{get_999, write_999};
 pub use edi270::controller::{get_270, write_270};
 pub use edi271::controller::{get_271, write_271};

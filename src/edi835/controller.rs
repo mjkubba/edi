@@ -81,7 +81,7 @@ pub fn get_835(mut contents: String) -> Edi835 {
 }
 
 
-pub fn write_edi(contents: String) -> String {
+pub fn write_835(contents: String) -> String {
     let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
     let mut new_edi = String::new();
     let new_ich = write_interchange_control(edi_json.interchange_header.clone());

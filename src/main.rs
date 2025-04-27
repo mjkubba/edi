@@ -38,7 +38,7 @@ fn main() {
             if contents.contains("\"transaction_set_id\":\"835\"") {
                 info!("Writing 835 format");
                 let edi835: Edi835 = serde_json::from_str(&contents).unwrap();
-                let new_edi = write_edi(contents.clone());
+                let new_edi = write_835(contents.clone());
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 999 format
@@ -73,7 +73,7 @@ fn main() {
                 info!("Writing 835 format from raw EDI");
                 let edi835 = get_835(contents.clone());
                 let serialized_edi = serde_json::to_string(&edi835).unwrap();
-                let new_edi = write_edi(serialized_edi);
+                let new_edi = write_835(serialized_edi);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is raw EDI for 999 format
