@@ -1,6 +1,5 @@
 use log::info;
 use serde::{Serialize, Deserialize};
-use crate::error::{EdiResult, EdiError};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct BHT {
@@ -12,17 +11,13 @@ pub struct BHT {
     pub bht06_transaction_type_code: String,
 }
 
-pub fn get_bht(bht_content: String) -> EdiResult<BHT> {
+pub fn get_bht(bht_content: String) -> BHT {
     let bht_parts: Vec<&str> = bht_content.split("*").collect();
-    
-    if bht_parts.len() < 4 {
-        return Err(EdiError::MalformedSegment("BHT".to_string()));
-    }
     
     let mut bht = BHT::default();
     
     // BHT01 - Hierarchical Structure Code
-    if !bht_parts[0].is_empty() {
+    if !bht_parts.is_empty() && !bht_parts[0].is_empty() {
         bht.bht01_hierarchical_structure_code = bht_parts[0].to_string();
     }
     
@@ -41,21 +36,21 @@ pub fn get_bht(bht_content: String) -> EdiResult<BHT> {
         bht.bht04_date = bht_parts[3].to_string();
     }
     
-    // BHT05 - Time (Situational)
+    // BHT05 - Time
     if bht_parts.len() > 4 && !bht_parts[4].is_empty() {
         bht.bht05_time = bht_parts[4].to_string();
     }
     
-    // BHT06 - Transaction Type Code (Situational)
+    // BHT06 - Transaction Type Code
     if bht_parts.len() > 5 && !bht_parts[5].is_empty() {
         bht.bht06_transaction_type_code = bht_parts[5].to_string();
     }
     
     info!("Parsed BHT segment: {:?}", bht);
-    Ok(bht)
+    bht
 }
 
-pub fn write_bht(bht: &BHT) -> String {
+pub fn write_bht(bht: BHT) -> String {
     let mut bht_content = String::new();
     
     bht_content.push_str("BHT*");
@@ -64,21 +59,23 @@ pub fn write_bht(bht: &BHT) -> String {
     bht_content.push_str(&bht.bht02_transaction_set_purpose_code);
     bht_content.push_str("*");
     bht_content.push_str(&bht.bht03_reference_identification);
-    bht_content.push_str("*");
-    bht_content.push_str(&bht.bht04_date);
     
-    // Only include non-empty fields
-    if !bht.bht05_time.is_empty() {
+    // Include BHT04 if not empty
+    if !bht.bht04_date.is_empty() {
         bht_content.push_str("*");
-        bht_content.push_str(&bht.bht05_time);
+        bht_content.push_str(&bht.bht04_date);
         
-        if !bht.bht06_transaction_type_code.is_empty() {
+        // Include BHT05 if not empty
+        if !bht.bht05_time.is_empty() {
             bht_content.push_str("*");
-            bht_content.push_str(&bht.bht06_transaction_type_code);
+            bht_content.push_str(&bht.bht05_time);
+            
+            // Include BHT06 if not empty
+            if !bht.bht06_transaction_type_code.is_empty() {
+                bht_content.push_str("*");
+                bht_content.push_str(&bht.bht06_transaction_type_code);
+            }
         }
-    } else if !bht.bht06_transaction_type_code.is_empty() {
-        bht_content.push_str("**");
-        bht_content.push_str(&bht.bht06_transaction_type_code);
     }
     
     bht_content.push_str("~");
@@ -90,9 +87,9 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_get_bht() -> EdiResult<()> {
-        let bht_content = "0022*13*10001234*20060501*1319*00~".to_string();
-        let bht = get_bht(bht_content)?;
+    fn test_get_bht() {
+        let bht_content = "0022*13*10001234*20060501*1319*00".to_string();
+        let bht = get_bht(bht_content);
         
         assert_eq!(bht.bht01_hierarchical_structure_code, "0022");
         assert_eq!(bht.bht02_transaction_set_purpose_code, "13");
@@ -100,8 +97,19 @@ mod tests {
         assert_eq!(bht.bht04_date, "20060501");
         assert_eq!(bht.bht05_time, "1319");
         assert_eq!(bht.bht06_transaction_type_code, "00");
+    }
+    
+    #[test]
+    fn test_get_bht_minimal() {
+        let bht_content = "0022*13*10001234".to_string();
+        let bht = get_bht(bht_content);
         
-        Ok(())
+        assert_eq!(bht.bht01_hierarchical_structure_code, "0022");
+        assert_eq!(bht.bht02_transaction_set_purpose_code, "13");
+        assert_eq!(bht.bht03_reference_identification, "10001234");
+        assert_eq!(bht.bht04_date, "");
+        assert_eq!(bht.bht05_time, "");
+        assert_eq!(bht.bht06_transaction_type_code, "");
     }
     
     #[test]
@@ -115,7 +123,7 @@ mod tests {
             bht06_transaction_type_code: "00".to_string(),
         };
         
-        let bht_content = write_bht(&bht);
+        let bht_content = write_bht(bht);
         assert_eq!(bht_content, "BHT*0022*13*10001234*20060501*1319*00~");
     }
     
@@ -125,12 +133,12 @@ mod tests {
             bht01_hierarchical_structure_code: "0022".to_string(),
             bht02_transaction_set_purpose_code: "13".to_string(),
             bht03_reference_identification: "10001234".to_string(),
-            bht04_date: "20060501".to_string(),
+            bht04_date: "".to_string(),
             bht05_time: "".to_string(),
             bht06_transaction_type_code: "".to_string(),
         };
         
-        let bht_content = write_bht(&bht);
-        assert_eq!(bht_content, "BHT*0022*13*10001234*20060501~");
+        let bht_content = write_bht(bht);
+        assert_eq!(bht_content, "BHT*0022*13*10001234~");
     }
 }

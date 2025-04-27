@@ -4,6 +4,8 @@ mod edi835;
 use edi835::controller::*;
 mod edi999;
 use edi999::controller::*;
+mod edi270;
+use edi270::controller::*;
 mod helper;
 use crate::helper::helper::{set_logger, write_to_file, process_args, get_file_contents, clean_contents};
 mod segments;
@@ -38,7 +40,7 @@ fn main() {
         // Check if the content is JSON for 835 format
         if contents.contains("\"transaction_set_id\":\"835\"") || contents.contains("\"bpr_segments\":") {
             info!("Writing 835 format");
-            let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
+            let _edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
             let new_edi = write_edi(contents.clone());
             write_to_file(new_edi, args.output_file);
         } 
@@ -47,6 +49,13 @@ fn main() {
             info!("Writing 999 format");
             let edi_json: Edi999 = serde_json::from_str(&contents.clone()).unwrap();
             let new_edi = write_999(&edi_json);
+            write_to_file(new_edi, args.output_file);
+        }
+        // Check if the content is JSON for 270 format
+        else if contents.contains("\"transaction_set_id\":\"270\"") || contents.contains("\"bht_segments\":") {
+            info!("Writing 270 format");
+            let edi_json: Edi270 = serde_json::from_str(&contents.clone()).unwrap();
+            let new_edi = write_270(&edi_json);
             write_to_file(new_edi, args.output_file);
         }
         // Check if the content is raw EDI for 835 format
@@ -61,6 +70,19 @@ fn main() {
             let edi999 = get_999(contents.clone());
             let new_edi = write_999(&edi999.0);
             write_to_file(new_edi, args.output_file);
+        }
+        // Check if the content is raw EDI for 270 format
+        else if contents.contains("BHT*0022") || (contents.contains("HL*") && contents.contains("*20*")) {
+            info!("Writing 270 format from raw EDI");
+            match get_270(contents.clone()) {
+                Ok((edi270, _)) => {
+                    let new_edi = write_270(&edi270);
+                    write_to_file(new_edi, args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 270 format: {:?}", e);
+                }
+            }
         }
         else {
             warn!("Unknown format for writing");
@@ -78,8 +100,19 @@ fn main() {
             let edi999 = get_999(contents.clone());
             let serialized_edi = serde_json::to_string(&edi999.0).unwrap();
             write_to_file(serialized_edi.clone(), args.output_file);
+        } else if contents.contains("~ST*270*") || contents.contains("ST*270*") {
+            info!("File is 270");
+            match get_270(contents.clone()) {
+                Ok((edi270, _)) => {
+                    let serialized_edi = serde_json::to_string(&edi270).unwrap();
+                    write_to_file(serialized_edi.clone(), args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 270 format: {:?}", e);
+                }
+            }
         } else {
-            warn!("File format not recognized. Currently supporting 835 and 999 formats.");
+            warn!("File format not recognized. Currently supporting 835, 999, and 270 formats.");
         }
     }
 }

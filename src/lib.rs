@@ -4,6 +4,7 @@ pub mod segment_config;
 pub mod loop_processor;
 pub mod edi835;
 pub mod edi999;
+pub mod edi270;
 pub mod helper;
 pub mod segments;
 

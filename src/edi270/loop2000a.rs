@@ -20,8 +20,11 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
     // Process HL segment (required)
     if contents.contains("HL") {
         info!("HL segment found");
-        let hl_content = get_segment_contents("HL", &contents).map_err(|_| EdiError::MissingSegment("HL".to_string()))?;
-        loop2000a.hl_segments = get_hl(hl_content)?;
+        let hl_content = get_segment_contents("HL", &contents);
+        if hl_content.is_empty() {
+            return Err(EdiError::MissingSegment("HL".to_string()));
+        }
+        loop2000a.hl_segments = get_hl(hl_content);
         
         // Verify this is an Information Source level HL segment (level code = 20)
         if loop2000a.hl_segments.hl03_hierarchical_level_code != "20" {
@@ -32,7 +35,7 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
         }
         
         info!("HL segment parsed");
-        contents = content_trim("HL", contents)?;
+        contents = content_trim("HL", contents);
     } else {
         return Err(EdiError::MissingSegment("HL".to_string()));
     }
@@ -40,10 +43,13 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
     // Process NM1 segment (required)
     if contents.contains("NM1") {
         info!("NM1 segment found");
-        let nm1_content = get_segment_contents("NM1", &contents).map_err(|_| EdiError::MissingSegment("NM1".to_string()))?;
-        loop2000a.nm1_segments = get_nm1(nm1_content)?;
+        let nm1_content = get_segment_contents("NM1", &contents);
+        if nm1_content.is_empty() {
+            return Err(EdiError::MissingSegment("NM1".to_string()));
+        }
+        loop2000a.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents)?;
+        contents = content_trim("NM1", contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -51,32 +57,35 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
     // Process PER segments (situational, can be multiple)
     while contents.starts_with("PER") {
         info!("PER segment found");
-        let per_content = get_segment_contents("PER", &contents).map_err(|_| EdiError::MissingSegment("PER".to_string()))?;
-        let per = get_per(per_content)?;
+        let per_content = get_segment_contents("PER", &contents);
+        if per_content.is_empty() {
+            break;
+        }
+        let per = get_per(per_content);
         info!("PER segment parsed");
         loop2000a.per_segments.push(per);
-        contents = content_trim("PER", contents)?;
+        contents = content_trim("PER", contents);
     }
     
     info!("Loop 2000A parsed");
     Ok((loop2000a, contents))
 }
 
-pub fn write_loop_2000a(loop2000a: &Loop2000A) -> EdiResult<String> {
+pub fn write_loop_2000a(loop2000a: &Loop2000A) -> String {
     let mut contents = String::new();
     
     // Write HL segment
-    contents.push_str(&write_hl(&loop2000a.hl_segments));
+    contents.push_str(&write_hl(loop2000a.hl_segments.clone()));
     
     // Write NM1 segment
-    contents.push_str(&write_nm1(&loop2000a.nm1_segments));
+    contents.push_str(&write_nm1(loop2000a.nm1_segments.clone()));
     
     // Write all PER segments
     for per in &loop2000a.per_segments {
-        contents.push_str(&write_per(per));
+        contents.push_str(&write_per(per.clone()));
     }
     
-    Ok(contents)
+    contents
 }
 
 #[cfg(test)]
@@ -140,7 +149,7 @@ mod tests {
             ],
         };
         
-        let contents = write_loop_2000a(&loop2000a)?;
+        let contents = write_loop_2000a(&loop2000a);
         assert!(contents.contains("HL*1**20*1~"));
         assert!(contents.contains("NM1*PR*2*ABC INSURANCE*****PI*12345~"));
         assert!(contents.contains("PER*IC*JANE DOE*TE*1234567890~"));

@@ -18,10 +18,13 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     // Process ST segment (required)
     if contents.contains("ST") {
         info!("ST segment found");
-        let st_content = get_segment_contents("ST", &contents).map_err(|_| EdiError::MissingSegment("ST".to_string()))?;
-        table1.st_segments = get_st(st_content)?;
+        let st_content = get_segment_contents("ST", &contents);
+        if st_content.is_empty() {
+            return Err(EdiError::MissingSegment("ST".to_string()));
+        }
+        table1.st_segments = get_st(st_content);
         info!("ST segment parsed");
-        contents = content_trim("ST", contents)?;
+        contents = content_trim("ST", contents);
     } else {
         return Err(EdiError::MissingSegment("ST".to_string()));
     }
@@ -29,10 +32,13 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     // Process BHT segment (required)
     if contents.contains("BHT") {
         info!("BHT segment found");
-        let bht_content = get_segment_contents("BHT", &contents).map_err(|_| EdiError::MissingSegment("BHT".to_string()))?;
-        table1.bht_segments = get_bht(bht_content)?;
+        let bht_content = get_segment_contents("BHT", &contents);
+        if bht_content.is_empty() {
+            return Err(EdiError::MissingSegment("BHT".to_string()));
+        }
+        table1.bht_segments = get_bht(bht_content);
         info!("BHT segment parsed");
-        contents = content_trim("BHT", contents)?;
+        contents = content_trim("BHT", contents);
     } else {
         return Err(EdiError::MissingSegment("BHT".to_string()));
     }
@@ -41,16 +47,16 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     Ok((table1, contents))
 }
 
-pub fn write_table1(table1: &Table1) -> EdiResult<String> {
+pub fn write_table1(table1: &Table1) -> String {
     let mut contents = String::new();
     
     // Write ST segment
-    contents.push_str(&write_st(&table1.st_segments));
+    contents.push_str(&write_st(table1.st_segments.clone()));
     
     // Write BHT segment
-    contents.push_str(&write_bht(&table1.bht_segments));
+    contents.push_str(&write_bht(table1.bht_segments.clone()));
     
-    Ok(contents)
+    contents
 }
 
 #[cfg(test)]
@@ -96,7 +102,7 @@ mod tests {
             },
         };
         
-        let contents = write_table1(&table1)?;
+        let contents = write_table1(&table1);
         assert_eq!(contents, "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~");
         
         Ok(())
