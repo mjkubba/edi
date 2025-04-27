@@ -1,178 +1,130 @@
 # EDI Parser Phase 2 Implementation Context
 
-## Current Implementation Status
+## Project Overview
 
-As of our last session, we've implemented the following components for Phase 2 of the EDI Parser project:
+The EDI Parser is a Rust-based library for parsing and generating Electronic Data Interchange (EDI) files in healthcare X12 formats. The project aims to support multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), and 837 (Claims).
 
-### 1. Common Infrastructure
+## Phase 2 Goals
 
-- **Error Handling Module (`error.rs`)**
-  - Created a placeholder for future error handling implementation
-  - Defined basic error types and EdiResult type alias
+Phase 2 of the project focuses on:
 
-- **Transaction Processor (`transaction_processor.rs`)**
-  - Implemented TransactionSet trait for standardized processing
-  - Created methods for parsing and generating EDI content
-  - Added transaction type detection functionality
+1. Implementing common infrastructure updates to support multiple transaction sets
+2. Implementing Transaction Set 270 (Health Care Eligibility Benefit Inquiry)
+3. Implementing Transaction Set 271 (Health Care Eligibility Benefit Response)
+4. Setting up the foundation for future transaction sets (276/277, 837)
 
-- **Library Structure (`lib.rs`)**
-  - Organized codebase with proper module structure
-  - Added re-exports for commonly used items
-  - Implemented helper functions for EDI processing
+## Technical Context
 
-### 2. Transaction Set 270 Implementation
+### EDI X12 Format
 
-- **Directory Structure**
-  - Created edi270 module with appropriate submodules
-  - Set up structure for controller, interchange control, and loops
+EDI X12 is a standard format for electronic data interchange used in healthcare. It consists of:
 
-- **Segment Structures**
-  - Implemented BHT segment for Beginning of Hierarchical Transaction
-  - Implemented HL segment for Hierarchical Level
+- **Interchange Control (ISA/IEA)**: The outermost envelope that contains one or more functional groups
+- **Functional Group (GS/GE)**: Contains one or more transaction sets of the same type
+- **Transaction Set (ST/SE)**: Contains the actual business data
+- **Segments**: Individual data elements grouped by function (e.g., NM1 for name information)
+- **Elements**: Individual data fields within segments
 
-- **Loop Structures**
-  - Implemented Loop2000A for Information Source
-  - Set up structure for other loops (2000B, 2000C, 2000D)
+### Transaction Set 270/271
 
-- **Controller**
-  - Implemented Edi270 struct with TransactionSet trait
-  - Added parsing and generation functions
+The 270/271 transaction set pair is used for eligibility, coverage, or benefit inquiry (270) and response (271):
 
-### 3. Project Documentation
+- **270**: Sent by providers to payers to inquire about a patient's eligibility for healthcare services
+- **271**: Sent by payers to providers in response to a 270 inquiry, containing eligibility information
 
-- Updated README.md with new transaction sets information
-- Created AmazonQ.md to track implementation progress
+### Loop Structure
 
-## Next Implementation Tasks
+Both 270 and 271 use a hierarchical loop structure:
 
-1. **Complete Transaction Set 270 Implementation**
-   - Implement Loop2000B (Information Receiver)
-   - Implement Loop2000C (Subscriber)
-   - Implement Loop2000D (Dependent)
-   - Add comprehensive tests for 270 format
+- **Loop 2000A**: Information Source level
+- **Loop 2000B**: Information Receiver level
+- **Loop 2000C**: Subscriber level
+- **Loop 2000D**: Dependent level
 
-2. **Implement Transaction Set 271**
-   - Create directory structure and module organization
-   - Implement segment and loop structures
-   - Implement controller and processing logic
-   - Add tests for validation
+The 271 adds additional loops for benefit information:
+- **Loop 2110C/D**: Eligibility or Benefit Information
+- **Loop 2115C/D**: Eligibility or Benefit Additional Information
+- **Loop 2120C/D**: Subscriber/Dependent Benefit Related Entity
 
-3. **Implement Transaction Sets 276/277**
-   - Create directory structure and module organization
-   - Implement segment and loop structures
-   - Implement controllers and processing logic
-   - Add tests for validation
+## Implementation Approach
 
-4. **Implement Transaction Set 837**
-   - Create directory structure for 837P, 837I, and 837D variants
-   - Implement common segments and loops
-   - Implement variant-specific components
-   - Add comprehensive tests
+### Error Handling
 
-5. **Enhance Error Handling (Deferred from Current Phase)**
-   - Implement robust error handling throughout the codebase
-   - Update helper functions to return Result types instead of default values
-   - Add proper error propagation with the ? operator
-   - Improve error messages for better diagnostics
-   - Add validation for required fields and segments
+We're using a Result-based approach with custom error types:
+```rust
+pub type EdiResult<T> = Result<T, EdiError>;
 
-## Implementation Details
-
-### Transaction Set 270 Structure
-
-The 270 transaction set has the following hierarchical structure:
-
-```
-ISA - Interchange Control Header
-  GS - Functional Group Header
-    ST - Transaction Set Header
-      BHT - Beginning of Hierarchical Transaction
-      Loop 2000A - Information Source
-        HL - Information Source Level
-        NM1 - Information Source Name
-        PER - Information Source Contact Information
-        Loop 2000B - Information Receiver
-          HL - Information Receiver Level
-          NM1 - Information Receiver Name
-          Loop 2000C - Subscriber
-            HL - Subscriber Level
-            TRN - Subscriber Trace Number
-            NM1 - Subscriber Name
-            REF - Subscriber Additional Identification
-            N3 - Subscriber Address
-            N4 - Subscriber City/State/ZIP
-            DMG - Subscriber Demographic Information
-            Loop 2000D - Dependent
-              HL - Dependent Level
-              TRN - Dependent Trace Number
-              NM1 - Dependent Name
-              REF - Dependent Additional Identification
-              N3 - Dependent Address
-              N4 - Dependent City/State/ZIP
-              DMG - Dependent Demographic Information
-    SE - Transaction Set Trailer
-  GE - Functional Group Trailer
-IEA - Interchange Control Trailer
+pub enum EdiError {
+    ParseError(String),
+    ValidationError(String),
+    IoError(std::io::Error),
+    MissingSegment(String),
+    MalformedSegment(String),
+    UnsupportedFormat(String),
+}
 ```
 
-### Implementation Approach
+### Segment Processing
 
-For each transaction set, we follow this implementation pattern:
+Each segment type has its own module with:
+- A struct representing the segment data
+- A function to parse the segment from a string
+- A function to generate the segment as a string
 
-1. **Define segment structures** with proper validation
-2. **Implement loop structures** that contain segments and child loops
-3. **Create a controller** that implements the TransactionSet trait
-4. **Add comprehensive tests** for parsing and generation
+Example:
+```rust
+pub struct BHT {
+    pub bht01_hierarchical_structure_code: String,
+    pub bht02_transaction_set_purpose_code: String,
+    // ...
+}
 
-### Code Structure
-
-The code is organized into modules by transaction set, with common functionality in shared modules:
-
-```
-src/
-├── error.rs                 # Error handling
-├── transaction_processor.rs # Generic transaction set processor
-├── segment_config.rs        # Configuration-driven segment definitions
-├── loop_processor.rs        # Enhanced loop detection and processing
-├── lib.rs                   # Library exports
-├── edi835/                  # 835 format implementation
-├── edi999/                  # 999 format implementation
-├── edi270/                  # 270 format implementation (in progress)
-│   ├── controller.rs        # Main control logic
-│   ├── interchangecontrol.rs # Interchange control handling
-│   ├── table1.rs            # Table 1 definitions
-│   ├── loop2000a.rs         # Information Source loop
-│   ├── loop2000b.rs         # Information Receiver loop (to be implemented)
-│   ├── loop2000c.rs         # Subscriber loop (to be implemented)
-│   └── loop2000d.rs         # Dependent loop (to be implemented)
-└── segments/                # Segment definitions
-    ├── bht.rs               # Beginning of Hierarchical Transaction
-    ├── hl.rs                # Hierarchical Level
-    └── [other segments]     # Other segment implementations
+pub fn get_bht(bht_content: String) -> BHT { /* ... */ }
+pub fn write_bht(bht: BHT) -> String { /* ... */ }
 ```
 
-## Development Environment
+### Loop Processing
 
-- Rust toolchain (1.56.0 or later)
-- Cargo package manager
-- Dependencies:
-  - serde (1.0) with derive feature
-  - serde_json (1.0)
-  - log (0.4)
-  - env_logger (0.10)
-  - once_cell (1.18)
+Loops are organized hierarchically, with each loop potentially containing other loops:
+```rust
+pub struct Loop2000A {
+    pub hl_segments: HL,
+    pub nm1_segments: NM1,
+    pub per_segments: Vec<PER>,
+    // ...
+}
 
-## Testing Strategy
+pub fn get_loop_2000a(contents: String) -> EdiResult<(Loop2000A, String)> { /* ... */ }
+pub fn write_loop_2000a(loop2000a: &Loop2000A) -> String { /* ... */ }
+```
 
-- Unit tests for individual segments and loops
-- Integration tests for end-to-end processing
-- Test fixtures for various EDI formats
+### Transaction Set Processing
 
-## Notes and Considerations
+Each transaction set has a controller module that orchestrates the parsing and generation:
+```rust
+pub struct Edi270 {
+    pub interchange_header: InterchangeHeader,
+    pub table1: Table1,
+    pub loop2000a: Loop2000A,
+    pub loop2000b: Vec<Loop2000B>,
+    // ...
+}
 
-- The configuration-driven approach allows for easy addition of new transaction sets
-- Error handling has been deferred to a later phase to focus on core functionality
-- The TransactionSet trait provides a consistent interface for all transaction sets
-- Loop detection and processing is enhanced with the LoopRegistry
+pub fn get_270(contents: String) -> EdiResult<(Edi270, String)> { /* ... */ }
+pub fn write_270(edi270: &Edi270) -> String { /* ... */ }
+```
 
-This context file provides all the necessary information to continue the implementation of Phase 2 of the EDI Parser project in future sessions.
+## Current Status
+
+As of now, we have:
+- Implemented the common infrastructure components
+- Completed the Transaction Set 270 implementation
+- Completed the Transaction Set 271 implementation
+- Set up the foundation for future transaction sets
+
+## Next Steps
+
+1. Create sample 271 EDI files for testing
+2. Update the main application to support 271 processing
+3. Begin implementation of Transaction Sets 276/277
+4. Plan for Transaction Set 837 implementation

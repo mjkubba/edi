@@ -160,8 +160,8 @@ mod tests {
         assert_eq!(loop2000d.nm1_segments.firstname, "JANE");
         
         assert_eq!(loop2000d.ref_segments.len(), 1);
-        assert_eq!(loop2000d.ref_segments[0].reference_id_qualifier, "SY");
-        assert_eq!(loop2000d.ref_segments[0].reference_id, "123456789");
+        assert_eq!(loop2000d.ref_segments[0].reference_id_number_qualifier, "SY");
+        assert_eq!(loop2000d.ref_segments[0].reference_id_number, "123456789");
         
         assert!(loop2000d.dmg_segments.is_some());
         let dmg = loop2000d.dmg_segments.unwrap();

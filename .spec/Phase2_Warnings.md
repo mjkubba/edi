@@ -1,103 +1,249 @@
-# Phase 2 Implementation Warnings and Issues
+# Phase 2 Warnings
 
-This document tracks the warnings and issues that need to be addressed in the EDI Parser project.
+This document tracks the warnings identified during the build process of Phase 2 implementation. These warnings should be addressed in future cleanup tasks.
 
-## Current Warnings
+## Library Warnings
 
-### Library Warnings
+```
+warning: unused import: `crate::segments::ik3::*`
+ --> src/edi999/loop2000.rs:5:5
+  |
+5 | use crate::segments::ik3::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **Unused Imports in edi999/loop2000.rs**
-   ```
-   warning: unused import: `crate::segments::ik3::*`
-   warning: unused import: `crate::segments::ik4::*`
-   warning: unused import: `crate::segments::ctx::*`
-   warning: unused import: `crate::edi999::loop2110::*`
-   ```
+warning: unused import: `crate::segments::ik4::*`
+ --> src/edi999/loop2000.rs:6:5
+  |
+6 | use crate::segments::ik4::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
 
-2. **Unused Imports in edi999/loop2100.rs**
-   ```
-   warning: unused import: `crate::segments::ik4::*`
-   ```
+warning: unused import: `crate::segments::ctx::*`
+ --> src/edi999/loop2000.rs:7:5
+  |
+7 | use crate::segments::ctx::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
 
-3. **Unused Imports in helper/helper.rs**
-   ```
-   warning: unused import: `std::env`
-   ```
+warning: unused import: `crate::edi999::loop2110::*`
+  --> src/edi999/loop2000.rs:10:5
+   |
+10 | use crate::edi999::loop2110::*;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-### Binary Warnings
+warning: unused import: `crate::segments::ik4::*`
+ --> src/edi999/loop2100.rs:5:5
+  |
+5 | use crate::segments::ik4::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **Unused Variable in main.rs**
-   ```
-   warning: unused variable: `edi_json`
-   ```
+warning: unused import: `EdiError`
+  --> src/edi270/controller.rs:10:31
+   |
+10 | use crate::error::{EdiResult, EdiError};
+   |                               ^^^^^^^^
 
-2. **Unused Function in edi999/controller.rs**
-   ```
-   warning: function `is_999_json` is never used
-   ```
+warning: unused import: `std::env`
+ --> src/helper/helper.rs:4:5
+  |
+4 | use std::env;
+  |     ^^^^^^^^
+```
 
-3. **Unused Error Handling in error.rs**
-   ```
-   warning: type alias `EdiResult` is never used
-   warning: variants `ParseError`, `ValidationError`, `MissingSegment`, `MalformedSegment`, and `UnsupportedFormat` are never constructed
-   ```
+## Binary Warnings
 
-4. **Unused Transaction Processor in transaction_processor.rs**
-   ```
-   warning: struct `TransactionProcessor` is never constructed
-   warning: associated functions `process`, `write`, and `detect_transaction_type` are never used
-   ```
+```
+warning: unused import: `controller::Edi270`
+  --> src/edi270/mod.rs:10:9
+   |
+10 | pub use controller::Edi270;
+   |         ^^^^^^^^^^^^^^^^^^
 
-5. **Unused Segment Registry in segment_config.rs**
-   ```
-   warning: struct `SegmentRegistry` is never constructed
-   warning: associated items `new`, `register`, `get_config`, `has_segment`, and `get_segment_ids` are never used
-   warning: static `SEGMENT_REGISTRY` is never used
-   warning: function `register_common_segments` is never used
-   ```
+warning: unused imports: `get_270`, `write_270`
+  --> src/edi270/mod.rs:11:22
+   |
+11 | pub use controller::{get_270, write_270};
+   |                      ^^^^^^^  ^^^^^^^^^
 
-6. **Unused Loop Registry in loop_processor.rs**
-   ```
-   warning: struct `LoopRegistry` is never constructed
-   warning: associated items `new`, `register`, `get_config`, `get_loops_for_transaction`, and `detect_loop` are never used
-   warning: static `LOOP_REGISTRY` is never used
-   warning: function `register_835_loops` is never used
-   warning: function `register_999_loops` is never used
-   warning: function `extract_loop` is never used
-   ```
+warning: function `is_999_json` is never used
+  --> src/edi999/controller.rs:95:8
+   |
+95 | pub fn is_999_json(contents: &str) -> bool {
+   |        ^^^^^^^^^^^
+
+warning: function `is_270_json` is never used
+   --> src/edi270/controller.rs:108:8
+    |
+108 | pub fn is_270_json(contents: &str) -> bool {
+    |        ^^^^^^^^^^^
+
+warning: function `is_271_json` is never used
+   --> src/edi271/controller.rs:108:8
+    |
+108 | pub fn is_271_json(contents: &str) -> bool {
+    |        ^^^^^^^^^^^
+
+warning: function `get_aaa` is never used
+  --> src/segments/aaa.rs:12:8
+   |
+12 | pub fn get_aaa(aaa_content: String) -> AAA {
+   |        ^^^^^^^
+
+warning: function `write_aaa` is never used
+  --> src/segments/aaa.rs:41:8
+   |
+41 | pub fn write_aaa(aaa: AAA) -> String {
+   |        ^^^^^^^^^
+
+warning: function `get_dtp` is never used
+  --> src/segments/dtp.rs:11:8
+   |
+11 | pub fn get_dtp(dtp_content: String) -> DTP {
+   |        ^^^^^^^
+
+warning: function `write_dtp` is never used
+  --> src/segments/dtp.rs:35:8
+   |
+35 | pub fn write_dtp(dtp: DTP) -> String {
+   |        ^^^^^^^^^
+
+warning: function `get_eb` is never used
+  --> src/segments/eb.rs:20:8
+   |
+20 | pub fn get_eb(eb_content: String) -> EB {
+   |        ^^^^^^
+
+warning: function `write_eb` is never used
+  --> src/segments/eb.rs:89:8
+   |
+89 | pub fn write_eb(eb: EB) -> String {
+   |        ^^^^^^^^
+
+warning: function `get_hsd` is never used
+  --> src/segments/hsd.rs:16:8
+   |
+16 | pub fn get_hsd(hsd_content: String) -> HSD {
+   |        ^^^^^^^
+
+warning: function `write_hsd` is never used
+  --> src/segments/hsd.rs:65:8
+   |
+65 | pub fn write_hsd(hsd: HSD) -> String {
+   |        ^^^^^^^^^
+
+warning: function `get_msg` is never used
+  --> src/segments/msg.rs:11:8
+   |
+11 | pub fn get_msg(msg_content: String) -> MSG {
+   |        ^^^^^^^
+
+warning: function `write_msg` is never used
+  --> src/segments/msg.rs:35:8
+   |
+35 | pub fn write_msg(msg: MSG) -> String {
+   |        ^^^^^^^^^
+```
+
+## Unused Code Warnings
+
+```
+warning: variants `ParseError`, `MalformedSegment`, and `UnsupportedFormat` are never constructed
+  --> src/error.rs:8:5
+   |
+7  | pub enum EdiError {
+   |          -------- variants in this enum
+8  |     ParseError(String),
+   |     ^^^^^^^^^^
+...
+12 |     MalformedSegment(String),
+   |     ^^^^^^^^^^^^^^^^
+13 |     UnsupportedFormat(String),
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: struct `TransactionProcessor` is never constructed
+  --> src/transaction_processor.rs:19:12
+   |
+19 | pub struct TransactionProcessor;
+   |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: associated functions `process`, `write`, and `detect_transaction_type` are never used
+  --> src/transaction_processor.rs:23:12
+   |
+21 | impl TransactionProcessor {
+   | ------------------------- associated functions in this implementation
+22 |     /// Process EDI content into a specific transaction set
+23 |     pub fn process<T: TransactionSet>(contents: String) -> T {
+   |            ^^^^^^^
+...
+38 |     pub fn write<T: TransactionSet>(transaction: T) -> String {
+   |            ^^^^^
+...
+43 |     pub fn detect_transaction_type(contents: &str) -> Option<&'static str> {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `SegmentRegistry` is never constructed
+  --> src/segment_config.rs:25:12
+   |
+25 | pub struct SegmentRegistry {
+   |            ^^^^^^^^^^^^^^^
+
+warning: static `SEGMENT_REGISTRY` is never used
+  --> src/segment_config.rs:59:12
+   |
+59 | pub static SEGMENT_REGISTRY: Lazy<Mutex<SegmentRegistry>> = Lazy::new(|| {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: function `register_common_segments` is never used
+  --> src/segment_config.rs:69:4
+   |
+69 | fn register_common_segments(registry: &mut SegmentRegistry) {
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `LoopRegistry` is never constructed
+  --> src/loop_processor.rs:22:12
+   |
+22 | pub struct LoopRegistry {
+   |            ^^^^^^^^^^^^
+
+warning: static `LOOP_REGISTRY` is never used
+  --> src/loop_processor.rs:80:12
+   |
+80 | pub static LOOP_REGISTRY: Lazy<Mutex<LoopRegistry>> = Lazy::new(|| {
+   |            ^^^^^^^^^^^^^
+
+warning: function `register_835_loops` is never used
+  --> src/loop_processor.rs:91:4
+   |
+91 | fn register_835_loops(registry: &mut LoopRegistry) {
+   |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `register_999_loops` is never used
+   --> src/loop_processor.rs:166:4
+    |
+166 | fn register_999_loops(registry: &mut LoopRegistry) {
+    |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `extract_loop` is never used
+   --> src/loop_processor.rs:208:8
+    |
+208 | pub fn extract_loop(contents: &str, config: &LoopConfig) -> EdiResult<(String, String)> {
+    |        ^^^^^^^^^^^^
+```
 
 ## Resolution Plan
 
-### Short-term Fixes
+1. **Unused Imports**
+   - Remove unused imports from all files
+   - Use more specific imports instead of wildcard imports where appropriate
 
-1. **Clean up unused imports**
-   - Remove unused imports in edi999/loop2000.rs, edi999/loop2100.rs, and helper/helper.rs
-   - Can be fixed with `cargo fix --lib -p edi`
+2. **Unused Functions**
+   - Evaluate if the unused functions should be kept for future use
+   - If not needed, remove them or mark them with `#[allow(dead_code)]`
+   - For functions that will be used in future implementations, add TODO comments
 
-2. **Fix unused variable in main.rs**
-   - Prefix the variable with an underscore: `_edi_json`
-   - Can be fixed with `cargo fix --bin "edi"`
+3. **Unused Structs and Enums**
+   - Review the unused structs and enums to determine if they're needed for future work
+   - Remove or mark with `#[allow(dead_code)]` as appropriate
 
-### Long-term Fixes (Phase 2)
-
-1. **Error Handling**
-   - Implement proper error handling throughout the codebase
-   - Start using the `EdiResult` type and error variants
-
-2. **Transaction Processor**
-   - Integrate the `TransactionProcessor` with the existing code
-   - Use the `TransactionSet` trait for all transaction sets
-
-3. **Segment Registry**
-   - Implement the segment registry for configuration-driven segment definitions
-   - Use the registry for validation and processing
-
-4. **Loop Registry**
-   - Implement the loop registry for enhanced loop detection and processing
-   - Use the registry for validation and processing
-
-## Notes
-
-These warnings are expected as we're in the middle of implementing Phase 2 features. Many of the unused components are part of the new architecture that will be integrated as we progress through Phase 2.
-
-The error handling components are intentionally unused at this point, as we've decided to defer comprehensive error handling to a later phase.
+4. **Registry Implementation**
+   - Evaluate if the registry pattern is still the best approach
+   - If yes, ensure the registries are properly used throughout the codebase
+   - If no, consider alternative approaches for configuration management
