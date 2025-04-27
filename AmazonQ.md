@@ -100,48 +100,54 @@ This document summarizes the progress made on Phase 2 of the EDI Parser project,
 
 ## Testing Results
 
-### 1. Transaction Set 271 Testing
+### 1. EDI835 (Payment/Remittance Advice)
+- **Status**: Fully functional
+- **Issues**: None identified
+- Successfully parsed and generated EDI835 files with identical output
 
-- Successfully parsed sample 271 EDI files to JSON
-- Successfully generated 271 EDI files from JSON
-- Identified missing segment handling (PER, REF, DTP, MSG)
-- Confirmed that core functionality works correctly
+### 2. EDI270 (Health Care Eligibility Benefit Inquiry)
+- **Status**: Functional with limitations
+- **Issues**: REF segments not processed
+- Successfully parsed and generated core structural elements
 
-### 2. EDI835 Testing
+### 3. EDI271 (Health Care Eligibility Benefit Response)
+- **Status**: Functional with limitations
+- **Issues**: PER, REF, DTP, MSG segments not processed
+- Successfully parsed and generated core structural elements
 
-- Successfully parsed sample 835 EDI files to JSON
-- Successfully generated 835 EDI files from JSON
-- Confirmed that the generated output matches the input exactly
-- Identified differences in error handling approach
+### 4. EDI999 (Implementation Acknowledgment)
+- **Status**: Functional with limitations
+- **Issues**: Some required segments not found in expected loops, CTX segments not processed
+- Successfully parsed and generated core structural elements
 
 ## Next Steps
 
 ### 1. Complete 271 Implementation
-
 - Fix missing segment handling (PER, REF, DTP, MSG)
 - Enhance parsing logic to capture all segments
 - Add more validation rules
 
-### 2. Refactor EDI835 Implementation
+### 2. Complete 270 Implementation
+- Fix missing segment handling (REF)
+- Ensure all segments from input files are captured
+- Add validation rules
 
-- Update the EDI835 implementation to use the Result type for error handling
-- Standardize return types across all transaction sets
-- Ensure consistent API across all transaction sets
+### 3. Improve 999 Implementation
+- Fix loop structure issues
+- Add support for CTX segments
+- Fix handling of multiple AK2 loops
 
-### 3. Implement Transaction Set 276/277
-
+### 4. Implement Transaction Set 276/277
 - Create the directory structure and module organization
 - Implement segment and loop structures
 - Implement controllers and processing logic
 
-### 4. Implement Transaction Set 837
-
+### 5. Implement Transaction Set 837
 - Create the directory structure for 837P, 837I, and 837D variants
 - Implement common segments and loops
 - Implement variant-specific components
 
-### 5. Clean Up Warnings
-
+### 6. Clean Up Warnings
 - Remove unused imports
 - Fix unused variables
 - Address other compiler warnings
