@@ -57,14 +57,29 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Loop2000>, String) {
     let mut loop_2000_array = vec![];
     info!("Number of loops in loop 2000: {:?}", ak2_count);
 
+    // Process each AK2 segment
     for _ in 0..ak2_count {
-        let tmp_contents = get_999_2000(contents.clone());
-        let (loop2000, inner_rem_contents) = get_loop_2000(tmp_contents.clone());
-        
-        loop_2000_array.push(loop2000);
-        
-        contents = contents.replacen(&tmp_contents, "", 1);
-        contents.push_str(&inner_rem_contents);
+        // Find the next AK2 segment
+        if contents.contains("AK2") {
+            // Extract the content for this AK2 loop
+            let end_pos = if let Some(next_ak2_pos) = contents[3..].find("AK2") {
+                // If there's another AK2, extract up to that point
+                3 + next_ak2_pos
+            } else {
+                // Otherwise, use all remaining content
+                contents.len()
+            };
+            
+            let loop_content = contents[..end_pos].to_string();
+            let (loop2000, _) = get_loop_2000(loop_content);
+            
+            loop_2000_array.push(loop2000);
+            
+            // Remove the processed content
+            contents = contents[end_pos..].to_string();
+        } else {
+            break;
+        }
     }
 
     (loop_2000_array, contents)

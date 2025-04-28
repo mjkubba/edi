@@ -30,7 +30,11 @@ pub fn get_999(mut contents: String) -> (Edi999, String) {
     let interchange_trailer;
     let table1_combined;
     
+    // Remove BOM if present
     contents = contents.trim_start_matches("\u{feff}").to_string();
+    
+    // Remove carriage returns and line feeds
+    contents = contents.replace("\r", "").replace("\n", "");
 
     // Control Segments
     (interchange_header, contents) = get_interchange_header(contents.clone());
@@ -96,5 +100,5 @@ pub fn is_999_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 999 format
     contents.contains("\"transaction_set_id\":\"999\"") || 
     contents.contains("\"ak01_functional_id_group\":") ||
-    contents.contains("\"ak201_ts_id_code\":")
+    contents.contains("\"ak201_transaction_set_identifier_code\":")
 }

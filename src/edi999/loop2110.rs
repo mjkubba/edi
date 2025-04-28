@@ -47,10 +47,35 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110>, String) {
     let mut loop_2110_array = vec![];
     info!("Number of loops in loop 2110: {:?}", ik4_count);
 
+    // Process each IK4 segment
     for _ in 0..ik4_count {
-        let (loop2110, new_contents) = get_loop_2110(contents.clone());
-        loop_2110_array.push(loop2110);
-        contents = new_contents;
+        // Find the next IK4 segment
+        if contents.contains("IK4") {
+            // Extract the content for this IK4 loop
+            let end_pos = if let Some(next_ik4_pos) = contents[3..].find("IK4") {
+                // If there's another IK4, extract up to that point
+                3 + next_ik4_pos
+            } else if let Some(ik3_pos) = contents.find("IK3") {
+                // If there's an IK3, extract up to that point
+                ik3_pos
+            } else if let Some(ik5_pos) = contents.find("IK5") {
+                // If there's an IK5, extract up to that point
+                ik5_pos
+            } else {
+                // Otherwise, use all remaining content
+                contents.len()
+            };
+            
+            let loop_content = contents[..end_pos].to_string();
+            let (loop2110, _) = get_loop_2110(loop_content);
+            
+            loop_2110_array.push(loop2110);
+            
+            // Remove the processed content
+            contents = contents[end_pos..].to_string();
+        } else {
+            break;
+        }
     }
 
     (loop_2110_array, contents)

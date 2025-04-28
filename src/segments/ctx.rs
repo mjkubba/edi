@@ -20,6 +20,15 @@ pub fn get_ctx(ctx_content: String) -> CTX {
         ctx_content
     };
     
+    // Special handling for formats like "CLM01:123456789"
+    if !content.contains('*') {
+        info!("Special CTX format detected: {}", content);
+        return CTX {
+            ctx01_context_name: content,
+            ..CTX::default()
+        };
+    }
+    
     let ctx_parts: Vec<&str> = content.split("*").collect();
     info!("CTX parts after split: {:?}", ctx_parts);
     
@@ -47,11 +56,13 @@ pub fn get_ctx(ctx_content: String) -> CTX {
     
     // CTX05 - Position in Segment (Situational)
     if ctx_parts.len() > 4 && !ctx_parts[4].is_empty() {
+        // Handle special format like "5:3"
         ctx.ctx05_position_in_segment = ctx_parts[4].to_string();
     }
     
     // CTX06 - Reference in Segment (Situational)
     if ctx_parts.len() > 5 && !ctx_parts[5].is_empty() {
+        // Handle special format like "C023:1325"
         ctx.ctx06_reference_in_segment = ctx_parts[5].to_string();
     }
     
@@ -133,6 +144,18 @@ mod tests {
     }
     
     #[test]
+    fn test_ctx_with_complex_format() {
+        let ctx_content = "SITUATIONAL TRIGGER*CLM*43**5:3*C023:1325".to_string();
+        let ctx = get_ctx(ctx_content);
+        assert_eq!(ctx.ctx01_context_name, "SITUATIONAL TRIGGER");
+        assert_eq!(ctx.ctx02_segment_id_code, "CLM");
+        assert_eq!(ctx.ctx03_segment_position_in_transaction, "43");
+        assert_eq!(ctx.ctx04_loop_id_code, "");
+        assert_eq!(ctx.ctx05_position_in_segment, "5:3");
+        assert_eq!(ctx.ctx06_reference_in_segment, "C023:1325");
+    }
+    
+    #[test]
     fn test_write_ctx() {
         let ctx = CTX {
             ctx01_context_name: "SITUATIONAL TRIGGER".to_string(),
@@ -160,5 +183,20 @@ mod tests {
         
         let ctx_content = write_ctx(ctx);
         assert_eq!(ctx_content, "CTX*CLM01:123456789~");
+    }
+    
+    #[test]
+    fn test_write_ctx_complex() {
+        let ctx = CTX {
+            ctx01_context_name: "SITUATIONAL TRIGGER".to_string(),
+            ctx02_segment_id_code: "CLM".to_string(),
+            ctx03_segment_position_in_transaction: "43".to_string(),
+            ctx04_loop_id_code: "".to_string(),
+            ctx05_position_in_segment: "5:3".to_string(),
+            ctx06_reference_in_segment: "C023:1325".to_string(),
+        };
+        
+        let ctx_content = write_ctx(ctx);
+        assert_eq!(ctx_content, "CTX*SITUATIONAL TRIGGER*CLM*43**5:3*C023:1325~");
     }
 }

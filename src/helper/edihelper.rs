@@ -56,9 +56,12 @@ pub fn get_999_2000(contents: String) -> String {
     let remaining_ak2_count = contents.matches("AK2").count();
     
     if remaining_ak2_count > 1 {
-        if let Some(skipped_content) = contents.get(3..) {
-            if let Some(foundak2) = skipped_content.find("AK2") {
-                tmp_contents = contents[..foundak2+3].to_string();
+        // Find the next AK2 segment
+        if let Some(pos) = contents.find("AK2") {
+            // Skip the first AK2 and find the next one
+            if let Some(next_pos) = contents[pos+3..].find("AK2") {
+                // Get content up to the next AK2
+                tmp_contents = contents[..pos+3+next_pos].to_string();
             }
         }
     }
