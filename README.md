@@ -12,7 +12,7 @@ The parser implements support for EDI X12 segment handling, including interchang
 ## Repository Structure
 ```
 edi/
-├── src/                          # Source code directory
+├── src/                         # Source code directory
 │   ├── edi835/                  # Healthcare Claim Payment/Advice format implementation
 │   ├── edi999/                  # Functional Acknowledgment format implementation
 │   ├── edi270/                  # Eligibility Benefit Inquiry format implementation
@@ -31,11 +31,12 @@ edi/
 
 ## Features
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 837
+- **Multiple Transaction Set Support**: 835, 999, 270/271, with 276/277 and 837 planned
 - **Configuration-Driven Architecture**: Segment and loop definitions are configurable
 - **Robust Error Handling**: Comprehensive error types and validation
 - **Bidirectional Conversion**: EDI to JSON and JSON to EDI
 - **Extensible Design**: Easy to add new transaction sets and segments
+- **Special Format Handling**: Support for complex CTX segments and other special formats
 
 ## Usage Instructions
 ### Prerequisites
@@ -74,36 +75,8 @@ cargo run
 cargo run -- -f input.edi -o output.json
 
 # Convert JSON to EDI
-cargo run -- -f input.json -o output.edi -w
+cargo run -- -f input.json -o output.edi -w -j
 ```
-
-## Data Flow
-The EDI processor handles documents through a pipeline of parsing, validation, and processing stages, transforming raw EDI text into structured data objects.
-
-```ascii
-Raw EDI Input
-     │
-     ▼
-[Parser Layer]
-     │
-     ▼
-[Validation Layer]
-     │
-     ▼
-[Processing Layer]
-     │
-     ▼
-Structured Output
-```
-
-Component interactions:
-1. Parser reads raw EDI text and splits into segments
-2. Segments are validated against X12 specifications
-3. Valid segments are grouped into functional groups and transactions
-4. Transaction sets are processed according to their type
-5. Business rules are applied to transaction data
-6. Results are transformed into structured output format
-7. Error handling occurs at each stage with appropriate logging
 
 ## Development Roadmap
 
@@ -119,11 +92,16 @@ Component interactions:
   - Configuration-driven segment definitions
   - Enhanced loop detection and processing
   - Standardized error handling
-- Transaction Set 270/271 (Health Care Eligibility)
+- Transaction Set 270 (Health Care Eligibility Inquiry)
+- Transaction Set 271 (Health Care Eligibility Response)
+- Enhanced 999 Implementation
+  - Fixed CTX segment handling for special formats
+  - Improved IK4 segment generation
+  - Enhanced input file processing
+
+### Phase 3: 🔄 Planned
 - Transaction Set 276/277 (Health Care Claim Status)
 - Transaction Set 837 (Health Care Claim)
-
-### Phase 3: 📅 Planned
 - Performance optimization
 - Schema validation
 - Additional features (custom delimiters, pretty printing, etc.)
