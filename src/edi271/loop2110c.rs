@@ -288,44 +288,48 @@ pub fn write_loop_2110c(loop2110c: &Loop2110C) -> String {
     // Write EB segment
     contents.push_str(&write_eb(loop2110c.eb_segments.clone()));
     
-    // Write all HSD segments
+    // Write HSD segments
     for hsd in &loop2110c.hsd_segments {
         contents.push_str(&write_hsd(hsd.clone()));
     }
     
-    // Write all REF segments
+    // Write REF segments
     for ref_segment in &loop2110c.ref_segments {
         contents.push_str(&write_ref(ref_segment.clone()));
     }
     
-    // Write all DTP segments
+    // Write DTP segments
     for dtp in &loop2110c.dtp_segments {
         contents.push_str(&write_dtp(dtp.clone()));
     }
     
-    // Write all AAA segments
+    // Write AAA segments
     for aaa in &loop2110c.aaa_segments {
         contents.push_str(&write_aaa(aaa.clone()));
     }
     
-    // Write all MSG segments
+    // Write MSG segments
     for msg in &loop2110c.msg_segments {
         contents.push_str(&write_msg(msg.clone()));
     }
     
-    // Write LS segment if present
+    // Write LS and LE segments with NM1 in between - in original file, LS/LE wrap around NM1
     if let Some(ls) = &loop2110c.ls {
         contents.push_str(&write_ls(ls.clone()));
-    }
-    
-    // Write all Loop 2115C segments
-    for loop2115c in &loop2110c.loop2115c {
-        contents.push_str(&write_loop_2115c(loop2115c));
-    }
-    
-    // Write LE segment if present
-    if let Some(le) = &loop2110c.le {
-        contents.push_str(&write_le(le.clone()));
+        
+        // Write Loop 2115C segments - these should include the NM1 segments
+        for loop2115c in &loop2110c.loop2115c {
+            contents.push_str(&write_loop_2115c(loop2115c));
+        }
+        
+        if let Some(le) = &loop2110c.le {
+            contents.push_str(&write_le(le.clone()));
+        }
+    } else {
+        // If no LS/LE, just write the Loop 2115C segments normally
+        for loop2115c in &loop2110c.loop2115c {
+            contents.push_str(&write_loop_2115c(loop2115c));
+        }
     }
     
     contents

@@ -330,7 +330,7 @@ pub fn write_loop_2000d(loop2000d: &Loop2000D) -> String {
     // Write HL segment
     contents.push_str(&write_hl(loop2000d.hl_segments.clone()));
     
-    // Write TRN segment if present
+    // Write TRN segment if present - in original file, TRN comes right after HL
     if let Some(trn) = &loop2000d.trn_segments {
         contents.push_str(&write_trn(trn.clone()));
     }
@@ -353,7 +353,7 @@ pub fn write_loop_2000d(loop2000d: &Loop2000D) -> String {
         contents.push_str(&write_dmg(dmg.clone()));
     }
     
-    // Write INS segment if present
+    // Write INS segment if present - in original file, INS comes after DMG
     if let Some(ins) = &loop2000d.ins_segments {
         contents.push_str(&write_ins(ins.clone()));
     }

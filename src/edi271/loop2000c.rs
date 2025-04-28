@@ -370,17 +370,17 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
         contents.push_str(&write_dmg(dmg.clone()));
     }
     
-    // Write all Loop 2000D segments
+    // Write all Loop 2000D segments first - in original file, Loop 2000D comes before other segments
     for loop2000d in &loop2000c.loop2000d {
         contents.push_str(&write_loop_2000d(loop2000d));
     }
     
-    // Write TRN segment if present
+    // Write TRN segment if present - in original file, TRN comes after Loop 2000D
     if let Some(trn) = &loop2000c.trn_segments {
         contents.push_str(&write_trn(trn.clone()));
     }
     
-    // Write INS segment if present
+    // Write INS segment if present - in original file, INS comes after TRN
     if let Some(ins) = &loop2000c.ins_segments {
         contents.push_str(&write_ins(ins.clone()));
     }
@@ -405,7 +405,7 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
         contents.push_str(&write_loop_2100c(loop2100c));
     }
     
-    // Write all Loop 2110C segments
+    // Write all Loop 2110C segments - in original file, EB segments come after Loop 2000D
     for loop2110c in &loop2000c.loop2110c {
         contents.push_str(&write_loop_2110c(loop2110c));
     }
