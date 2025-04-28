@@ -4,6 +4,7 @@ use serde::{Serialize, Deserialize};
 use crate::segments::hl::*;
 use crate::segments::nm1::*;
 use crate::segments::per::*;
+use crate::segments::r#ref::*;
 use crate::segments::aaa::*;
 use crate::helper::edihelper::*;
 use crate::error::{EdiResult, EdiError};
@@ -13,6 +14,7 @@ pub struct Loop2000A {
     pub hl_segments: HL,
     pub nm1_segments: NM1,
     pub per_segments: Vec<PER>,
+    pub ref_segments: Vec<REF>,
     pub aaa_segments: Vec<AAA>,
     pub loop2100a: Vec<Loop2100A>,
 }
@@ -21,6 +23,7 @@ pub struct Loop2000A {
 pub struct Loop2100A {
     pub nm1_segments: NM1,
     pub per_segments: Vec<PER>,
+    pub ref_segments: Vec<REF>,
     pub aaa_segments: Vec<AAA>,
 }
 
@@ -75,6 +78,19 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
         info!("PER segment parsed");
         loop2000a.per_segments.push(per);
         contents = content_trim("PER", contents);
+    }
+    
+    // Process REF segments (situational, can be multiple)
+    while contents.starts_with("REF") {
+        info!("REF segment found");
+        let ref_content = get_segment_contents("REF", &contents);
+        if ref_content.is_empty() {
+            break;
+        }
+        let ref_segment = get_ref(ref_content);
+        info!("REF segment parsed");
+        loop2000a.ref_segments.push(ref_segment);
+        contents = content_trim("REF", contents);
     }
     
     // Process AAA segments (situational, can be multiple)
@@ -146,6 +162,19 @@ pub fn get_loop_2100a(mut contents: String) -> EdiResult<(Loop2100A, String)> {
         contents = content_trim("PER", contents);
     }
     
+    // Process REF segments (situational, can be multiple)
+    while contents.starts_with("REF") {
+        info!("REF segment found for Loop 2100A");
+        let ref_content = get_segment_contents("REF", &contents);
+        if ref_content.is_empty() {
+            break;
+        }
+        let ref_segment = get_ref(ref_content);
+        info!("REF segment parsed for Loop 2100A");
+        loop2100a.ref_segments.push(ref_segment);
+        contents = content_trim("REF", contents);
+    }
+    
     // Process AAA segments (situational, can be multiple)
     while contents.starts_with("AAA") {
         info!("AAA segment found for Loop 2100A");
@@ -177,6 +206,11 @@ pub fn write_loop_2000a(loop2000a: &Loop2000A) -> String {
         contents.push_str(&write_per(per.clone()));
     }
     
+    // Write all REF segments
+    for ref_segment in &loop2000a.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
+    }
+    
     // Write all AAA segments
     for aaa in &loop2000a.aaa_segments {
         contents.push_str(&write_aaa(aaa.clone()));
@@ -199,6 +233,11 @@ pub fn write_loop_2100a(loop2100a: &Loop2100A) -> String {
     // Write all PER segments
     for per in &loop2100a.per_segments {
         contents.push_str(&write_per(per.clone()));
+    }
+    
+    // Write all REF segments
+    for ref_segment in &loop2100a.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
     }
     
     // Write all AAA segments

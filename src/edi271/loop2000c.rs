@@ -352,18 +352,8 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
     // Write HL segment
     contents.push_str(&write_hl(loop2000c.hl_segments.clone()));
     
-    // Write TRN segment if present
-    if let Some(trn) = &loop2000c.trn_segments {
-        contents.push_str(&write_trn(trn.clone()));
-    }
-    
     // Write NM1 segment
     contents.push_str(&write_nm1(loop2000c.nm1_segments.clone()));
-    
-    // Write all REF segments
-    for ref_segment in &loop2000c.ref_segments {
-        contents.push_str(&write_ref(ref_segment.clone()));
-    }
     
     // Write N3 segment if present
     if let Some(n3) = &loop2000c.n3_segments {
@@ -375,14 +365,19 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
         contents.push_str(&write_n4(n4.clone()));
     }
     
-    // Write all AAA segments
-    for aaa in &loop2000c.aaa_segments {
-        contents.push_str(&write_aaa(aaa.clone()));
-    }
-    
     // Write DMG segment if present
     if let Some(dmg) = &loop2000c.dmg_segments {
         contents.push_str(&write_dmg(dmg.clone()));
+    }
+    
+    // Write all Loop 2000D segments
+    for loop2000d in &loop2000c.loop2000d {
+        contents.push_str(&write_loop_2000d(loop2000d));
+    }
+    
+    // Write TRN segment if present
+    if let Some(trn) = &loop2000c.trn_segments {
+        contents.push_str(&write_trn(trn.clone()));
     }
     
     // Write INS segment if present
@@ -395,6 +390,16 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
         contents.push_str(&write_dtp(dtp.clone()));
     }
     
+    // Write all REF segments
+    for ref_segment in &loop2000c.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
+    }
+    
+    // Write all AAA segments
+    for aaa in &loop2000c.aaa_segments {
+        contents.push_str(&write_aaa(aaa.clone()));
+    }
+    
     // Write all Loop 2100C segments
     for loop2100c in &loop2000c.loop2100c {
         contents.push_str(&write_loop_2100c(loop2100c));
@@ -403,11 +408,6 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
     // Write all Loop 2110C segments
     for loop2110c in &loop2000c.loop2110c {
         contents.push_str(&write_loop_2110c(loop2110c));
-    }
-    
-    // Write all Loop 2000D segments
-    for loop2000d in &loop2000c.loop2000d {
-        contents.push_str(&write_loop_2000d(loop2000d));
     }
     
     contents

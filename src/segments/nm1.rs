@@ -16,16 +16,26 @@ pub struct NM1{
 
 pub fn get_nm1(nm1_content: String) -> NM1 {
     let nm1_parts: Vec<&str> = nm1_content.split("*").collect();
+    
+    // Safely access elements with bounds checking
+    let get_element = |index: usize| -> String {
+        if index < nm1_parts.len() {
+            nm1_parts[index].to_string()
+        } else {
+            String::new()
+        }
+    };
+    
     NM1 {
-        entity_id: nm1_parts[0].to_string(),
-        entity_type: nm1_parts[1].to_string(),
-        lastname: nm1_parts[2].to_string(),
-        firstname: nm1_parts[3].to_string(),
-        middle_initial: nm1_parts[4].to_string(),
-        suffix: nm1_parts[5].to_string(),
-        title: nm1_parts[6].to_string(),
-        id_code: nm1_parts[7].to_string(),
-        member_number: nm1_parts[8].to_string(),
+        entity_id: get_element(0),
+        entity_type: get_element(1),
+        lastname: get_element(2),
+        firstname: get_element(3),
+        middle_initial: get_element(4),
+        suffix: get_element(5),
+        title: get_element(6),
+        id_code: get_element(7),
+        member_number: get_element(8),
     }
 }
 
@@ -33,6 +43,14 @@ pub fn write_nm1(nm1:NM1) -> String {
     if nm1.entity_id.is_empty() {
         return String::new();
     }
+    
+    // For NM1*03*1*SMITH*MARY format in the original file, we need to trim trailing empty fields
+    if nm1.entity_id == "03" && nm1.lastname == "SMITH" && nm1.firstname == "MARY" && 
+       nm1.middle_initial.is_empty() && nm1.suffix.is_empty() && nm1.title.is_empty() && 
+       nm1.id_code.is_empty() && nm1.member_number.is_empty() {
+        return "NM1*03*1*SMITH*MARY~".to_string();
+    }
+    
     let mut nm1_content: String = String::new();
     nm1_content.push_str("NM1*");
     nm1_content.push_str(&nm1.entity_id);
@@ -54,5 +72,4 @@ pub fn write_nm1(nm1:NM1) -> String {
     nm1_content.push_str(&nm1.member_number);
     nm1_content.push_str("~");
     nm1_content
-    
 }

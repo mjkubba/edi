@@ -10,6 +10,7 @@ use crate::segments::n4::*;
 use crate::segments::aaa::*;
 use crate::segments::dmg::*;
 use crate::segments::ins::*;
+use crate::segments::dtp::*;
 use crate::helper::edihelper::*;
 use crate::error::{EdiResult, EdiError};
 use crate::edi271::loop2000c::*;
@@ -25,6 +26,7 @@ pub struct Loop2000D {
     pub aaa_segments: Vec<AAA>,
     pub dmg_segments: Option<DMG>,
     pub ins_segments: Option<INS>,
+    pub dtp_segments: Vec<DTP>,
     pub loop2100d: Vec<Loop2100D>,
     pub loop2110d: Vec<Loop2110D>,
 }
@@ -39,6 +41,7 @@ pub struct Loop2100D {
     pub prv_segments: Option<PRV>,
     pub dmg_segments: Option<DMG>,
     pub ins_segments: Option<INS>,
+    pub dtp_segments: Vec<DTP>,
 }
 
 pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
@@ -160,6 +163,19 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
             info!("INS segment parsed");
             contents = content_trim("INS", contents);
         }
+    }
+    
+    // Process DTP segments (situational, can be multiple)
+    while contents.starts_with("DTP") {
+        info!("DTP segment found");
+        let dtp_content = get_segment_contents("DTP", &contents);
+        if dtp_content.is_empty() {
+            break;
+        }
+        let dtp = get_dtp(dtp_content);
+        info!("DTP segment parsed");
+        loop2000d.dtp_segments.push(dtp);
+        contents = content_trim("DTP", contents);
     }
     
     // Process Loop 2100D segments (can be multiple)
@@ -291,6 +307,19 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         }
     }
     
+    // Process DTP segments (situational, can be multiple)
+    while contents.starts_with("DTP") {
+        info!("DTP segment found for Loop 2100D");
+        let dtp_content = get_segment_contents("DTP", &contents);
+        if dtp_content.is_empty() {
+            break;
+        }
+        let dtp = get_dtp(dtp_content);
+        info!("DTP segment parsed for Loop 2100D");
+        loop2100d.dtp_segments.push(dtp);
+        contents = content_trim("DTP", contents);
+    }
+    
     info!("Loop 2100D parsed");
     Ok((loop2100d, contents))
 }
@@ -309,11 +338,6 @@ pub fn write_loop_2000d(loop2000d: &Loop2000D) -> String {
     // Write NM1 segment
     contents.push_str(&write_nm1(loop2000d.nm1_segments.clone()));
     
-    // Write all REF segments
-    for ref_segment in &loop2000d.ref_segments {
-        contents.push_str(&write_ref(ref_segment.clone()));
-    }
-    
     // Write N3 segment if present
     if let Some(n3) = &loop2000d.n3_segments {
         contents.push_str(&write_n3(n3.clone()));
@@ -322,11 +346,6 @@ pub fn write_loop_2000d(loop2000d: &Loop2000D) -> String {
     // Write N4 segment if present
     if let Some(n4) = &loop2000d.n4_segments {
         contents.push_str(&write_n4(n4.clone()));
-    }
-    
-    // Write all AAA segments
-    for aaa in &loop2000d.aaa_segments {
-        contents.push_str(&write_aaa(aaa.clone()));
     }
     
     // Write DMG segment if present
@@ -339,9 +358,24 @@ pub fn write_loop_2000d(loop2000d: &Loop2000D) -> String {
         contents.push_str(&write_ins(ins.clone()));
     }
     
+    // Write all DTP segments
+    for dtp in &loop2000d.dtp_segments {
+        contents.push_str(&write_dtp(dtp.clone()));
+    }
+    
     // Write all Loop 2100D segments
     for loop2100d in &loop2000d.loop2100d {
         contents.push_str(&write_loop_2100d(loop2100d));
+    }
+    
+    // Write all REF segments
+    for ref_segment in &loop2000d.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
+    }
+    
+    // Write all AAA segments
+    for aaa in &loop2000d.aaa_segments {
+        contents.push_str(&write_aaa(aaa.clone()));
     }
     
     // Write all Loop 2110D segments
@@ -391,6 +425,11 @@ pub fn write_loop_2100d(loop2100d: &Loop2100D) -> String {
     // Write INS segment if present
     if let Some(ins) = &loop2100d.ins_segments {
         contents.push_str(&write_ins(ins.clone()));
+    }
+    
+    // Write all DTP segments
+    for dtp in &loop2100d.dtp_segments {
+        contents.push_str(&write_dtp(dtp.clone()));
     }
     
     contents

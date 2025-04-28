@@ -19,6 +19,8 @@ pub struct Loop2110C {
     pub aaa_segments: Vec<AAA>,
     pub msg_segments: Vec<MSG>,
     pub loop2115c: Vec<Loop2115C>,
+    pub ls: Option<LS>,
+    pub le: Option<LE>,
 }
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -118,6 +120,30 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         info!("MSG segment parsed");
         loop2110c.msg_segments.push(msg);
         contents = content_trim("MSG", contents);
+    }
+    
+    // Process LS segment (situational)
+    if contents.starts_with("LS") {
+        info!("LS segment found");
+        let ls_content = get_segment_contents("LS", &contents);
+        if !ls_content.is_empty() {
+            let ls = get_ls(ls_content);
+            info!("LS segment parsed");
+            loop2110c.ls = Some(ls);
+            contents = content_trim("LS", contents);
+        }
+    }
+    
+    // Process LE segment (situational)
+    if contents.starts_with("LE") {
+        info!("LE segment found");
+        let le_content = get_segment_contents("LE", &contents);
+        if !le_content.is_empty() {
+            let le = get_le(le_content);
+            info!("LE segment parsed");
+            loop2110c.le = Some(le);
+            contents = content_trim("LE", contents);
+        }
     }
     
     // Process Loop 2115C segments (can be multiple)
@@ -287,9 +313,19 @@ pub fn write_loop_2110c(loop2110c: &Loop2110C) -> String {
         contents.push_str(&write_msg(msg.clone()));
     }
     
+    // Write LS segment if present
+    if let Some(ls) = &loop2110c.ls {
+        contents.push_str(&write_ls(ls.clone()));
+    }
+    
     // Write all Loop 2115C segments
     for loop2115c in &loop2110c.loop2115c {
         contents.push_str(&write_loop_2115c(loop2115c));
+    }
+    
+    // Write LE segment if present
+    if let Some(le) = &loop2110c.le {
+        contents.push_str(&write_le(le.clone()));
     }
     
     contents
@@ -373,7 +409,20 @@ pub struct LS {
 }
 
 pub fn get_ls(ls_content: String) -> LS {
-    LS::default()
+    let ls_parts: Vec<&str> = ls_content.split("*").collect();
+    
+    // Safely access elements with bounds checking
+    let get_element = |index: usize| -> String {
+        if index < ls_parts.len() {
+            ls_parts[index].to_string()
+        } else {
+            String::new()
+        }
+    };
+    
+    LS {
+        loop_identifier_code: get_element(1),
+    }
 }
 
 pub fn write_ls(ls: LS) -> String {
@@ -387,7 +436,20 @@ pub struct LE {
 }
 
 pub fn get_le(le_content: String) -> LE {
-    LE::default()
+    let le_parts: Vec<&str> = le_content.split("*").collect();
+    
+    // Safely access elements with bounds checking
+    let get_element = |index: usize| -> String {
+        if index < le_parts.len() {
+            le_parts[index].to_string()
+        } else {
+            String::new()
+        }
+    };
+    
+    LE {
+        loop_identifier_code: get_element(1),
+    }
 }
 
 pub fn write_le(le: LE) -> String {

@@ -3,6 +3,8 @@ use serde::{Serialize, Deserialize};
 
 use crate::segments::hl::*;
 use crate::segments::nm1::*;
+use crate::segments::per::*;
+use crate::segments::r#ref::*;
 use crate::segments::aaa::*;
 use crate::helper::edihelper::*;
 use crate::error::{EdiResult, EdiError};
@@ -11,6 +13,8 @@ use crate::error::{EdiResult, EdiError};
 pub struct Loop2000B {
     pub hl_segments: HL,
     pub nm1_segments: NM1,
+    pub per_segments: Vec<PER>,
+    pub ref_segments: Vec<REF>,
     pub aaa_segments: Vec<AAA>,
     pub loop2100b: Vec<Loop2100B>,
     pub loop2000c: Vec<Loop2000C>,
@@ -19,6 +23,8 @@ pub struct Loop2000B {
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2100B {
     pub nm1_segments: NM1,
+    pub per_segments: Vec<PER>,
+    pub ref_segments: Vec<REF>,
     pub aaa_segments: Vec<AAA>,
 }
 
@@ -60,6 +66,32 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         contents = content_trim("NM1", contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
+    }
+    
+    // Process PER segments (situational, can be multiple)
+    while contents.starts_with("PER") {
+        info!("PER segment found");
+        let per_content = get_segment_contents("PER", &contents);
+        if per_content.is_empty() {
+            break;
+        }
+        let per = get_per(per_content);
+        info!("PER segment parsed");
+        loop2000b.per_segments.push(per);
+        contents = content_trim("PER", contents);
+    }
+    
+    // Process REF segments (situational, can be multiple)
+    while contents.starts_with("REF") {
+        info!("REF segment found");
+        let ref_content = get_segment_contents("REF", &contents);
+        if ref_content.is_empty() {
+            break;
+        }
+        let ref_segment = get_ref(ref_content);
+        info!("REF segment parsed");
+        loop2000b.ref_segments.push(ref_segment);
+        contents = content_trim("REF", contents);
     }
     
     // Process AAA segments (situational, can be multiple)
@@ -129,6 +161,32 @@ pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
     
+    // Process PER segments (situational, can be multiple)
+    while contents.starts_with("PER") {
+        info!("PER segment found for Loop 2100B");
+        let per_content = get_segment_contents("PER", &contents);
+        if per_content.is_empty() {
+            break;
+        }
+        let per = get_per(per_content);
+        info!("PER segment parsed for Loop 2100B");
+        loop2100b.per_segments.push(per);
+        contents = content_trim("PER", contents);
+    }
+    
+    // Process REF segments (situational, can be multiple)
+    while contents.starts_with("REF") {
+        info!("REF segment found for Loop 2100B");
+        let ref_content = get_segment_contents("REF", &contents);
+        if ref_content.is_empty() {
+            break;
+        }
+        let ref_segment = get_ref(ref_content);
+        info!("REF segment parsed for Loop 2100B");
+        loop2100b.ref_segments.push(ref_segment);
+        contents = content_trim("REF", contents);
+    }
+    
     // Process AAA segments (situational, can be multiple)
     while contents.starts_with("AAA") {
         info!("AAA segment found for Loop 2100B");
@@ -155,6 +213,16 @@ pub fn write_loop_2000b(loop2000b: &Loop2000B) -> String {
     // Write NM1 segment
     contents.push_str(&write_nm1(loop2000b.nm1_segments.clone()));
     
+    // Write all PER segments
+    for per in &loop2000b.per_segments {
+        contents.push_str(&write_per(per.clone()));
+    }
+    
+    // Write all REF segments
+    for ref_segment in &loop2000b.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
+    }
+    
     // Write all AAA segments
     for aaa in &loop2000b.aaa_segments {
         contents.push_str(&write_aaa(aaa.clone()));
@@ -178,6 +246,16 @@ pub fn write_loop_2100b(loop2100b: &Loop2100B) -> String {
     
     // Write NM1 segment
     contents.push_str(&write_nm1(loop2100b.nm1_segments.clone()));
+    
+    // Write all PER segments
+    for per in &loop2100b.per_segments {
+        contents.push_str(&write_per(per.clone()));
+    }
+    
+    // Write all REF segments
+    for ref_segment in &loop2100b.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
+    }
     
     // Write all AAA segments
     for aaa in &loop2100b.aaa_segments {
