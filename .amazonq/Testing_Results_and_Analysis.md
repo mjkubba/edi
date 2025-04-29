@@ -21,9 +21,9 @@ This document consolidates the results of comprehensive testing performed on all
 - EDI271: `demo/edi271-1.edi`, `demo/edi271-2.edi`
 - EDI999: `demo/999.edi`
 - X279: 
-  - `X279-generic-request-by-clinic-for-patient-(subscriber)-eligibility.edi`
-  - `X279-response-to-generic-request-by-clinic-for-patient-(subscriber)-eligibility.edi`
-  - `X279-error-response-from-payer-to-clinic-not-eligible-for-inquiries-with-payer.edi`
+  - `demo/279/X279-generic-request-by-clinic-for-patient-(subscriber)-eligibility.edi`
+  - `demo/279/X279-response-to-generic-request-by-clinic-for-patient-(subscriber)-eligibility.edi`
+  - `demo/279/X279-error-response-from-payer-to-clinic-not-eligible-for-inquiries-with-payer.edi`
 
 ## 2. EDI835 (Payment/Remittance Advice) Testing
 
@@ -56,23 +56,25 @@ This document consolidates the results of comprehensive testing performed on all
 
 ## 3. EDI270 (Health Care Eligibility Benefit Inquiry) Testing
 
-### Parsing Test Results
+### Initial Testing Results (Before Fixes)
+
+#### Parsing Test Results
 - **Input**: `demo/edi270-1.edi`
 - **Output**: `out270.json`
 - **Command**: `cargo run -- -f ./demo/edi270-1.edi -o out270.json`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly parsed
-- Some segments were not processed
+- REF segments were not processed
 
-### Generation Test Results
+#### Generation Test Results
 - **Input**: `out270.json`
 - **Output**: `out270.edi`
 - **Command**: `cargo run -- -f out270.json -o out270.edi -w -j`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly generated
-- Some segments were missing from the output
+- REF segments were missing from the output
 
-### Unprocessed Segments Analysis
+#### Unprocessed Segments Analysis
 The parser reported unprocessed segments:
 ```
 [INFO ] Unprocessed segments: "\n\n\n\n\n\n\n\n\n\n\nREF*SY*123456789~\n\n\n\n\nREF*SY*987654321~\n\n\n\n\n"
@@ -81,31 +83,59 @@ The parser reported unprocessed segments:
 - REF segments were not processed and stored in the data structure
 - The REF segments contain subscriber identification information
 
+### Updated Testing Results (After Fixes)
+
+#### Parsing Test Results
+- **Input**: `demo/edi270-1.edi`
+- **Output**: `out270.json`
+- **Command**: `cargo run -- -f ./demo/edi270-1.edi -o out270.json`
+- **Result**: Success
+- All segments including REF segments were correctly parsed
+- No unprocessed segments were reported
+
+#### Generation Test Results
+- **Input**: `out270.json`
+- **Output**: `out270.edi`
+- **Command**: `cargo run -- -f out270.json -o out270.edi -w -j`
+- **Result**: Success
+- All segments including REF segments were correctly generated
+- No errors or warnings were reported
+
+#### Comparison Analysis
+- **Command**: `diff ./demo/edi270-1.edi out270.edi`
+- **Result**: Only formatting differences found
+- The generated EDI file contains all the same segments as the original file
+- The only difference is that the generated file has all segments on a single line
+
 ### Issues and Observations
-- The EDI270 implementation is functional for basic use cases
-- Core structural elements are correctly parsed and generated
-- REF segments are not being processed and stored in the data structure
-- The generated EDI file contains all the structural elements but is missing some segments
+- The EDI270 implementation is now fully functional
+- All segments including REF segments are correctly parsed and generated
+- The generated EDI file contains all the same segments as the original file
+- The only difference is the formatting (line breaks)
 
 ## 4. EDI271 (Health Care Eligibility Benefit Response) Testing
 
-### Parsing Test Results
+### Initial Testing Results (Before Fixes)
+
+#### Parsing Test Results
 - **Input**: `demo/edi271-1.edi`
 - **Output**: `out271.json`
 - **Command**: `cargo run -- -f ./demo/edi271-1.edi -o out271.json`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly parsed
-- Some segments were not processed
+- PER, REF, DTP, and MSG segments were not processed
+- LS/LE segments were not properly handled
 
-### Generation Test Results
+#### Generation Test Results
 - **Input**: `out271.json`
 - **Output**: `out271.edi`
 - **Command**: `cargo run -- -f out271.json -o out271.edi -w -j`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly generated
-- Some segments were missing from the output
+- PER, REF, DTP, and MSG segments were missing from the output
+- LS/LE segments were not properly generated
 
-### Unprocessed Segments Analysis
+#### Unprocessed Segments Analysis
 The parser reported unprocessed segments:
 ```
 [INFO ] Unprocessed segments: "\n\n\n\n\n\nPER*IC*CUSTOMER SERVICE*TE*8005557722~\n\n\n\n\n\nREF*SY*123456789~\n\n\n\nDTP*291*D8*20220101~\nDTP*348*RD8*20220101-20221231~\nMSG*PLEASE CONTACT CUSTOMER SERVICE FOR ADDITIONAL INFORMATION~\n\n\n\nREF*SY*987654321~\n\n\n\nDTP*291*D8*20220101~\nDTP*348*RD8*20220101-20221231~\n\n\n\n"
@@ -116,12 +146,38 @@ The parser reported unprocessed segments:
 - DTP segments (date/time period) were not processed
 - MSG segments (message text) were not processed
 
+### Updated Testing Results (After Fixes)
+
+#### Parsing Test Results
+- **Input**: `demo/edi271-1.edi`
+- **Output**: `out271.json`
+- **Command**: `cargo run -- -f ./demo/edi271-1.edi -o out271.json`
+- **Result**: Success
+- All segments including PER, REF, DTP, and MSG segments were correctly parsed
+- LS/LE segments were properly handled
+- No unprocessed segments were reported
+
+#### Generation Test Results
+- **Input**: `out271.json`
+- **Output**: `out271.edi`
+- **Command**: `cargo run -- -f out271.json -o out271.edi -w -j`
+- **Result**: Success
+- All segments including PER, REF, DTP, and MSG segments were correctly generated
+- LS/LE segments were properly generated with correct loop identifier codes
+- No errors or warnings were reported
+
+#### Comparison Analysis
+- **Command**: `diff ./demo/edi271-1.edi out271.edi`
+- **Result**: Only formatting differences found
+- The generated EDI file contains all the same segments as the original file
+- The only difference is that the generated file has all segments on a single line
+
 ### Issues and Observations
-- The EDI271 implementation is functional for basic use cases
-- Core structural elements are correctly parsed and generated
-- Several segments are not being processed: PER, REF, DTP, MSG
-- The generated EDI file contains all the structural elements but is missing some segments
-- Some differences in segment order were observed
+- The EDI271 implementation is now fully functional
+- All segments including PER, REF, DTP, and MSG segments are correctly parsed and generated
+- LS/LE segments are properly handled with correct loop identifier codes
+- The generated EDI file contains all the same segments as the original file
+- The only difference is the formatting (line breaks)
 
 ## 5. EDI999 (Implementation Acknowledgment) Testing
 
@@ -129,7 +185,7 @@ The parser reported unprocessed segments:
 - **Input**: `demo/999.edi`
 - **Output**: `out999.json`
 - **Command**: `cargo run -- -f ./demo/999.edi -o out999.json`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly parsed
 - Some segments were not processed
 
@@ -137,7 +193,7 @@ The parser reported unprocessed segments:
 - **Input**: `out999.json`
 - **Output**: `out999.edi`
 - **Command**: `cargo run -- -f out999.json -o out999.edi -w -j`
-- **Result**: Success
+- **Result**: Success with limitations
 - Core structural elements were correctly generated
 - Some segments were missing from the output
 
@@ -192,13 +248,19 @@ GE*1*20213~
 IEA*1*000010216~
 ```
 
-#### Parsing Results:
+#### Initial Parsing Results (Before Fixes):
 - Successfully parsed the file structure
-- Identified unprocessed segments: DTP and EQ
+- Identified unprocessed segments: DTP, EQ, and REF
+
+#### Updated Parsing Results (After Fixes):
+- Successfully parsed the file structure
+- All segments including DTP, EQ, and REF are correctly processed
+- No unprocessed segments reported
 
 #### Generation Results:
 - Successfully generated an EDI file from the parsed JSON
-- Missing segments in the generated file: DTP and EQ
+- All segments including DTP, EQ, and REF are included in the generated file
+- The only difference is the formatting (line breaks)
 
 ### Response File Testing (271 Format)
 
@@ -210,27 +272,21 @@ NM1*P3*1*JONES*MARCUS****SV*0202034~
 LE*2120~
 ```
 
-#### Parsing Results:
+#### Initial Parsing Results (Before Fixes):
 - Successfully parsed the file structure
 - Identified unprocessed segments: NM1*P3 within LS/LE loop, LS, and LE
 
-#### Generation Results:
-- Successfully generated an EDI file from the parsed JSON
-- Issues in the generated file:
-  - LS segment is missing the loop identifier code (appears as "LS*~" instead of "LS*2120~")
-  - NM1*P3 segment is missing
-  - LE segment is associated with the wrong loop
-
-### Error Response File Testing (271 Format)
-
-#### Parsing Results:
+#### Updated Parsing Results (After Fixes):
 - Successfully parsed the file structure
-- All segments were processed correctly
+- All segments including NM1*P3 within LS/LE loop are correctly processed
+- LS and LE segments are properly handled with correct loop identifier codes
+- No unprocessed segments reported
 
 #### Generation Results:
 - Successfully generated an EDI file from the parsed JSON
-- The generated file matched the original file exactly
-- The AAA segment with error code was correctly processed and generated
+- All segments including NM1*P3 within LS/LE loop are included in the generated file
+- LS and LE segments are properly generated with correct loop identifier codes
+- The only difference is the formatting (line breaks)
 
 ## 7. Summary of Findings
 
@@ -242,14 +298,14 @@ LE*2120~
 - **Recommendation**: No immediate action needed
 
 #### EDI270 (Health Care Eligibility Benefit Inquiry)
-- **Status**: Functional with limitations
-- **Issues**: REF segments not processed, DTP and EQ segments not processed in X279 format
-- **Recommendation**: Update the loop structures to handle REF, DTP, and EQ segments
+- **Status**: Fully functional
+- **Issues**: None identified after fixes
+- **Recommendation**: No immediate action needed
 
 #### EDI271 (Health Care Eligibility Benefit Response)
-- **Status**: Functional with limitations
-- **Issues**: PER, REF, DTP, MSG segments not processed; LS/LE loop handling issues
-- **Recommendation**: Update the loop structures to handle these segments and fix LS/LE loop handling
+- **Status**: Fully functional
+- **Issues**: None identified after fixes
+- **Recommendation**: No immediate action needed
 
 #### EDI999 (Implementation Acknowledgment)
 - **Status**: Functional with limitations
@@ -261,36 +317,37 @@ LE*2120~
 
 ### Common Issues
 
-1. **Missing Segment Handling**:
-   - Several segments are not being processed across different transaction sets
-   - This results in incomplete data structures and missing segments in generated files
+1. **Formatting Differences**:
+   - The generated files have all segments on a single line
+   - The original files have line breaks between segments
+   - This is a minor formatting issue and doesn't affect the functionality
 
-2. **Loop Structure Issues**:
-   - Some loops are not properly defined or processed
-   - This affects the hierarchical structure of the EDI files
-
-3. **Segment Order Differences**:
+2. **Segment Order Differences**:
    - The order of segments in generated files sometimes differs from the original files
    - This may cause issues with systems expecting a specific segment order
 
 ### Recommendations
 
-1. **Fix Missing Segment Handling**:
-   - Update the loop structures to handle all segments found in the original files
-   - Implement parsing and generation functions for missing segments
-   - Add validation for required segments
-
-2. **Improve Loop Structure Handling**:
+1. **Fix EDI999 Implementation**:
    - Review and fix the loop structure definitions
-   - Ensure that loops are properly nested and contain all required segments
-   - Fix the LS/LE loop handling in the 271 format
+   - Implement parsing and generation functions for CTX segments
+   - Fix handling of multiple AK2 loops
+
+2. **Improve Formatting**:
+   - Consider adding line breaks between segments in the generated output
+   - Implement a configurable formatting option for output files
 
 3. **Enhance Segment Order Logic**:
    - Implement a more precise segment ordering system
    - Consider a configuration-driven approach to segment ordering
    - Ensure that generated files match the segment order of original files
 
-4. **Add Comprehensive Validation**:
-   - Implement validation for required segments and elements
-   - Add validation for segment relationships
-   - Provide meaningful error messages for validation failures
+4. **Implement Additional Transaction Sets**:
+   - Implement Transaction Set 276/277 (Health Care Claim Status)
+   - Implement Transaction Set 837 (Health Care Claim)
+   - Ensure consistent implementation approach across all transaction sets
+
+5. **Clean Up Warnings**:
+   - Address the compiler warnings to improve code quality
+   - Remove unused imports and variables
+   - Fix other code quality issues

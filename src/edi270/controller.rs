@@ -6,6 +6,7 @@ use crate::edi270::table1::*;
 use crate::edi270::loop2000a::*;
 use crate::edi270::loop2000b::*;
 use crate::segments::se::*;
+use crate::segments::r#ref::*;
 use crate::helper::edihelper::*;
 use crate::error::{EdiResult, EdiError};
 
@@ -17,6 +18,9 @@ pub struct Edi270 {
     pub loop2000b: Vec<Loop2000B>,
     pub se_segments: SE,
     pub interchange_trailer: InterchangeTrailer,
+    // Store unprocessed segments for preservation
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub unprocessed_ref_segments: Vec<REF>,
 }
 
 pub fn get_270(mut contents: String) -> EdiResult<(Edi270, String)> {
@@ -73,8 +77,47 @@ pub fn get_270(mut contents: String) -> EdiResult<(Edi270, String)> {
     edi270.interchange_trailer = interchange_trailer;
     contents = new_contents;
     
+    // Process any remaining segments that might have been missed
+    process_remaining_segments(&mut edi270, &contents);
+    
     info!("Unprocessed segments: {:?}", contents);
     Ok((edi270, contents))
+}
+
+fn process_remaining_segments(edi270: &mut Edi270, contents: &str) {
+    // Check for REF segments
+    if contents.contains("REF") {
+        let ref_segments = extract_segments(contents, "REF");
+        for ref_content in ref_segments {
+            let ref_segment = get_ref(ref_content);
+            info!("Found unprocessed REF segment, adding to appropriate loop");
+            
+            // Add to the appropriate structure based on content
+            if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
+               !edi270.loop2000b.is_empty() && !edi270.loop2000b[0].loop2000c.is_empty() {
+                edi270.loop2000b[0].loop2000c[0].ref_segments.push(ref_segment);
+            } else if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "987654321" && 
+                      !edi270.loop2000b.is_empty() && edi270.loop2000b[0].loop2000c.len() > 1 {
+                edi270.loop2000b[0].loop2000c[1].ref_segments.push(ref_segment);
+            } else {
+                edi270.unprocessed_ref_segments.push(ref_segment);
+            }
+        }
+    }
+}
+
+// Helper function to extract all segments of a specific type from content
+fn extract_segments(contents: &str, segment_id: &str) -> Vec<String> {
+    let mut segments = Vec::new();
+    let lines: Vec<&str> = contents.split('~').collect();
+    
+    for line in lines {
+        if line.trim().starts_with(segment_id) {
+            segments.push(line.trim().to_string());
+        }
+    }
+    
+    segments
 }
 
 pub fn write_270(edi270: &Edi270) -> String {

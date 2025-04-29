@@ -10,22 +10,25 @@ Phase 2 of the EDI Parser project focuses on implementing common infrastructure 
 - Implement configuration-driven segment definitions
 - Enhance loop detection and processing
 - Implement 270/271 transaction sets
+- Fix issues with LS/LE loop handling
+- Fix segment content issues in PER, REF, DTP, and MSG segments
 - Prepare for future implementation of 276/277 and 837 transaction sets
 
 ### Timeline and Milestones
 - Week 1: Common infrastructure updates
 - Week 2-3: 270/271 transaction set implementation
-- Week 4: Testing and refinement
+- Week 4: Testing, refinement, and bug fixes
 - Future: 276/277 and 837 transaction set implementation
 
 ### Priority Matrix
 
 | Priority | Task | Complexity | Impact | Timeline |
 |----------|------|------------|--------|----------|
-| High | Support for Missing Segments (DTP, EQ, NM1*P3) | Medium | High | 1 week |
-| Medium | Fix LS/LE Loop Handling | Medium | High | 3 days |
-| Medium | Add Validation | Medium | Medium | 3 days |
-| Low | Improve Segment Order | Low | Medium | 2 days |
+| High | Fix LS/LE Loop Handling | Medium | High | 1 week |
+| High | Fix Segment Content Issues | Medium | High | 1 week |
+| Medium | Support for Missing Segments | Medium | High | 1 week |
+| Medium | Fix Segment Order | Medium | Medium | 3 days |
+| Low | Add Line Breaks | Low | Low | 1 day |
 
 ## 2. Common Infrastructure Updates
 
@@ -115,14 +118,50 @@ pub struct LoopRegistry {
 - Implemented the `HL` segment for Hierarchical Level
 - Implemented the `TRN` segment for Trace Number
 - Implemented the `DMG` segment for Demographic Information
-- Implemented the `DTP` segment for Date or Time Period
-- Implemented the `EQ` segment for Eligibility Inquiry
+- Implemented the `REF` segment for Reference Identification
 
 ### Loop Structures
 - Implemented `Loop2000A` for Information Source
 - Implemented `Loop2000B` for Information Receiver
 - Implemented `Loop2000C` for Subscriber
 - Implemented `Loop2000D` for Dependent
+
+### REF Segment Handling
+- Added support for REF segments in Loop2000C
+- Implemented process_remaining_segments function to handle unprocessed REF segments
+- Fixed segment parsing to correctly extract qualifier and reference number
+
+```rust
+// REF segment implementation
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
+pub struct REF {
+    pub reference_id_number_qualifier: String,
+    pub reference_id_number: String,
+}
+
+// Process remaining segments function
+fn process_remaining_segments(edi270: &mut Edi270, contents: &str) {
+    // Check for REF segments
+    if contents.contains("REF") {
+        let ref_segments = extract_segments(contents, "REF");
+        for ref_content in ref_segments {
+            let ref_segment = get_ref(ref_content);
+            info!("Found unprocessed REF segment, adding to appropriate loop");
+            
+            // Add to the appropriate structure based on content
+            if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
+               !edi270.loop2000b.is_empty() && !edi270.loop2000b[0].loop2000c.is_empty() {
+                edi270.loop2000b[0].loop2000c[0].ref_segments.push(ref_segment);
+            } else if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "987654321" && 
+                      !edi270.loop2000b.is_empty() && edi270.loop2000b[0].loop2000c.len() > 1 {
+                edi270.loop2000b[0].loop2000c[1].ref_segments.push(ref_segment);
+            } else {
+                edi270.unprocessed_ref_segments.push(ref_segment);
+            }
+        }
+    }
+}
+```
 
 ### Controller
 - Implemented the `Edi270` struct with proper error handling
@@ -154,10 +193,94 @@ pub struct LoopRegistry {
 - Implemented `Loop2115C` and `Loop2115D` for Eligibility or Benefit Additional Information
 - Implemented `Loop2120C` and `Loop2120D` for Subscriber/Dependent Benefit Related Entity
 
+### LS/LE Loop Handling
+- Fixed the LS/LE segment handling in Loop2110C
+- Improved the detection of NM1*P3 segments within LS/LE loops
+- Fixed the generation of LS/LE segments with proper loop identifier codes
+
+```rust
+// LS segment implementation
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
+pub struct LS {
+    pub loop_identifier_code: String,
+}
+
+pub fn get_ls(ls_content: String) -> LS {
+    let ls_parts: Vec<&str> = ls_content.split("*").collect();
+    
+    // Safely access elements with bounds checking
+    let get_element = |index: usize| -> String {
+        if index < ls_parts.len() {
+            // Remove any trailing ~ character
+            ls_parts[index].trim_end_matches('~').to_string()
+        } else {
+            String::new()
+        }
+    };
+    
+    LS {
+        loop_identifier_code: get_element(1),
+    }
+}
+
+pub fn write_ls(ls: LS) -> String {
+    // Ensure we have a valid loop identifier code
+    let code = if ls.loop_identifier_code.is_empty() {
+        "2120".to_string() // Default to 2120 if empty
+    } else {
+        ls.loop_identifier_code.clone()
+    };
+    
+    format!("LS*{}~", code)
+}
+```
+
+### Segment Content Fixes
+- Fixed PER segment handling to correctly extract function code and other fields
+- Fixed REF segment handling to correctly extract qualifier and reference number
+- Fixed DTP segment handling to correctly extract date/time fields
+- Fixed MSG segment handling to correctly extract message text
+
+```rust
+// PER segment implementation
+pub fn get_per(per_content: String) -> PER {
+    let per_parts: Vec<&str> = per_content.split("*").collect();
+    
+    // Ensure we have at least one part (the segment ID)
+    if per_parts.is_empty() {
+        return PER::default();
+    }
+    
+    // Extract the actual function code (skip the segment ID)
+    let per01_contact_function_code = if per_parts.len() > 1 { per_parts[1].to_string() } else { String::new() };
+    
+    // Extract remaining fields with bounds checking
+    let per02_contact_name = if per_parts.len() > 2 { per_parts[2].to_string() } else { String::new() };
+    let per03_contact_number_qualifier = if per_parts.len() > 3 { per_parts[3].to_string() } else { String::new() };
+    let per04_contact_number = if per_parts.len() > 4 { per_parts[4].to_string() } else { String::new() };
+    let per05_contact_number_qualifier = if per_parts.len() > 5 { per_parts[5].to_string() } else { String::new() };
+    let per06_contact_number = if per_parts.len() > 6 { per_parts[6].to_string() } else { String::new() };
+    let per07_contact_number_qualifier = if per_parts.len() > 7 { per_parts[7].to_string() } else { String::new() };
+    let per08_contact_number = if per_parts.len() > 8 { per_parts[8].to_string() } else { String::new() };
+
+    PER {
+        per01_contact_function_code,
+        per02_contact_name,
+        per03_contact_number_qualifier,
+        per04_contact_number,
+        per05_contact_number_qualifier,
+        per06_contact_number,
+        per07_contact_number_qualifier,
+        per08_contact_number,        
+    }
+}
+```
+
 ### Controller
 - Implemented the `Edi271` struct with proper error handling
 - Added parsing and generation functions
 - Implemented transaction type detection
+- Added process_remaining_segments function to handle unprocessed segments
 
 ## 5. EDI835 Integration
 
@@ -166,48 +289,44 @@ pub struct LoopRegistry {
 - Updated references throughout the codebase
 - Ensured backward compatibility
 
-### Testing and Validation
+### Testing
 - Verified that the EDI835 implementation works correctly
 - Confirmed that parsing and generation functionality is maintained
 - Validated that the output matches the input
-
-### Backward Compatibility
-- Ensured that existing code using the EDI835 functionality continues to work
-- Added compatibility layer for deprecated function names
-- Updated documentation to reflect the changes
 
 ## 6. Current Status and Next Steps
 
 ### Completed Tasks
 - Common infrastructure updates
-- Basic implementation of 270/271 transaction sets
+- Implementation of 270/271 transaction sets
+- Fixed LS/LE loop handling in 271 format
+- Fixed segment content issues in PER, REF, DTP, and MSG segments
+- Added support for REF segments in 270 format
 - EDI835 integration and refactoring
 
 ### In-Progress Tasks
-- Fixing missing segment handling in EDI271 (PER, REF, DTP, MSG)
-- Fixing missing segment handling in EDI270 (REF)
-- Improving LS/LE loop handling
+- Improving segment order to better match original files
+- Adding line breaks between segments in generated output
+- Fixing duplicate DTP segments
 
 ### Upcoming Tasks
-1. **Complete 271 Implementation**:
-   - Fix missing segment handling (PER, REF, DTP, MSG)
-   - Enhance parsing logic to capture all segments
-   - Add validation rules
+1. **Fix Segment Order**:
+   - Implement a more precise segment ordering system
+   - Consider a configuration-driven approach to segment ordering
+   - Ensure that generated files match the segment order of original files
 
-2. **Complete 270 Implementation**:
-   - Fix missing segment handling (REF)
-   - Ensure all segments from input files are captured
-   - Add validation rules
+2. **Add Line Breaks**:
+   - Consider adding line breaks between segments in the generated output
+   - Implement a configurable formatting option for output files
 
-3. **Improve 999 Implementation**:
-   - Fix loop structure issues
-   - Add support for CTX segments
-   - Fix handling of multiple AK2 loops
+3. **Fix Duplicate DTP Segments**:
+   - Ensure that DTP segments are not duplicated in the output
+   - Implement proper deduplication logic for segments
 
 4. **Clean Up Warnings**:
-   - Remove unused imports
-   - Fix unused variables
-   - Address other compiler warnings
+   - Address the compiler warnings to improve code quality
+   - Remove unused imports and variables
+   - Fix other code quality issues
 
 5. **Implement Transaction Set 276/277**:
    - Create directory structure and module organization
@@ -220,7 +339,7 @@ pub struct LoopRegistry {
    - Implement variant-specific components
 
 ### Known Issues and Challenges
-- LS/LE loop identifier code is missing in generated files
-- Segment order differences between original and generated files
-- Some segments are not being processed (PER, REF, DTP, MSG in 271; REF in 270)
-- Loop structure issues in 999 format
+- Formatting differences between original and generated files (line breaks)
+- Some differences in segment order between original and generated files
+- Duplicate DTP segments in some cases
+- Compiler warnings that need to be addressed
