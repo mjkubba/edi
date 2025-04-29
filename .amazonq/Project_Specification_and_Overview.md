@@ -1,11 +1,16 @@
-# EDI to JSON Converter Specification
+# EDI Parser Project Specification and Overview
 
-## Overview
+## 1. Introduction
 
-This specification outlines the development plan for enhancing an existing open-source application that converts X12 EDI formats to JSON. The application currently supports 835 (Health Care Claim Payment/Advice) and 999 (Implementation Acknowledgment) formats, and this specification details the approach for fixing existing issues and implementing additional X12 formats.
+This document outlines the development plan for enhancing an existing open-source application that converts X12 EDI formats to JSON. The application currently supports 835 (Health Care Claim Payment/Advice) and 999 (Implementation Acknowledgment) formats, and this specification details the approach for fixing existing issues and implementing additional X12 formats.
 
-## Current State Assessment
+### Project Purpose and Scope
+- Convert EDI formats to JSON and vice versa
+- Support multiple healthcare X12 transaction sets
+- Provide robust error handling and validation
+- Maintain a modular and extensible architecture
 
+### Current State Assessment
 The application is built in Rust and follows a modular architecture with separate components for:
 - Segment parsing and representation
 - Loop structure handling
@@ -16,8 +21,9 @@ Currently implemented transaction sets:
 - 835 (Health Care Claim Payment/Advice)
 - 999 (Implementation Acknowledgment)
 
-### Existing Architecture
+## 2. Architecture
 
+### Directory Structure
 ```
 edi/
 ├── src/
@@ -41,131 +47,79 @@ edi/
 │   │   ├── loop2110.rs         # Implementation of 999 2110 loop
 │   │   ├── table1.rs           # Table 1 definitions
 │   │   └── table1trailer.rs     # Table 1 trailer definitions
+│   ├── edi270/                  # Health Care Eligibility Benefit Inquiry implementation
+│   ├── edi271/                  # Health Care Eligibility Benefit Response implementation
 │   ├── helper/                  # Utility functions and shared helpers
 │   ├── segments/               # EDI segment definitions and processors
+│   ├── error.rs                # Error handling module
+│   ├── transaction_processor.rs # Generic transaction set processor
+│   ├── segment_config.rs       # Configuration-driven segment definitions
+│   ├── loop_processor.rs       # Enhanced loop detection and processing
+│   ├── lib.rs                  # Library exports
 │   └── main.rs                 # Application entry point
 ```
 
-### Known Issues
+### Component Overview
+- **Segment Parsers**: Convert EDI segment strings to structured data
+- **Loop Handlers**: Process hierarchical loops within transaction sets
+- **Controllers**: Coordinate the parsing and generation of transaction sets
+- **Helper Functions**: Provide utility functions for common operations
+- **Error Handling**: Standardized error types and handling mechanisms
 
-1. CTX segment implementation in 999 format may not conform to standards
-2. Error handling needs improvement for malformed input files
-3. Table 1 content placement issues in both 835 and 999 formats
-4. Missing unit and integration tests
-5. Limited transaction set support (only 835 and 999)
+## 3. Development Plan
 
-## Development Plan
+### Phase 1: Fix Existing Issues (COMPLETED)
+- Fixed CTX segment implementation in 999 format
+- Improved error handling for malformed input files
+- Addressed Table 1 content placement issues in both 835 and 999 formats
+- Implemented testing framework with unit and integration tests
 
-The development will proceed in phases, with each phase focusing on specific aspects of the application.
+### Phase 2: Implement Additional Transaction Sets (IN PROGRESS)
+- Common Infrastructure Updates
+  - Created a generic transaction set processor
+  - Implemented a configuration-driven approach for segment definitions
+  - Enhanced the loop detection and processing logic
+  - Standardized error handling across all transaction sets
 
-### Phase 1: Fix Existing Issues
+- Transaction Set: 270/271 (Health Care Eligibility Benefit Inquiry and Response)
+  - Created segment definitions specific to 270/271
+  - Implemented loop structures (2000A, 2000B, 2000C, 2000D, etc.)
+  - Added validation for 270/271-specific requirements
+  - Implemented bidirectional conversion (EDI to JSON and JSON to EDI)
 
-#### 1.1 CTX Segment Implementation
+- Transaction Set: 276/277 (Health Care Claim Status Request and Response)
+  - Create segment definitions specific to 276/277
+  - Implement loop structures (2000A, 2000B, 2000C, 2000D, etc.)
+  - Add validation for 276/277-specific requirements
+  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
 
-**Issue:** The CTX segment implementation may not conform to the 999 standards.
+- Transaction Set: 837 (Health Care Claim)
+  - Create segment definitions specific to 837P, 837I, and 837D
+  - Implement loop structures (2000A, 2000B, 2300, 2400, etc.)
+  - Add validation for 837-specific requirements
+  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
 
-**Solution:**
-- Review the X12 999 implementation guide for CTX segment requirements
-- Compare current implementation against standards
-- Update the CTX segment implementation to match the standards
-- Add validation for required and situational elements
+### Phase 3: Advanced Features and Optimizations (PLANNED)
+- Performance Optimization
+  - Profile the application to identify performance bottlenecks
+  - Optimize memory usage for large EDI files
+  - Implement parallel processing for batch operations
+  - Add benchmarking tools for performance measurement
 
-#### 1.2 Error Handling Improvements
+- Schema Validation
+  - Implement JSON schema validation for output
+  - Add EDI schema validation for input
+  - Provide schema documentation for users
 
-**Issue:** The application needs better error handling for malformed input files.
+- Additional Features
+  - Add support for custom delimiters
+  - Implement pretty printing for JSON output
+  - Add support for EDI file validation without conversion
+  - Implement a command-line interface for advanced options
 
-**Solution:**
-- Implement robust error handling for file reading operations
-- Add validation for EDI file structure before processing
-- Provide meaningful error messages for common issues
-- Implement graceful exit strategies for critical errors
+## 4. Implementation Approach
 
-#### 1.3 Table 1 Content Placement
-
-**Issue:** Table 1 content placement issues in both 835 and 999 formats.
-
-**Solution:**
-- Review the structure of Table 1 in both 835 and 999 formats
-- Ensure proper nesting of Table 1 content in the JSON output
-- Fix any inconsistencies in the Table 1 implementation
-- Add validation for Table 1 structure
-
-#### 1.4 Testing Framework
-
-**Issue:** Missing unit and integration tests.
-
-**Solution:**
-- Implement unit tests for segment parsing
-- Add integration tests for end-to-end processing
-- Create test fixtures for various EDI formats
-- Implement test coverage reporting
-
-### Phase 2: Implement Additional Transaction Sets
-
-#### 2.1 Common Infrastructure Updates
-
-Before implementing new transaction sets, update the common infrastructure:
-
-- Create a generic transaction set processor
-- Implement a configuration-driven approach for segment definitions
-- Enhance the loop detection and processing logic
-- Standardize error handling across all transaction sets
-
-#### 2.2 Transaction Set: 270/271 (Health Care Eligibility Benefit Inquiry and Response)
-
-Implement support for the 270/271 transaction set:
-
-- Create segment definitions specific to 270/271
-- Implement loop structures (2000A, 2000B, 2000C, 2000D, etc.)
-- Add validation for 270/271-specific requirements
-- Implement bidirectional conversion (EDI to JSON and JSON to EDI)
-
-#### 2.3 Transaction Set: 276/277 (Health Care Claim Status Request and Response)
-
-Implement support for the 276/277 transaction set:
-
-- Create segment definitions specific to 276/277
-- Implement loop structures (2000A, 2000B, 2000C, 2000D, etc.)
-- Add validation for 276/277-specific requirements
-- Implement bidirectional conversion (EDI to JSON and JSON to EDI)
-
-#### 2.4 Transaction Set: 837 (Health Care Claim)
-
-Implement support for the 837 transaction set (Professional, Institutional, and Dental):
-
-- Create segment definitions specific to 837P, 837I, and 837D
-- Implement loop structures (2000A, 2000B, 2300, 2400, etc.)
-- Add validation for 837-specific requirements
-- Implement bidirectional conversion (EDI to JSON and JSON to EDI)
-
-### Phase 3: Advanced Features and Optimizations
-
-#### 3.1 Performance Optimization
-
-- Profile the application to identify performance bottlenecks
-- Optimize memory usage for large EDI files
-- Implement parallel processing for batch operations
-- Add benchmarking tools for performance measurement
-
-#### 3.2 Schema Validation
-
-- Implement JSON schema validation for output
-- Add EDI schema validation for input
-- Provide schema documentation for users
-
-#### 3.3 Additional Features
-
-- Add support for custom delimiters
-- Implement pretty printing for JSON output
-- Add support for EDI file validation without conversion
-- Implement a command-line interface for advanced options
-
-## Implementation Details
-
-### Segment Implementation Approach
-
-Each segment should follow this implementation pattern:
-
+### Segment Implementation Pattern
 ```rust
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct SegmentName {
@@ -186,10 +140,7 @@ impl SegmentName {
 }
 ```
 
-### Loop Implementation Approach
-
-Each loop should follow this implementation pattern:
-
+### Loop Implementation Pattern
 ```rust
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct LoopName {
@@ -209,10 +160,7 @@ pub fn write_loop_name(loop_data: LoopName) -> String {
 }
 ```
 
-### Transaction Set Implementation Approach
-
-Each transaction set should follow this implementation pattern:
-
+### Transaction Set Implementation Pattern
 ```rust
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct TransactionSet {
@@ -231,38 +179,9 @@ pub fn write_transaction_set(transaction_set: TransactionSet) -> String {
 }
 ```
 
-## Questions for Clarification
-
-1. Are there specific EDI transaction sets that should be prioritized beyond the ones mentioned in this specification?
-2. Are there any specific validation rules or business logic that should be implemented for each transaction set?
-3. Should the application support any specific EDI dialects or variations?
-4. Are there any performance requirements or constraints for processing large EDI files?
-5. Should the application support any specific output formats beyond JSON (e.g., XML, CSV)?
-6. Are there any specific error handling or logging requirements?
-7. Should the application support any specific character encodings beyond UTF-8?
-8. Are there any specific security considerations for handling sensitive healthcare data?
-
-## Assumptions
-
-1. The application will continue to be developed in Rust.
-2. The application will maintain backward compatibility with existing functionality.
-3. The application will follow the same architectural pattern for new transaction sets.
-4. The application will support both reading (EDI to JSON) and writing (JSON to EDI) operations.
-5. The application will validate input and output according to X12 standards.
-6. The application will handle common EDI delimiters (segment, element, component, repetition).
-7. The application will support the X12 5010 version of the transaction sets.
-
-## Next Steps
-
-1. Review and approve this specification
-2. Prioritize the issues and features
-3. Begin implementation of Phase 1
-4. Conduct regular reviews and updates to the specification as needed
-
-## Appendix A: X12 Transaction Set Structure
+## 5. X12 Transaction Set Structures
 
 ### 835 (Health Care Claim Payment/Advice)
-
 ```
 ISA - Interchange Control Header
   GS - Functional Group Header
@@ -315,7 +234,6 @@ IEA - Interchange Control Trailer
 ```
 
 ### 999 (Implementation Acknowledgment)
-
 ```
 ISA - Interchange Control Header
   GS - Functional Group Header
@@ -336,7 +254,6 @@ IEA - Interchange Control Trailer
 ```
 
 ### 270/271 (Health Care Eligibility Benefit Inquiry and Response)
-
 ```
 ISA - Interchange Control Header
   GS - Functional Group Header
@@ -410,6 +327,23 @@ ISA - Interchange Control Header
 IEA - Interchange Control Trailer
 ```
 
-## Appendix B: Segment Definitions
+## 6. Assumptions and Constraints
 
-This section will be expanded with detailed segment definitions for each transaction set as implementation progresses.
+### Technical Assumptions
+1. The application will continue to be developed in Rust.
+2. The application will maintain backward compatibility with existing functionality.
+3. The application will follow the same architectural pattern for new transaction sets.
+4. The application will support both reading (EDI to JSON) and writing (JSON to EDI) operations.
+5. The application will validate input and output according to X12 standards.
+6. The application will handle common EDI delimiters (segment, element, component, repetition).
+7. The application will support the X12 5010 version of the transaction sets.
+
+### Compatibility Requirements
+- Maintain compatibility with existing 835 and 999 implementations
+- Ensure consistent API across all transaction sets
+- Support standard EDI delimiters and formats
+
+### Performance Considerations
+- Handle large EDI files efficiently
+- Minimize memory usage during parsing and generation
+- Provide reasonable performance for batch processing
