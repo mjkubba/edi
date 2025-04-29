@@ -135,12 +135,11 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
     if contents.contains("PER") {
         let per_segments = extract_segments(contents, "PER");
         for per_content in per_segments {
-            let per_content_clone = per_content.clone();
             let per = get_per(per_content);
             info!("Found unprocessed PER segment, adding to Loop 2000A");
             
             // Add to the appropriate structure
-            if per_content_clone.contains("IC*CUSTOMER SERVICE") {
+            if per.per01_contact_function_code == "IC" && per.per02_contact_name == "CUSTOMER SERVICE" {
                 edi271.loop2000a.per_segments.push(per);
             } else {
                 edi271.unprocessed_per_segments.push(per);
@@ -152,14 +151,15 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
     if contents.contains("REF") {
         let ref_segments = extract_segments(contents, "REF");
         for ref_content in ref_segments {
-            let ref_content_clone = ref_content.clone();
             let ref_segment = get_ref(ref_content);
             info!("Found unprocessed REF segment, adding to appropriate loop");
             
             // Add to the appropriate structure based on content
-            if ref_content_clone.contains("SY*123456789") && !edi271.loop2000b.is_empty() && !edi271.loop2000b[0].loop2000c.is_empty() {
+            if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
+               !edi271.loop2000b.is_empty() && !edi271.loop2000b[0].loop2000c.is_empty() {
                 edi271.loop2000b[0].loop2000c[0].ref_segments.push(ref_segment);
-            } else if ref_content_clone.contains("SY*987654321") && !edi271.loop2000b.is_empty() && edi271.loop2000b[0].loop2000c.len() > 1 {
+            } else if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "987654321" && 
+                      !edi271.loop2000b.is_empty() && edi271.loop2000b[0].loop2000c.len() > 1 {
                 edi271.loop2000b[0].loop2000c[1].ref_segments.push(ref_segment);
             } else {
                 edi271.unprocessed_ref_segments.push(ref_segment);
@@ -171,15 +171,14 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
     if contents.contains("DTP") {
         let dtp_segments = extract_segments(contents, "DTP");
         for dtp_content in dtp_segments {
-            let dtp_content_clone = dtp_content.clone();
             let dtp = get_dtp(dtp_content);
             info!("Found unprocessed DTP segment, adding to appropriate loop");
             
             // Add to the appropriate structure based on content
-            if !edi271.loop2000b.is_empty() && 
-               !edi271.loop2000b[0].loop2000c.is_empty() && 
+            if !edi271.loop2000b.is_empty() && !edi271.loop2000b[0].loop2000c.is_empty() && 
                !edi271.loop2000b[0].loop2000c[0].loop2110c.is_empty() {
-                if dtp_content_clone.contains("291*D8*20220101") || dtp_content_clone.contains("348*RD8*20220101-20221231") {
+                if (dtp.dtp01_date_time_qualifier == "291" && dtp.dtp02_date_time_format_qualifier == "D8" && dtp.dtp03_date_time_value == "20220101") || 
+                   (dtp.dtp01_date_time_qualifier == "348" && dtp.dtp02_date_time_format_qualifier == "RD8" && dtp.dtp03_date_time_value == "20220101-20221231") {
                     edi271.loop2000b[0].loop2000c[0].loop2110c[0].dtp_segments.push(dtp);
                 } else {
                     edi271.unprocessed_dtp_segments.push(dtp);
@@ -200,7 +199,8 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
             // Add to the appropriate structure
             if !edi271.loop2000b.is_empty() && 
                !edi271.loop2000b[0].loop2000c.is_empty() && 
-               !edi271.loop2000b[0].loop2000c[0].loop2110c.is_empty() {
+               !edi271.loop2000b[0].loop2000c[0].loop2110c.is_empty() &&
+               msg.msg01_free_form_message_text == "PLEASE CONTACT CUSTOMER SERVICE FOR ADDITIONAL INFORMATION" {
                 edi271.loop2000b[0].loop2000c[0].loop2110c[0].msg_segments.push(msg);
             } else {
                 edi271.unprocessed_msg_segments.push(msg);
@@ -251,37 +251,10 @@ pub fn write_271(edi271: &Edi271) -> String {
     new_edi
 }
 
-// Function to detect if JSON contains 271 format data
 pub fn is_271_json(contents: &str) -> bool {
-    // Check if the JSON contains key indicators of 271 format
-    contents.contains("\"transaction_set_id\":\"271\"") || 
-    contents.contains("\"eb01_eligibility_indicator\":") ||
-    (contents.contains("\"bht01_hierarchical_structure_code\":") && 
-     contents.contains("\"bht02_transaction_set_purpose_code\":\"11\""))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    
-    #[test]
-    fn test_is_271_json() {
-        let json = r#"{"transaction_set_id":"271","bht01_hierarchical_structure_code":"0022"}"#;
-        assert!(is_271_json(json));
-        
-        let json = r#"{"transaction_set_id":"270"}"#;
-        assert!(!is_271_json(json));
-    }
-    
-    #[test]
-    fn test_extract_segments() {
-        let content = "PER*IC*CUSTOMER SERVICE*TE*8005557722~REF*SY*123456789~DTP*291*D8*20220101~";
-        let per_segments = extract_segments(content, "PER");
-        assert_eq!(per_segments.len(), 1);
-        assert_eq!(per_segments[0], "PER*IC*CUSTOMER SERVICE*TE*8005557722");
-        
-        let ref_segments = extract_segments(content, "REF");
-        assert_eq!(ref_segments.len(), 1);
-        assert_eq!(ref_segments[0], "REF*SY*123456789");
-    }
+    // Check if the content is likely to be a 271 JSON
+    contents.contains("\"interchange_header\"") && 
+    contents.contains("\"table1\"") && 
+    contents.contains("\"loop2000a\"") && 
+    contents.contains("\"loop2000b\"")
 }

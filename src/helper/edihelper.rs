@@ -101,6 +101,35 @@ pub fn get_segment_contents_opt(key: &str, contents: &str) -> Option<String> {
     }
 }
 
+// Helper function to extract content between LS and LE segments
+pub fn extract_between_ls_le(contents: &str) -> Option<String> {
+    if let Some(ls_pos) = contents.find("LS*") {
+        // Find the end of the LS segment
+        if let Some(ls_end) = contents[ls_pos..].find('~') {
+            let ls_segment_end = ls_pos + ls_end + 1;
+            
+            // Find the LE segment after the LS segment
+            if let Some(le_pos) = contents[ls_segment_end..].find("LE*") {
+                let le_pos_absolute = ls_segment_end + le_pos;
+                
+                // Return the content between LS~ and LE*
+                return Some(contents[ls_segment_end..le_pos_absolute].to_string());
+            }
+        }
+    }
+    None
+}
+
+// Helper function to get the loop identifier code from LS or LE segment
+pub fn get_loop_identifier_code(segment_content: &str) -> String {
+    let parts: Vec<&str> = segment_content.split('*').collect();
+    if parts.len() > 1 {
+        parts[1].trim_end_matches('~').to_string()
+    } else {
+        String::new()
+    }
+}
+
 pub fn get_full_segment_contents(key: &str, contents: &str) -> Option<String> {
     let nkey = key.to_string() + "*";
     

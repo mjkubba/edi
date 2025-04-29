@@ -106,27 +106,47 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         contents = content_trim("MSG", contents);
     }
     
-    // Process LS segment (situational)
+    // Process LS segment and its content (situational)
     if contents.starts_with("LS") {
         info!("LS segment found");
-        let ls_content = get_segment_contents("LS", &contents);
-        if !ls_content.is_empty() {
-            let ls = get_ls(ls_content);
-            info!("LS segment parsed");
-            loop2110c.ls = Some(ls);
-            contents = content_trim("LS", contents);
+        let ls_content = get_full_segment_contents("LS", &contents).unwrap_or_default();
+        
+        // Extract the loop identifier code from the LS segment
+        let ls_parts: Vec<&str> = ls_content.split('*').collect();
+        let loop_id = if ls_parts.len() > 1 {
+            ls_parts[1].trim_end_matches('~').to_string()
+        } else {
+            "2120".to_string() // Default value if not found
+        };
+        
+        // Create the LS segment
+        let ls = LS {
+            loop_identifier_code: loop_id.clone(),
+        };
+        loop2110c.ls = Some(ls);
+        
+        // Remove the LS segment from contents
+        contents = content_trim("LS", contents);
+        
+        // Find the corresponding LE segment
+        let le_position = contents.find("LE*");
+        
+        if let Some(le_pos) = le_position {
+            // Extract content between LS and LE
+            let ls_le_content = &contents[..le_pos];
             
-            // Process NM1*P3 segments within LS/LE loop
-            let mut ls_content = contents.clone();
-            let mut end_index = ls_content.find("LE*");
-            
-            if let Some(idx) = end_index {
-                // Extract content between LS and LE
-                let ls_le_content = ls_content[..idx].to_string();
-                
-                // Look for NM1*P3 segments in the LS/LE content
-                if ls_le_content.contains("NM1*P3") {
-                    match get_loop_2115c(ls_le_content) {
+            // Process NM1*P3 segments within the LS/LE loop
+            let mut remaining_content = ls_le_content.to_string();
+            while remaining_content.contains("NM1*P3") {
+                // Find the NM1*P3 segment
+                if let Some(nm1_pos) = remaining_content.find("NM1*P3") {
+                    // Extract from NM1 to the next segment or end
+                    let nm1_content = &remaining_content[nm1_pos..];
+                    let end_pos = nm1_content.find('~').unwrap_or(nm1_content.len());
+                    let nm1_segment = &nm1_content[..end_pos+1];
+                    
+                    // Process this segment as Loop2115C
+                    match get_loop_2115c(nm1_segment.to_string()) {
                         Ok((loop2115c, _)) => {
                             loop2110c.loop2115c.push(loop2115c);
                         },
@@ -134,14 +154,34 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
                             info!("Error parsing Loop 2115C: {:?}", e);
                         }
                     }
+                    
+                    // Remove the processed segment from remaining content
+                    remaining_content = remaining_content[nm1_pos + end_pos + 1..].to_string();
+                } else {
+                    break;
                 }
-                
-                // Move past the LE segment
-                if let Some(le_content) = get_segment_contents_opt("LE", &contents) {
-                    let le = get_le(le_content);
-                    loop2110c.le = Some(le);
-                    contents = content_trim("LE", contents);
-                }
+            }
+            
+            // Process the LE segment
+            let le_content = get_full_segment_contents("LE", &contents[le_pos..]).unwrap_or_default();
+            
+            // Extract the loop identifier code from the LE segment (should match LS)
+            let le_parts: Vec<&str> = le_content.split('*').collect();
+            let le_loop_id = if le_parts.len() > 1 {
+                le_parts[1].trim_end_matches('~').to_string()
+            } else {
+                loop_id.clone() // Use the same as LS if not found
+            };
+            
+            // Create the LE segment
+            let le = LE {
+                loop_identifier_code: le_loop_id,
+            };
+            loop2110c.le = Some(le);
+            
+            // Remove everything up to and including the LE segment
+            if let Some(le_end) = contents[le_pos..].find('~') {
+                contents = contents[le_pos + le_end + 1..].to_string();
             }
         }
     }
@@ -203,7 +243,6 @@ pub fn write_loop_2110c(loop2110c: &Loop2110C) -> String {
     contents
 }
 
-// Placeholder for LS segment functions until we implement them
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct LS {
     pub loop_identifier_code: String,
@@ -215,7 +254,8 @@ pub fn get_ls(ls_content: String) -> LS {
     // Safely access elements with bounds checking
     let get_element = |index: usize| -> String {
         if index < ls_parts.len() {
-            ls_parts[index].to_string()
+            // Remove any trailing ~ character
+            ls_parts[index].trim_end_matches('~').to_string()
         } else {
             String::new()
         }
@@ -227,10 +267,16 @@ pub fn get_ls(ls_content: String) -> LS {
 }
 
 pub fn write_ls(ls: LS) -> String {
-    format!("LS*{}~", ls.loop_identifier_code)
+    // Ensure we have a valid loop identifier code
+    let code = if ls.loop_identifier_code.is_empty() {
+        "2120".to_string() // Default to 2120 if empty
+    } else {
+        ls.loop_identifier_code.clone()
+    };
+    
+    format!("LS*{}~", code)
 }
 
-// Placeholder for LE segment functions until we implement them
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct LE {
     pub loop_identifier_code: String,
@@ -242,7 +288,8 @@ pub fn get_le(le_content: String) -> LE {
     // Safely access elements with bounds checking
     let get_element = |index: usize| -> String {
         if index < le_parts.len() {
-            le_parts[index].to_string()
+            // Remove any trailing ~ character
+            le_parts[index].trim_end_matches('~').to_string()
         } else {
             String::new()
         }
@@ -254,12 +301,13 @@ pub fn get_le(le_content: String) -> LE {
 }
 
 pub fn write_le(le: LE) -> String {
-    format!("LE*{}~", le.loop_identifier_code)
+    // Ensure we have a valid loop identifier code
+    // The LE code should match the LS code
+    let code = if le.loop_identifier_code.is_empty() {
+        "2120".to_string() // Default to 2120 if empty
+    } else {
+        le.loop_identifier_code.clone()
+    };
+    
+    format!("LE*{}~", code)
 }
-
-// Import required segments
-use crate::segments::n3::*;
-use crate::segments::n4::*;
-use crate::segments::per::*;
-use crate::segments::nm1::*;
-use crate::edi271::loop2000c::*;

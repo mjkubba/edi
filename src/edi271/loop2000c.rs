@@ -215,20 +215,71 @@ pub fn get_loop_2000c(mut contents: String) -> EdiResult<(Loop2000C, String)> {
     Ok((loop2000c, contents))
 }
 
-// Helper function to check if the next segment starts a new 2110C loop
-fn is_next_loop_2110c(contents: &str) -> bool {
-    contents.contains("EB*")
-}
-
-// Helper function to check if the next segment starts a new 2000D loop
-fn is_next_loop_2000d(contents: &str) -> bool {
-    if let Some(hl_content) = get_full_segment_contents("HL", contents) {
-        let parts: Vec<&str> = hl_content.split('*').collect();
-        if parts.len() > 3 && parts[3] == "23" {
-            return true;
-        }
+pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
+    let mut contents = String::new();
+    
+    // Write HL segment
+    contents.push_str(&write_hl(loop2000c.hl_segments.clone()));
+    
+    // Write NM1 segment
+    contents.push_str(&write_nm1(loop2000c.nm1_segments.clone()));
+    
+    // Write REF segments
+    for ref_segment in &loop2000c.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
     }
-    false
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop2000c.n3_segments {
+        contents.push_str(&write_n3(n3.clone()));
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop2000c.n4_segments {
+        contents.push_str(&write_n4(n4.clone()));
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop2000c.dmg_segments {
+        contents.push_str(&write_dmg(dmg.clone()));
+    }
+    
+    // Write TRN segment if present
+    if let Some(trn) = &loop2000c.trn_segments {
+        contents.push_str(&write_trn(trn.clone()));
+    }
+    
+    // Write AAA segments
+    for aaa in &loop2000c.aaa_segments {
+        contents.push_str(&write_aaa(aaa.clone()));
+    }
+    
+    // Write INS segment if present
+    if let Some(ins) = &loop2000c.ins_segments {
+        contents.push_str(&write_ins(ins.clone()));
+    }
+    
+    // Write DTP segments
+    for dtp in &loop2000c.dtp_segments {
+        contents.push_str(&write_dtp(dtp.clone()));
+    }
+    
+    // Write all Loop 2100C segments
+    for loop2100c in &loop2000c.loop2100c {
+        contents.push_str(&write_loop_2100c(loop2100c));
+    }
+    
+    // Write all Loop 2000D segments
+    for loop2000d in &loop2000c.loop2000d {
+        contents.push_str(&write_loop_2000d(loop2000d));
+    }
+    
+    // Write all Loop 2110C segments - in original file, EB segments come after Loop 2000D
+    for loop2110c in &loop2000c.loop2110c {
+        contents.push_str(&write_loop_2110c(loop2110c));
+    }
+    
+    contents
 }
 
 pub fn get_loop_2100c(mut contents: String) -> EdiResult<(Loop2100C, String)> {
@@ -346,73 +397,6 @@ pub fn get_loop_2100c(mut contents: String) -> EdiResult<(Loop2100C, String)> {
     Ok((loop2100c, contents))
 }
 
-pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
-    let mut contents = String::new();
-    
-    // Write HL segment
-    contents.push_str(&write_hl(loop2000c.hl_segments.clone()));
-    
-    // Write NM1 segment
-    contents.push_str(&write_nm1(loop2000c.nm1_segments.clone()));
-    
-    // Write N3 segment if present
-    if let Some(n3) = &loop2000c.n3_segments {
-        contents.push_str(&write_n3(n3.clone()));
-    }
-    
-    // Write N4 segment if present
-    if let Some(n4) = &loop2000c.n4_segments {
-        contents.push_str(&write_n4(n4.clone()));
-    }
-    
-    // Write DMG segment if present
-    if let Some(dmg) = &loop2000c.dmg_segments {
-        contents.push_str(&write_dmg(dmg.clone()));
-    }
-    
-    // Write all Loop 2000D segments first - in original file, Loop 2000D comes before other segments
-    for loop2000d in &loop2000c.loop2000d {
-        contents.push_str(&write_loop_2000d(loop2000d));
-    }
-    
-    // Write TRN segment if present - in original file, TRN comes after Loop 2000D
-    if let Some(trn) = &loop2000c.trn_segments {
-        contents.push_str(&write_trn(trn.clone()));
-    }
-    
-    // Write INS segment if present - in original file, INS comes after TRN
-    if let Some(ins) = &loop2000c.ins_segments {
-        contents.push_str(&write_ins(ins.clone()));
-    }
-    
-    // Write all DTP segments
-    for dtp in &loop2000c.dtp_segments {
-        contents.push_str(&write_dtp(dtp.clone()));
-    }
-    
-    // Write all REF segments
-    for ref_segment in &loop2000c.ref_segments {
-        contents.push_str(&write_ref(ref_segment.clone()));
-    }
-    
-    // Write all AAA segments
-    for aaa in &loop2000c.aaa_segments {
-        contents.push_str(&write_aaa(aaa.clone()));
-    }
-    
-    // Write all Loop 2100C segments
-    for loop2100c in &loop2000c.loop2100c {
-        contents.push_str(&write_loop_2100c(loop2100c));
-    }
-    
-    // Write all Loop 2110C segments - in original file, EB segments come after Loop 2000D
-    for loop2110c in &loop2000c.loop2110c {
-        contents.push_str(&write_loop_2110c(loop2110c));
-    }
-    
-    contents
-}
-
 pub fn write_loop_2100c(loop2100c: &Loop2100C) -> String {
     let mut contents = String::new();
     
@@ -476,6 +460,22 @@ pub fn get_prv(prv_content: String) -> PRV {
 
 pub fn write_prv(prv: PRV) -> String {
     format!("PRV*{}*{}*{}~", prv.provider_code, prv.reference_id_qualifier, prv.reference_id)
+}
+
+// Helper function to check if the next segment starts a new 2110C loop
+fn is_next_loop_2110c(contents: &str) -> bool {
+    contents.contains("EB*")
+}
+
+// Helper function to check if the next segment starts a new 2000D loop
+fn is_next_loop_2000d(contents: &str) -> bool {
+    if let Some(hl_content) = get_full_segment_contents("HL", contents) {
+        let parts: Vec<&str> = hl_content.split('*').collect();
+        if parts.len() > 3 && parts[3] == "23" {
+            return true;
+        }
+    }
+    false
 }
 
 // Import Loop2110C and Loop2000D to avoid circular dependency

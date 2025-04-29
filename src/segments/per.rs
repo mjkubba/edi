@@ -16,37 +16,26 @@ pub struct PER {
 
 pub fn get_per(per_content: String) -> PER {
     let per_parts: Vec<&str> = per_content.split("*").collect();
-    let mut per02_contact_name: String ="".to_string();
-    let mut per03_contact_number_qualifier: String ="".to_string();
-    let mut per04_contact_number: String ="".to_string();
-    let mut per05_contact_number_qualifier: String ="".to_string();
-    let mut per06_contact_number: String ="".to_string();
-    let mut per07_contact_number_qualifier: String ="".to_string();
-    let mut per08_contact_number: String ="".to_string();
-    if per_parts.get(1).is_some() {
-        per02_contact_name = per_parts[1].to_string();
+    
+    // Ensure we have at least one part (the segment ID)
+    if per_parts.is_empty() {
+        return PER::default();
     }
-    if per_parts.get(2).is_some() {
-        per03_contact_number_qualifier = per_parts[2].to_string();
-    }
-    if per_parts.get(3).is_some() {
-        per04_contact_number = per_parts[3].to_string();
-    }
-    if per_parts.get(4).is_some() {
-        per05_contact_number_qualifier = per_parts[4].to_string();
-    }
-    if per_parts.get(5).is_some() {
-        per06_contact_number = per_parts[5].to_string();
-    }
-    if per_parts.get(6).is_some() {
-        per07_contact_number_qualifier = per_parts[6].to_string();
-    }
-    if per_parts.get(7).is_some() {
-        per08_contact_number = per_parts[7].to_string();
-    }
+    
+    // Extract the actual function code (skip the segment ID)
+    let per01_contact_function_code = if per_parts.len() > 1 { per_parts[1].to_string() } else { String::new() };
+    
+    // Extract remaining fields with bounds checking
+    let per02_contact_name = if per_parts.len() > 2 { per_parts[2].to_string() } else { String::new() };
+    let per03_contact_number_qualifier = if per_parts.len() > 3 { per_parts[3].to_string() } else { String::new() };
+    let per04_contact_number = if per_parts.len() > 4 { per_parts[4].to_string() } else { String::new() };
+    let per05_contact_number_qualifier = if per_parts.len() > 5 { per_parts[5].to_string() } else { String::new() };
+    let per06_contact_number = if per_parts.len() > 6 { per_parts[6].to_string() } else { String::new() };
+    let per07_contact_number_qualifier = if per_parts.len() > 7 { per_parts[7].to_string() } else { String::new() };
+    let per08_contact_number = if per_parts.len() > 8 { per_parts[8].to_string() } else { String::new() };
 
     PER {
-        per01_contact_function_code: per_parts[0].to_string(),
+        per01_contact_function_code,
         per02_contact_name,
         per03_contact_number_qualifier,
         per04_contact_number,
@@ -56,7 +45,6 @@ pub fn get_per(per_content: String) -> PER {
         per08_contact_number,        
     }
 }
-
 
 pub fn write_per(per:PER) -> String {
     if per.per01_contact_function_code.is_empty() {
@@ -72,40 +60,39 @@ pub fn write_per(per:PER) -> String {
     per_content.push_str(&stiuational_element(per.per06_contact_number));
     per_content.push_str(&stiuational_element(per.per07_contact_number_qualifier));
     per_content.push_str(&stiuational_element(per.per08_contact_number));
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per02_contact_name);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per03_contact_number_qualifier);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per04_contact_number);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per05_contact_number_qualifier);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per06_contact_number);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per07_contact_number_qualifier);
-    // per_content.push_str("*");
-    // per_content.push_str(&per.per08_contact_number);
     per_content.push_str("~");
     per_content
 }
 
-
 #[cfg(test)]
-
 mod tests {
     use super::*;
+    
     #[test]
     fn test_get_per() {
-        let per_content = "PER*PER02*PER03*PER04*PER05*PER06*PER07*PER08";
-        let per = get_per(per_content.to_string());
-        assert_eq!(per.per01_contact_function_code, "PER");
-        assert_eq!(per.per02_contact_name, "PER02");
-        assert_eq!(per.per03_contact_number_qualifier, "PER03");
-        assert_eq!(per.per04_contact_number, "PER04");
-        assert_eq!(per.per05_contact_number_qualifier, "PER05");
-        assert_eq!(per.per06_contact_number, "PER06");
-        assert_eq!(per.per07_contact_number_qualifier, "PER07");
-        assert_eq!(per.per08_contact_number, "PER08");
+        let per_content = "PER*IC*CUSTOMER SERVICE*TE*8005557722".to_string();
+        let per = get_per(per_content);
+        
+        assert_eq!(per.per01_contact_function_code, "IC");
+        assert_eq!(per.per02_contact_name, "CUSTOMER SERVICE");
+        assert_eq!(per.per03_contact_number_qualifier, "TE");
+        assert_eq!(per.per04_contact_number, "8005557722");
+    }
+    
+    #[test]
+    fn test_write_per() {
+        let per = PER {
+            per01_contact_function_code: "IC".to_string(),
+            per02_contact_name: "CUSTOMER SERVICE".to_string(),
+            per03_contact_number_qualifier: "TE".to_string(),
+            per04_contact_number: "8005557722".to_string(),
+            per05_contact_number_qualifier: "".to_string(),
+            per06_contact_number: "".to_string(),
+            per07_contact_number_qualifier: "".to_string(),
+            per08_contact_number: "".to_string(),
+        };
+        
+        let per_content = write_per(per);
+        assert_eq!(per_content, "PER*IC*CUSTOMER SERVICE*TE*8005557722~");
     }
 }
