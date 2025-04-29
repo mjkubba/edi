@@ -9,6 +9,7 @@ use crate::segments::aaa::*;
 use crate::segments::msg::*;
 use crate::helper::edihelper::*;
 use crate::error::{EdiResult, EdiError};
+use crate::edi271::loop2115c::*;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2110C {
@@ -21,23 +22,6 @@ pub struct Loop2110C {
     pub loop2115c: Vec<Loop2115C>,
     pub ls: Option<LS>,
     pub le: Option<LE>,
-}
-
-#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-pub struct Loop2115C {
-    pub iii_segments: III,
-    pub ls_segments: Option<LS>,
-    pub loop2120c: Vec<Loop2120C>,
-    pub le_segments: Option<LE>,
-}
-
-#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-pub struct Loop2120C {
-    pub nm1_segments: NM1,
-    pub n3_segments: Option<N3>,
-    pub n4_segments: Option<N4>,
-    pub per_segments: Vec<PER>,
-    pub prv_segments: Option<PRV>,
 }
 
 pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
@@ -131,155 +115,39 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
             info!("LS segment parsed");
             loop2110c.ls = Some(ls);
             contents = content_trim("LS", contents);
-        }
-    }
-    
-    // Process LE segment (situational)
-    if contents.starts_with("LE") {
-        info!("LE segment found");
-        let le_content = get_segment_contents("LE", &contents);
-        if !le_content.is_empty() {
-            let le = get_le(le_content);
-            info!("LE segment parsed");
-            loop2110c.le = Some(le);
-            contents = content_trim("LE", contents);
-        }
-    }
-    
-    // Process Loop 2115C segments (can be multiple)
-    while contents.contains("III") {
-        match get_loop_2115c(contents.clone()) {
-            Ok((loop2115c, new_contents)) => {
-                loop2110c.loop2115c.push(loop2115c);
-                contents = new_contents;
-            },
-            Err(_) => break,
-        }
-    }
-    
-    info!("Loop 2110C parsed");
-    Ok((loop2110c, contents))
-}
-
-pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
-    let mut loop2115c = Loop2115C::default();
-    
-    // Process III segment (required)
-    if contents.contains("III") {
-        info!("III segment found");
-        let iii_content = get_segment_contents("III", &contents);
-        if iii_content.is_empty() {
-            return Err(EdiError::MissingSegment("III".to_string()));
-        }
-        loop2115c.iii_segments = get_iii(iii_content);
-        info!("III segment parsed");
-        contents = content_trim("III", contents);
-    } else {
-        return Err(EdiError::MissingSegment("III".to_string()));
-    }
-    
-    // Process LS segment (situational)
-    if contents.contains("LS") {
-        info!("LS segment found");
-        let ls_content = get_segment_contents("LS", &contents);
-        if !ls_content.is_empty() {
-            loop2115c.ls_segments = Some(get_ls(ls_content));
-            info!("LS segment parsed");
-            contents = content_trim("LS", contents);
             
-            // Process Loop 2120C segments (can be multiple)
-            while contents.contains("NM1") && !contents.contains("LE") {
-                match get_loop_2120c(contents.clone()) {
-                    Ok((loop2120c, new_contents)) => {
-                        loop2115c.loop2120c.push(loop2120c);
-                        contents = new_contents;
-                    },
-                    Err(_) => break,
+            // Process NM1*P3 segments within LS/LE loop
+            let mut ls_content = contents.clone();
+            let mut end_index = ls_content.find("LE*");
+            
+            if let Some(idx) = end_index {
+                // Extract content between LS and LE
+                let ls_le_content = ls_content[..idx].to_string();
+                
+                // Look for NM1*P3 segments in the LS/LE content
+                if ls_le_content.contains("NM1*P3") {
+                    match get_loop_2115c(ls_le_content) {
+                        Ok((loop2115c, _)) => {
+                            loop2110c.loop2115c.push(loop2115c);
+                        },
+                        Err(e) => {
+                            info!("Error parsing Loop 2115C: {:?}", e);
+                        }
+                    }
                 }
-            }
-            
-            // Process LE segment (required if LS is present)
-            if contents.contains("LE") {
-                info!("LE segment found");
-                let le_content = get_segment_contents("LE", &contents);
-                if !le_content.is_empty() {
-                    loop2115c.le_segments = Some(get_le(le_content));
-                    info!("LE segment parsed");
+                
+                // Move past the LE segment
+                if let Some(le_content) = get_segment_contents_opt("LE", &contents) {
+                    let le = get_le(le_content);
+                    loop2110c.le = Some(le);
                     contents = content_trim("LE", contents);
                 }
             }
         }
     }
     
-    info!("Loop 2115C parsed");
-    Ok((loop2115c, contents))
-}
-
-pub fn get_loop_2120c(mut contents: String) -> EdiResult<(Loop2120C, String)> {
-    let mut loop2120c = Loop2120C::default();
-    
-    // Process NM1 segment (required)
-    if contents.contains("NM1") {
-        info!("NM1 segment found for Loop 2120C");
-        let nm1_content = get_segment_contents("NM1", &contents);
-        if nm1_content.is_empty() {
-            return Err(EdiError::MissingSegment("NM1".to_string()));
-        }
-        loop2120c.nm1_segments = get_nm1(nm1_content);
-        info!("NM1 segment parsed for Loop 2120C");
-        contents = content_trim("NM1", contents);
-    } else {
-        return Err(EdiError::MissingSegment("NM1".to_string()));
-    }
-    
-    // Process N3 segment (situational)
-    if contents.contains("N3") {
-        info!("N3 segment found for Loop 2120C");
-        let n3_content = get_segment_contents("N3", &contents);
-        if !n3_content.is_empty() {
-            loop2120c.n3_segments = Some(get_n3(n3_content));
-            info!("N3 segment parsed for Loop 2120C");
-            contents = content_trim("N3", contents);
-        }
-    }
-    
-    // Process N4 segment (situational)
-    if contents.contains("N4") {
-        info!("N4 segment found for Loop 2120C");
-        let n4_content = get_segment_contents("N4", &contents);
-        if !n4_content.is_empty() {
-            loop2120c.n4_segments = Some(get_n4(n4_content));
-            info!("N4 segment parsed for Loop 2120C");
-            contents = content_trim("N4", contents);
-        }
-    }
-    
-    // Process PER segments (situational, can be multiple)
-    while contents.starts_with("PER") {
-        info!("PER segment found for Loop 2120C");
-        let per_content = get_segment_contents("PER", &contents);
-        if per_content.is_empty() {
-            break;
-        }
-        let per = get_per(per_content);
-        info!("PER segment parsed for Loop 2120C");
-        loop2120c.per_segments.push(per);
-        contents = content_trim("PER", contents);
-    }
-    
-    // Process PRV segment (situational)
-    if contents.contains("PRV") {
-        info!("PRV segment found for Loop 2120C");
-        let prv_content = get_segment_contents("PRV", &contents);
-        if !prv_content.is_empty() {
-            loop2120c.prv_segments = Some(get_prv(prv_content));
-            info!("PRV segment parsed for Loop 2120C");
-            contents = content_trim("PRV", contents);
-        }
-    }
-    
-    info!("Loop 2120C parsed");
-    Ok((loop2120c, contents))
+    info!("Loop 2110C parsed");
+    Ok((loop2110c, contents))
 }
 
 pub fn write_loop_2110c(loop2110c: &Loop2110C) -> String {
@@ -333,77 +201,6 @@ pub fn write_loop_2110c(loop2110c: &Loop2110C) -> String {
     }
     
     contents
-}
-
-pub fn write_loop_2115c(loop2115c: &Loop2115C) -> String {
-    let mut contents = String::new();
-    
-    // Write III segment
-    contents.push_str(&write_iii(loop2115c.iii_segments.clone()));
-    
-    // Write LS segment if present
-    if let Some(ls) = &loop2115c.ls_segments {
-        contents.push_str(&write_ls(ls.clone()));
-        
-        // Write all Loop 2120C segments
-        for loop2120c in &loop2115c.loop2120c {
-            contents.push_str(&write_loop_2120c(loop2120c));
-        }
-        
-        // Write LE segment if present
-        if let Some(le) = &loop2115c.le_segments {
-            contents.push_str(&write_le(le.clone()));
-        }
-    }
-    
-    contents
-}
-
-pub fn write_loop_2120c(loop2120c: &Loop2120C) -> String {
-    let mut contents = String::new();
-    
-    // Write NM1 segment
-    contents.push_str(&write_nm1(loop2120c.nm1_segments.clone()));
-    
-    // Write N3 segment if present
-    if let Some(n3) = &loop2120c.n3_segments {
-        contents.push_str(&write_n3(n3.clone()));
-    }
-    
-    // Write N4 segment if present
-    if let Some(n4) = &loop2120c.n4_segments {
-        contents.push_str(&write_n4(n4.clone()));
-    }
-    
-    // Write all PER segments
-    for per in &loop2120c.per_segments {
-        contents.push_str(&write_per(per.clone()));
-    }
-    
-    // Write PRV segment if present
-    if let Some(prv) = &loop2120c.prv_segments {
-        contents.push_str(&write_prv(prv.clone()));
-    }
-    
-    contents
-}
-
-// Placeholder for III segment functions until we implement them
-#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-pub struct III {
-    pub code_list_qualifier_code: String,
-    pub industry_code: String,
-    pub code_category: String,
-    pub free_form_message_text: String,
-}
-
-pub fn get_iii(iii_content: String) -> III {
-    III::default()
-}
-
-pub fn write_iii(iii: III) -> String {
-    format!("III*{}*{}*{}*{}~", iii.code_list_qualifier_code, iii.industry_code, 
-            iii.code_category, iii.free_form_message_text)
 }
 
 // Placeholder for LS segment functions until we implement them

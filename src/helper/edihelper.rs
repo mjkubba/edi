@@ -87,6 +87,20 @@ pub fn get_segment_contents(key: &str, contents: &str) -> String {
     }
 }
 
+pub fn get_segment_contents_opt(key: &str, contents: &str) -> Option<String> {
+    match get_full_segment_contents(key, contents) {
+        Some(segment_content) => {
+            let start_skip = key.len() + 1;
+            if segment_content.len() > start_skip {
+                Some(segment_content[start_skip..].to_string())
+            } else {
+                Some(String::new())
+            }
+        },
+        None => None
+    }
+}
+
 pub fn get_full_segment_contents(key: &str, contents: &str) -> Option<String> {
     let nkey = key.to_string() + "*";
     
@@ -120,6 +134,18 @@ mod tests {
         let contents = "PER*BL*JANE DOE*TE*9005555555~N1*PE*BAN DDS LLC*FI*999994703~";
         let result = get_segment_contents(key, contents);
         assert_eq!(result, "PE*BAN DDS LLC*FI*999994703");
+    }
+
+    #[test]
+    fn test_get_segment_contents_opt() {
+        let key = "DTM";
+        let contents = "SVC*AD|D1110*73*49~DTM*472*20190324~CAS*CO*131*24~AMT*B6*49~";
+        let result = get_segment_contents_opt(key, contents);
+        assert_eq!(result, Some("472*20190324".to_string()));
+        
+        let key = "XYZ"; // Non-existent segment
+        let result = get_segment_contents_opt(key, contents);
+        assert_eq!(result, None);
     }
 
     #[test]

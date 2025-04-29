@@ -8,6 +8,8 @@ use crate::segments::r#ref::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
 use crate::segments::dmg::*;
+use crate::segments::dtp::*;
+use crate::segments::eq::*;
 use crate::helper::edihelper::*;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -19,6 +21,8 @@ pub struct Loop2000C {
     pub n3_segments: Option<N3>,
     pub n4_segments: Option<N4>,
     pub dmg_segments: Option<DMG>,
+    pub dtp_segments: Vec<DTP>,
+    pub eq_segments: Vec<EQ>,
     pub loop2000d: Vec<Loop2000D>,
 }
 
@@ -100,6 +104,26 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         contents = content_trim("DMG", contents);
     }
     
+    // Process DTP segments (situational, can be multiple)
+    while contents.starts_with("DTP") {
+        info!("DTP segment found");
+        let dtp_content = get_segment_contents("DTP", &contents);
+        let dtp_segment = get_dtp(dtp_content);
+        info!("DTP segment parsed");
+        loop2000c.dtp_segments.push(dtp_segment);
+        contents = content_trim("DTP", contents);
+    }
+    
+    // Process EQ segments (situational, can be multiple)
+    while contents.starts_with("EQ") {
+        info!("EQ segment found");
+        let eq_content = get_segment_contents("EQ", &contents);
+        let eq_segment = get_eq(eq_content);
+        info!("EQ segment parsed");
+        loop2000c.eq_segments.push(eq_segment);
+        contents = content_trim("EQ", contents);
+    }
+    
     // Process Loop 2000D segments (can be multiple)
     let mut loop2000d_vec = Vec::new();
     while contents.contains("HL") && is_loop_2000d(&contents) {
@@ -159,6 +183,16 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
     // Write DMG segment if present
     if let Some(dmg) = &loop2000c.dmg_segments {
         contents.push_str(&write_dmg(dmg.clone()));
+    }
+    
+    // Write all DTP segments
+    for dtp in &loop2000c.dtp_segments {
+        contents.push_str(&write_dtp(dtp.clone()));
+    }
+    
+    // Write all EQ segments
+    for eq in &loop2000c.eq_segments {
+        contents.push_str(&write_eq(eq.clone()));
     }
     
     // Write all Loop 2000D segments

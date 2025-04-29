@@ -7,6 +7,7 @@ pub mod loop2000c;
 pub mod loop2000d;
 pub mod loop2110c;
 pub mod loop2110d;
+pub mod loop2115c;
 
 // Re-export commonly used items
 pub use controller::Edi271;
