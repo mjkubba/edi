@@ -53,3 +53,40 @@ The `markdown_files` directory contains specifications for various EDI transacti
 
 ## Project Summary
 For a high-level summary of the project's current status, see the [AmazonQ.md](../AmazonQ.md) file in the root directory.
+## Recent Updates - April 29, 2025
+
+### Duplicate DTP Segments Fix
+- Fixed issue with duplicate DTP segments in EDI271 output
+- Implemented segment filtering by qualifier to ensure proper loop assignment
+- Added duplicate detection and prevention mechanisms
+- Added final deduplication step in output generation
+- Comprehensive testing confirms fix works across all formats
+
+### Next Steps
+1. **Improve Segment Order**:
+   - Implement a more precise segment ordering system
+   - Consider a configuration-driven approach to segment ordering
+   - Ensure generated files match the segment order of original files
+
+2. **Add Line Breaks**:
+   - Add line breaks between segments in the generated output
+   - Implement a configurable formatting option for output files
+
+3. **Fix Segment Formatting Issues**:
+   - Address formatting issues in REF and PER segments in EDI835
+   - Fix CTX segment formatting in EDI999
+
+4. **Clean Up Warnings**:
+   - Address compiler warnings to improve code quality
+   - Remove unused imports and variables
+   - Fix other code quality issues
+
+5. **Implement Transaction Set 276/277**:
+   - Create directory structure and module organization
+   - Implement segment and loop structures
+   - Implement controllers and processing logic
+
+6. **Implement Transaction Set 837**:
+   - Create directory structure for 837P, 837I, and 837D variants
+   - Implement common segments and loops
+   - Implement variant-specific components

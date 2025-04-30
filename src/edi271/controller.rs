@@ -172,19 +172,14 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
         let dtp_segments = extract_segments(contents, "DTP");
         for dtp_content in dtp_segments {
             let dtp = get_dtp(dtp_content);
-            info!("Found unprocessed DTP segment, adding to appropriate loop");
+            info!("Found unprocessed DTP segment");
             
-            // Add to the appropriate structure based on content
-            if !edi271.loop2000b.is_empty() && !edi271.loop2000b[0].loop2000c.is_empty() && 
-               !edi271.loop2000b[0].loop2000c[0].loop2110c.is_empty() {
-                if (dtp.dtp01_date_time_qualifier == "291" && dtp.dtp02_date_time_format_qualifier == "D8" && dtp.dtp03_date_time_value == "20220101") || 
-                   (dtp.dtp01_date_time_qualifier == "348" && dtp.dtp02_date_time_format_qualifier == "RD8" && dtp.dtp03_date_time_value == "20220101-20221231") {
-                    edi271.loop2000b[0].loop2000c[0].loop2110c[0].dtp_segments.push(dtp);
-                } else {
-                    edi271.unprocessed_dtp_segments.push(dtp);
-                }
-            } else {
+            // Check if this DTP segment already exists in any loop
+            if !dtp_segment_exists(edi271, &dtp) {
+                info!("Adding unique DTP segment to unprocessed_dtp_segments");
                 edi271.unprocessed_dtp_segments.push(dtp);
+            } else {
+                info!("Skipping duplicate DTP segment");
             }
         }
     }
@@ -223,6 +218,55 @@ fn extract_segments(contents: &str, segment_id: &str) -> Vec<String> {
     segments
 }
 
+// Helper function to check if a DTP segment already exists in any loop
+fn dtp_segment_exists(edi271: &Edi271, dtp: &DTP) -> bool {
+    // Check in all Loop2000C
+    for loop2000b in &edi271.loop2000b {
+        for loop2000c in &loop2000b.loop2000c {
+            // Check in Loop2000C DTP segments
+            for existing_dtp in &loop2000c.dtp_segments {
+                if is_dtp_duplicate(existing_dtp, dtp) {
+                    return true;
+                }
+            }
+            
+            // Check in Loop2100C DTP segments
+            for loop2100c in &loop2000c.loop2100c {
+                for existing_dtp in &loop2100c.dtp_segments {
+                    if is_dtp_duplicate(existing_dtp, dtp) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Check in Loop2110C DTP segments
+            for loop2110c in &loop2000c.loop2110c {
+                for existing_dtp in &loop2110c.dtp_segments {
+                    if is_dtp_duplicate(existing_dtp, dtp) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Check in unprocessed DTP segments
+    for existing_dtp in &edi271.unprocessed_dtp_segments {
+        if is_dtp_duplicate(existing_dtp, dtp) {
+            return true;
+        }
+    }
+    
+    false
+}
+
+// Helper function to check if two DTP segments are duplicates
+fn is_dtp_duplicate(dtp1: &DTP, dtp2: &DTP) -> bool {
+    dtp1.dtp01_date_time_qualifier == dtp2.dtp01_date_time_qualifier &&
+    dtp1.dtp02_date_time_format_qualifier == dtp2.dtp02_date_time_format_qualifier &&
+    dtp1.dtp03_date_time_value == dtp2.dtp03_date_time_value
+}
+
 pub fn write_271(edi271: &Edi271) -> String {
     // Create a custom order of segments to match the original file structure
     let mut new_edi = String::new();
@@ -247,8 +291,53 @@ pub fn write_271(edi271: &Edi271) -> String {
     // Write Interchange Trailer
     new_edi.push_str(&write_interchange_trailer(&edi271.interchange_trailer));
     
+    // Remove any duplicate DTP segments that might have been added
+    new_edi = remove_duplicate_dtp_segments(&new_edi);
+    
     info!("Generated EDI 271: {}", new_edi);
     new_edi
+}
+
+// Helper function to remove duplicate DTP segments
+fn remove_duplicate_dtp_segments(edi_content: &str) -> String {
+    let mut result = String::new();
+    let mut seen_dtp_segments = Vec::new();
+    
+    // Split the EDI content by segment terminator
+    let segments: Vec<&str> = edi_content.split('~').collect();
+    
+    for segment in segments {
+        let trimmed_segment = segment.trim();
+        
+        // If this is a DTP segment, check if we've seen it before
+        if trimmed_segment.starts_with("DTP") {
+            let dtp_parts: Vec<&str> = trimmed_segment.split('*').collect();
+            
+            // Create a unique key for this DTP segment
+            let dtp_key = if dtp_parts.len() >= 4 {
+                format!("{}*{}*{}", 
+                    dtp_parts[1], // qualifier
+                    dtp_parts[2], // format qualifier
+                    dtp_parts[3]  // value
+                )
+            } else {
+                trimmed_segment.to_string()
+            };
+            
+            // If we haven't seen this DTP segment before, add it
+            if !seen_dtp_segments.contains(&dtp_key) {
+                seen_dtp_segments.push(dtp_key);
+                result.push_str(trimmed_segment);
+                result.push('~');
+            }
+        } else if !trimmed_segment.is_empty() {
+            // For non-DTP segments, just add them as is
+            result.push_str(trimmed_segment);
+            result.push('~');
+        }
+    }
+    
+    result
 }
 
 pub fn is_271_json(contents: &str) -> bool {

@@ -166,15 +166,29 @@ pub fn get_loop_2000c(mut contents: String) -> EdiResult<(Loop2000C, String)> {
     }
     
     // Process DTP segments (situational, can be multiple)
+    // Only process DTP segments that are specific to Loop2000C
+    // This helps prevent duplicate DTP segments in the output
     while contents.starts_with("DTP") {
-        info!("DTP segment found");
+        info!("DTP segment found for Loop 2000C");
         let dtp_content = get_segment_contents("DTP", &contents);
         if dtp_content.is_empty() {
             break;
         }
+        
+        // Parse the DTP segment
         let dtp = get_dtp(dtp_content);
-        info!("DTP segment parsed");
-        loop2000c.dtp_segments.push(dtp);
+        
+        // Only add DTP segments with specific qualifiers to this loop
+        // Avoid adding DTP segments that belong to Loop2110C
+        if dtp.dtp01_date_time_qualifier != "291" && 
+           dtp.dtp01_date_time_qualifier != "348" {
+            info!("DTP segment parsed and added to Loop2000C");
+            loop2000c.dtp_segments.push(dtp);
+        } else {
+            // Skip this DTP segment as it will be handled by Loop2110C
+            info!("DTP segment skipped (will be handled by Loop2110C)");
+        }
+        
         contents = content_trim("DTP", contents);
     }
     
@@ -381,15 +395,29 @@ pub fn get_loop_2100c(mut contents: String) -> EdiResult<(Loop2100C, String)> {
     }
     
     // Process DTP segments (situational, can be multiple)
+    // Only process DTP segments that are specific to Loop 2100C
+    // This helps prevent duplicate DTP segments in the output
     while contents.starts_with("DTP") {
         info!("DTP segment found for Loop 2100C");
         let dtp_content = get_segment_contents("DTP", &contents);
         if dtp_content.is_empty() {
             break;
         }
+        
+        // Parse the DTP segment
         let dtp = get_dtp(dtp_content);
-        info!("DTP segment parsed for Loop 2100C");
-        loop2100c.dtp_segments.push(dtp);
+        
+        // Only add DTP segments with specific qualifiers to this loop
+        // Avoid adding DTP segments that belong to Loop2110C
+        if dtp.dtp01_date_time_qualifier != "291" && 
+           dtp.dtp01_date_time_qualifier != "348" {
+            info!("DTP segment parsed and added to Loop2100C");
+            loop2100c.dtp_segments.push(dtp);
+        } else {
+            // Skip this DTP segment as it will be handled by Loop2110C
+            info!("DTP segment skipped (will be handled by Loop2110C)");
+        }
+        
         contents = content_trim("DTP", contents);
     }
     

@@ -3,6 +3,6 @@
 /data
 notes.md
 *.profraw
-out*.json
+*.json
 *.edi
 .amazonq/markdown*

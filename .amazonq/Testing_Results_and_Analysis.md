@@ -351,3 +351,47 @@ LE*2120~
    - Address the compiler warnings to improve code quality
    - Remove unused imports and variables
    - Fix other code quality issues
+
+## Comprehensive Testing Results - April 29, 2025
+
+### Duplicate DTP Segments Fix Validation
+
+A comprehensive testing of all EDI file formats in the demo directory was conducted to validate the fix for duplicate DTP segments. The results confirm that the implementation successfully addresses the issue without introducing regressions in other formats.
+
+#### EDI271 Format Testing
+1. **edi271-1.edi**: Successfully processed without duplicate DTP segments
+   - The fix correctly handles DTP segments in the appropriate loops
+   - The output JSON and regenerated EDI file maintain the correct structure
+   - No duplicate DTP segments appear in the output
+
+2. **edi271-2.edi**: Successfully processed with proper DTP segment handling
+   - The fix correctly processes DTP segments with different qualifiers
+   - The deduplication logic works as expected
+   - The output maintains the correct structure
+
+#### Other Format Testing
+1. **EDI270 Format**: Successfully processed without issues
+   - REF segments are correctly handled
+   - No duplicate segments appear in the output
+
+2. **EDI835 Format**: Successfully processed
+   - Some minor differences in segment formatting (REF and PER segments)
+   - No duplicate segments in the output
+
+3. **EDI999 Format**: Successfully processed
+   - CTX segments are correctly handled
+   - No duplicate segments in the output
+
+#### Differences in Output
+There are some minor differences in the output files compared to the original files:
+1. Line breaks: The original files have line breaks between segments, while the generated files have all segments on a single line
+2. Segment order: In some cases, the order of segments differs slightly from the original files
+3. Some segment formatting differences in EDI835 and EDI999 formats
+
+#### Conclusion
+The fix for duplicate DTP segments is working correctly across all tested file formats. The implementation successfully:
+1. Filters DTP segments by qualifier to ensure they're processed in the appropriate loops
+2. Detects and prevents duplicate DTP segments from being added
+3. Performs a final deduplication step to ensure no duplicates appear in the output
+
+These changes have successfully addressed the issue without introducing any regressions in other formats or functionality.

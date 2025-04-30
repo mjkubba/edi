@@ -343,3 +343,71 @@ pub fn get_per(per_content: String) -> PER {
 - Some differences in segment order between original and generated files
 - Duplicate DTP segments in some cases
 - Compiler warnings that need to be addressed
+### Fix for Duplicate DTP Segments
+
+The issue with duplicate DTP segments in the EDI271 implementation has been resolved. The problem was occurring because DTP segments were being processed in multiple places:
+
+1. In `loop2000c.rs` - DTP segments were processed and stored in `loop2000c.dtp_segments`
+2. In `loop2110c.rs` - DTP segments were processed and stored in `loop2110c.dtp_segments`
+3. In `controller.rs` - The `process_remaining_segments` function was also adding DTP segments to `loop2110c.dtp_segments`
+
+The solution involved several changes:
+
+1. **Segment Filtering by Qualifier**:
+   - Modified the DTP segment processing in `loop2000c.rs` and `loop2100c.rs` to only process DTP segments with qualifiers that don't belong to Loop2110C
+   - Modified the DTP segment processing in `loop2110c.rs` to only process DTP segments with specific qualifiers (291 and 348)
+
+2. **Duplicate Detection**:
+   - Added helper functions in `controller.rs` to detect duplicate DTP segments:
+     - `dtp_segment_exists`: Checks if a DTP segment already exists in any loop
+     - `is_dtp_duplicate`: Compares two DTP segments to determine if they are duplicates
+
+3. **Final Deduplication**:
+   - Added a `remove_duplicate_dtp_segments` function to the `write_271` method that removes any remaining duplicate DTP segments from the final output
+
+These changes ensure that DTP segments are only included once in the output, regardless of where they are processed in the code.
+## Phase 2 Implementation Status Update - April 29, 2025
+
+### Completed Tasks
+
+1. **Duplicate DTP Segments Fix**
+   - Implemented segment filtering by qualifier in loop2000c.rs, loop2100c.rs, and loop2110c.rs
+   - Added duplicate detection functions in controller.rs
+   - Added final deduplication step in write_271 function
+   - Comprehensive testing confirms fix works across all formats
+
+### Current Status
+
+The duplicate DTP segments issue has been successfully resolved. The implementation now correctly handles DTP segments in the appropriate loops based on their qualifiers, detects and prevents duplicate segments from being added, and performs a final deduplication step to ensure no duplicates appear in the output.
+
+Comprehensive testing across all EDI formats in the demo directory confirms that the fix works correctly without introducing regressions in other formats or functionality.
+
+### Next Steps
+
+1. **Improve Segment Order**:
+   - Implement a more precise segment ordering system
+   - Consider a configuration-driven approach to segment ordering
+   - Ensure generated files match the segment order of original files
+
+2. **Add Line Breaks**:
+   - Add line breaks between segments in the generated output
+   - Implement a configurable formatting option for output files
+
+3. **Fix Segment Formatting Issues**:
+   - Address formatting issues in REF and PER segments in EDI835
+   - Fix CTX segment formatting in EDI999
+
+4. **Clean Up Warnings**:
+   - Address compiler warnings to improve code quality
+   - Remove unused imports and variables
+   - Fix other code quality issues
+
+5. **Implement Transaction Set 276/277**:
+   - Create directory structure and module organization
+   - Implement segment and loop structures
+   - Implement controllers and processing logic
+
+6. **Implement Transaction Set 837**:
+   - Create directory structure for 837P, 837I, and 837D variants
+   - Implement common segments and loops
+   - Implement variant-specific components

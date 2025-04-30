@@ -68,15 +68,28 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
     }
     
     // Process DTP segments (situational, can be multiple)
+    // Only process DTP segments that are specific to this loop
+    // This helps prevent duplicate DTP segments in the output
     while contents.starts_with("DTP") {
         info!("DTP segment found");
         let dtp_content = get_segment_contents("DTP", &contents);
         if dtp_content.is_empty() {
             break;
         }
+        
+        // Parse the DTP segment
         let dtp = get_dtp(dtp_content);
-        info!("DTP segment parsed");
-        loop2110c.dtp_segments.push(dtp);
+        
+        // Only add DTP segments with specific qualifiers to this loop
+        // This prevents duplicates from being added in process_remaining_segments
+        if dtp.dtp01_date_time_qualifier == "291" || 
+           dtp.dtp01_date_time_qualifier == "348" {
+            info!("DTP segment parsed and added to Loop2110C");
+            loop2110c.dtp_segments.push(dtp);
+        } else {
+            info!("DTP segment parsed but not added to Loop2110C (will be handled elsewhere)");
+        }
+        
         contents = content_trim("DTP", contents);
     }
     

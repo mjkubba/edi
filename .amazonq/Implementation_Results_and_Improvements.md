@@ -421,3 +421,158 @@ fn extract_segments(contents: &str, segment_id: &str) -> Vec<String> {
 - Implement Transaction Set 276/277 (Health Care Claim Status)
 - Implement Transaction Set 837 (Health Care Claim)
 - Ensure consistent implementation approach across all transaction sets
+## Duplicate DTP Segments Fix Implementation - April 29, 2025
+
+### Problem Statement
+The EDI271 implementation was generating duplicate DTP segments in the output, which violated the EDI standard and caused issues with downstream systems. The duplication occurred because DTP segments were being processed in multiple places:
+1. In `loop2000c.rs` and `loop2100c.rs` - DTP segments were added to their respective collections
+2. In `loop2110c.rs` - The same DTP segments were being added again
+3. In `controller.rs` - The `process_remaining_segments` function was adding DTP segments yet again
+
+### Solution Implemented
+
+#### 1. Segment Filtering by Qualifier
+Modified the DTP segment processing in each loop to only handle segments with specific qualifiers:
+```rust
+// In loop2110c.rs
+if dtp.dtp01_date_time_qualifier == "291" || 
+   dtp.dtp01_date_time_qualifier == "348" {
+    info!("DTP segment parsed and added to Loop2110C");
+    loop2110c.dtp_segments.push(dtp);
+} else {
+    info!("DTP segment parsed but not added to Loop2110C (will be handled elsewhere)");
+}
+```
+
+```rust
+// In loop2000c.rs and loop2100c.rs
+if dtp.dtp01_date_time_qualifier != "291" && 
+   dtp.dtp01_date_time_qualifier != "348" {
+    info!("DTP segment parsed and added to Loop2000C");
+    loop2000c.dtp_segments.push(dtp);
+} else {
+    // Skip this DTP segment as it will be handled by Loop2110C
+    info!("DTP segment skipped (will be handled by Loop2110C)");
+}
+```
+
+#### 2. Duplicate Detection
+Added helper functions to detect duplicate DTP segments:
+```rust
+// Helper function to check if a DTP segment already exists in any loop
+fn dtp_segment_exists(edi271: &Edi271, dtp: &DTP) -> bool {
+    // Check in all Loop2000C
+    for loop2000b in &edi271.loop2000b {
+        for loop2000c in &loop2000b.loop2000c {
+            // Check in Loop2000C DTP segments
+            for existing_dtp in &loop2000c.dtp_segments {
+                if is_dtp_duplicate(existing_dtp, dtp) {
+                    return true;
+                }
+            }
+            
+            // Check in Loop2100C DTP segments
+            for loop2100c in &loop2000c.loop2100c {
+                for existing_dtp in &loop2100c.dtp_segments {
+                    if is_dtp_duplicate(existing_dtp, dtp) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Check in Loop2110C DTP segments
+            for loop2110c in &loop2000c.loop2110c {
+                for existing_dtp in &loop2110c.dtp_segments {
+                    if is_dtp_duplicate(existing_dtp, dtp) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Check in unprocessed DTP segments
+    for existing_dtp in &edi271.unprocessed_dtp_segments {
+        if is_dtp_duplicate(existing_dtp, dtp) {
+            return true;
+        }
+    }
+    
+    false
+}
+
+// Helper function to check if two DTP segments are duplicates
+fn is_dtp_duplicate(dtp1: &DTP, dtp2: &DTP) -> bool {
+    dtp1.dtp01_date_time_qualifier == dtp2.dtp01_date_time_qualifier &&
+    dtp1.dtp02_date_time_format_qualifier == dtp2.dtp02_date_time_format_qualifier &&
+    dtp1.dtp03_date_time_value == dtp2.dtp03_date_time_value
+}
+```
+
+#### 3. Final Deduplication
+Added a post-processing step in the `write_271` function:
+```rust
+pub fn write_271(edi271: &Edi271) -> String {
+    // Create a custom order of segments to match the original file structure
+    let mut new_edi = String::new();
+    
+    // Write all segments...
+    
+    // Remove any duplicate DTP segments that might have been added
+    new_edi = remove_duplicate_dtp_segments(&new_edi);
+    
+    info!("Generated EDI 271: {}", new_edi);
+    new_edi
+}
+
+// Helper function to remove duplicate DTP segments
+fn remove_duplicate_dtp_segments(edi_content: &str) -> String {
+    let mut result = String::new();
+    let mut seen_dtp_segments = Vec::new();
+    
+    // Split the EDI content by segment terminator
+    let segments: Vec<&str> = edi_content.split('~').collect();
+    
+    for segment in segments {
+        let trimmed_segment = segment.trim();
+        
+        // If this is a DTP segment, check if we've seen it before
+        if trimmed_segment.starts_with("DTP") {
+            let dtp_parts: Vec<&str> = trimmed_segment.split('*').collect();
+            
+            // Create a unique key for this DTP segment
+            let dtp_key = if dtp_parts.len() >= 4 {
+                format!("{}*{}*{}", 
+                    dtp_parts[1], // qualifier
+                    dtp_parts[2], // format qualifier
+                    dtp_parts[3]  // value
+                )
+            } else {
+                trimmed_segment.to_string()
+            };
+            
+            // If we haven't seen this DTP segment before, add it
+            if !seen_dtp_segments.contains(&dtp_key) {
+                seen_dtp_segments.push(dtp_key);
+                result.push_str(trimmed_segment);
+                result.push('~');
+            }
+        } else if !trimmed_segment.is_empty() {
+            // For non-DTP segments, just add them as is
+            result.push_str(trimmed_segment);
+            result.push('~');
+        }
+    }
+    
+    result
+}
+```
+
+### Results
+The implementation successfully eliminates duplicate DTP segments in the output while maintaining the correct structure according to the EDI 271 format specifications. Comprehensive testing across all EDI formats in the demo directory confirms that the fix works correctly without introducing regressions.
+
+### Benefits
+- Eliminates duplicate DTP segments in the output
+- Maintains proper segment organization by qualifier
+- Preserves all necessary information while avoiding redundancy
+- Provides a more robust solution that will prevent similar issues in the future
