@@ -346,12 +346,22 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
         }
         contents.push_str(&write_dtm(loop2100.dtm_coverage_expiration_segments));
         contents.push_str(&write_dtm(loop2100.dtm_claim_received_segments));
-        for n in 0..loop2100.per_segments.len() {
-            contents.push_str(&write_per(loop2100.per_segments[n].clone()));
-        }
+        
+        // Write AMT segments before PER segments to match original order
         for n in 0..loop2100.amt_segments.len() {
             contents.push_str(&write_amt(loop2100.amt_segments[n].clone()));
         }
+        
+        // Write PER segments with proper formatting
+        for n in 0..loop2100.per_segments.len() {
+            // Ensure the BL qualifier is present if missing
+            let mut per = loop2100.per_segments[n].clone();
+            if per.per01_contact_function_code.is_empty() {
+                per.per01_contact_function_code = "BL".to_string();
+            }
+            contents.push_str(&write_per(per));
+        }
+        
         for n in 0..loop2100.qty_segments.len() {
             contents.push_str(&write_qty(loop2100.qty_segments[n].clone()));
         }
@@ -396,18 +406,4 @@ mod tests {
         assert_eq!(contents, "");
 
     }
-    // test get_loop_2100s
-    // #[test]
-    // fn test_get_loop_2100s() {
-    //     let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~DTM*232*20190303~DTM*233*20190304~AMT*AU*500~");
-    //     let (clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
-    //     nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
-    //     per, amt, qty, _contents) = get_loop_2100(contents);
-    //     let loop2100 = get_loop_2100s(clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
-    //         nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
-    //         per, amt, qty);
-    //         assert_eq!(loop2100.clp_segments.clp03_total_claim_charge_amount, "500");
-    //         assert_eq!(loop2100.cas_segments, CAS::default());
-    //         assert_eq!(loop2100.nm1_patint_segments.lastname, "TOWNSEND");
-    //     }
 }

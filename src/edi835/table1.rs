@@ -147,7 +147,20 @@ pub fn write_table1(table1:Table1s) -> String {
     contents.push_str(&write_bpr(table1.bpr_segments));
     contents.push_str(&write_trn(table1.trn_segments));
     contents.push_str(&write_cur(table1.cur_segments));
-    contents.push_str(&write_ref(table1.ref_receiver_segments));
+    
+    // Fix for REF segment - ensure the qualifier is included
+    if !table1.ref_receiver_segments.reference_id_number_qualifier.is_empty() {
+        let mut ref_content = String::new();
+        ref_content.push_str("REF*");
+        ref_content.push_str(&table1.ref_receiver_segments.reference_id_number_qualifier);
+        ref_content.push_str("*");
+        ref_content.push_str(&table1.ref_receiver_segments.reference_id_number);
+        ref_content.push_str("~");
+        contents.push_str(&ref_content);
+    } else {
+        contents.push_str(&write_ref(table1.ref_receiver_segments));
+    }
+    
     contents.push_str(&write_ref(table1.ref_version_segments));
     contents.push_str(&write_dtm(table1.dtm_segments));
     return contents;

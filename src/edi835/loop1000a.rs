@@ -133,14 +133,33 @@ pub fn write_loop1000a(loop1000a:Loop1000as) -> String {
     contents.push_str(&write_n1(loop1000a.n1_segments));
     contents.push_str(&write_n3(loop1000a.n3_segments));
     contents.push_str(&write_n4(loop1000a.n4_segments));
+    
+    // Write REF segments
     for n in 0..loop1000a.ref_segments.len() {
         contents.push_str(&write_ref(loop1000a.ref_segments[n].clone()));
     }
-    contents.push_str(&write_per(loop1000a.per_payer_business));
-    for n in 0..loop1000a.per_technical_contact.len() {
-        contents.push_str(&write_per(loop1000a.per_technical_contact[n].clone()));
+    
+    // Write PER segments with proper formatting
+    // First, write the business contact if present
+    if !loop1000a.per_payer_business.per01_contact_function_code.is_empty() {
+        contents.push_str(&write_per(loop1000a.per_payer_business));
     }
-    contents.push_str(&write_per(loop1000a.per_web_site));
+    
+    // Then write technical contacts
+    for n in 0..loop1000a.per_technical_contact.len() {
+        // Ensure the BL qualifier is present
+        let mut per = loop1000a.per_technical_contact[n].clone();
+        if per.per01_contact_function_code.is_empty() {
+            per.per01_contact_function_code = "BL".to_string();
+        }
+        contents.push_str(&write_per(per));
+    }
+    
+    // Finally write web site contact if present
+    if !loop1000a.per_web_site.per01_contact_function_code.is_empty() {
+        contents.push_str(&write_per(loop1000a.per_web_site));
+    }
+    
     return contents;
 }
 
@@ -168,6 +187,4 @@ mod tests {
         assert_eq!(ref_segments, vec![]);
         assert_eq!(contents, "N1*");
     }
-
-
 }

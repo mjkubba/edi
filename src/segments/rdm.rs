@@ -1,5 +1,4 @@
 use serde::{Serialize, Deserialize};
-use crate::helper::edihelper::stiuational_element;
 
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
@@ -38,23 +37,27 @@ pub fn write_rdm(rdm:RDM) -> String {
     let mut rdm_content: String = String::new();
     rdm_content.push_str("RDM*");
     rdm_content.push_str(&rdm.rdm01_report_transmission_code);
-    rdm_content.push_str(&stiuational_element(rdm.rdm02_name));
-    rdm_content.push_str(&stiuational_element(rdm.rdm03_communication_number));
-
-    // rdm_content.push_str("*");
-    // rdm_content.push_str(&rdm.rdm02_name);
-    // rdm_content.push_str("*");
-    // rdm_content.push_str(&rdm.rdm03_communication_number);
+    
+    // Add name if present or if communication number is present
+    if !rdm.rdm02_name.is_empty() {
+        rdm_content.push_str("*");
+        rdm_content.push_str(&rdm.rdm02_name);
+    } else if !rdm.rdm03_communication_number.is_empty() {
+        rdm_content.push_str("*");
+    }
+    
+    // Add communication number if present
+    if !rdm.rdm03_communication_number.is_empty() {
+        rdm_content.push_str("*");
+        rdm_content.push_str(&rdm.rdm03_communication_number);
+    }
+    
     rdm_content.push_str("~");
     rdm_content
-    
 }
 
 // unit test
-
-
 #[cfg(test)]
-
 mod tests {
     use super::*;
     #[test]

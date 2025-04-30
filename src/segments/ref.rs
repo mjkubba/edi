@@ -16,8 +16,8 @@ pub fn get_ref(ref_content: String) -> REF {
     }
     
     // Extract the qualifier and reference number, skipping the segment ID
-    let reference_id_number_qualifier = if ref_parts.len() > 1 { ref_parts[1].to_string() } else { String::new() };
-    let reference_id_number = if ref_parts.len() > 2 { ref_parts[2].to_string() } else { String::new() };
+    let reference_id_number_qualifier = if ref_parts.len() > 0 { ref_parts[0].to_string() } else { String::new() };
+    let reference_id_number = if ref_parts.len() > 1 { ref_parts[1].to_string() } else { String::new() };
     
     REF {
         reference_id_number_qualifier,
@@ -32,8 +32,13 @@ pub fn write_ref(rref:REF) -> String {
     let mut ref_content = String::new();
     ref_content.push_str("REF*");
     ref_content.push_str(&rref.reference_id_number_qualifier);
-    ref_content.push_str("*");
-    ref_content.push_str(&rref.reference_id_number);
+    
+    // Add reference identification if present
+    if !rref.reference_id_number.is_empty() {
+        ref_content.push_str("*");
+        ref_content.push_str(&rref.reference_id_number);
+    }
+    
     ref_content.push_str("~");
     ref_content
 }
@@ -44,7 +49,7 @@ mod tests {
     
     #[test]
     fn test_get_ref() {
-        let ref_content = "REF*SY*123456789".to_string();
+        let ref_content = "SY*123456789".to_string();
         let ref_segment = get_ref(ref_content);
         
         assert_eq!(ref_segment.reference_id_number_qualifier, "SY");

@@ -84,21 +84,27 @@ pub fn get_835(mut contents: String) -> Edi835 {
 pub fn write_835(contents: String) -> String {
     let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
     let mut new_edi = String::new();
-    let new_ich = write_interchange_control(edi_json.interchange_header.clone());
     
-    let new_t1 = write_table1(edi_json.table1.table1.clone());
-    let new_l1a = write_loop1000a(edi_json.table1.loop1000as.clone());
-    let new_l1b = write_loop1000b(edi_json.table1.loop1000bs.clone());
-    let new_l2 = write_loop2000(edi_json.table2s.clone());
-    let new_t3 = write_table3(edi_json.table3s.clone());
-    let new_ict = write_interchange_trailer(edi_json.interchange_trailer.clone());
-    new_edi.push_str(&new_ich);
-    new_edi.push_str(&new_t1);
-    new_edi.push_str(&new_l1a);
-    new_edi.push_str(&new_l1b);
-    new_edi.push_str(&new_l2);
-    new_edi.push_str(&new_t3);
-    new_edi.push_str(&new_ict);
-    println!("{:?}", new_edi.clone());
+    // Write interchange control header
+    new_edi.push_str(&write_interchange_control(edi_json.interchange_header.clone()));
+    
+    // Write table 1 segments
+    new_edi.push_str(&write_table1(edi_json.table1.table1.clone()));
+    
+    // Write loop 1000A segments (payer identification)
+    new_edi.push_str(&write_loop1000a(edi_json.table1.loop1000as.clone()));
+    
+    // Write loop 1000B segments (payee identification)
+    new_edi.push_str(&write_loop1000b(edi_json.table1.loop1000bs.clone()));
+    
+    // Write loop 2000 segments (claim payment information)
+    new_edi.push_str(&write_loop2000(edi_json.table2s.clone()));
+    
+    // Write table 3 segments (summary)
+    new_edi.push_str(&write_table3(edi_json.table3s.clone()));
+    
+    // Write interchange control trailer
+    new_edi.push_str(&write_interchange_trailer(edi_json.interchange_trailer.clone()));
+    
     new_edi
 }
