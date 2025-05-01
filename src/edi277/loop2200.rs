@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use crate::segments::trn::*;
 use crate::segments::stc::*;
-use crate::segments::ref_seg::*;
+use crate::segments::r#ref::*;
 use crate::segments::dtp::*;
 use crate::segments::qty::*;
 use crate::segments::amt::*;
@@ -79,7 +79,7 @@ pub fn write_loop_2200c(loop_2200c: &Loop2200C) -> String {
     let mut result = String::new();
     
     // Write TRN segment
-    result.push_str(&write_trn(&loop_2200c.trn));
+    result.push_str(&write_trn(loop_2200c.trn.clone()));
     
     // Write STC segments
     for stc in &loop_2200c.stc_segments {
@@ -88,22 +88,22 @@ pub fn write_loop_2200c(loop_2200c: &Loop2200C) -> String {
     
     // Write REF segments
     for ref_seg in &loop_2200c.ref_segments {
-        result.push_str(&write_ref(ref_seg));
+        result.push_str(&write_ref(ref_seg.clone()));
     }
     
     // Write DTP segments
     for dtp in &loop_2200c.dtp_segments {
-        result.push_str(&write_dtp(dtp));
+        result.push_str(&write_dtp(dtp.clone()));
     }
     
     // Write QTY segments
     for qty in &loop_2200c.qty_segments {
-        result.push_str(&write_qty(qty));
+        result.push_str(&write_qty(qty.clone()));
     }
     
     // Write AMT segments
     for amt in &loop_2200c.amt_segments {
-        result.push_str(&write_amt(amt));
+        result.push_str(&write_amt(amt.clone()));
     }
     
     // Write Loop 2220C
@@ -118,16 +118,32 @@ pub fn write_loop_2200c(loop_2200c: &Loop2200C) -> String {
 // These will be implemented in detail later
 
 pub fn write_loop_2220c(loop_2220c: &Loop2220C) -> String {
-    // Implementation will be added later
-    String::new()
-}
-
-pub fn write_qty(qty: &QTY) -> String {
-    // Implementation will be added later
-    String::new()
-}
-
-pub fn write_amt(amt: &AMT) -> String {
-    // Implementation will be added later
-    String::new()
+    let mut result = String::new();
+    
+    // Write STC segments
+    for stc in &loop_2220c.stc_segments {
+        result.push_str(&write_stc(stc));
+    }
+    
+    // Write REF segments
+    for ref_seg in &loop_2220c.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+    }
+    
+    // Write DTP segments
+    for dtp in &loop_2220c.dtp_segments {
+        result.push_str(&write_dtp(dtp.clone()));
+    }
+    
+    // Write QTY segments
+    for qty in &loop_2220c.qty_segments {
+        result.push_str(&write_qty(qty.clone()));
+    }
+    
+    // Write AMT segments
+    for amt in &loop_2220c.amt_segments {
+        result.push_str(&write_amt(amt.clone()));
+    }
+    
+    result
 }

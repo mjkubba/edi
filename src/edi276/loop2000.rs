@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 use crate::segments::hl::*;
 use crate::segments::nm1::*;
 use crate::segments::trn::*;
-use crate::segments::ref_seg::*;
+use crate::segments::r#ref::*;
 use crate::edi276::loop2100::*;
 use crate::edi276::loop2200::*;
 
@@ -67,7 +67,7 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
         let hl_elements: Vec<&str> = hl_segment.split('*').collect();
         
         if hl_elements.len() >= 4 && hl_elements[3] == "20" {  // 20 is the code for Information Source
-            loop_2000a.hl = get_hl(hl_segment);
+            loop_2000a.hl = get_hl(hl_segment.to_string());
             
             // Remove the HL segment from the remaining content
             remaining_content = contents[hl_segment_start + hl_segment_end + 1..].to_string();
@@ -77,7 +77,7 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
                 let nm1_segment_end = remaining_content[nm1_segment_start..].find('~').unwrap_or(remaining_content.len() - nm1_segment_start);
                 let nm1_segment = &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
                 
-                loop_2000a.nm1 = get_nm1(nm1_segment);
+                loop_2000a.nm1 = get_nm1(nm1_segment.to_string());
                 
                 // Remove the NM1 segment from the remaining content
                 remaining_content = remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
@@ -106,7 +106,7 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
         
         if hl_elements.len() >= 4 && hl_elements[3] == "21" {  // 21 is the code for Information Receiver
             let mut loop_2000b = Loop2000B::default();
-            loop_2000b.hl = get_hl(hl_segment);
+            loop_2000b.hl = get_hl(hl_segment.to_string());
             
             // Remove the HL segment from the remaining content
             remaining_content = remaining_content[hl_segment_start + hl_segment_end + 1..].to_string();
@@ -116,7 +116,7 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
                 let nm1_segment_end = remaining_content[nm1_segment_start..].find('~').unwrap_or(remaining_content.len() - nm1_segment_start);
                 let nm1_segment = &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
                 
-                loop_2000b.nm1 = get_nm1(nm1_segment);
+                loop_2000b.nm1 = get_nm1(nm1_segment.to_string());
                 
                 // Remove the NM1 segment from the remaining content
                 remaining_content = remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
@@ -152,10 +152,10 @@ pub fn write_loop_2000a(loop_2000a: &Loop2000A) -> String {
     let mut result = String::new();
     
     // Write HL segment
-    result.push_str(&write_hl(&loop_2000a.hl));
+    result.push_str(&write_hl(loop_2000a.hl.clone()));
     
     // Write NM1 segment
-    result.push_str(&write_nm1(&loop_2000a.nm1));
+    result.push_str(&write_nm1(loop_2000a.nm1.clone()));
     
     // Write Loop 2100A
     for loop_2100a in &loop_2000a.loop2100a {
@@ -170,10 +170,10 @@ pub fn write_loop_2000b_vec(loop_2000b_vec: &[Loop2000B]) -> String {
     
     for loop_2000b in loop_2000b_vec {
         // Write HL segment
-        result.push_str(&write_hl(&loop_2000b.hl));
+        result.push_str(&write_hl(loop_2000b.hl.clone()));
         
         // Write NM1 segment
-        result.push_str(&write_nm1(&loop_2000b.nm1));
+        result.push_str(&write_nm1(loop_2000b.nm1.clone()));
         
         // Write Loop 2100B
         for loop_2100b in &loop_2000b.loop2100b {

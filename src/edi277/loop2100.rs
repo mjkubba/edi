@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 use crate::segments::nm1::*;
-use crate::segments::ref_seg::*;
+use crate::segments::r#ref::*;
 use crate::segments::per::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
@@ -73,26 +73,26 @@ pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
     let mut result = String::new();
     
     // Write NM1 segment
-    result.push_str(&write_nm1(&loop_2100a.nm1));
+    result.push_str(&write_nm1(loop_2100a.nm1.clone()));
     
     // Write REF segments
     for ref_seg in &loop_2100a.ref_segments {
-        result.push_str(&write_ref(ref_seg));
+        result.push_str(&write_ref(ref_seg.clone()));
     }
     
     // Write N3 segment if present
     if let Some(n3) = &loop_2100a.n3 {
-        result.push_str(&write_n3(n3));
+        result.push_str(&write_n3(n3.clone()));
     }
     
     // Write N4 segment if present
     if let Some(n4) = &loop_2100a.n4 {
-        result.push_str(&write_n4(n4));
+        result.push_str(&write_n4(n4.clone()));
     }
     
     // Write PER segments
     for per in &loop_2100a.per_segments {
-        result.push_str(&write_per(per));
+        result.push_str(&write_per(per.clone()));
     }
     
     result
@@ -102,26 +102,26 @@ pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
     let mut result = String::new();
     
     // Write NM1 segment
-    result.push_str(&write_nm1(&loop_2100b.nm1));
+    result.push_str(&write_nm1(loop_2100b.nm1.clone()));
     
     // Write REF segments
     for ref_seg in &loop_2100b.ref_segments {
-        result.push_str(&write_ref(ref_seg));
+        result.push_str(&write_ref(ref_seg.clone()));
     }
     
     // Write N3 segment if present
     if let Some(n3) = &loop_2100b.n3 {
-        result.push_str(&write_n3(n3));
+        result.push_str(&write_n3(n3.clone()));
     }
     
     // Write N4 segment if present
     if let Some(n4) = &loop_2100b.n4 {
-        result.push_str(&write_n4(n4));
+        result.push_str(&write_n4(n4.clone()));
     }
     
     // Write PER segments
     for per in &loop_2100b.per_segments {
-        result.push_str(&write_per(per));
+        result.push_str(&write_per(per.clone()));
     }
     
     result
