@@ -16,10 +16,13 @@ pub fn get_dtp(dtp_content: String) -> DTP {
         return DTP::default();
     }
     
-    // Extract fields with bounds checking, skipping the segment ID
-    let dtp01_date_time_qualifier = if dtp_parts.len() > 1 { dtp_parts[1].to_string() } else { String::new() };
-    let dtp02_date_time_format_qualifier = if dtp_parts.len() > 2 { dtp_parts[2].to_string() } else { String::new() };
-    let dtp03_date_time_value = if dtp_parts.len() > 3 { dtp_parts[3].to_string() } else { String::new() };
+    // Check if the first part is the segment ID "DTP"
+    let start_index = if dtp_parts[0] == "DTP" { 1 } else { 0 };
+    
+    // Extract fields with bounds checking, skipping the segment ID if present
+    let dtp01_date_time_qualifier = if dtp_parts.len() > start_index { dtp_parts[start_index].to_string() } else { String::new() };
+    let dtp02_date_time_format_qualifier = if dtp_parts.len() > start_index + 1 { dtp_parts[start_index + 1].to_string() } else { String::new() };
+    let dtp03_date_time_value = if dtp_parts.len() > start_index + 2 { dtp_parts[start_index + 2].to_string() } else { String::new() };
     
     let dtp = DTP {
         dtp01_date_time_qualifier,

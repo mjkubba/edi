@@ -74,6 +74,19 @@ pub fn write_ctx(ctx: CTX) -> String {
     let mut ctx_content = String::new();
     info!("Writing CTX segment: {:?}", ctx);
     
+    // Special handling for formats like "CLM01:123456789"
+    if ctx.ctx01_context_name.contains(':') && 
+       ctx.ctx02_segment_id_code.is_empty() && 
+       ctx.ctx03_segment_position_in_transaction.is_empty() && 
+       ctx.ctx04_loop_id_code.is_empty() && 
+       ctx.ctx05_position_in_segment.is_empty() && 
+       ctx.ctx06_reference_in_segment.is_empty() {
+        ctx_content.push_str("CTX*");
+        ctx_content.push_str(&ctx.ctx01_context_name);
+        ctx_content.push_str("~");
+        return ctx_content;
+    }
+    
     ctx_content.push_str("CTX*");
     ctx_content.push_str(&ctx.ctx01_context_name);
     
@@ -91,6 +104,19 @@ pub fn write_ctx(ctx: CTX) -> String {
                 ctx_content.push_str(&ctx.ctx04_loop_id_code);
                 
                 if !ctx.ctx05_position_in_segment.is_empty() {
+                    ctx_content.push_str("*");
+                    ctx_content.push_str(&ctx.ctx05_position_in_segment);
+                    
+                    if !ctx.ctx06_reference_in_segment.is_empty() {
+                        ctx_content.push_str("*");
+                        ctx_content.push_str(&ctx.ctx06_reference_in_segment);
+                    }
+                }
+            } else {
+                // Add empty field for ctx04_loop_id_code if ctx05_position_in_segment is not empty
+                if !ctx.ctx05_position_in_segment.is_empty() {
+                    ctx_content.push_str("*");
+                    
                     ctx_content.push_str("*");
                     ctx_content.push_str(&ctx.ctx05_position_in_segment);
                     

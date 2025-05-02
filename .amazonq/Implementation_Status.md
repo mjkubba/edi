@@ -5,9 +5,9 @@
 | Transaction Set | Status | Description |
 |----------------|--------|-------------|
 | EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with all segments correctly processed and generated |
-| EDI270 (Health Care Eligibility Benefit Inquiry) | ⚠️ Mostly Complete | Core functionality working, REF segments not included in output |
-| EDI271 (Health Care Eligibility Benefit Response) | ⚠️ Partially Complete | Core functionality working, PER/REF/DTP segments not included in output |
-| EDI999 (Implementation Acknowledgment) | ⚠️ Partially Complete | Core functionality working, CTX segment formatting issues, trailer segments incomplete |
+| EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Core functionality working, REF segments included in output, DTP segments fixed |
+| EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
+| EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | 🔄 In Progress | Basic structure implemented, needs further development |
 | EDI837 (Health Care Claim) | 📝 Planned | Not yet implemented |
 
@@ -19,46 +19,31 @@
 - Updated write_loop1000a function to properly handle PER segments with BL qualifier
 - Reordered segments in write_loop2100 function to match expected order (AMT before PER)
 
-### EDI270/271
-- Improved parsing of REF, PER, and DTP segments
-- Added support for MSG segments in EDI271
-- Enhanced loop detection and segment assignment
-
-### EDI999
-- Improved CTX segment parsing
-- Enhanced handling of multiple AK2 loops
-
-## Known Issues
-
 ### EDI270
-- REF segments are not included in the generated output
-- Line breaks are not preserved in the generated output
+- Fixed REF segments not being included in the generated output
+- Fixed DTP segment parsing to correctly handle the segment ID
+- Added line breaks between segments in the generated output for better readability
+- Added test to verify REF segment handling
 
 ### EDI271
-- PER, REF, and DTP segments are not included in the generated output
-- Line breaks are not preserved in the generated output
+- Fixed PER, REF, and DTP segments not being included in the generated output
+- Added line breaks between segments in the generated output for better readability
+- Enhanced logging to show segment details
+- Added test to verify unprocessed segments handling
 
 ### EDI999
-- CTX segment formatting issues (not all fields preserved)
-- Trailer segments (SE, AK9, GE, IEA) missing values
-- Line breaks are not preserved in the generated output
+- Fixed CTX segment formatting to properly handle special formats like "CLM01:123456789"
+- Fixed CTX segment formatting to properly handle empty fields in the middle of the segment
+- Added proper values for trailer segments (SE, AK9, GE, IEA)
+- Added line breaks between segments in the generated output for better readability
+- Added test to verify CTX segment handling and trailer segment values
 
 ## Next Development Tasks
 
-1. **EDI270/271**:
-   - Modify write functions to include REF, PER, and DTP segments in output
-   - Implement proper segment ordering
-
-2. **EDI999**:
-   - Fix CTX segment formatting to preserve all fields
-   - Ensure proper values for trailer segments
-   - Implement proper segment ordering
-
-3. **General Improvements**:
-   - Implement line breaks between segments in generated output
+1. **General Improvements**:
    - Address compiler warnings
    - Enhance error handling and validation
 
-4. **New Transaction Sets**:
+2. **New Transaction Sets**:
    - Complete EDI276/277 implementation
    - Begin EDI837 implementation

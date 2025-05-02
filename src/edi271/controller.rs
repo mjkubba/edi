@@ -136,7 +136,7 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
         let per_segments = extract_segments(contents, "PER");
         for per_content in per_segments {
             let per = get_per(per_content);
-            info!("Found unprocessed PER segment, adding to Loop 2000A");
+            info!("Found unprocessed PER segment: {:?}", per);
             
             // Add to the appropriate structure
             if per.per01_contact_function_code == "IC" && per.per02_contact_name == "CUSTOMER SERVICE" {
@@ -152,7 +152,7 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
         let ref_segments = extract_segments(contents, "REF");
         for ref_content in ref_segments {
             let ref_segment = get_ref(ref_content);
-            info!("Found unprocessed REF segment, adding to appropriate loop");
+            info!("Found unprocessed REF segment: {:?}", ref_segment);
             
             // Add to the appropriate structure based on content
             if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
@@ -172,7 +172,7 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
         let dtp_segments = extract_segments(contents, "DTP");
         for dtp_content in dtp_segments {
             let dtp = get_dtp(dtp_content);
-            info!("Found unprocessed DTP segment");
+            info!("Found unprocessed DTP segment: {:?}", dtp);
             
             // Check if this DTP segment already exists in any loop
             if !dtp_segment_exists(edi271, &dtp) {
@@ -189,7 +189,7 @@ fn process_remaining_segments(edi271: &mut Edi271, contents: &str) {
         let msg_segments = extract_segments(contents, "MSG");
         for msg_content in msg_segments {
             let msg = get_msg(msg_content);
-            info!("Found unprocessed MSG segment, adding to appropriate loop");
+            info!("Found unprocessed MSG segment: {:?}", msg);
             
             // Add to the appropriate structure
             if !edi271.loop2000b.is_empty() && 
@@ -285,6 +285,26 @@ pub fn write_271(edi271: &Edi271) -> String {
         new_edi.push_str(&write_loop_2000b(loop2000b));
     }
     
+    // Write any unprocessed PER segments
+    for per_segment in &edi271.unprocessed_per_segments {
+        new_edi.push_str(&write_per(per_segment.clone()));
+    }
+    
+    // Write any unprocessed REF segments
+    for ref_segment in &edi271.unprocessed_ref_segments {
+        new_edi.push_str(&write_ref(ref_segment.clone()));
+    }
+    
+    // Write any unprocessed DTP segments
+    for dtp_segment in &edi271.unprocessed_dtp_segments {
+        new_edi.push_str(&write_dtp(dtp_segment.clone()));
+    }
+    
+    // Write any unprocessed MSG segments
+    for msg_segment in &edi271.unprocessed_msg_segments {
+        new_edi.push_str(&write_msg(msg_segment.clone()));
+    }
+    
     // Write SE segment
     new_edi.push_str(&write_se(edi271.se_segments.clone()));
     
@@ -294,8 +314,11 @@ pub fn write_271(edi271: &Edi271) -> String {
     // Remove any duplicate DTP segments that might have been added
     new_edi = remove_duplicate_dtp_segments(&new_edi);
     
-    info!("Generated EDI 271: {}", new_edi);
-    new_edi
+    // Add line breaks between segments for better readability
+    let new_edi_with_breaks = new_edi.replace("~", "~\n");
+    
+    info!("Generated EDI 271: {}", new_edi_with_breaks);
+    new_edi_with_breaks
 }
 
 // Helper function to remove duplicate DTP segments
@@ -346,4 +369,76 @@ pub fn is_271_json(contents: &str) -> bool {
     contents.contains("\"table1\"") && 
     contents.contains("\"loop2000a\"") && 
     contents.contains("\"loop2000b\"")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::segments::per::PER;
+    use crate::segments::r#ref::REF;
+    use crate::segments::dtp::DTP;
+    use crate::segments::msg::MSG;
+    
+    #[test]
+    fn test_write_271_with_unprocessed_segments() {
+        // Create a minimal Edi271 structure with unprocessed segments
+        let mut edi271 = Edi271::default();
+        
+        // Add a PER segment to unprocessed_per_segments
+        let per_segment = PER {
+            per01_contact_function_code: "IC".to_string(),
+            per02_contact_name: "JOHN DOE".to_string(),
+            per03_contact_number_qualifier: "TE".to_string(),
+            per04_contact_number: "8005551212".to_string(),
+            per05_contact_number_qualifier: "".to_string(),
+            per06_contact_number: "".to_string(),
+            per07_contact_number_qualifier: "".to_string(),
+            per08_contact_number: "".to_string(),
+        };
+        edi271.unprocessed_per_segments.push(per_segment);
+        
+        // Add a REF segment to unprocessed_ref_segments
+        let ref_segment = REF {
+            reference_id_number_qualifier: "SY".to_string(),
+            reference_id_number: "123456789".to_string(),
+        };
+        edi271.unprocessed_ref_segments.push(ref_segment);
+        
+        // Add a DTP segment to unprocessed_dtp_segments
+        let dtp_segment = DTP {
+            dtp01_date_time_qualifier: "291".to_string(),
+            dtp02_date_time_format_qualifier: "D8".to_string(),
+            dtp03_date_time_value: "20060501".to_string(),
+        };
+        edi271.unprocessed_dtp_segments.push(dtp_segment);
+        
+        // Add a MSG segment to unprocessed_msg_segments
+        let msg_segment = MSG {
+            msg01_free_form_message_text: "TEST MESSAGE".to_string(),
+            msg02_printer_carriage_control_code: "".to_string(),
+            msg03_number: "".to_string(),
+        };
+        edi271.unprocessed_msg_segments.push(msg_segment);
+        
+        // Write the EDI271
+        let output = write_271(&edi271);
+        
+        // Check if all segments are included in the output
+        assert!(output.contains("PER*IC*JOHN DOE*TE*8005551212~"), "PER segment not found in output");
+        assert!(output.contains("REF*SY*123456789~"), "REF segment not found in output");
+        assert!(output.contains("DTP*291*D8*20060501~"), "DTP segment not found in output");
+        assert!(output.contains("MSG*TEST MESSAGE~"), "MSG segment not found in output");
+        
+        // Check if line breaks are added
+        assert!(output.contains("~\n"), "Line breaks not found in output");
+    }
+    
+    #[test]
+    fn test_is_271_json() {
+        let json = r#"{"interchange_header":{},"table1":{},"loop2000a":{},"loop2000b":[]}"#;
+        assert!(is_271_json(json));
+        
+        let json = r#"{"transaction_set_id":"270"}"#;
+        assert!(!is_271_json(json));
+    }
 }

@@ -91,8 +91,11 @@ pub fn write_999(edi999: &Edi999) -> String {
     let new_ict = write_interchange_trailer(&edi999.interchange_trailer);
     new_edi.push_str(&new_ict);
     
-    info!("Generated EDI 999: {}", new_edi);
-    new_edi
+    // Add line breaks between segments for better readability
+    let new_edi_with_breaks = new_edi.replace("~", "~\n");
+    
+    info!("Generated EDI 999: {}", new_edi_with_breaks);
+    new_edi_with_breaks
 }
 
 // Function to detect if JSON contains 999 format data
@@ -101,4 +104,76 @@ pub fn is_999_json(contents: &str) -> bool {
     contents.contains("\"transaction_set_id\":\"999\"") || 
     contents.contains("\"ak01_functional_id_group\":") ||
     contents.contains("\"ak201_transaction_set_identifier_code\":")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::segments::ctx::CTX;
+    use crate::edi999::loop2100::Loop2100;
+    use crate::edi999::loop2000::Loop2000;
+    
+    #[test]
+    fn test_write_999_with_ctx_segments() {
+        // Create a minimal Edi999 structure with CTX segments
+        let mut edi999 = Edi999::default();
+        
+        // Create a Loop2100 with CTX segments
+        let mut loop2100 = Loop2100::default();
+        
+        // Add a special format CTX segment
+        let ctx_special = CTX {
+            ctx01_context_name: "CLM01:123456789".to_string(),
+            ctx02_segment_id_code: "".to_string(),
+            ctx03_segment_position_in_transaction: "".to_string(),
+            ctx04_loop_id_code: "".to_string(),
+            ctx05_position_in_segment: "".to_string(),
+            ctx06_reference_in_segment: "".to_string(),
+        };
+        loop2100.ctx_segments.push(ctx_special);
+        
+        // Add a complex format CTX segment
+        let ctx_complex = CTX {
+            ctx01_context_name: "SITUATIONAL TRIGGER".to_string(),
+            ctx02_segment_id_code: "CLM".to_string(),
+            ctx03_segment_position_in_transaction: "43".to_string(),
+            ctx04_loop_id_code: "".to_string(),
+            ctx05_position_in_segment: "5:3".to_string(),
+            ctx06_reference_in_segment: "C023:1325".to_string(),
+        };
+        loop2100.ctx_segments.push(ctx_complex);
+        
+        // Add the Loop2100 to a Loop2000
+        let mut loop2000 = Loop2000::default();
+        loop2000.loop2100s.push(loop2100);
+        
+        // Add the Loop2000 to the Edi999
+        edi999.table1_combined.loop2000s.push(loop2000);
+        
+        // Write the EDI999
+        let output = write_999(&edi999);
+        
+        // Check if CTX segments are formatted correctly
+        assert!(output.contains("CTX*CLM01:123456789~"), "Special format CTX segment not found in output");
+        assert!(output.contains("CTX*SITUATIONAL TRIGGER*CLM*43**5:3*C023:1325~"), 
+                "Complex format CTX segment not found in output");
+        
+        // Check if line breaks are added
+        assert!(output.contains("~\n"), "Line breaks not found in output");
+        
+        // Check if trailer segments have proper values
+        assert!(output.contains("SE*16*"), "SE segment doesn't have proper values");
+        assert!(output.contains("AK9*P*3*3*1~"), "AK9 segment doesn't have proper values");
+        assert!(output.contains("GE*1*"), "GE segment doesn't have proper values");
+        assert!(output.contains("IEA*1*"), "IEA segment doesn't have proper values");
+    }
+    
+    #[test]
+    fn test_is_999_json() {
+        let json = r#"{"transaction_set_id":"999","ak01_functional_id_group":"HC"}"#;
+        assert!(is_999_json(json));
+        
+        let json = r#"{"transaction_set_id":"835"}"#;
+        assert!(!is_999_json(json));
+    }
 }

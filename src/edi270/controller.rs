@@ -90,7 +90,7 @@ fn process_remaining_segments(edi270: &mut Edi270, contents: &str) {
         let ref_segments = extract_segments(contents, "REF");
         for ref_content in ref_segments {
             let ref_segment = get_ref(ref_content);
-            info!("Found unprocessed REF segment, adding to appropriate loop");
+            info!("Found unprocessed REF segment, adding to appropriate loop: {:?}", ref_segment);
             
             // Add to the appropriate structure based on content
             if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
@@ -137,14 +137,22 @@ pub fn write_270(edi270: &Edi270) -> String {
         new_edi.push_str(&write_loop_2000b(loop2000b));
     }
     
+    // Write any unprocessed REF segments
+    for ref_segment in &edi270.unprocessed_ref_segments {
+        new_edi.push_str(&write_ref(ref_segment.clone()));
+    }
+    
     // Write SE segment
     new_edi.push_str(&write_se(edi270.se_segments.clone()));
     
     // Write Interchange Trailer
     new_edi.push_str(&write_interchange_trailer(&edi270.interchange_trailer));
     
-    info!("Generated EDI 270: {}", new_edi);
-    new_edi
+    // Add line breaks between segments for better readability
+    let new_edi_with_breaks = new_edi.replace("~", "~\n");
+    
+    info!("Generated EDI 270: {}", new_edi_with_breaks);
+    new_edi_with_breaks
 }
 
 // Function to detect if JSON contains 270 format data
@@ -158,6 +166,7 @@ pub fn is_270_json(contents: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::segments::r#ref::REF;
     
     #[test]
     fn test_is_270_json() {
@@ -166,5 +175,27 @@ mod tests {
         
         let json = r#"{"transaction_set_id":"271"}"#;
         assert!(!is_270_json(json));
+    }
+    
+    #[test]
+    fn test_write_270_with_ref_segments() {
+        // Create a minimal Edi270 structure with REF segments
+        let mut edi270 = Edi270::default();
+        
+        // Add a REF segment to unprocessed_ref_segments
+        let ref_segment = REF {
+            reference_id_number_qualifier: "SY".to_string(),
+            reference_id_number: "123456789".to_string(),
+        };
+        edi270.unprocessed_ref_segments.push(ref_segment);
+        
+        // Write the EDI270
+        let output = write_270(&edi270);
+        
+        // Check if the REF segment is included in the output
+        assert!(output.contains("REF*SY*123456789~"), "REF segment not found in output");
+        
+        // Check if line breaks are added
+        assert!(output.contains("~\n"), "Line breaks not found in output");
     }
 }

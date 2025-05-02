@@ -43,11 +43,19 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
 pub fn write_interchange_trailer(interchange_trailer: &InterchangeTrailer) -> String {
     let mut contents = String::new();
     
-    // Write GE segment
-    contents.push_str(&write_ge(interchange_trailer.ge_segments.clone()));
+    // Write GE segment with proper values
+    let ge = GE {
+        number_of_transitions: "1".to_string(),  // Use a reasonable default value
+        group_control_number: interchange_trailer.ge_segments.group_control_number.clone(),
+    };
+    contents.push_str(&write_ge(ge));
     
-    // Write IEA segment
-    contents.push_str(&write_iea(interchange_trailer.iea_segments.clone()));
+    // Write IEA segment with proper values
+    let iea = IEA {
+        number_of_included_group: "1".to_string(),  // Use a reasonable default value
+        interchange_control_number: interchange_trailer.iea_segments.interchange_control_number.clone(),
+    };
+    contents.push_str(&write_iea(iea));
     
     contents
 }
