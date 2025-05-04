@@ -18,24 +18,31 @@ pub fn get_table1s(contents: String) -> (Table1s, String) {
     let mut remaining_content = contents.clone();
 
     // Process ST segment
-    if let Some(st_segment_start) = contents.find("ST") {
-        let st_segment_end = contents[st_segment_start..].find('~').unwrap_or(contents.len() - st_segment_start);
-        let st_segment = &contents[st_segment_start..st_segment_start + st_segment_end];
+    if let Some(st_segment_start) = remaining_content.find("ST") {
+        let st_segment_end = remaining_content[st_segment_start..].find('~').unwrap_or(remaining_content.len() - st_segment_start);
+        let st_segment = &remaining_content[st_segment_start..st_segment_start + st_segment_end];
         
         let st_elements: Vec<&str> = st_segment.split('*').collect();
         
-        if st_elements.len() >= 3 {
+        // ST01 - Transaction Set Identifier Code
+        if st_elements.len() > 1 {
             table1s.st01_transaction_set_identifier_code = st_elements[1].to_string();
+        }
+        
+        // ST02 - Transaction Set Control Number
+        if st_elements.len() > 2 {
             table1s.st02_transaction_set_control_number = st_elements[2].to_string();
-            if st_elements.len() >= 4 {
-                table1s.st03_implementation_convention_reference = st_elements[3].to_string();
-            }
+        }
+        
+        // ST03 - Implementation Convention Reference
+        if st_elements.len() > 3 {
+            table1s.st03_implementation_convention_reference = st_elements[3].to_string();
         }
         
         // Remove the ST segment from the remaining content
-        remaining_content = contents[st_segment_start + st_segment_end + 1..].to_string();
+        remaining_content = remaining_content[st_segment_start + st_segment_end + 1..].to_string();
     }
-
+    
     // Process BHT segment
     if let Some(bht_segment_start) = remaining_content.find("BHT") {
         let bht_segment_end = remaining_content[bht_segment_start..].find('~').unwrap_or(remaining_content.len() - bht_segment_start);
@@ -43,12 +50,33 @@ pub fn get_table1s(contents: String) -> (Table1s, String) {
         
         let bht_elements: Vec<&str> = bht_segment.split('*').collect();
         
-        if bht_elements.len() >= 7 {
+        // BHT01 - Hierarchical Structure Code
+        if bht_elements.len() > 1 {
             table1s.bht01_hierarchical_structure_code = bht_elements[1].to_string();
+        }
+        
+        // BHT02 - Transaction Set Purpose Code
+        if bht_elements.len() > 2 {
             table1s.bht02_transaction_set_purpose_code = bht_elements[2].to_string();
+        }
+        
+        // BHT03 - Reference Identification
+        if bht_elements.len() > 3 {
             table1s.bht03_reference_identification = bht_elements[3].to_string();
+        }
+        
+        // BHT04 - Date
+        if bht_elements.len() > 4 {
             table1s.bht04_date = bht_elements[4].to_string();
+        }
+        
+        // BHT05 - Time
+        if bht_elements.len() > 5 {
             table1s.bht05_time = bht_elements[5].to_string();
+        }
+        
+        // BHT06 - Transaction Type Code
+        if bht_elements.len() > 6 {
             table1s.bht06_transaction_type_code = bht_elements[6].to_string();
         }
         

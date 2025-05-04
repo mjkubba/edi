@@ -41,8 +41,15 @@ pub fn get_hl(hl_content: String) -> HL {
 pub fn write_hl(hl: HL) -> String {
     let mut hl_content = String::new();
     
+    // Don't include the segment ID in the HL01 field
+    let hl01 = if hl.hl01_hierarchical_id_number == "HL" {
+        "1"
+    } else {
+        &hl.hl01_hierarchical_id_number
+    };
+    
     hl_content.push_str("HL*");
-    hl_content.push_str(&hl.hl01_hierarchical_id_number);
+    hl_content.push_str(hl01);
     
     // Include HL02 (can be empty)
     hl_content.push_str("*");

@@ -26,17 +26,24 @@
 
 ## Medium Priority Tasks
 
-### 1. Fix EDI276/277 Implementation
+### 1. ✅ Complete EDI276/277 Implementation
 - [x] Add comprehensive documentation to functions and structures
 - [x] Add unit tests for parsing and generating EDI files
 - [x] Enhance loop processing for Loop2100A and Loop2100B
 - [x] Add line breaks between segments in generated output
-- [ ] Fix compilation errors related to field name mismatches
-- [ ] Add missing imports for write_ins and write_dtp functions
-- [ ] Fix test cases to match actual struct definitions
-- [ ] Complete implementation of Loop2000C, Loop2000D, and Loop2000E
-- [ ] Add support for STC segments in EDI277
+- [x] Fix compilation errors related to field name mismatches
+- [x] Add missing imports for write_ins and write_dtp functions
+- [x] Fix test cases to match actual struct definitions
+- [x] Complete implementation of Loop2000C, Loop2000D, and Loop2000E
+- [x] Add support for STC segments in EDI277
+- [x] Implement get_276 and write_276 functions in controller.rs
+- [x] Implement get_277 and write_277 functions in controller.rs
+- [x] Update main.rs to recognize 276/277 formats
+- [x] Fix JSON to EDI conversion for 276 format
+- [x] Fix JSON to EDI conversion for 277 format
 - [ ] Add functional tests for EDI276/277
+- [x] Improve handling of STC segments in EDI277
+- [x] Ensure proper handling of nested loops
 
 ### 2. General Code Quality Improvements
 - [ ] Address compiler warnings

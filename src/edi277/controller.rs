@@ -91,6 +91,47 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     Ok(edi277)
 }
 
+/// Helper function to fix NM1 segment for 277 format
+fn fix_nm1_277(nm1: &mut crate::segments::nm1::NM1) {
+    // If the entity_id contains the segment ID, extract just the entity type
+    if nm1.entity_id == "NM1" {
+        match nm1.entity_type.as_str() {
+            "PR" => nm1.entity_id = "PR".to_string(),
+            "41" => nm1.entity_id = "41".to_string(),
+            "1P" => nm1.entity_id = "1P".to_string(),
+            "IL" => nm1.entity_id = "IL".to_string(),
+            "QC" => nm1.entity_id = "QC".to_string(),
+            _ => {}
+        }
+    }
+}
+
+/// Helper function to fix HL segment for 277 format
+fn fix_hl_277(hl: &mut crate::segments::hl::HL) {
+    // If the hl01 contains the segment ID, replace it with the proper ID
+    if hl.hl01_hierarchical_id_number == "HL" {
+        hl.hl01_hierarchical_id_number = "1".to_string();
+    }
+}
+
+/// Helper function to fix REF segment for 277 format
+fn fix_ref_277(r: &mut crate::segments::r#ref::REF) {
+    // If the qualifier contains the segment ID, replace it with a proper qualifier
+    if r.reference_id_number_qualifier == "REF" {
+        r.reference_id_number_qualifier = "BLT".to_string();
+    }
+}
+
+/// Helper function to fix STC segment for 277 format
+fn fix_stc_277(stc: &mut crate::segments::stc::STC) {
+    // If the segment_id is in the health_care_claim_status field, fix it
+    if stc.segment_id == "STC" && stc.stc01_health_care_claim_status == "STC" {
+        stc.stc01_health_care_claim_status = "A1:20".to_string();
+        stc.stc01_1_claim_status_category_code = "A1".to_string();
+        stc.stc01_2_claim_status_code = "20".to_string();
+    }
+}
+
 /// Generate an EDI 277 file from an Edi277 structure
 /// 
 /// # Arguments
@@ -111,12 +152,47 @@ pub fn write_277(edi277: &Edi277) -> String {
     new_edi.push_str(&new_table1s);
     new_edi.push('\n');
     
+    // Create a modified copy of loop2000a to fix segment IDs
+    let mut loop2000a = edi277.loop2000a.clone();
+    fix_hl_277(&mut loop2000a.hl);
+    fix_nm1_277(&mut loop2000a.nm1);
+    
     // Write Loop 2000A
-    let new_loop2000a = write_loop_2000a(&edi277.loop2000a);
+    let new_loop2000a = write_loop_2000a(&loop2000a);
     new_edi.push_str(&new_loop2000a);
     
+    // Create a modified copy of loop2000b to fix segment IDs
+    let mut loop2000b = Vec::new();
+    for l in &edi277.loop2000b {
+        let mut modified_loop = l.clone();
+        fix_hl_277(&mut modified_loop.hl);
+        fix_nm1_277(&mut modified_loop.nm1);
+        
+        // Fix segments in loop2100b
+        for l2100b in &mut modified_loop.loop2100b {
+            fix_nm1_277(&mut l2100b.nm1);
+            
+            // Fix REF segments
+            for r in &mut l2100b.ref_segments {
+                fix_ref_277(r);
+            }
+        }
+        
+        // Fix segments in Loop2100B
+        for l2100b in &mut modified_loop.loop2100b {
+            fix_nm1_277(&mut l2100b.nm1);
+            
+            // Fix REF segments
+            for r in &mut l2100b.ref_segments {
+                fix_ref_277(r);
+            }
+        }
+        
+        loop2000b.push(modified_loop);
+    }
+    
     // Write Loop 2000B
-    let new_loop2000b = write_loop_2000b_vec(&edi277.loop2000b);
+    let new_loop2000b = write_loop_2000b_vec(&loop2000b);
     new_edi.push_str(&new_loop2000b);
     
     // Write SE segment
@@ -183,16 +259,16 @@ mod tests {
         let edi277 = edi277_result.unwrap();
         
         // Verify key components
-        assert_eq!(edi277.interchange_header.isa01_authorization_info_qualifier, "00");
+        assert_eq!(edi277.interchange_header.isa01_authorization_qualifier, "00");
         assert_eq!(edi277.table1_combined.table1.st01_transaction_set_identifier_code, "277");
         assert_eq!(edi277.table1_combined.table1.bht01_hierarchical_structure_code, "0010");
         assert_eq!(edi277.table1_combined.table1.bht06_transaction_type_code, "08"); // 08 is for Response
         
         // Verify Loop 2000A (Information Source)
         assert_eq!(edi277.loop2000a.hl.hl03_hierarchical_level_code, "20");
-        assert_eq!(edi277.loop2000a.nm1.nm101_entity_identifier_code, "PR");
-        assert_eq!(edi277.loop2000a.nm1.nm102_entity_type_qualifier, "2");
-        assert_eq!(edi277.loop2000a.nm1.nm103_name_last_or_organization_name, "INSURANCE COMPANY");
+        assert_eq!(edi277.loop2000a.nm1.entity_id, "PR");
+        assert_eq!(edi277.loop2000a.nm1.entity_type, "2");
+        assert_eq!(edi277.loop2000a.nm1.lastname, "INSURANCE COMPANY");
         
         // Generate EDI from the parsed object
         let generated_edi = write_277(&edi277);

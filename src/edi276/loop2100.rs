@@ -127,5 +127,149 @@ pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
     result
 }
 
-// Placeholder functions for writing other loops
-// These will be implemented in detail later
+// Function to write Loop 2100C
+pub fn write_loop_2100c(loop_2100c: &Loop2100C) -> String {
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100c.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100c.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100c.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100c.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100c.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    // Write PRV segment if present
+    if let Some(prv) = &loop_2100c.prv {
+        result.push_str(&write_prv(prv));
+        result.push('\n');
+    }
+    
+    result
+}
+
+// Function to write Loop 2100D
+pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100d.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100d.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100d.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100d.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100d.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2100d.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write INS segment if present
+    if let Some(ins) = &loop_2100d.ins {
+        result.push_str(&write_ins(ins.clone()));
+        result.push('\n');
+    }
+    
+    // Write DTP segments
+    for dtp in &loop_2100d.dtp_segments {
+        result.push_str(&write_dtp(dtp.clone()));
+        result.push('\n');
+    }
+    
+    result
+}
+
+// Function to write Loop 2100E
+pub fn write_loop_2100e(loop_2100e: &Loop2100E) -> String {
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100e.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100e.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100e.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100e.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100e.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2100e.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write INS segment if present
+    if let Some(ins) = &loop_2100e.ins {
+        result.push_str(&write_ins(ins.clone()));
+        result.push('\n');
+    }
+    
+    // Write DTP segments
+    for dtp in &loop_2100e.dtp_segments {
+        result.push_str(&write_dtp(dtp.clone()));
+        result.push('\n');
+    }
+    
+    result
+}

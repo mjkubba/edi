@@ -3,6 +3,7 @@ use crate::segments::hl::*;
 use crate::segments::nm1::*;
 use crate::segments::trn::*;
 use crate::segments::r#ref::*;
+use crate::segments::stc::*;
 use crate::edi277::loop2100::*;
 use crate::edi277::loop2200::*;
 
@@ -29,6 +30,7 @@ pub struct Loop2000C {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub stc_segments: Vec<STC>,
     pub loop2100c: Vec<Loop2100C>,
     pub loop2200c: Vec<Loop2200C>,
 }
@@ -40,6 +42,7 @@ pub struct Loop2000D {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub stc_segments: Vec<STC>,
     pub loop2100d: Vec<Loop2100D>,
     pub loop2200d: Vec<Loop2200D>,
 }
@@ -51,6 +54,7 @@ pub struct Loop2000E {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub stc_segments: Vec<STC>,
     pub loop2100e: Vec<Loop2100E>,
     pub loop2200e: Vec<Loop2200E>,
 }
@@ -193,4 +197,126 @@ pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
 pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
     // Implementation will be added later
     String::new()
+}
+// Function to write Loop 2000C
+pub fn write_loop_2000c(loop_2000c: &Loop2000C) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000c.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000c.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000c.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000c.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write STC segments
+    for stc in &loop_2000c.stc_segments {
+        result.push_str(&write_stc(stc));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100C
+    for loop_2100c in &loop_2000c.loop2100c {
+        result.push_str(&write_loop_2100c(loop_2100c));
+    }
+    
+    // Write Loop 2200C
+    for loop_2200c in &loop_2000c.loop2200c {
+        result.push_str(&write_loop_2200c(loop_2200c));
+    }
+    
+    result
+}
+
+// Function to write Loop 2000D
+pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000d.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000d.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000d.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000d.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write STC segments
+    for stc in &loop_2000d.stc_segments {
+        result.push_str(&write_stc(stc));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100D
+    for loop_2100d in &loop_2000d.loop2100d {
+        result.push_str(&write_loop_2100d(loop_2100d));
+    }
+    
+    // Write Loop 2200D
+    for loop_2200d in &loop_2000d.loop2200d {
+        result.push_str(&write_loop_2200d(loop_2200d));
+    }
+    
+    result
+}
+
+// Function to write Loop 2000E
+pub fn write_loop_2000e(loop_2000e: &Loop2000E) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000e.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000e.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000e.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000e.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write STC segments
+    for stc in &loop_2000e.stc_segments {
+        result.push_str(&write_stc(stc));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100E
+    for loop_2100e in &loop_2000e.loop2100e {
+        result.push_str(&write_loop_2100e(loop_2100e));
+    }
+    
+    // Write Loop 2200E
+    for loop_2200e in &loop_2000e.loop2200e {
+        result.push_str(&write_loop_2200e(loop_2200e));
+    }
+    
+    result
 }

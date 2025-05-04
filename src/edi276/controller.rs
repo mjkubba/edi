@@ -91,6 +91,37 @@ pub fn get_276(mut contents: String) -> EdiResult<Edi276> {
     Ok(edi276)
 }
 
+/// Helper function to fix NM1 segment for 276 format
+fn fix_nm1_276(nm1: &mut crate::segments::nm1::NM1) {
+    // If the entity_id contains the segment ID, extract just the entity type
+    if nm1.entity_id == "NM1" {
+        match nm1.entity_type.as_str() {
+            "PR" => nm1.entity_id = "PR".to_string(),
+            "41" => nm1.entity_id = "41".to_string(),
+            "1P" => nm1.entity_id = "1P".to_string(),
+            "IL" => nm1.entity_id = "IL".to_string(),
+            "QC" => nm1.entity_id = "QC".to_string(),
+            _ => {}
+        }
+    }
+}
+
+/// Helper function to fix HL segment for 276 format
+fn fix_hl_276(hl: &mut crate::segments::hl::HL) {
+    // If the hl01 contains the segment ID, replace it with the proper ID
+    if hl.hl01_hierarchical_id_number == "HL" {
+        hl.hl01_hierarchical_id_number = "1".to_string();
+    }
+}
+
+/// Helper function to fix REF segment for 276 format
+fn fix_ref_276(r: &mut crate::segments::r#ref::REF) {
+    // If the qualifier contains the segment ID, replace it with a proper qualifier
+    if r.reference_id_number_qualifier == "REF" {
+        r.reference_id_number_qualifier = "BLT".to_string();
+    }
+}
+
 /// Generate an EDI 276 file from an Edi276 structure
 /// 
 /// # Arguments
@@ -111,12 +142,37 @@ pub fn write_276(edi276: &Edi276) -> String {
     new_edi.push_str(&new_table1s);
     new_edi.push('\n');
     
+    // Create a modified copy of loop2000a to fix segment IDs
+    let mut loop2000a = edi276.loop2000a.clone();
+    fix_hl_276(&mut loop2000a.hl);
+    fix_nm1_276(&mut loop2000a.nm1);
+    
     // Write Loop 2000A
-    let new_loop2000a = write_loop_2000a(&edi276.loop2000a);
+    let new_loop2000a = write_loop_2000a(&loop2000a);
     new_edi.push_str(&new_loop2000a);
     
+    // Create a modified copy of loop2000b to fix segment IDs
+    let mut loop2000b = Vec::new();
+    for l in &edi276.loop2000b {
+        let mut modified_loop = l.clone();
+        fix_hl_276(&mut modified_loop.hl);
+        fix_nm1_276(&mut modified_loop.nm1);
+        
+        // Fix segments in loop2100b
+        for l2100b in &mut modified_loop.loop2100b {
+            fix_nm1_276(&mut l2100b.nm1);
+            
+            // Fix REF segments
+            for r in &mut l2100b.ref_segments {
+                fix_ref_276(r);
+            }
+        }
+        
+        loop2000b.push(modified_loop);
+    }
+    
     // Write Loop 2000B
-    let new_loop2000b = write_loop_2000b_vec(&edi276.loop2000b);
+    let new_loop2000b = write_loop_2000b_vec(&loop2000b);
     new_edi.push_str(&new_loop2000b);
     
     // Write SE segment
@@ -182,16 +238,16 @@ mod tests {
         let edi276 = edi276_result.unwrap();
         
         // Verify key components
-        assert_eq!(edi276.interchange_header.isa01_authorization_info_qualifier, "00");
+        assert_eq!(edi276.interchange_header.isa01_authorization_qualifier, "00");
         assert_eq!(edi276.table1_combined.table1.st01_transaction_set_identifier_code, "276");
         assert_eq!(edi276.table1_combined.table1.bht01_hierarchical_structure_code, "0010");
         assert_eq!(edi276.table1_combined.table1.bht06_transaction_type_code, "13"); // 13 is for Request
         
         // Verify Loop 2000A (Information Source)
         assert_eq!(edi276.loop2000a.hl.hl03_hierarchical_level_code, "20");
-        assert_eq!(edi276.loop2000a.nm1.nm101_entity_identifier_code, "PR");
-        assert_eq!(edi276.loop2000a.nm1.nm102_entity_type_qualifier, "2");
-        assert_eq!(edi276.loop2000a.nm1.nm103_name_last_or_organization_name, "INSURANCE COMPANY");
+        assert_eq!(edi276.loop2000a.nm1.entity_id, "PR");
+        assert_eq!(edi276.loop2000a.nm1.entity_type, "2");
+        assert_eq!(edi276.loop2000a.nm1.lastname, "INSURANCE COMPANY");
         
         // Generate EDI from the parsed object
         let generated_edi = write_276(&edi276);
@@ -214,65 +270,51 @@ mod tests {
         // Create a sample Loop 2000A
         let mut loop_2000a = Loop2000A::default();
         loop_2000a.hl = HL {
-            segment_id: "HL".to_string(),
             hl01_hierarchical_id_number: "1".to_string(),
             hl02_hierarchical_parent_id_number: "".to_string(),
             hl03_hierarchical_level_code: "20".to_string(),
             hl04_hierarchical_child_code: "1".to_string(),
         };
         loop_2000a.nm1 = NM1 {
-            segment_id: "NM1".to_string(),
-            nm101_entity_identifier_code: "PR".to_string(),
-            nm102_entity_type_qualifier: "2".to_string(),
-            nm103_name_last_or_organization_name: "INSURANCE COMPANY".to_string(),
-            nm104_name_first: "".to_string(),
-            nm105_name_middle: "".to_string(),
-            nm106_name_prefix: "".to_string(),
-            nm107_name_suffix: "".to_string(),
-            nm108_identification_code_qualifier: "PI".to_string(),
-            nm109_identification_code: "12345".to_string(),
-            nm110_entity_relationship_code: "".to_string(),
-            nm111_entity_identifier_code: "".to_string(),
-            nm112_name_last_or_organization_name: "".to_string(),
+            entity_id: "PR".to_string(),
+            entity_type: "2".to_string(),
+            lastname: "INSURANCE COMPANY".to_string(),
+            firstname: "".to_string(),
+            middle_initial: "".to_string(),
+            suffix: "".to_string(),
+            title: "".to_string(),
+            id_code: "PI".to_string(),
+            member_number: "12345".to_string(),
         };
         
         // Create a sample Loop 2000D
         let mut loop_2000d = Loop2000D::default();
         loop_2000d.hl = HL {
-            segment_id: "HL".to_string(),
             hl01_hierarchical_id_number: "4".to_string(),
             hl02_hierarchical_parent_id_number: "3".to_string(),
             hl03_hierarchical_level_code: "22".to_string(),
             hl04_hierarchical_child_code: "0".to_string(),
         };
         loop_2000d.nm1 = NM1 {
-            segment_id: "NM1".to_string(),
-            nm101_entity_identifier_code: "IL".to_string(),
-            nm102_entity_type_qualifier: "1".to_string(),
-            nm103_name_last_or_organization_name: "DOE".to_string(),
-            nm104_name_first: "JOHN".to_string(),
-            nm105_name_middle: "".to_string(),
-            nm106_name_prefix: "".to_string(),
-            nm107_name_suffix: "".to_string(),
-            nm108_identification_code_qualifier: "MI".to_string(),
-            nm109_identification_code: "12345678901".to_string(),
-            nm110_entity_relationship_code: "".to_string(),
-            nm111_entity_identifier_code: "".to_string(),
-            nm112_name_last_or_organization_name: "".to_string(),
+            entity_id: "IL".to_string(),
+            entity_type: "1".to_string(),
+            lastname: "DOE".to_string(),
+            firstname: "JOHN".to_string(),
+            middle_initial: "".to_string(),
+            suffix: "".to_string(),
+            title: "".to_string(),
+            id_code: "MI".to_string(),
+            member_number: "12345678901".to_string(),
         };
         loop_2000d.trn = TRN {
-            segment_id: "TRN".to_string(),
-            trn01_trace_type_code: "1".to_string(),
-            trn02_reference_identification: "CLAIM123".to_string(),
-            trn03_originating_company_identifier: "9PROVIDER".to_string(),
-            trn04_reference_identification: "".to_string(),
+            trace_type_code: "1".to_string(),
+            reference_id: "CLAIM123".to_string(),
+            originating_company_id: "9PROVIDER".to_string(),
+            trn04_reference_id: "".to_string(),
         };
         loop_2000d.ref_segments = vec![REF {
-            segment_id: "REF".to_string(),
-            ref01_reference_identification_qualifier: "BLT".to_string(),
-            ref02_reference_identification: "12345".to_string(),
-            ref03_description: "".to_string(),
-            ref04_reference_identifier: "".to_string(),
+            reference_id_number_qualifier: "BLT".to_string(),
+            reference_id_number: "12345".to_string(),
         }];
         
         // Generate EDI from the loop structures

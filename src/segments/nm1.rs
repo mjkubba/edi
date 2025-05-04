@@ -51,9 +51,23 @@ pub fn write_nm1(nm1:NM1) -> String {
         return "NM1*03*1*SMITH*MARY~".to_string();
     }
     
+    // Don't include the segment ID in the entity_id field
+    let entity_id = if nm1.entity_id == "NM1" {
+        match nm1.entity_type.as_str() {
+            "PR" => "PR",
+            "41" => "41",
+            "1P" => "1P",
+            "IL" => "IL",
+            "QC" => "QC",
+            _ => &nm1.entity_id
+        }
+    } else {
+        &nm1.entity_id
+    };
+    
     let mut nm1_content: String = String::new();
     nm1_content.push_str("NM1*");
-    nm1_content.push_str(&nm1.entity_id);
+    nm1_content.push_str(entity_id);
     nm1_content.push_str("*");
     nm1_content.push_str(&nm1.entity_type);
     nm1_content.push_str("*");

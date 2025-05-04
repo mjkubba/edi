@@ -8,3 +8,4 @@ pub mod controller;
 
 // Re-export commonly used types
 pub use controller::Edi277;
+pub use controller::{get_277, write_277, is_277_json};

@@ -8,6 +8,8 @@ use crate::edi835::controller::*;
 use crate::edi999::controller::*;
 use crate::edi270::controller::*;
 use crate::edi271::controller::*;
+use crate::edi276::controller::*;
+use crate::edi277::controller::*;
 
 mod helper;
 mod segments;
@@ -15,6 +17,8 @@ mod edi835;
 mod edi999;
 mod edi270;
 mod edi271;
+mod edi276;
+mod edi277;
 mod error;
 mod transaction_processor;
 mod segment_config;
@@ -60,6 +64,20 @@ fn main() {
                 info!("Writing 271 format");
                 let edi271: Edi271 = serde_json::from_str(&contents).unwrap();
                 let new_edi = write_271(&edi271);
+                write_to_file(new_edi, args.output_file);
+            }
+            // Check if the content is JSON for 276 format
+            else if contents.contains("\"st01_transaction_set_identifier_code\":\"276\"") {
+                info!("Writing 276 format");
+                let edi276: Edi276 = serde_json::from_str(&contents).unwrap();
+                let new_edi = write_276(&edi276);
+                write_to_file(new_edi, args.output_file);
+            }
+            // Check if the content is JSON for 277 format
+            else if contents.contains("\"st01_transaction_set_identifier_code\":\"277\"") {
+                info!("Writing 277 format");
+                let edi277: Edi277 = serde_json::from_str(&contents).unwrap();
+                let new_edi = write_277(&edi277);
                 write_to_file(new_edi, args.output_file);
             }
             else {
@@ -148,8 +166,30 @@ fn main() {
                     warn!("Error processing 271 format: {:?}", e);
                 }
             }
+        } else if contents.contains("~ST*276*") || contents.contains("ST*276*") {
+            info!("File is 276");
+            match get_276(contents.clone()) {
+                Ok(edi276) => {
+                    let serialized_edi = serde_json::to_string(&edi276).unwrap();
+                    write_to_file(serialized_edi.clone(), args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 276 format: {:?}", e);
+                }
+            }
+        } else if contents.contains("~ST*277*") || contents.contains("ST*277*") {
+            info!("File is 277");
+            match get_277(contents.clone()) {
+                Ok(edi277) => {
+                    let serialized_edi = serde_json::to_string(&edi277).unwrap();
+                    write_to_file(serialized_edi.clone(), args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 277 format: {:?}", e);
+                }
+            }
         } else {
-            warn!("File format not recognized. Currently supporting 835, 999, 270, and 271 formats.");
+            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, and 277 formats.");
         }
     }
 }

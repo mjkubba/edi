@@ -342,6 +342,41 @@ pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
     result
 }
 
+// Function to write Loop 2000C
+pub fn write_loop_2000c(loop_2000c: &Loop2000C) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000c.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000c.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000c.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000c.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100C
+    for loop_2100c in &loop_2000c.loop2100c {
+        result.push_str(&write_loop_2100c(loop_2100c));
+    }
+    
+    // Write Loop 2200C
+    for loop_2200c in &loop_2000c.loop2200c {
+        result.push_str(&write_loop_2200c(loop_2200c));
+    }
+    
+    result
+}
+
 // Function to write Loop 2000E
 pub fn write_loop_2000e(loop_2000e: &Loop2000E) -> String {
     let mut result = String::new();
