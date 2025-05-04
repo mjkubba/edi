@@ -15,9 +15,21 @@ pub fn get_ref(ref_content: String) -> REF {
         return REF::default();
     }
     
-    // Extract the qualifier and reference number, skipping the segment ID
-    let reference_id_number_qualifier = if ref_parts.len() > 0 { ref_parts[0].to_string() } else { String::new() };
-    let reference_id_number = if ref_parts.len() > 1 { ref_parts[1].to_string() } else { String::new() };
+    // Check if the first part is the segment ID "REF"
+    let start_index = if ref_parts[0] == "REF" { 1 } else { 0 };
+    
+    // Extract the qualifier and reference number, skipping the segment ID if present
+    let reference_id_number_qualifier = if ref_parts.len() > start_index { 
+        ref_parts[start_index].to_string() 
+    } else { 
+        String::new() 
+    };
+    
+    let reference_id_number = if ref_parts.len() > start_index + 1 { 
+        ref_parts[start_index + 1].to_string() 
+    } else { 
+        String::new() 
+    };
     
     REF {
         reference_id_number_qualifier,

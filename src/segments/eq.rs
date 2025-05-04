@@ -14,24 +14,27 @@ pub fn get_eq(eq_content: String) -> EQ {
     
     let mut eq = EQ::default();
     
+    // Check if the first part is the segment ID "EQ"
+    let start_index = if !eq_parts.is_empty() && eq_parts[0] == "EQ" { 1 } else { 0 };
+    
     // EQ01 - Service Type Code
-    if !eq_parts.is_empty() && !eq_parts[0].is_empty() {
-        eq.eq01_service_type_code = eq_parts[0].to_string();
+    if eq_parts.len() > start_index && !eq_parts[start_index].is_empty() {
+        eq.eq01_service_type_code = eq_parts[start_index].to_string();
     }
     
     // EQ02 - Composite Medical Procedure Identifier
-    if eq_parts.len() > 1 && !eq_parts[1].is_empty() {
-        eq.eq02_composite_medical_procedure_identifier = eq_parts[1].to_string();
+    if eq_parts.len() > start_index + 1 && !eq_parts[start_index + 1].is_empty() {
+        eq.eq02_composite_medical_procedure_identifier = eq_parts[start_index + 1].to_string();
     }
     
     // EQ03 - Coverage Level Code
-    if eq_parts.len() > 2 && !eq_parts[2].is_empty() {
-        eq.eq03_coverage_level_code = eq_parts[2].to_string();
+    if eq_parts.len() > start_index + 2 && !eq_parts[start_index + 2].is_empty() {
+        eq.eq03_coverage_level_code = eq_parts[start_index + 2].to_string();
     }
     
     // EQ04 - Insurance Type Code
-    if eq_parts.len() > 3 && !eq_parts[3].is_empty() {
-        eq.eq04_insurance_type_code = eq_parts[3].to_string();
+    if eq_parts.len() > start_index + 3 && !eq_parts[start_index + 3].is_empty() {
+        eq.eq04_insurance_type_code = eq_parts[start_index + 3].to_string();
     }
     
     info!("Parsed EQ segment: {:?}", eq);

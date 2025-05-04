@@ -6,3 +6,4 @@ notes.md
 *.json
 *.edi
 .amazonq/markdown*
+test_results*

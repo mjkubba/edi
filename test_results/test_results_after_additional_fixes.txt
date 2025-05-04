@@ -1,9 +1,0 @@
-=== Testing EDI270 Format (After Additional Fixes) ===
-Converting EDI to JSON...
-Converting JSON back to EDI...
-Comparing original and generated EDI files...
-12d11
-< REF*SY*123456789~
-13a13
-> REF*SY*123456789~
-
