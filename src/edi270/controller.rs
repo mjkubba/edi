@@ -7,6 +7,8 @@ use crate::edi270::loop2000a::*;
 use crate::edi270::loop2000b::*;
 use crate::segments::se::*;
 use crate::segments::r#ref::*;
+use crate::segments::dtp::*;
+use crate::segments::eq::*;
 use crate::helper::edihelper::*;
 use crate::error::EdiResult;
 
@@ -21,6 +23,10 @@ pub struct Edi270 {
     // Store unprocessed segments for preservation
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub unprocessed_ref_segments: Vec<REF>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub unprocessed_dtp_segments: Vec<DTP>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub unprocessed_eq_segments: Vec<EQ>,
 }
 
 pub fn get_270(mut contents: String) -> EdiResult<(Edi270, String)> {
@@ -92,16 +98,32 @@ fn process_remaining_segments(edi270: &mut Edi270, contents: &str) {
             let ref_segment = get_ref(ref_content);
             info!("Found unprocessed REF segment, adding to appropriate loop: {:?}", ref_segment);
             
-            // Add to the appropriate structure based on content
-            if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "123456789" && 
-               !edi270.loop2000b.is_empty() && !edi270.loop2000b[0].loop2000c.is_empty() {
-                edi270.loop2000b[0].loop2000c[0].ref_segments.push(ref_segment);
-            } else if ref_segment.reference_id_number_qualifier == "SY" && ref_segment.reference_id_number == "987654321" && 
-                      !edi270.loop2000b.is_empty() && edi270.loop2000b[0].loop2000c.len() > 1 {
-                edi270.loop2000b[0].loop2000c[1].ref_segments.push(ref_segment);
-            } else {
-                edi270.unprocessed_ref_segments.push(ref_segment);
-            }
+            // Preserve the original qualifier and value
+            edi270.unprocessed_ref_segments.push(ref_segment);
+        }
+    }
+    
+    // Check for DTP segments
+    if contents.contains("DTP") {
+        let dtp_segments = extract_segments(contents, "DTP");
+        for dtp_content in dtp_segments {
+            let dtp_segment = crate::segments::dtp::get_dtp(dtp_content);
+            info!("Found unprocessed DTP segment: {:?}", dtp_segment);
+            
+            // Store for later use
+            edi270.unprocessed_dtp_segments.push(dtp_segment);
+        }
+    }
+    
+    // Check for EQ segments
+    if contents.contains("EQ") {
+        let eq_segments = extract_segments(contents, "EQ");
+        for eq_content in eq_segments {
+            let eq_segment = crate::segments::eq::get_eq(eq_content);
+            info!("Found unprocessed EQ segment: {:?}", eq_segment);
+            
+            // Store for later use
+            edi270.unprocessed_eq_segments.push(eq_segment);
         }
     }
 }
@@ -140,6 +162,16 @@ pub fn write_270(edi270: &Edi270) -> String {
     // Write any unprocessed REF segments
     for ref_segment in &edi270.unprocessed_ref_segments {
         new_edi.push_str(&write_ref(ref_segment.clone()));
+    }
+    
+    // Write any unprocessed DTP segments
+    for dtp_segment in &edi270.unprocessed_dtp_segments {
+        new_edi.push_str(&write_dtp(dtp_segment.clone()));
+    }
+    
+    // Write any unprocessed EQ segments
+    for eq_segment in &edi270.unprocessed_eq_segments {
+        new_edi.push_str(&write_eq(eq_segment.clone()));
     }
     
     // Write SE segment
