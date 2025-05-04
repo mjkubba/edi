@@ -249,7 +249,7 @@ pub fn write_loop_2100a(loop2100a: &Loop2100A) -> String {
 }
 
 // Placeholder for AAA segment functions until we implement them
-fn get_aaa(aaa_content: String) -> AAA {
+fn get_aaa(_aaa_content: String) -> AAA {
     AAA::default()
 }
 

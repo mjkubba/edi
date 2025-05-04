@@ -1,7 +1,13 @@
+/**
+ * EDI Parser and Processor for Healthcare X12 Formats
+ * 
+ * This application provides functionality to parse and generate EDI files
+ * for healthcare X12 formats including 835, 999, 270/271, and 276/277.
+ * 
+ * The main module handles command line arguments and routes processing
+ * to the appropriate controller based on the EDI format.
+ */
 use log::{info, warn};
-use std::fs::File;
-use std::io::{Read, Write};
-use std::path::Path;
 
 use crate::helper::helper::*;
 use crate::edi835::controller::*;
@@ -24,13 +30,19 @@ mod transaction_processor;
 mod segment_config;
 mod loop_processor;
 
+/**
+ * Main entry point for the EDI Parser application
+ * 
+ * Processes command line arguments and routes to the appropriate
+ * controller based on the EDI format and operation.
+ */
 fn main() {
     set_logger();
     info!("Starting EDI Parser");
     
     let args = process_args();
     let contents = get_file_contents(args.clone());
-    let clean_contents = clean_contents(contents.clone());
+    let _clean_contents = clean_contents(contents.clone());
     
     if args.operation == "write" {
         info!("Write EDI Operation");
@@ -41,7 +53,7 @@ fn main() {
             // Check if the content is JSON for 835 format
             if contents.contains("\"transaction_set_id\":\"835\"") {
                 info!("Writing 835 format");
-                let edi835: Edi835 = serde_json::from_str(&contents).unwrap();
+                let _edi835: Edi835 = serde_json::from_str(&contents).unwrap();
                 let new_edi = write_835(contents.clone());
                 write_to_file(new_edi, args.output_file);
             }

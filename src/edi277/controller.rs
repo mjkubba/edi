@@ -123,6 +123,7 @@ fn fix_ref_277(r: &mut crate::segments::r#ref::REF) {
 }
 
 /// Helper function to fix STC segment for 277 format
+#[allow(dead_code)]
 fn fix_stc_277(stc: &mut crate::segments::stc::STC) {
     // If the segment_id is in the health_care_claim_status field, fix it
     if stc.segment_id == "STC" && stc.stc01_health_care_claim_status == "STC" {

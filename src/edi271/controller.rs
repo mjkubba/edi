@@ -11,8 +11,8 @@ use crate::segments::r#ref::*;
 use crate::segments::dtp::*;
 use crate::segments::msg::*;
 use crate::helper::edihelper::*;
-use crate::error::{EdiResult, EdiError};
-use crate::edi271::loop2110c::{LS, LE, get_ls, get_le};
+use crate::error::EdiResult;
+use crate::edi271::loop2110c::{get_ls, get_le};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Edi271 {

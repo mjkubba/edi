@@ -189,12 +189,12 @@ pub fn write_loop_2000b_vec(loop_2000b_vec: &[Loop2000B]) -> String {
 }
 
 // Placeholder functions for loop writing
-pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
+pub fn write_loop_2100a(_loop_2100a: &Loop2100A) -> String {
     // Implementation will be added later
     String::new()
 }
 
-pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
+pub fn write_loop_2100b(_loop_2100b: &Loop2100B) -> String {
     // Implementation will be added later
     String::new()
 }

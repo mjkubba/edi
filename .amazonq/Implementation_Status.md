@@ -8,7 +8,7 @@
 | EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Core functionality working, REF segments included in output, DTP segments fixed |
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
-| EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented |
+| EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
 | EDI837 (Health Care Claim) | 📝 Planned | Not yet implemented |
 
 ## Recent Improvements
@@ -59,15 +59,22 @@
 - Improved segment ID handling to ensure proper output format
 - Enhanced STC segment handling in EDI277 with proper formatting
 - Implemented proper handling of nested loops in both 276 and 277 formats
+- Added functional tests for EDI276/277 formats
+
+### Code Quality Improvements
+- Fixed unused imports in multiple files
+- Fixed unused variables by prefixing with underscore
+- Added comprehensive documentation to helper module
+- Added comprehensive documentation to main module
+- Added comprehensive documentation to PER segment module
+- Marked unused functions with #[allow(dead_code)] where appropriate
 
 ## Next Development Tasks
 
 1. **General Improvements**:
-   - Address compiler warnings
-   - Remove unused imports
-   - Fix unused variables
+   - Continue addressing remaining compiler warnings
    - Enhance error handling and validation
-   - Add more comprehensive documentation
+   - Add more comprehensive documentation to remaining modules
 
 2. **New Transaction Sets**:
    - Begin EDI837 implementation

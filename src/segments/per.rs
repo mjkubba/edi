@@ -1,6 +1,24 @@
+/**
+ * PER (Administrative Communications Contact) Segment
+ * 
+ * This segment provides contact information for administrative communications.
+ * It includes contact function code, name, and multiple contact methods.
+ */
 use serde::{Serialize, Deserialize};
-use crate::helper::edihelper::stiuational_element;
 
+/**
+ * PER Segment Structure
+ * 
+ * Fields:
+ * - per01_contact_function_code: Code identifying the major function of the contact person
+ * - per02_contact_name: Name of the contact person
+ * - per03_contact_number_qualifier: Code qualifying the type of communication number
+ * - per04_contact_number: Communication number
+ * - per05_contact_number_qualifier: Code qualifying the type of second communication number
+ * - per06_contact_number: Second communication number
+ * - per07_contact_number_qualifier: Code qualifying the type of third communication number
+ * - per08_contact_number: Third communication number
+ */
 #[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct PER {
@@ -14,6 +32,15 @@ pub struct PER {
     pub per08_contact_number: String,
 }
 
+/**
+ * Parse PER segment from string
+ * 
+ * Parameters:
+ * - per_content: String containing the PER segment content
+ * 
+ * Returns:
+ * - PER structure with parsed fields
+ */
 pub fn get_per(per_content: String) -> PER {
     let per_parts: Vec<&str> = per_content.split("*").collect();
     
@@ -46,6 +73,15 @@ pub fn get_per(per_content: String) -> PER {
     }
 }
 
+/**
+ * Generate PER segment string from structure
+ * 
+ * Parameters:
+ * - per: PER structure to convert to string
+ * 
+ * Returns:
+ * - String containing the formatted PER segment
+ */
 pub fn write_per(per:PER) -> String {
     if per.per01_contact_function_code.is_empty() && 
        per.per02_contact_name.is_empty() &&

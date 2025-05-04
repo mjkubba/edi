@@ -41,16 +41,17 @@
 - [x] Update main.rs to recognize 276/277 formats
 - [x] Fix JSON to EDI conversion for 276 format
 - [x] Fix JSON to EDI conversion for 277 format
-- [ ] Add functional tests for EDI276/277
+- [x] Add functional tests for EDI276/277
 - [x] Improve handling of STC segments in EDI277
 - [x] Ensure proper handling of nested loops
 
 ### 2. General Code Quality Improvements
-- [ ] Address compiler warnings
-- [ ] Remove unused imports
-- [ ] Fix unused variables
+- [x] Address compiler warnings (partially completed)
+- [x] Remove unused imports (partially completed)
+- [x] Fix unused variables (partially completed)
+- [x] Add comprehensive documentation (partially completed)
+- [ ] Continue addressing remaining compiler warnings
 - [ ] Improve error handling and validation
-- [ ] Add more comprehensive documentation
 
 ## Low Priority Tasks
 

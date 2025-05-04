@@ -8,7 +8,7 @@ use crate::edi270::loop2000b::*;
 use crate::segments::se::*;
 use crate::segments::r#ref::*;
 use crate::helper::edihelper::*;
-use crate::error::{EdiResult, EdiError};
+use crate::error::EdiResult;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Edi270 {

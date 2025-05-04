@@ -1,10 +1,22 @@
+/**
+ * Helper module for EDI processing
+ * 
+ * This module provides utility functions for handling EDI files, including:
+ * - Command line argument processing
+ * - File operations (reading and writing)
+ * - Content cleaning and formatting
+ * - Logging setup
+ */
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
-use std::env;
 use log::{info, warn};
 
-
+/**
+ * Command line arguments structure
+ * 
+ * Holds the parsed command line arguments for the EDI processor
+ */
 #[derive(Debug, Default,Clone)]
 pub struct Args {
     pub file_path: String,
@@ -13,7 +25,11 @@ pub struct Args {
     pub is_json: bool,
 }
 
-
+/**
+ * Set up the logger for the application
+ * 
+ * Configures the logger to display info level messages without timestamps or targets
+ */
 pub fn set_logger(){
     env_logger::builder()
     .filter_level(log::LevelFilter::Info)
@@ -22,7 +38,21 @@ pub fn set_logger(){
     .init();
 }
 
-
+/**
+ * Process command line arguments
+ * 
+ * Parses the command line arguments and returns an Args structure
+ * 
+ * Arguments:
+ * - -f: Input file path
+ * - -o: Output file path
+ * - -w: Write mode (convert JSON to EDI)
+ * - -j: Input is JSON
+ * - -h/--help: Show help information
+ * 
+ * Returns:
+ * - Args structure with parsed arguments
+ */
 pub fn process_args() -> Args {
     let mut args = Args::default();
     let mut args_iter = std::env::args().skip(1);
@@ -96,6 +126,17 @@ pub fn process_args() -> Args {
     args
 }
 
+/**
+ * Read file contents
+ * 
+ * Reads the contents of a file specified in the Args structure
+ * 
+ * Parameters:
+ * - args: Args structure with file_path
+ * 
+ * Returns:
+ * - String containing the file contents
+ */
 pub fn get_file_contents(args: Args) -> String {
     let mut contents = String::new();
     let file_path = Path::new(&args.file_path);
@@ -111,6 +152,17 @@ pub fn get_file_contents(args: Args) -> String {
     contents
 }
 
+/**
+ * Clean file contents
+ * 
+ * Removes line breaks and normalizes delimiters in EDI content
+ * 
+ * Parameters:
+ * - contents: String to clean
+ * 
+ * Returns:
+ * - Cleaned string
+ */
 pub fn clean_contents(contents: String) -> String {
     let mut clean_contents = contents.replace("\r\n", "");
     clean_contents = clean_contents.replace("\r", "");
@@ -119,6 +171,15 @@ pub fn clean_contents(contents: String) -> String {
     clean_contents
 }
 
+/**
+ * Write content to file
+ * 
+ * Writes the provided content to the specified file
+ * 
+ * Parameters:
+ * - write_contents: Content to write
+ * - write_file: Path to the output file
+ */
 pub fn write_to_file(write_contents: String, write_file: String) {
     let write_file_path = if write_file.is_empty() {
         info!("No output file specified, writing to default file");
