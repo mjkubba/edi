@@ -15,4 +15,22 @@
 - Command-line interface for running tests
 - File comparison tools for analyzing differences
 
+example of testing:
+```bash
+# Parse EDI to JSON
+cargo run -- -f ./demo/edi835-1.edi -o ./demo/test835-new.json
+
+# Generate EDI from JSON
+cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
+
+# Compare files
+diff ./demo/edi835-1.edi ./demo/test835-new.edi
+```
+
+demo files are in the demo dir
+for 270 and 271 look in the 221 dir
+for 835 look in the 221 dir
+for 999 look in the 231 dir
+for 277 and 276 look in the 212 dir
+
 after running the tests make sure to update any tasks or status documentations based on results

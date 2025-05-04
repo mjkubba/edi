@@ -8,7 +8,7 @@
 | EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Core functionality working, REF segments included in output, DTP segments fixed |
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
-| EDI276/277 (Health Care Claim Status) | 🔄 In Progress | Basic structure implemented, needs further development |
+| EDI276/277 (Health Care Claim Status) | 🔄 In Progress | Basic structure implemented, enhanced loop processing added, compilation errors need to be fixed |
 | EDI837 (Health Care Claim) | 📝 Planned | Not yet implemented |
 
 ## Recent Improvements
@@ -38,12 +38,26 @@
 - Added line breaks between segments in the generated output for better readability
 - Added test to verify CTX segment handling and trailer segment values
 
+### EDI276/277
+- Enhanced loop processing for Loop2100A and Loop2100B
+- Added line breaks between segments in the generated output
+- Added comprehensive documentation to functions and structures
+- Added unit tests for parsing and generating EDI files
+- Identified compilation errors related to field name mismatches and missing imports
+
 ## Next Development Tasks
 
-1. **General Improvements**:
+1. **EDI276/277 Fixes**:
+   - Fix compilation errors related to field name mismatches
+   - Add missing imports for write_ins and write_dtp functions
+   - Fix test cases to match actual struct definitions
+   - Complete implementation of Loop2000C, Loop2000D, and Loop2000E
+   - Add support for STC segments in EDI277
+
+2. **General Improvements**:
    - Address compiler warnings
+   - Remove unused imports
    - Enhance error handling and validation
 
-2. **New Transaction Sets**:
-   - Complete EDI276/277 implementation
+3. **New Transaction Sets**:
    - Begin EDI837 implementation

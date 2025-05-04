@@ -26,18 +26,24 @@
 
 ## Medium Priority Tasks
 
-### 1. General Code Quality Improvements
+### 1. Fix EDI276/277 Implementation
+- [x] Add comprehensive documentation to functions and structures
+- [x] Add unit tests for parsing and generating EDI files
+- [x] Enhance loop processing for Loop2100A and Loop2100B
+- [x] Add line breaks between segments in generated output
+- [ ] Fix compilation errors related to field name mismatches
+- [ ] Add missing imports for write_ins and write_dtp functions
+- [ ] Fix test cases to match actual struct definitions
+- [ ] Complete implementation of Loop2000C, Loop2000D, and Loop2000E
+- [ ] Add support for STC segments in EDI277
+- [ ] Add functional tests for EDI276/277
+
+### 2. General Code Quality Improvements
 - [ ] Address compiler warnings
 - [ ] Remove unused imports
 - [ ] Fix unused variables
 - [ ] Improve error handling and validation
 - [ ] Add more comprehensive documentation
-
-### 2. Complete EDI276/277 Implementation
-- [ ] Finish implementing segment structures
-- [ ] Implement loop structures
-- [ ] Create controllers and processing logic
-- [ ] Add tests for EDI276/277
 
 ## Low Priority Tasks
 

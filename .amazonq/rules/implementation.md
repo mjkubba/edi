@@ -1,0 +1,2 @@
+when you implement new code, keep the current structure, mimic what was already created, don't create a new stucture.
+make sure the changes to an existing code or file will not impact the existing functionality and keep the code backward compatible 

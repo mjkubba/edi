@@ -3,6 +3,12 @@ use crate::segments::hl::*;
 use crate::segments::nm1::*;
 use crate::segments::trn::*;
 use crate::segments::r#ref::*;
+use crate::segments::n3::*;
+use crate::segments::n4::*;
+use crate::segments::per::*;
+use crate::segments::dmg::*;
+use crate::segments::ins::*;
+use crate::segments::dtp::*;
 use crate::edi276::loop2100::*;
 use crate::edi276::loop2200::*;
 
@@ -40,6 +46,7 @@ pub struct Loop2000D {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub dmg: Option<DMG>,
     pub loop2100d: Vec<Loop2100D>,
     pub loop2200d: Vec<Loop2200D>,
 }
@@ -51,6 +58,7 @@ pub struct Loop2000E {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub dmg: Option<DMG>,
     pub loop2100e: Vec<Loop2100E>,
     pub loop2200e: Vec<Loop2200E>,
 }
@@ -137,15 +145,242 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
     (loop_2000b_vec, remaining_content)
 }
 
-// Placeholder functions for loop processing
+// Process Loop 2100A segments
 pub fn get_loop_2100a_vec(contents: String) -> (Vec<Loop2100A>, String) {
-    // Implementation will be added later
-    (Vec::new(), contents)
+    let mut loop_2100a_vec = Vec::new();
+    let mut remaining_content = contents.clone();
+    
+    // Process NM1 segments for Loop 2100A
+    while let Some(nm1_segment_start) = remaining_content.find("NM1") {
+        let nm1_segment_end = remaining_content[nm1_segment_start..].find('~').unwrap_or(remaining_content.len() - nm1_segment_start);
+        let nm1_segment = &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
+        
+        let nm1_elements: Vec<&str> = nm1_segment.split('*').collect();
+        
+        // Check if this is a Loop 2100A NM1 segment
+        if nm1_elements.len() >= 2 && (nm1_elements[1] == "PR" || nm1_elements[1] == "IL") {
+            let mut loop_2100a = Loop2100A::default();
+            loop_2100a.nm1 = get_nm1(nm1_segment.to_string());
+            
+            // Remove the NM1 segment from the remaining content
+            remaining_content = remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
+            
+            // Process REF segments
+            while let Some(ref_segment_start) = remaining_content.find("REF") {
+                let ref_segment_end = remaining_content[ref_segment_start..].find('~').unwrap_or(remaining_content.len() - ref_segment_start);
+                let ref_segment = &remaining_content[ref_segment_start..ref_segment_start + ref_segment_end];
+                
+                // Check if the next segment is not a new loop
+                if !remaining_content[ref_segment_start + ref_segment_end + 1..].starts_with("NM1") &&
+                   !remaining_content[ref_segment_start + ref_segment_end + 1..].starts_with("HL") {
+                    loop_2100a.ref_segments.push(get_ref(ref_segment.to_string()));
+                    remaining_content = remaining_content[ref_segment_start + ref_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+            
+            // Process N3 segment
+            if let Some(n3_segment_start) = remaining_content.find("N3") {
+                let n3_segment_end = remaining_content[n3_segment_start..].find('~').unwrap_or(remaining_content.len() - n3_segment_start);
+                let n3_segment = &remaining_content[n3_segment_start..n3_segment_start + n3_segment_end];
+                
+                loop_2100a.n3 = Some(get_n3(n3_segment.to_string()));
+                remaining_content = remaining_content[n3_segment_start + n3_segment_end + 1..].to_string();
+            }
+            
+            // Process N4 segment
+            if let Some(n4_segment_start) = remaining_content.find("N4") {
+                let n4_segment_end = remaining_content[n4_segment_start..].find('~').unwrap_or(remaining_content.len() - n4_segment_start);
+                let n4_segment = &remaining_content[n4_segment_start..n4_segment_start + n4_segment_end];
+                
+                loop_2100a.n4 = Some(get_n4(n4_segment.to_string()));
+                remaining_content = remaining_content[n4_segment_start + n4_segment_end + 1..].to_string();
+            }
+            
+            // Process PER segments
+            while let Some(per_segment_start) = remaining_content.find("PER") {
+                let per_segment_end = remaining_content[per_segment_start..].find('~').unwrap_or(remaining_content.len() - per_segment_start);
+                let per_segment = &remaining_content[per_segment_start..per_segment_start + per_segment_end];
+                
+                // Check if the next segment is not a new loop
+                if !remaining_content[per_segment_start + per_segment_end + 1..].starts_with("NM1") &&
+                   !remaining_content[per_segment_start + per_segment_end + 1..].starts_with("HL") {
+                    loop_2100a.per_segments.push(get_per(per_segment.to_string()));
+                    remaining_content = remaining_content[per_segment_start + per_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+            
+            loop_2100a_vec.push(loop_2100a);
+        } else {
+            // If not a Loop 2100A NM1 segment, break the loop
+            break;
+        }
+    }
+    
+    (loop_2100a_vec, remaining_content)
 }
 
+// Process Loop 2100B segments
 pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
-    // Implementation will be added later
-    (Vec::new(), contents)
+    let mut loop_2100b_vec = Vec::new();
+    let mut remaining_content = contents.clone();
+    
+    // Process NM1 segments for Loop 2100B
+    while let Some(nm1_segment_start) = remaining_content.find("NM1") {
+        let nm1_segment_end = remaining_content[nm1_segment_start..].find('~').unwrap_or(remaining_content.len() - nm1_segment_start);
+        let nm1_segment = &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
+        
+        let nm1_elements: Vec<&str> = nm1_segment.split('*').collect();
+        
+        // Check if this is a Loop 2100B NM1 segment
+        if nm1_elements.len() >= 2 && (nm1_elements[1] == "41" || nm1_elements[1] == "1P") {
+            let mut loop_2100b = Loop2100B::default();
+            loop_2100b.nm1 = get_nm1(nm1_segment.to_string());
+            
+            // Remove the NM1 segment from the remaining content
+            remaining_content = remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
+            
+            // Process REF segments
+            while let Some(ref_segment_start) = remaining_content.find("REF") {
+                let ref_segment_end = remaining_content[ref_segment_start..].find('~').unwrap_or(remaining_content.len() - ref_segment_start);
+                let ref_segment = &remaining_content[ref_segment_start..ref_segment_start + ref_segment_end];
+                
+                // Check if the next segment is not a new loop
+                if !remaining_content[ref_segment_start + ref_segment_end + 1..].starts_with("NM1") &&
+                   !remaining_content[ref_segment_start + ref_segment_end + 1..].starts_with("HL") {
+                    loop_2100b.ref_segments.push(get_ref(ref_segment.to_string()));
+                    remaining_content = remaining_content[ref_segment_start + ref_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+            
+            // Process N3 segment
+            if let Some(n3_segment_start) = remaining_content.find("N3") {
+                let n3_segment_end = remaining_content[n3_segment_start..].find('~').unwrap_or(remaining_content.len() - n3_segment_start);
+                let n3_segment = &remaining_content[n3_segment_start..n3_segment_start + n3_segment_end];
+                
+                loop_2100b.n3 = Some(get_n3(n3_segment.to_string()));
+                remaining_content = remaining_content[n3_segment_start + n3_segment_end + 1..].to_string();
+            }
+            
+            // Process N4 segment
+            if let Some(n4_segment_start) = remaining_content.find("N4") {
+                let n4_segment_end = remaining_content[n4_segment_start..].find('~').unwrap_or(remaining_content.len() - n4_segment_start);
+                let n4_segment = &remaining_content[n4_segment_start..n4_segment_start + n4_segment_end];
+                
+                loop_2100b.n4 = Some(get_n4(n4_segment.to_string()));
+                remaining_content = remaining_content[n4_segment_start + n4_segment_end + 1..].to_string();
+            }
+            
+            // Process PER segments
+            while let Some(per_segment_start) = remaining_content.find("PER") {
+                let per_segment_end = remaining_content[per_segment_start..].find('~').unwrap_or(remaining_content.len() - per_segment_start);
+                let per_segment = &remaining_content[per_segment_start..per_segment_start + per_segment_end];
+                
+                // Check if the next segment is not a new loop
+                if !remaining_content[per_segment_start + per_segment_end + 1..].starts_with("NM1") &&
+                   !remaining_content[per_segment_start + per_segment_end + 1..].starts_with("HL") {
+                    loop_2100b.per_segments.push(get_per(per_segment.to_string()));
+                    remaining_content = remaining_content[per_segment_start + per_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+            
+            loop_2100b_vec.push(loop_2100b);
+        } else {
+            // If not a Loop 2100B NM1 segment, break the loop
+            break;
+        }
+    }
+    
+    (loop_2100b_vec, remaining_content)
+}
+
+// Function to write Loop 2000D
+pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000d.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000d.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000d.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000d.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2000d.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100D
+    for loop_2100d in &loop_2000d.loop2100d {
+        result.push_str(&write_loop_2100d(loop_2100d));
+    }
+    
+    // Write Loop 2200D
+    for loop_2200d in &loop_2000d.loop2200d {
+        result.push_str(&write_loop_2200d(loop_2200d));
+    }
+    
+    result
+}
+
+// Function to write Loop 2000E
+pub fn write_loop_2000e(loop_2000e: &Loop2000E) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&write_hl(loop_2000e.hl.clone()));
+    result.push('\n');
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2000e.nm1.clone()));
+    result.push('\n');
+    
+    // Write TRN segment
+    result.push_str(&write_trn(loop_2000e.trn.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2000e.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2000e.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write Loop 2100E
+    for loop_2100e in &loop_2000e.loop2100e {
+        result.push_str(&write_loop_2100e(loop_2100e));
+    }
+    
+    // Write Loop 2200E
+    for loop_2200e in &loop_2000e.loop2200e {
+        result.push_str(&write_loop_2200e(loop_2200e));
+    }
+    
+    result
 }
 
 pub fn write_loop_2000a(loop_2000a: &Loop2000A) -> String {
@@ -153,9 +388,11 @@ pub fn write_loop_2000a(loop_2000a: &Loop2000A) -> String {
     
     // Write HL segment
     result.push_str(&write_hl(loop_2000a.hl.clone()));
+    result.push('\n');
     
     // Write NM1 segment
     result.push_str(&write_nm1(loop_2000a.nm1.clone()));
+    result.push('\n');
     
     // Write Loop 2100A
     for loop_2100a in &loop_2000a.loop2100a {
@@ -171,9 +408,11 @@ pub fn write_loop_2000b_vec(loop_2000b_vec: &[Loop2000B]) -> String {
     for loop_2000b in loop_2000b_vec {
         // Write HL segment
         result.push_str(&write_hl(loop_2000b.hl.clone()));
+        result.push('\n');
         
         // Write NM1 segment
         result.push_str(&write_nm1(loop_2000b.nm1.clone()));
+        result.push('\n');
         
         // Write Loop 2100B
         for loop_2100b in &loop_2000b.loop2100b {
@@ -184,13 +423,176 @@ pub fn write_loop_2000b_vec(loop_2000b_vec: &[Loop2000B]) -> String {
     result
 }
 
-// Placeholder functions for loop writing
+// Function to write Loop 2100D
+pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100d.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100d.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100d.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100d.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100d.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2100d.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write INS segment if present
+    if let Some(ins) = &loop_2100d.ins {
+        result.push_str(&write_ins(ins.clone()));
+        result.push('\n');
+    }
+    
+    // Write DTP segments
+    for dtp in &loop_2100d.dtp_segments {
+        result.push_str(&write_dtp(dtp.clone()));
+        result.push('\n');
+    }
+    
+    result
+}
+
+// Function to write Loop 2100E
+pub fn write_loop_2100e(loop_2100e: &Loop2100E) -> String {
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100e.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100e.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100e.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100e.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100e.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    // Write DMG segment if present
+    if let Some(dmg) = &loop_2100e.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+    
+    // Write INS segment if present
+    if let Some(ins) = &loop_2100e.ins {
+        result.push_str(&write_ins(ins.clone()));
+        result.push('\n');
+    }
+    
+    // Write DTP segments
+    for dtp in &loop_2100e.dtp_segments {
+        result.push_str(&write_dtp(dtp.clone()));
+        result.push('\n');
+    }
+    
+    result
+}
+
 pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
-    // Implementation will be added later
-    String::new()
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100a.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100a.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100a.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100a.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100a.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    result
 }
 
 pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
-    // Implementation will be added later
-    String::new()
+    let mut result = String::new();
+    
+    // Write NM1 segment
+    result.push_str(&write_nm1(loop_2100b.nm1.clone()));
+    result.push('\n');
+    
+    // Write REF segments
+    for ref_seg in &loop_2100b.ref_segments {
+        result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+    
+    // Write N3 segment if present
+    if let Some(n3) = &loop_2100b.n3 {
+        result.push_str(&write_n3(n3.clone()));
+        result.push('\n');
+    }
+    
+    // Write N4 segment if present
+    if let Some(n4) = &loop_2100b.n4 {
+        result.push_str(&write_n4(n4.clone()));
+        result.push('\n');
+    }
+    
+    // Write PER segments
+    for per in &loop_2100b.per_segments {
+        result.push_str(&write_per(per.clone()));
+        result.push('\n');
+    }
+    
+    result
 }

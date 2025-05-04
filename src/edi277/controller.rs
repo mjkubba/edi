@@ -8,11 +8,15 @@ use crate::edi277::loop2000::*;
 use crate::edi277::interchangecontroltrailer::*;
 use crate::error::EdiResult;
 
+/// Table1Combined structure for EDI 277
+/// Contains the ST, BHT, and other header segments
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Table1Combined {
     pub table1: Table1s,
 }
 
+/// Main structure for EDI 277 (Health Care Claim Status Response)
+/// Contains all segments and loops for the 277 transaction set
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Edi277 {
     pub interchange_header: InterchangeHeader,
@@ -23,6 +27,13 @@ pub struct Edi277 {
     pub interchange_trailer: InterchangeTrailer,
 }
 
+/// Parse an EDI 277 file into an Edi277 structure
+/// 
+/// # Arguments
+/// * `contents` - The EDI 277 file contents as a string
+/// 
+/// # Returns
+/// * `EdiResult<Edi277>` - The parsed EDI 277 structure or an error
 pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     let interchange_header;
     let table1s;
@@ -80,16 +91,25 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     Ok(edi277)
 }
 
+/// Generate an EDI 277 file from an Edi277 structure
+/// 
+/// # Arguments
+/// * `edi277` - The Edi277 structure to convert to an EDI file
+/// 
+/// # Returns
+/// * `String` - The generated EDI 277 file contents
 pub fn write_277(edi277: &Edi277) -> String {
     let mut new_edi = String::new();
     
     // Write interchange header
     let new_ich = write_interchange_control(&edi277.interchange_header);
     new_edi.push_str(&new_ich);
+    new_edi.push('\n');
     
     // Write Table 1
     let new_table1s = write_table1(&edi277.table1_combined.table1);
     new_edi.push_str(&new_table1s);
+    new_edi.push('\n');
     
     // Write Loop 2000A
     let new_loop2000a = write_loop_2000a(&edi277.loop2000a);
@@ -101,7 +121,7 @@ pub fn write_277(edi277: &Edi277) -> String {
     
     // Write SE segment
     new_edi.push_str(&edi277.se_segment);
-    new_edi.push_str("~");
+    new_edi.push_str("~\n");
     
     // Write interchange trailer
     let new_ict = write_interchange_trailer(&edi277.interchange_trailer);
@@ -111,10 +131,97 @@ pub fn write_277(edi277: &Edi277) -> String {
     new_edi
 }
 
-// Function to detect if JSON contains 277 format data
+/// Function to detect if JSON contains 277 format data
+/// 
+/// # Arguments
+/// * `contents` - The JSON string to check
+/// 
+/// # Returns
+/// * `bool` - True if the JSON contains 277 format data, false otherwise
 pub fn is_277_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 277 format
     contents.contains("\"st01_transaction_set_identifier_code\":\"277\"") || 
     contents.contains("\"bht06_transaction_type_code\":\"28\"") ||
     contents.contains("\"stc01_health_care_claim_status\":")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::segments::hl::HL;
+    use crate::segments::nm1::NM1;
+    use crate::segments::trn::TRN;
+    use crate::segments::stc::STC;
+    use crate::segments::r#ref::REF;
+    
+    #[test]
+    fn test_parse_and_generate_277() {
+        // Create a sample EDI 277 file
+        let sample_edi = "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *230501*1200*^*00501*000000001*0*P*:~\
+                          GS*HN*SENDER*RECEIVER*20230501*1200*1*X*005010X212~\
+                          ST*277*0001*005010X212~\
+                          BHT*0010*08*12345*20230501*1200~\
+                          HL*1**20*1~\
+                          NM1*PR*2*INSURANCE COMPANY*****PI*12345~\
+                          HL*2*1*21*1~\
+                          NM1*41*2*CLEARINGHOUSE*****46*67890~\
+                          HL*3*2*19*1~\
+                          NM1*1P*2*PROVIDER NAME*****XX*1234567890~\
+                          HL*4*3*22*0~\
+                          NM1*IL*1*DOE*JOHN****MI*12345678901~\
+                          TRN*2*CLAIM123*9PROVIDER~\
+                          STC*A1:20*20230501*WQ~\
+                          REF*BLT*12345~\
+                          SE*14*0001~\
+                          GE*1*1~\
+                          IEA*1*000000001~";
+        
+        // Parse the EDI file
+        let edi277_result = get_277(sample_edi.to_string());
+        assert!(edi277_result.is_ok(), "Failed to parse EDI 277 file");
+        
+        let edi277 = edi277_result.unwrap();
+        
+        // Verify key components
+        assert_eq!(edi277.interchange_header.isa01_authorization_info_qualifier, "00");
+        assert_eq!(edi277.table1_combined.table1.st01_transaction_set_identifier_code, "277");
+        assert_eq!(edi277.table1_combined.table1.bht01_hierarchical_structure_code, "0010");
+        assert_eq!(edi277.table1_combined.table1.bht06_transaction_type_code, "08"); // 08 is for Response
+        
+        // Verify Loop 2000A (Information Source)
+        assert_eq!(edi277.loop2000a.hl.hl03_hierarchical_level_code, "20");
+        assert_eq!(edi277.loop2000a.nm1.nm101_entity_identifier_code, "PR");
+        assert_eq!(edi277.loop2000a.nm1.nm102_entity_type_qualifier, "2");
+        assert_eq!(edi277.loop2000a.nm1.nm103_name_last_or_organization_name, "INSURANCE COMPANY");
+        
+        // Generate EDI from the parsed object
+        let generated_edi = write_277(&edi277);
+        
+        // Verify that the generated EDI contains key segments
+        assert!(generated_edi.contains("ISA*00*"), "Missing ISA segment");
+        assert!(generated_edi.contains("ST*277*"), "Missing ST segment");
+        assert!(generated_edi.contains("BHT*0010*08*"), "Missing BHT segment");
+        assert!(generated_edi.contains("HL*1**20*1"), "Missing HL segment for Information Source");
+        assert!(generated_edi.contains("NM1*PR*2*INSURANCE COMPANY"), "Missing NM1 segment for Information Source");
+        assert!(generated_edi.contains("HL*2*1*21*1"), "Missing HL segment for Information Receiver");
+        assert!(generated_edi.contains("NM1*41*2*CLEARINGHOUSE"), "Missing NM1 segment for Information Receiver");
+        assert!(generated_edi.contains("TRN*2*CLAIM123*9PROVIDER"), "Missing TRN segment");
+        assert!(generated_edi.contains("STC*A1:20*20230501*WQ"), "Missing STC segment");
+        assert!(generated_edi.contains("REF*BLT*12345"), "Missing REF segment");
+    }
+    
+    #[test]
+    fn test_is_277_json() {
+        // Test with valid 277 JSON
+        let valid_json = r#"{"table1_combined":{"table1":{"st01_transaction_set_identifier_code":"277","bht06_transaction_type_code":"08"}}}"#;
+        assert!(is_277_json(valid_json), "Failed to identify valid 277 JSON");
+        
+        // Test with STC segment
+        let stc_json = r#"{"stc_segments":[{"stc01_health_care_claim_status":"A1:20"}]}"#;
+        assert!(is_277_json(stc_json), "Failed to identify 277 JSON with STC segment");
+        
+        // Test with invalid JSON
+        let invalid_json = r#"{"table1_combined":{"table1":{"st01_transaction_set_identifier_code":"276","bht06_transaction_type_code":"13"}}}"#;
+        assert!(!is_277_json(invalid_json), "Incorrectly identified invalid JSON as 277");
+    }
 }
