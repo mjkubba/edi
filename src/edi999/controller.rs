@@ -99,6 +99,7 @@ pub fn write_999(edi999: &Edi999) -> String {
 }
 
 // Function to detect if JSON contains 999 format data
+#[allow(dead_code)]
 pub fn is_999_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 999 format
     contents.contains("\"transaction_set_id\":\"999\"") || 

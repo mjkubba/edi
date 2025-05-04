@@ -156,6 +156,7 @@ pub fn write_270(edi270: &Edi270) -> String {
 }
 
 // Function to detect if JSON contains 270 format data
+#[allow(dead_code)]
 pub fn is_270_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 270 format
     contents.contains("\"transaction_set_id\":\"270\"") || 

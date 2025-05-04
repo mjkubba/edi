@@ -302,6 +302,7 @@ pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
 }
 
 // Function to write Loop 2000D
+#[allow(dead_code)]
 pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
     let mut result = String::new();
     
@@ -343,6 +344,7 @@ pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
 }
 
 // Function to write Loop 2000C
+#[allow(dead_code)]
 pub fn write_loop_2000c(loop_2000c: &Loop2000C) -> String {
     let mut result = String::new();
     
@@ -378,6 +380,7 @@ pub fn write_loop_2000c(loop_2000c: &Loop2000C) -> String {
 }
 
 // Function to write Loop 2000E
+#[allow(dead_code)]
 pub fn write_loop_2000e(loop_2000e: &Loop2000E) -> String {
     let mut result = String::new();
     
@@ -459,6 +462,7 @@ pub fn write_loop_2000b_vec(loop_2000b_vec: &[Loop2000B]) -> String {
 }
 
 // Function to write Loop 2100D
+#[allow(dead_code)]
 pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
     let mut result = String::new();
     
@@ -512,6 +516,7 @@ pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
 }
 
 // Function to write Loop 2100E
+#[allow(dead_code)]
 pub fn write_loop_2100e(loop_2100e: &Loop2100E) -> String {
     let mut result = String::new();
     

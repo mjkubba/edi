@@ -34,6 +34,7 @@ pub struct STC {
 }
 
 /// Parse an STC segment string into an STC struct
+#[allow(dead_code)]
 pub fn get_stc(segment: &str) -> STC {
     let elements: Vec<&str> = segment.split('*').collect();
     
@@ -148,6 +149,7 @@ pub fn get_stc(segment: &str) -> STC {
 }
 
 /// Convert an STC struct to an EDI segment string
+#[allow(dead_code)]
 pub fn write_stc(stc: &STC) -> String {
     let mut result = String::new();
     

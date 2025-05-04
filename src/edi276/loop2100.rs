@@ -69,6 +69,7 @@ pub struct Loop2100E {
 // Placeholder functions for loop processing
 // These will be implemented in detail later
 
+#[allow(dead_code)]
 pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
     let mut result = String::new();
     
@@ -98,6 +99,7 @@ pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
     result
 }
 
+#[allow(dead_code)]
 pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
     let mut result = String::new();
     
@@ -128,6 +130,7 @@ pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
 }
 
 // Function to write Loop 2100C
+#[allow(dead_code)]
 pub fn write_loop_2100c(loop_2100c: &Loop2100C) -> String {
     let mut result = String::new();
     
@@ -169,6 +172,7 @@ pub fn write_loop_2100c(loop_2100c: &Loop2100C) -> String {
 }
 
 // Function to write Loop 2100D
+#[allow(dead_code)]
 pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
     let mut result = String::new();
     
@@ -222,6 +226,7 @@ pub fn write_loop_2100d(loop_2100d: &Loop2100D) -> String {
 }
 
 // Function to write Loop 2100E
+#[allow(dead_code)]
 pub fn write_loop_2100e(loop_2100e: &Loop2100E) -> String {
     let mut result = String::new();
     

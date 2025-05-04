@@ -194,6 +194,7 @@ pub fn write_276(edi276: &Edi276) -> String {
 /// 
 /// # Returns
 /// * `bool` - True if the JSON contains 276 format data, false otherwise
+#[allow(dead_code)]
 pub fn is_276_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 276 format
     contents.contains("\"st01_transaction_set_identifier_code\":\"276\"") || 
