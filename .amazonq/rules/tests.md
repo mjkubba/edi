@@ -27,6 +27,8 @@ cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
 diff ./demo/edi835-1.edi ./demo/test835-new.edi
 ```
 
+you don't have to create new files for testing, it's better to run these commands one by one with less files
+
 demo files are in the demo dir
 for 270 and 271 look in the 221 dir
 for 835 look in the 221 dir
