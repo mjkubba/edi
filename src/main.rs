@@ -106,7 +106,11 @@ fn main() {
             // Check if the content is JSON for 837I format
             else if contents.contains("\"transaction_set_id\":\"837I\"") {
                 info!("Writing 837I format");
-                warn!("837I format not yet supported for writing");
+                let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
+                match write_837i(&edi837i) {
+                    Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                    Err(e) => warn!("Error writing 837I format: {:?}", e)
+                }
             }
             // Check if the content is JSON for 837P format
             else if contents.contains("\"transaction_set_id\":\"837P\"") {
@@ -254,8 +258,19 @@ fn main() {
                         warn!("Error processing 837P format: {:?}", e);
                     }
                 }
+            } else if contents.contains("005010X223") {
+                info!("File is 837I");
+                match get_837i(&contents) {
+                    Ok(edi837i) => {
+                        let serialized_edi = serde_json::to_string(&edi837i).unwrap();
+                        write_to_file(serialized_edi.clone(), args.output_file);
+                    },
+                    Err(e) => {
+                        warn!("Error processing 837I format: {:?}", e);
+                    }
+                }
             } else {
-                warn!("Unable to determine specific 837 variant. Currently supporting 837P.");
+                warn!("Unable to determine specific 837 variant. Currently supporting 837P and 837I.");
             }
         } else {
             warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, and 837 formats.");
