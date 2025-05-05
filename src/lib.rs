@@ -32,4 +32,4 @@ pub use edi270::controller::{get_270, write_270};
 pub use edi271::controller::{get_271, write_271};
 pub use edi276::controller::{get_276, write_276};
 pub use edi277::controller::{get_277, write_277};
-pub use edi837::controller::{get_837p, write_837p, get_837i, write_837i};
+pub use edi837::controller::{get_837p, write_837p, get_837i, write_837i, get_837d, write_837d};

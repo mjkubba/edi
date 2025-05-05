@@ -519,12 +519,145 @@ impl TransactionSet for Edi837I {
 }
 
 impl TransactionSet for Edi837D {
-    fn parse(_contents: String) -> EdiResult<(Self, String)> {
+    fn parse(contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837D content");
         
-        // Implementation will be added later
+        let mut edi837d = Edi837D::default();
+        let mut remaining_content = contents.clone();
         
-        Err(EdiError::UnsupportedFormat("EDI837D parsing not yet implemented".to_string()))
+        // Parse interchange header
+        if let Some(isa_pos) = remaining_content.find("ISA*") {
+            let isa_end = remaining_content[isa_pos..].find('~').unwrap_or(remaining_content.len()) + isa_pos;
+            edi837d.isa = remaining_content[isa_pos..=isa_end].to_string();
+            remaining_content = remaining_content[isa_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("ISA segment not found".to_string()));
+        }
+        
+        // Parse GS segment
+        if let Some(gs_pos) = remaining_content.find("GS*") {
+            let gs_end = remaining_content[gs_pos..].find('~').unwrap_or(remaining_content.len()) + gs_pos;
+            edi837d.gs = remaining_content[gs_pos..=gs_end].to_string();
+            remaining_content = remaining_content[gs_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("GS segment not found".to_string()));
+        }
+        
+        // Parse ST segment
+        if let Some(st_pos) = remaining_content.find("ST*") {
+            let st_end = remaining_content[st_pos..].find('~').unwrap_or(remaining_content.len()) + st_pos;
+            edi837d.st = remaining_content[st_pos..=st_end].to_string();
+            remaining_content = remaining_content[st_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("ST segment not found".to_string()));
+        }
+        
+        // Parse BHT segment
+        if let Some(bht_pos) = remaining_content.find("BHT*") {
+            let bht_end = remaining_content[bht_pos..].find('~').unwrap_or(remaining_content.len()) + bht_pos;
+            edi837d.table1.table1.bht = remaining_content[bht_pos..=bht_end].to_string();
+            remaining_content = remaining_content[bht_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("BHT segment not found".to_string()));
+        }
+        
+        // Parse Loop2000A (Billing Provider Hierarchical Level)
+        let (loop2000a, remaining) = parse_loop2000a(&remaining_content);
+        edi837d.table1.loop2000a = loop2000a;
+        remaining_content = remaining;
+        
+        // Parse Loop2010AA (Billing Provider Name)
+        let (loop2010aa, remaining) = parse_loop2010aa(&remaining_content);
+        edi837d.loop2010aa = loop2010aa;
+        remaining_content = remaining;
+        
+        // Parse Loop2010AB (Pay-to Address) if present
+        if remaining_content.contains("NM1*87*") {
+            let (loop2010ab, remaining) = parse_loop2010ab(&remaining_content);
+            edi837d.loop2010ab = Some(loop2010ab);
+            remaining_content = remaining;
+        }
+        
+        // Parse Loop2010AC (Pay-to Plan Name) if present
+        if remaining_content.contains("NM1*PE*") {
+            let (loop2010ac, remaining) = parse_loop2010ac(&remaining_content);
+            edi837d.loop2010ac = Some(loop2010ac);
+            remaining_content = remaining;
+        }
+        
+        // Parse Loop2000B (Subscriber Hierarchical Level)
+        let mut loop2000b_vec = Vec::new();
+        while remaining_content.contains("HL*") && remaining_content.contains("*22*") {
+            let (loop2000b, remaining) = parse_loop2000b(&remaining_content);
+            if loop2000b.hl.is_empty() {
+                break;
+            }
+            loop2000b_vec.push(loop2000b);
+            remaining_content = remaining;
+        }
+        edi837d.loop2000b = loop2000b_vec;
+        
+        // Parse Loop2000C (Patient Hierarchical Level)
+        let mut loop2000c_vec = Vec::new();
+        while remaining_content.contains("HL*") && remaining_content.contains("*23*") {
+            let (loop2000c, remaining) = parse_loop2000c(&remaining_content);
+            if loop2000c.hl.is_empty() {
+                break;
+            }
+            loop2000c_vec.push(loop2000c);
+            remaining_content = remaining;
+        }
+        edi837d.loop2000c = loop2000c_vec;
+        
+        // Parse Loop2300 (Claim Information)
+        let mut loop2300_vec = Vec::new();
+        while remaining_content.contains("CLM*") {
+            let (loop2300, remaining) = parse_loop2300(&remaining_content);
+            if loop2300.clm.is_empty() {
+                break;
+            }
+            loop2300_vec.push(loop2300);
+            remaining_content = remaining;
+            
+            // Parse Loop2400 (Service Line Information) for this claim
+            let mut loop2400_vec = Vec::new();
+            while remaining_content.contains("LX*") {
+                let (loop2400, remaining) = parse_loop2400(&remaining_content);
+                if loop2400.lx.is_empty() {
+                    break;
+                }
+                loop2400_vec.push(loop2400);
+                remaining_content = remaining;
+            }
+            
+            // Add service lines to the claim
+            if !loop2400_vec.is_empty() {
+                let last_index = loop2300_vec.len() - 1;
+                loop2300_vec[last_index].loop2400 = loop2400_vec;
+            }
+        }
+        edi837d.loop2300 = loop2300_vec;
+        
+        // Parse interchange trailer
+        if let Some(se_pos) = remaining_content.find("SE*") {
+            let se_end = remaining_content[se_pos..].find('~').unwrap_or(remaining_content.len()) + se_pos;
+            edi837d.se = remaining_content[se_pos..=se_end].to_string();
+            remaining_content = remaining_content[se_end + 1..].to_string();
+        }
+        
+        if let Some(ge_pos) = remaining_content.find("GE*") {
+            let ge_end = remaining_content[ge_pos..].find('~').unwrap_or(remaining_content.len()) + ge_pos;
+            edi837d.ge = remaining_content[ge_pos..=ge_end].to_string();
+            remaining_content = remaining_content[ge_end + 1..].to_string();
+        }
+        
+        if let Some(iea_pos) = remaining_content.find("IEA*") {
+            let iea_end = remaining_content[iea_pos..].find('~').unwrap_or(remaining_content.len()) + iea_pos;
+            edi837d.iea = remaining_content[iea_pos..=iea_end].to_string();
+            remaining_content = remaining_content[iea_end + 1..].to_string();
+        }
+        
+        Ok((edi837d, remaining_content))
     }
     
     fn to_edi(&self) -> String {
@@ -635,12 +768,13 @@ pub fn write_837i(edi837i: &Edi837I) -> EdiResult<String> {
 }
 
 /// Parse EDI837D content
-pub fn get_837d(_content: &str) -> EdiResult<Edi837D> {
+pub fn get_837d(content: &str) -> EdiResult<Edi837D> {
     info!("Parsing EDI837D content");
     
-    // Implementation will be added later
-    
-    Err(EdiError::UnsupportedFormat("EDI837D parsing not yet implemented".to_string()))
+    match Edi837D::parse(content.to_string()) {
+        Ok((edi837d, _)) => Ok(edi837d),
+        Err(e) => Err(e)
+    }
 }
 
 #[cfg(test)]
@@ -810,4 +944,10 @@ mod tests {
         assert!(generated_edi.contains("SV2*0305*HC:85025*13.39*UN*1"), 
                 "Generated EDI should contain SV2 segment");
     }
+}
+/// Generate EDI837D content
+pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
+    info!("Generating EDI837D content");
+    
+    Ok(edi837d.to_edi())
 }

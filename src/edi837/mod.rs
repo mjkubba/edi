@@ -14,4 +14,4 @@ pub mod loop2300;
 pub mod loop2400;
 pub mod controller;
 
-pub use controller::{Edi837P, Edi837I, Edi837D, get_837p, write_837p, get_837i, write_837i};
+pub use controller::{Edi837P, Edi837I, Edi837D, get_837p, write_837p, get_837i, write_837i, get_837d, write_837d};
