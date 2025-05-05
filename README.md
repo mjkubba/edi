@@ -1,14 +1,19 @@
 # EDI Parser and Processor for Healthcare X12 Formats in Rust
 
-This project provides a robust Electronic Data Interchange (EDI) parser and processor specifically designed for healthcare X12 formats. It supports multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), and 837 (Claims).
+This project provides a robust Electronic Data Interchange (EDI) parser and processor specifically designed for healthcare X12 formats. It supports multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), and 837P/I/D (Claims).
 
 ## Project Status
 
-- **Phase 1**: ✅ Complete - Fixed CTX segment implementation, improved error handling, addressed Table 1 content placement
-- **Phase 2**: ✅ Complete - Implemented common infrastructure and additional transaction sets (270/271, 276/277)
-- **Phase 3**: 🔄 In Progress - Implementing 837 transaction sets and performance optimizations
-
-The parser implements support for EDI X12 segment handling, including interchange control, functional groups, and transaction sets. It features specialized modules for processing healthcare-specific loops and segments, making it particularly valuable for healthcare claims processing systems and medical billing applications. The implementation follows strict EDI standards while providing a developer-friendly API for parsing and generating EDI documents.
+| Transaction Set | Status | Description |
+|----------------|--------|-------------|
+| EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with all segments correctly processed and generated |
+| EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Core functionality working, REF segments included in output, DTP segments fixed |
+| EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
+| EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
+| EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
+| EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
+| EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I, specialized handling for CL1 segment |
+| EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D, specialized handling for TOO segment |
 
 ## Repository Structure
 ```
@@ -35,12 +40,13 @@ edi/
 
 ## Features
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, with 837 in progress
+- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 837P/I/D
 - **Configuration-Driven Architecture**: Segment and loop definitions are configurable
 - **Robust Error Handling**: Comprehensive error types and validation
 - **Bidirectional Conversion**: EDI to JSON and JSON to EDI
 - **Extensible Design**: Easy to add new transaction sets and segments
 - **Special Format Handling**: Support for complex CTX segments and other special formats
+- **Variant-Specific Components**: Specialized handling for format-specific segments like TOO in 837D and CL1 in 837I
 
 ## Usage Instructions
 ### Prerequisites
@@ -59,9 +65,6 @@ cargo build --release
 
 # Run tests
 cargo test
-
-## Run application
-cargo run
 ```
 
 ### Command Line Options
@@ -82,49 +85,56 @@ cargo run -- -f input.edi -o output.json
 cargo run -- -f input.json -o output.edi -w -j
 ```
 
+## Testing Methodology
+- Parse EDI files to JSON and verify structure
+- Generate EDI files from JSON and verify structure
+- Compare original and generated EDI files
+- Identify unprocessed segments and structural differences
+
+```bash
+# Parse EDI to JSON
+cargo run -- -f ./demo/edi835-1.edi -o ./demo/test835-new.json
+
+# Generate EDI from JSON
+cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
+
+# Compare files
+diff ./demo/edi835-1.edi ./demo/test835-new.edi
+```
+
 ## Development Roadmap
 
-### Phase 1: ✅ Complete
-- Fixed CTX segment implementation in 999 format
-- Improved error handling for malformed input files
-- Addressed Table 1 content placement issues
-- Added comprehensive unit tests
+### Completed
+- ✅ Fixed CTX segment implementation in 999 format
+- ✅ Improved error handling for malformed input files
+- ✅ Addressed Table 1 content placement issues
+- ✅ Added comprehensive unit tests
+- ✅ Common Infrastructure Updates
+  - ✅ Generic transaction set processor
+  - ✅ Configuration-driven segment definitions
+  - ✅ Enhanced loop detection and processing
+  - ✅ Standardized error handling
+- ✅ Transaction Set 270/271 (Health Care Eligibility)
+- ✅ Transaction Set 276/277 (Health Care Claim Status)
+- ✅ Transaction Set 837P/I/D (Health Care Claim)
+  - ✅ Implemented variant-specific components
+  - ✅ Added specialized handling for TOO segment in 837D
+  - ✅ Added specialized handling for CL1 segment in 837I
+  - ✅ Improved format detection logic
 
-### Phase 2: ✅ Complete
-- Common Infrastructure Updates
-  - Generic transaction set processor
-  - Configuration-driven segment definitions
-  - Enhanced loop detection and processing
-  - Standardized error handling
-- Transaction Set 270 (Health Care Eligibility Inquiry)
-  - Fixed REF segments not being included in output
-  - Fixed DTP segment parsing
-  - Added line breaks between segments
-- Transaction Set 271 (Health Care Eligibility Response)
-  - Fixed PER, REF, and DTP segments in output
-  - Enhanced logging and error handling
-- Transaction Set 276 (Health Care Claim Status Request)
-  - Implemented full parsing and generation
-  - Added support for all required loops and segments
-- Transaction Set 277 (Health Care Claim Status Response)
-  - Implemented full parsing and generation
-  - Added support for STC segments
-  - Enhanced nested loop handling
-
-### Phase 3: 🔄 In Progress
-- Transaction Set 837 (Health Care Claim)
-  - Created directory structure for 837P, 837I, and 837D variants
-  - Implemented common segments and basic loop structure
-  - Implemented parsing for Loop2000A (Billing Provider)
-  - Implemented parsing for Loop2010AA, Loop2010AB, Loop2010AC
-  - In progress: Implementing remaining loops and segments
-- Performance optimization
-  - Planned: Optimize parsing algorithms
-  - Planned: Implement caching for frequently used segments
-- Additional features
-  - Planned: Custom delimiters
-  - Planned: Pretty printing
-  - Planned: Schema validation
+### Planned
+- Performance Optimization
+  - Optimize parsing algorithms
+  - Implement caching for frequently used segments
+  - Reduce memory usage for large files
+- Additional Features
+  - Add support for custom delimiters
+  - Implement pretty printing for output files
+  - Add schema validation
+  - Create a web interface for EDI processing
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+[Specify your license here]
