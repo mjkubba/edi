@@ -113,8 +113,60 @@ impl TransactionSet for Edi837P {
             return Err(EdiError::MissingSegment("BHT segment not found".to_string()));
         }
         
-        // For now, we'll return a basic structure with just the header segments
-        // In a complete implementation, we would parse all loops and segments
+        // Parse Loop2000A (Billing Provider Hierarchical Level)
+        let (loop2000a, remaining) = parse_loop2000a(&remaining_content);
+        edi837p.table1.loop2000a = loop2000a;
+        remaining_content = remaining;
+        
+        // Parse Loop2010AA (Billing Provider Name)
+        let (loop2010aa, remaining) = parse_loop2010aa(&remaining_content);
+        edi837p.loop2010aa = loop2010aa;
+        remaining_content = remaining;
+        
+        // Parse Loop2010AB (Pay-to Address) if present
+        if remaining_content.contains("NM1*87*") {
+            let (loop2010ab, remaining) = parse_loop2010ab(&remaining_content);
+            edi837p.loop2010ab = Some(loop2010ab);
+            remaining_content = remaining;
+        }
+        
+        // Parse Loop2010AC (Pay-to Plan Name) if present
+        if remaining_content.contains("NM1*PE*") {
+            let (loop2010ac, remaining) = parse_loop2010ac(&remaining_content);
+            edi837p.loop2010ac = Some(loop2010ac);
+            remaining_content = remaining;
+        }
+        
+        // Parse Loop2000B (Subscriber Hierarchical Level)
+        // This would be implemented in a complete version
+        
+        // Parse Loop2000C (Patient Hierarchical Level)
+        // This would be implemented in a complete version
+        
+        // Parse Loop2300 (Claim Information)
+        // This would be implemented in a complete version
+        
+        // Parse Loop2400 (Service Line Information)
+        // This would be implemented in a complete version
+        
+        // Parse interchange trailer
+        if let Some(se_pos) = remaining_content.find("SE*") {
+            let se_end = remaining_content[se_pos..].find('~').unwrap_or(remaining_content.len()) + se_pos;
+            edi837p.interchange_trailer.se = remaining_content[se_pos..=se_end].to_string();
+            remaining_content = remaining_content[se_end + 1..].to_string();
+        }
+        
+        if let Some(ge_pos) = remaining_content.find("GE*") {
+            let ge_end = remaining_content[ge_pos..].find('~').unwrap_or(remaining_content.len()) + ge_pos;
+            edi837p.interchange_trailer.ge = remaining_content[ge_pos..=ge_end].to_string();
+            remaining_content = remaining_content[ge_end + 1..].to_string();
+        }
+        
+        if let Some(iea_pos) = remaining_content.find("IEA*") {
+            let iea_end = remaining_content[iea_pos..].find('~').unwrap_or(remaining_content.len()) + iea_pos;
+            edi837p.interchange_trailer.iea = remaining_content[iea_pos..=iea_end].to_string();
+            remaining_content = remaining_content[iea_end + 1..].to_string();
+        }
         
         Ok((edi837p, remaining_content))
     }

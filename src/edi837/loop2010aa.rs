@@ -47,25 +47,56 @@ pub fn write_loop2010aa(loop2010aa: &Loop2010aa) -> String {
 }
 
 /// Parse Loop2010AA from EDI content
-pub fn parse_loop2010aa(content: &str) -> Loop2010aa {
+pub fn parse_loop2010aa(content: &str) -> (Loop2010aa, String) {
     let mut loop2010aa = Loop2010aa::default();
-    let segments: Vec<&str> = content.split('\n').collect();
+    let mut remaining_content = content.to_string();
     
-    for segment in segments {
-        if segment.starts_with("NM1*85*") {
-            loop2010aa.nm1 = segment.to_string();
-        } else if segment.starts_with("N3*") {
-            loop2010aa.n3 = segment.to_string();
-        } else if segment.starts_with("N4*") {
-            loop2010aa.n4 = segment.to_string();
-        } else if segment.starts_with("REF*") {
-            loop2010aa.ref_segments.push(segment.to_string());
-        } else if segment.starts_with("PER*") {
-            loop2010aa.per = Some(segment.to_string());
+    // Parse NM1 segment
+    if let Some(nm1_pos) = remaining_content.find("NM1*85*") {
+        let nm1_end = remaining_content[nm1_pos..].find('~').unwrap_or(remaining_content.len()) + nm1_pos;
+        loop2010aa.nm1 = remaining_content[nm1_pos..=nm1_end].to_string();
+        remaining_content = remaining_content[nm1_end + 1..].to_string();
+    }
+    
+    // Parse N3 segment
+    if let Some(n3_pos) = remaining_content.find("N3*") {
+        let n3_end = remaining_content[n3_pos..].find('~').unwrap_or(remaining_content.len()) + n3_pos;
+        loop2010aa.n3 = remaining_content[n3_pos..=n3_end].to_string();
+        remaining_content = remaining_content[n3_end + 1..].to_string();
+    }
+    
+    // Parse N4 segment
+    if let Some(n4_pos) = remaining_content.find("N4*") {
+        let n4_end = remaining_content[n4_pos..].find('~').unwrap_or(remaining_content.len()) + n4_pos;
+        loop2010aa.n4 = remaining_content[n4_pos..=n4_end].to_string();
+        remaining_content = remaining_content[n4_end + 1..].to_string();
+    }
+    
+    // Parse REF segments
+    while let Some(ref_pos) = remaining_content.find("REF*") {
+        // Check if this REF belongs to this loop or the next one
+        if remaining_content[..ref_pos].contains("NM1*") || 
+           remaining_content[..ref_pos].contains("HL*") {
+            break;
+        }
+        
+        let ref_end = remaining_content[ref_pos..].find('~').unwrap_or(remaining_content.len()) + ref_pos;
+        loop2010aa.ref_segments.push(remaining_content[ref_pos..=ref_end].to_string());
+        remaining_content = remaining_content[ref_end + 1..].to_string();
+    }
+    
+    // Parse PER segment
+    if let Some(per_pos) = remaining_content.find("PER*") {
+        // Check if this PER belongs to this loop or the next one
+        if !remaining_content[..per_pos].contains("NM1*") && 
+           !remaining_content[..per_pos].contains("HL*") {
+            let per_end = remaining_content[per_pos..].find('~').unwrap_or(remaining_content.len()) + per_pos;
+            loop2010aa.per = Some(remaining_content[per_pos..=per_end].to_string());
+            remaining_content = remaining_content[per_end + 1..].to_string();
         }
     }
     
-    loop2010aa
+    (loop2010aa, remaining_content)
 }
 
 #[cfg(test)]
