@@ -7,7 +7,7 @@ use crate::edi837::interchangecontrol::*;
 pub struct Table1s {
     pub functional_group_header: FunctionalGroupHeader,
     pub transaction_set_header: TransactionSetHeader,
-    pub bht: BHT,
+    pub bht: String,
 }
 
 /// Parse GS segment

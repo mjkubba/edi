@@ -3,20 +3,17 @@ use serde::{Serialize, Deserialize};
 use crate::error::{EdiResult, EdiError};
 use crate::transaction_processor::TransactionSet;
 
-use crate::edi837::interchangecontrol::*;
-use crate::edi837::table1::*;
-use crate::edi837::loop2000a::*;
-use crate::edi837::loop2000b::*;
-use crate::edi837::loop2000c::*;
-use crate::edi837::loop2010aa::*;
-use crate::edi837::loop2010ab::*;
-use crate::edi837::loop2010ac::*;
-use crate::edi837::loop2010ba::*;
-use crate::edi837::loop2010bb::*;
-use crate::edi837::loop2010ca::*;
-use crate::edi837::loop2300::*;
-use crate::edi837::loop2400::*;
-use crate::edi837::interchangecontroltrailer::*;
+use crate::edi837::interchangecontrol::InterchangeHeader;
+use crate::edi837::table1::{Table1s, write_bht};
+use crate::edi837::loop2000a::{Loop2000a, parse_loop2000a};
+use crate::edi837::loop2000b::{Loop2000b, parse_loop2000b, write_loop2000b};
+use crate::edi837::loop2000c::{Loop2000c, parse_loop2000c, write_loop2000c};
+use crate::edi837::loop2010aa::{Loop2010aa, parse_loop2010aa, write_loop2010aa};
+use crate::edi837::loop2010ab::{Loop2010ab, parse_loop2010ab, write_loop2010ab};
+use crate::edi837::loop2010ac::{Loop2010ac, parse_loop2010ac, write_loop2010ac};
+use crate::edi837::loop2300::{Loop2300, write_loop2300};
+use crate::edi837::loop2400::{Loop2400, write_loop2400};
+use crate::edi837::interchangecontroltrailer::InterchangeTrailer;
 
 /// Table1 structure for EDI837
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -38,6 +35,13 @@ pub struct Edi837P {
     pub loop2300: Vec<Loop2300>,
     pub loop2400: Vec<Loop2400>,
     pub interchange_trailer: InterchangeTrailer,
+    // Raw segments for segments we don't parse yet
+    pub isa: String,
+    pub gs: String,
+    pub st: String,
+    pub se: String,
+    pub ge: String,
+    pub iea: String,
 }
 
 /// EDI837 Institutional structure
@@ -53,6 +57,13 @@ pub struct Edi837I {
     pub loop2300: Vec<Loop2300>,
     pub loop2400: Vec<Loop2400>,
     pub interchange_trailer: InterchangeTrailer,
+    // Raw segments for segments we don't parse yet
+    pub isa: String,
+    pub gs: String,
+    pub st: String,
+    pub se: String,
+    pub ge: String,
+    pub iea: String,
 }
 
 /// EDI837 Dental structure
@@ -68,6 +79,13 @@ pub struct Edi837D {
     pub loop2300: Vec<Loop2300>,
     pub loop2400: Vec<Loop2400>,
     pub interchange_trailer: InterchangeTrailer,
+    // Raw segments for segments we don't parse yet
+    pub isa: String,
+    pub gs: String,
+    pub st: String,
+    pub se: String,
+    pub ge: String,
+    pub iea: String,
 }
 
 impl TransactionSet for Edi837P {
@@ -80,7 +98,7 @@ impl TransactionSet for Edi837P {
         // Parse interchange header
         if let Some(isa_pos) = remaining_content.find("ISA*") {
             let isa_end = remaining_content[isa_pos..].find('~').unwrap_or(remaining_content.len()) + isa_pos;
-            edi837p.interchange_header.isa = remaining_content[isa_pos..=isa_end].to_string();
+            edi837p.isa = remaining_content[isa_pos..=isa_end].to_string();
             remaining_content = remaining_content[isa_end + 1..].to_string();
         } else {
             return Err(EdiError::MissingSegment("ISA segment not found".to_string()));
@@ -89,7 +107,7 @@ impl TransactionSet for Edi837P {
         // Parse GS segment
         if let Some(gs_pos) = remaining_content.find("GS*") {
             let gs_end = remaining_content[gs_pos..].find('~').unwrap_or(remaining_content.len()) + gs_pos;
-            edi837p.interchange_header.gs = remaining_content[gs_pos..=gs_end].to_string();
+            edi837p.gs = remaining_content[gs_pos..=gs_end].to_string();
             remaining_content = remaining_content[gs_end + 1..].to_string();
         } else {
             return Err(EdiError::MissingSegment("GS segment not found".to_string()));
@@ -98,7 +116,7 @@ impl TransactionSet for Edi837P {
         // Parse ST segment
         if let Some(st_pos) = remaining_content.find("ST*") {
             let st_end = remaining_content[st_pos..].find('~').unwrap_or(remaining_content.len()) + st_pos;
-            edi837p.interchange_header.st = remaining_content[st_pos..=st_end].to_string();
+            edi837p.st = remaining_content[st_pos..=st_end].to_string();
             remaining_content = remaining_content[st_end + 1..].to_string();
         } else {
             return Err(EdiError::MissingSegment("ST segment not found".to_string()));
@@ -170,19 +188,19 @@ impl TransactionSet for Edi837P {
         // Parse interchange trailer
         if let Some(se_pos) = remaining_content.find("SE*") {
             let se_end = remaining_content[se_pos..].find('~').unwrap_or(remaining_content.len()) + se_pos;
-            edi837p.interchange_trailer.se = remaining_content[se_pos..=se_end].to_string();
+            edi837p.se = remaining_content[se_pos..=se_end].to_string();
             remaining_content = remaining_content[se_end + 1..].to_string();
         }
         
         if let Some(ge_pos) = remaining_content.find("GE*") {
             let ge_end = remaining_content[ge_pos..].find('~').unwrap_or(remaining_content.len()) + ge_pos;
-            edi837p.interchange_trailer.ge = remaining_content[ge_pos..=ge_end].to_string();
+            edi837p.ge = remaining_content[ge_pos..=ge_end].to_string();
             remaining_content = remaining_content[ge_end + 1..].to_string();
         }
         
         if let Some(iea_pos) = remaining_content.find("IEA*") {
             let iea_end = remaining_content[iea_pos..].find('~').unwrap_or(remaining_content.len()) + iea_pos;
-            edi837p.interchange_trailer.iea = remaining_content[iea_pos..=iea_end].to_string();
+            edi837p.iea = remaining_content[iea_pos..=iea_end].to_string();
             remaining_content = remaining_content[iea_end + 1..].to_string();
         }
         
@@ -195,11 +213,11 @@ impl TransactionSet for Edi837P {
         let mut result = String::new();
         
         // Write interchange header
-        result.push_str(&self.interchange_header.isa);
+        result.push_str(&self.isa);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.gs);
+        result.push_str(&self.gs);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.st);
+        result.push_str(&self.st);
         result.push_str("\n");
         
         // Write table1
@@ -207,7 +225,7 @@ impl TransactionSet for Edi837P {
         result.push_str("\n");
         
         // Write loop2000a
-        result.push_str(&write_loop2000a(&self.table1.loop2000a));
+        // We'll need to implement write_loop2000a in loop2000a.rs
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -225,17 +243,11 @@ impl TransactionSet for Edi837P {
         // Write loop2000b
         for loop2000b in &self.loop2000b {
             result.push_str(&write_loop2000b(loop2000b));
-            
-            // Write loop2010ba and loop2010bb for each subscriber
-            // This would be implemented in a real scenario
         }
         
         // Write loop2000c
         for loop2000c in &self.loop2000c {
             result.push_str(&write_loop2000c(loop2000c));
-            
-            // Write loop2010ca for each patient
-            // This would be implemented in a real scenario
         }
         
         // Write loop2300
@@ -249,11 +261,11 @@ impl TransactionSet for Edi837P {
         }
         
         // Write interchange trailer
-        result.push_str(&self.interchange_trailer.se);
+        result.push_str(&self.se);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.ge);
+        result.push_str(&self.ge);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.iea);
+        result.push_str(&self.iea);
         result.push_str("\n");
         
         result
@@ -269,7 +281,7 @@ impl TransactionSet for Edi837P {
 }
 
 impl TransactionSet for Edi837I {
-    fn parse(_contents: String) -> EdiResult<(Self, String)> {
+    fn parse(contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837I content");
         
         // Implementation will be added later
@@ -283,11 +295,11 @@ impl TransactionSet for Edi837I {
         let mut result = String::new();
         
         // Write interchange header
-        result.push_str(&self.interchange_header.isa);
+        result.push_str(&self.isa);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.gs);
+        result.push_str(&self.gs);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.st);
+        result.push_str(&self.st);
         result.push_str("\n");
         
         // Write table1
@@ -295,7 +307,7 @@ impl TransactionSet for Edi837I {
         result.push_str("\n");
         
         // Write loop2000a
-        result.push_str(&write_loop2000a(&self.table1.loop2000a));
+        // We'll need to implement write_loop2000a in loop2000a.rs
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -313,17 +325,11 @@ impl TransactionSet for Edi837I {
         // Write loop2000b
         for loop2000b in &self.loop2000b {
             result.push_str(&write_loop2000b(loop2000b));
-            
-            // Write loop2010ba and loop2010bb for each subscriber
-            // This would be implemented in a real scenario
         }
         
         // Write loop2000c
         for loop2000c in &self.loop2000c {
             result.push_str(&write_loop2000c(loop2000c));
-            
-            // Write loop2010ca for each patient
-            // This would be implemented in a real scenario
         }
         
         // Write loop2300
@@ -337,11 +343,11 @@ impl TransactionSet for Edi837I {
         }
         
         // Write interchange trailer
-        result.push_str(&self.interchange_trailer.se);
+        result.push_str(&self.se);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.ge);
+        result.push_str(&self.ge);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.iea);
+        result.push_str(&self.iea);
         result.push_str("\n");
         
         result
@@ -357,7 +363,7 @@ impl TransactionSet for Edi837I {
 }
 
 impl TransactionSet for Edi837D {
-    fn parse(_contents: String) -> EdiResult<(Self, String)> {
+    fn parse(contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837D content");
         
         // Implementation will be added later
@@ -371,11 +377,11 @@ impl TransactionSet for Edi837D {
         let mut result = String::new();
         
         // Write interchange header
-        result.push_str(&self.interchange_header.isa);
+        result.push_str(&self.isa);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.gs);
+        result.push_str(&self.gs);
         result.push_str("\n");
-        result.push_str(&self.interchange_header.st);
+        result.push_str(&self.st);
         result.push_str("\n");
         
         // Write table1
@@ -383,7 +389,7 @@ impl TransactionSet for Edi837D {
         result.push_str("\n");
         
         // Write loop2000a
-        result.push_str(&write_loop2000a(&self.table1.loop2000a));
+        // We'll need to implement write_loop2000a in loop2000a.rs
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -401,17 +407,11 @@ impl TransactionSet for Edi837D {
         // Write loop2000b
         for loop2000b in &self.loop2000b {
             result.push_str(&write_loop2000b(loop2000b));
-            
-            // Write loop2010ba and loop2010bb for each subscriber
-            // This would be implemented in a real scenario
         }
         
         // Write loop2000c
         for loop2000c in &self.loop2000c {
             result.push_str(&write_loop2000c(loop2000c));
-            
-            // Write loop2010ca for each patient
-            // This would be implemented in a real scenario
         }
         
         // Write loop2300
@@ -425,11 +425,11 @@ impl TransactionSet for Edi837D {
         }
         
         // Write interchange trailer
-        result.push_str(&self.interchange_trailer.se);
+        result.push_str(&self.se);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.ge);
+        result.push_str(&self.ge);
         result.push_str("\n");
-        result.push_str(&self.interchange_trailer.iea);
+        result.push_str(&self.iea);
         result.push_str("\n");
         
         result

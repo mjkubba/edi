@@ -42,10 +42,8 @@ pub struct PRV {
 /// Loop2000a structure for EDI837
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2000a {
-    pub hl: HL,
-    pub prv: Option<PRV>,
-    pub loop2010aa: Vec<Loop2010aa>,
-    pub loop2000b: Vec<Loop2000b>,
+    pub hl: String,
+    pub prv: Option<String>,
 }
 
 /// Loop2010aa structure for EDI837
@@ -343,47 +341,33 @@ pub fn parse_loop2000a(content: &str) -> (Loop2000a, String) {
     // Parse HL segment for billing provider
     if let Some(hl_pos) = remaining_content.find("HL*") {
         let hl_end = remaining_content[hl_pos..].find('~').unwrap_or(remaining_content.len()) + hl_pos;
-        let hl_segment = remaining_content[hl_pos..=hl_end].to_string();
-        
-        // Parse HL segment fields
-        let hl_fields: Vec<&str> = hl_segment.split('*').collect();
-        if hl_fields.len() >= 5 {
-            loop2000a.hl = HL {
-                segment_id: hl_fields[0].to_string(),
-                hierarchical_id_number: hl_fields[1].to_string(),
-                hierarchical_parent_id_number: if hl_fields[2].is_empty() { None } else { Some(hl_fields[2].to_string()) },
-                hierarchical_level_code: hl_fields[3].to_string(),
-                hierarchical_child_code: hl_fields[4].replace("~", ""),
-            };
-        }
-        
+        loop2000a.hl = remaining_content[hl_pos..=hl_end].to_string();
         remaining_content = remaining_content[hl_end + 1..].to_string();
     }
     
     // Parse PRV segment if present
     if let Some(prv_pos) = remaining_content.find("PRV*") {
         let prv_end = remaining_content[prv_pos..].find('~').unwrap_or(remaining_content.len()) + prv_pos;
-        let prv_segment = remaining_content[prv_pos..=prv_end].to_string();
-        
-        // Parse PRV segment fields
-        let prv_fields: Vec<&str> = prv_segment.split('*').collect();
-        if prv_fields.len() >= 4 {
-            loop2000a.prv = Some(PRV {
-                segment_id: prv_fields[0].to_string(),
-                provider_code: prv_fields[1].to_string(),
-                reference_identification_qualifier: prv_fields[2].to_string(),
-                reference_identification: prv_fields[3].replace("~", ""),
-                state_or_province_code: None,
-                provider_specialty_information: None,
-                provider_organization_code: None,
-            });
-        }
-        
+        loop2000a.prv = Some(remaining_content[prv_pos..=prv_end].to_string());
         remaining_content = remaining_content[prv_end + 1..].to_string();
     }
     
-    // For now, we'll return a basic structure
-    // In a complete implementation, we would parse all nested loops
-    
     (loop2000a, remaining_content)
+}
+
+/// Write Loop2000A to EDI format
+pub fn write_loop2000a(loop2000a: &Loop2000a) -> String {
+    let mut result = String::new();
+    
+    // Write HL segment
+    result.push_str(&loop2000a.hl);
+    result.push_str("\n");
+    
+    // Write PRV segment if present
+    if let Some(prv) = &loop2000a.prv {
+        result.push_str(prv);
+        result.push_str("\n");
+    }
+    
+    result
 }
