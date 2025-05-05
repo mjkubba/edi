@@ -91,35 +91,118 @@ pub fn write_loop2400(loop2400: &Loop2400) -> String {
 }
 
 /// Parse Loop2400 from EDI content
-pub fn parse_loop2400(content: &str) -> Loop2400 {
+pub fn parse_loop2400(content: &str) -> (Loop2400, String) {
     let mut loop2400 = Loop2400::default();
-    let segments: Vec<&str> = content.split('\n').collect();
+    let mut remaining_content = content.to_string();
     
-    for segment in segments {
-        if segment.starts_with("LX*") {
-            loop2400.lx = segment.to_string();
-        } else if segment.starts_with("SV1*") {
-            loop2400.sv1 = Some(segment.to_string());
-        } else if segment.starts_with("SV2*") {
-            loop2400.sv2 = Some(segment.to_string());
-        } else if segment.starts_with("SV3*") {
-            loop2400.sv3 = Some(segment.to_string());
-        } else if segment.starts_with("DTP*") {
-            loop2400.dtp.push(segment.to_string());
-        } else if segment.starts_with("REF*") {
-            loop2400.ref_segments.push(segment.to_string());
-        } else if segment.starts_with("AMT*") {
-            loop2400.amt.push(segment.to_string());
-        } else if segment.starts_with("QTY*") {
-            loop2400.qty.push(segment.to_string());
-        } else if segment.starts_with("NTE*") {
-            loop2400.nte.push(segment.to_string());
-        } else if segment.starts_with("HCP*") {
-            loop2400.hcp = Some(segment.to_string());
+    // Parse LX segment
+    if let Some(lx_pos) = remaining_content.find("LX*") {
+        let lx_end = remaining_content[lx_pos..].find('~').unwrap_or(remaining_content.len()) + lx_pos;
+        loop2400.lx = remaining_content[lx_pos..=lx_end].to_string();
+        remaining_content = remaining_content[lx_end + 1..].to_string();
+    }
+    
+    // Parse SV1 segment if present
+    if let Some(sv1_pos) = remaining_content.find("SV1*") {
+        // Check if this SV1 belongs to this loop or the next one
+        if !remaining_content[..sv1_pos].contains("LX*") {
+            let sv1_end = remaining_content[sv1_pos..].find('~').unwrap_or(remaining_content.len()) + sv1_pos;
+            loop2400.sv1 = Some(remaining_content[sv1_pos..=sv1_end].to_string());
+            remaining_content = remaining_content[sv1_end + 1..].to_string();
         }
     }
     
-    loop2400
+    // Parse SV2 segment if present
+    if let Some(sv2_pos) = remaining_content.find("SV2*") {
+        // Check if this SV2 belongs to this loop or the next one
+        if !remaining_content[..sv2_pos].contains("LX*") {
+            let sv2_end = remaining_content[sv2_pos..].find('~').unwrap_or(remaining_content.len()) + sv2_pos;
+            loop2400.sv2 = Some(remaining_content[sv2_pos..=sv2_end].to_string());
+            remaining_content = remaining_content[sv2_end + 1..].to_string();
+        }
+    }
+    
+    // Parse SV3 segment if present
+    if let Some(sv3_pos) = remaining_content.find("SV3*") {
+        // Check if this SV3 belongs to this loop or the next one
+        if !remaining_content[..sv3_pos].contains("LX*") {
+            let sv3_end = remaining_content[sv3_pos..].find('~').unwrap_or(remaining_content.len()) + sv3_pos;
+            loop2400.sv3 = Some(remaining_content[sv3_pos..=sv3_end].to_string());
+            remaining_content = remaining_content[sv3_end + 1..].to_string();
+        }
+    }
+    
+    // Parse DTP segments
+    while let Some(dtp_pos) = remaining_content.find("DTP*") {
+        // Check if this DTP belongs to this loop or the next one
+        if remaining_content[..dtp_pos].contains("LX*") {
+            break;
+        }
+        
+        let dtp_end = remaining_content[dtp_pos..].find('~').unwrap_or(remaining_content.len()) + dtp_pos;
+        loop2400.dtp.push(remaining_content[dtp_pos..=dtp_end].to_string());
+        remaining_content = remaining_content[dtp_end + 1..].to_string();
+    }
+    
+    // Parse REF segments
+    while let Some(ref_pos) = remaining_content.find("REF*") {
+        // Check if this REF belongs to this loop or the next one
+        if remaining_content[..ref_pos].contains("LX*") {
+            break;
+        }
+        
+        let ref_end = remaining_content[ref_pos..].find('~').unwrap_or(remaining_content.len()) + ref_pos;
+        loop2400.ref_segments.push(remaining_content[ref_pos..=ref_end].to_string());
+        remaining_content = remaining_content[ref_end + 1..].to_string();
+    }
+    
+    // Parse AMT segments
+    while let Some(amt_pos) = remaining_content.find("AMT*") {
+        // Check if this AMT belongs to this loop or the next one
+        if remaining_content[..amt_pos].contains("LX*") {
+            break;
+        }
+        
+        let amt_end = remaining_content[amt_pos..].find('~').unwrap_or(remaining_content.len()) + amt_pos;
+        loop2400.amt.push(remaining_content[amt_pos..=amt_end].to_string());
+        remaining_content = remaining_content[amt_end + 1..].to_string();
+    }
+    
+    // Parse QTY segments
+    while let Some(qty_pos) = remaining_content.find("QTY*") {
+        // Check if this QTY belongs to this loop or the next one
+        if remaining_content[..qty_pos].contains("LX*") {
+            break;
+        }
+        
+        let qty_end = remaining_content[qty_pos..].find('~').unwrap_or(remaining_content.len()) + qty_pos;
+        loop2400.qty.push(remaining_content[qty_pos..=qty_end].to_string());
+        remaining_content = remaining_content[qty_end + 1..].to_string();
+    }
+    
+    // Parse NTE segments
+    while let Some(nte_pos) = remaining_content.find("NTE*") {
+        // Check if this NTE belongs to this loop or the next one
+        if remaining_content[..nte_pos].contains("LX*") {
+            break;
+        }
+        
+        let nte_end = remaining_content[nte_pos..].find('~').unwrap_or(remaining_content.len()) + nte_pos;
+        loop2400.nte.push(remaining_content[nte_pos..=nte_end].to_string());
+        remaining_content = remaining_content[nte_end + 1..].to_string();
+    }
+    
+    // Parse HCP segment if present
+    if let Some(hcp_pos) = remaining_content.find("HCP*") {
+        // Check if this HCP belongs to this loop or the next one
+        if !remaining_content[..hcp_pos].contains("LX*") {
+            let hcp_end = remaining_content[hcp_pos..].find('~').unwrap_or(remaining_content.len()) + hcp_pos;
+            loop2400.hcp = Some(remaining_content[hcp_pos..=hcp_end].to_string());
+            remaining_content = remaining_content[hcp_end + 1..].to_string();
+        }
+    }
+    
+    (loop2400, remaining_content)
 }
 
 #[cfg(test)]

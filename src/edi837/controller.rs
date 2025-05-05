@@ -180,10 +180,33 @@ impl TransactionSet for Edi837P {
         edi837p.loop2000c = loop2000c_vec;
         
         // Parse Loop2300 (Claim Information)
-        // This would be implemented in a complete version
-        
-        // Parse Loop2400 (Service Line Information)
-        // This would be implemented in a complete version
+        let mut loop2300_vec = Vec::new();
+        while remaining_content.contains("CLM*") {
+            let (loop2300, remaining) = crate::edi837::loop2300::parse_loop2300(&remaining_content);
+            if loop2300.clm.is_empty() {
+                break;
+            }
+            loop2300_vec.push(loop2300);
+            remaining_content = remaining;
+            
+            // Parse Loop2400 (Service Line Information) for this claim
+            let mut loop2400_vec = Vec::new();
+            while remaining_content.contains("LX*") {
+                let (loop2400, remaining) = crate::edi837::loop2400::parse_loop2400(&remaining_content);
+                if loop2400.lx.is_empty() {
+                    break;
+                }
+                loop2400_vec.push(loop2400);
+                remaining_content = remaining;
+            }
+            
+            // Add service lines to the claim
+            if !loop2400_vec.is_empty() {
+                let last_index = loop2300_vec.len() - 1;
+                loop2300_vec[last_index].loop2400 = loop2400_vec;
+            }
+        }
+        edi837p.loop2300 = loop2300_vec;
         
         // Parse interchange trailer
         if let Some(se_pos) = remaining_content.find("SE*") {
