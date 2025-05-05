@@ -5,7 +5,8 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 ## Project Status
 
 - **Phase 1**: ✅ Complete - Fixed CTX segment implementation, improved error handling, addressed Table 1 content placement
-- **Phase 2**: 🔄 In Progress - Implementing common infrastructure and additional transaction sets
+- **Phase 2**: ✅ Complete - Implemented common infrastructure and additional transaction sets (270/271, 276/277)
+- **Phase 3**: 🔄 In Progress - Implementing 837 transaction sets and performance optimizations
 
 The parser implements support for EDI X12 segment handling, including interchange control, functional groups, and transaction sets. It features specialized modules for processing healthcare-specific loops and segments, making it particularly valuable for healthcare claims processing systems and medical billing applications. The implementation follows strict EDI standards while providing a developer-friendly API for parsing and generating EDI documents.
 
@@ -17,6 +18,9 @@ edi/
 │   ├── edi999/                  # Functional Acknowledgment format implementation
 │   ├── edi270/                  # Eligibility Benefit Inquiry format implementation
 │   ├── edi271/                  # Eligibility Benefit Response format implementation
+│   ├── edi276/                  # Health Care Claim Status Request implementation
+│   ├── edi277/                  # Health Care Claim Status Response implementation
+│   ├── edi837/                  # Health Care Claim implementation (Professional, Institutional, Dental)
 │   ├── helper/                  # Utility functions and shared helpers
 │   ├── segments/                # EDI segment definitions and processors
 │   ├── error.rs                 # Error handling module
@@ -31,7 +35,7 @@ edi/
 
 ## Features
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, with 276/277 and 837 planned
+- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, with 837 in progress
 - **Configuration-Driven Architecture**: Segment and loop definitions are configurable
 - **Robust Error Handling**: Comprehensive error types and validation
 - **Bidirectional Conversion**: EDI to JSON and JSON to EDI
@@ -86,25 +90,41 @@ cargo run -- -f input.json -o output.edi -w -j
 - Addressed Table 1 content placement issues
 - Added comprehensive unit tests
 
-### Phase 2: 🔄 In Progress
+### Phase 2: ✅ Complete
 - Common Infrastructure Updates
   - Generic transaction set processor
   - Configuration-driven segment definitions
   - Enhanced loop detection and processing
   - Standardized error handling
 - Transaction Set 270 (Health Care Eligibility Inquiry)
+  - Fixed REF segments not being included in output
+  - Fixed DTP segment parsing
+  - Added line breaks between segments
 - Transaction Set 271 (Health Care Eligibility Response)
-- Enhanced 999 Implementation
-  - Fixed CTX segment handling for special formats
-  - Improved IK4 segment generation
-  - Enhanced input file processing
+  - Fixed PER, REF, and DTP segments in output
+  - Enhanced logging and error handling
+- Transaction Set 276 (Health Care Claim Status Request)
+  - Implemented full parsing and generation
+  - Added support for all required loops and segments
+- Transaction Set 277 (Health Care Claim Status Response)
+  - Implemented full parsing and generation
+  - Added support for STC segments
+  - Enhanced nested loop handling
 
-### Phase 3: 🔄 Planned
-- Transaction Set 276/277 (Health Care Claim Status)
+### Phase 3: 🔄 In Progress
 - Transaction Set 837 (Health Care Claim)
+  - Created directory structure for 837P, 837I, and 837D variants
+  - Implemented common segments and basic loop structure
+  - Implemented parsing for Loop2000A (Billing Provider)
+  - Implemented parsing for Loop2010AA, Loop2010AB, Loop2010AC
+  - In progress: Implementing remaining loops and segments
 - Performance optimization
-- Schema validation
-- Additional features (custom delimiters, pretty printing, etc.)
+  - Planned: Optimize parsing algorithms
+  - Planned: Implement caching for frequently used segments
+- Additional features
+  - Planned: Custom delimiters
+  - Planned: Pretty printing
+  - Planned: Schema validation
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
