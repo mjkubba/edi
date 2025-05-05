@@ -10,8 +10,8 @@
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
 | EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
-| EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I |
-| EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D |
+| EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I, specialized handling for CL1 segment |
+| EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D, specialized handling for TOO segment |
 
 ## Recent Improvements
 
@@ -94,7 +94,11 @@
 - Updated main.rs to support EDI837I format detection and processing
 - Implemented parsing for EDI837D (Dental) format
 - Updated main.rs to support EDI837D format detection and processing
-- Updated lib.rs and mod.rs to export necessary types and functions for 837D
+- Implemented specialized handling for TOO segment in 837D format
+- Implemented specialized handling for CL1 segment in 837I format
+- Improved format detection logic to better distinguish between 837 variants
+- Updated Loop2300 to include fields for specialized segments
+- Updated parse_loop2300 to handle specialized segments
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -112,19 +116,12 @@
 
 ## Next Development Tasks
 
-1. **Implement Variant-Specific Components**:
-   - Implement variant-specific components for 837P
-   - Implement variant-specific components for 837I
-   - Implement variant-specific components for 837D
-   - Add specialized handling for TOO segment in 837D
-   - Add specialized handling for CL1 segment in 837I
-
-2. **Performance Optimization**:
+1. **Performance Optimization**:
    - Optimize parsing algorithms
    - Implement caching for frequently used segments
    - Reduce memory usage for large files
 
-3. **Additional Features**:
+2. **Additional Features**:
    - Add support for custom delimiters
    - Implement pretty printing for output files
    - Add schema validation

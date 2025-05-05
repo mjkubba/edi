@@ -83,12 +83,12 @@
 - [x] Complete implementation of parse method for 837D
 - [x] Update main.rs to support 837D format
 
-### 2. Implement Variant-Specific Components
-- [ ] Implement variant-specific components for 837P
-- [ ] Implement variant-specific components for 837I
-- [ ] Implement variant-specific components for 837D
-- [ ] Add specialized handling for TOO segment in 837D
-- [ ] Add specialized handling for CL1 segment in 837I
+### 2. ✅ Implement Variant-Specific Components
+- [x] Implement specialized handling for TOO segment in 837D
+- [x] Implement specialized handling for CL1 segment in 837I
+- [x] Improve format detection logic to better distinguish between 837 variants
+- [x] Update Loop2300 to include fields for specialized segments
+- [x] Update parse_loop2300 to handle specialized segments
 
 ### 3. Performance Optimization
 - [ ] Optimize parsing algorithms
