@@ -59,7 +59,7 @@
 
 ## Low Priority Tasks
 
-### 1. Continue EDI837 Implementation
+### 1. ✅ Complete EDI837 Implementation
 - [x] Create directory structure for 837P, 837I, and 837D variants
 - [x] Create basic module structure (mod.rs, controller.rs)
 - [x] Implement common segments (interchangecontrol.rs, interchangecontroltrailer.rs)
@@ -80,17 +80,22 @@
 - [x] Complete implementation of parse method for 837I
 - [x] Add tests for EDI837I
 - [x] Update main.rs to support 837I format
-- [ ] Complete implementation of parse method for 837D
+- [x] Complete implementation of parse method for 837D
+- [x] Update main.rs to support 837D format
+
+### 2. Implement Variant-Specific Components
 - [ ] Implement variant-specific components for 837P
 - [ ] Implement variant-specific components for 837I
 - [ ] Implement variant-specific components for 837D
+- [ ] Add specialized handling for TOO segment in 837D
+- [ ] Add specialized handling for CL1 segment in 837I
 
-### 2. Performance Optimization
+### 3. Performance Optimization
 - [ ] Optimize parsing algorithms
 - [ ] Implement caching for frequently used segments
 - [ ] Reduce memory usage for large files
 
-### 3. Additional Features
+### 4. Additional Features
 - [ ] Add support for custom delimiters
 - [ ] Implement pretty printing for output files
 - [ ] Add schema validation

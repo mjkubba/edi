@@ -11,7 +11,7 @@
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
 | EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
 | EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I |
-| EDI837D (Health Care Claim Dental) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added |
+| EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D |
 
 ## Recent Improvements
 
@@ -92,6 +92,9 @@
 - Implemented parsing for EDI837I (Institutional) format
 - Added tests for EDI837I parsing and generation
 - Updated main.rs to support EDI837I format detection and processing
+- Implemented parsing for EDI837D (Dental) format
+- Updated main.rs to support EDI837D format detection and processing
+- Updated lib.rs and mod.rs to export necessary types and functions for 837D
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -109,11 +112,12 @@
 
 ## Next Development Tasks
 
-1. **EDI837D Implementation**:
-   - Complete implementation of parse method for 837D
-   - Implement variant-specific components for each format
-   - Add tests for EDI837D
-   - Update main.rs to fully support 837D format
+1. **Implement Variant-Specific Components**:
+   - Implement variant-specific components for 837P
+   - Implement variant-specific components for 837I
+   - Implement variant-specific components for 837D
+   - Add specialized handling for TOO segment in 837D
+   - Add specialized handling for CL1 segment in 837I
 
 2. **Performance Optimization**:
    - Optimize parsing algorithms
