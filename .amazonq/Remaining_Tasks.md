@@ -66,11 +66,15 @@
 - [x] Set up table1.rs with basic segment structures
 - [x] Create initial loop structure in loop2000a.rs
 - [x] Implement TransactionSet trait for 837P, 837I, and 837D
-- [ ] Complete implementation of all required loops and segments
+- [ ] Complete implementation of parse method for 837P
+- [ ] Complete implementation of parse method for 837I
+- [ ] Complete implementation of parse method for 837D
+- [ ] Implement parsing for all required loops and segments
 - [ ] Implement variant-specific components for 837P
 - [ ] Implement variant-specific components for 837I
 - [ ] Implement variant-specific components for 837D
 - [ ] Add tests for EDI837
+- [ ] Update main.rs to fully support 837 formats
 
 ### 2. Performance Optimization
 - [ ] Optimize parsing algorithms

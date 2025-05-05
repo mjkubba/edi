@@ -9,7 +9,7 @@
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
-| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added |
+| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parse method implementation started |
 
 ## Recent Improvements
 
@@ -69,6 +69,9 @@
 - Created initial loop structure in loop2000a.rs
 - Implemented TransactionSet trait for 837P, 837I, and 837D variants
 - Updated controller functions to use EdiResult type for better error handling
+- Started implementation of parse method for Edi837P
+- Added parse_loop2000a function to handle parsing of Loop2000A
+- Updated main.rs to recognize and process 837 formats
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -87,8 +90,9 @@
 ## Next Development Tasks
 
 1. **EDI837 Implementation**:
-   - Complete implementation of all required loops and segments
-   - Implement variant-specific components for 837P, 837I, and 837D
+   - Complete implementation of parse methods for 837P, 837I, and 837D
+   - Implement parsing for all required loops and segments
+   - Implement variant-specific components for each format
    - Add tests for EDI837
 
 2. **Performance Optimization**:

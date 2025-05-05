@@ -71,12 +71,52 @@ pub struct Edi837D {
 }
 
 impl TransactionSet for Edi837P {
-    fn parse(_contents: String) -> EdiResult<(Self, String)> {
+    fn parse(contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837P content");
         
-        // Implementation will be added later
+        let mut edi837p = Edi837P::default();
+        let mut remaining_content = contents.clone();
         
-        Err(EdiError::UnsupportedFormat("EDI837P parsing not yet implemented".to_string()))
+        // Parse interchange header
+        if let Some(isa_pos) = remaining_content.find("ISA*") {
+            let isa_end = remaining_content[isa_pos..].find('~').unwrap_or(remaining_content.len()) + isa_pos;
+            edi837p.interchange_header.isa = remaining_content[isa_pos..=isa_end].to_string();
+            remaining_content = remaining_content[isa_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("ISA segment not found".to_string()));
+        }
+        
+        // Parse GS segment
+        if let Some(gs_pos) = remaining_content.find("GS*") {
+            let gs_end = remaining_content[gs_pos..].find('~').unwrap_or(remaining_content.len()) + gs_pos;
+            edi837p.interchange_header.gs = remaining_content[gs_pos..=gs_end].to_string();
+            remaining_content = remaining_content[gs_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("GS segment not found".to_string()));
+        }
+        
+        // Parse ST segment
+        if let Some(st_pos) = remaining_content.find("ST*") {
+            let st_end = remaining_content[st_pos..].find('~').unwrap_or(remaining_content.len()) + st_pos;
+            edi837p.interchange_header.st = remaining_content[st_pos..=st_end].to_string();
+            remaining_content = remaining_content[st_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("ST segment not found".to_string()));
+        }
+        
+        // Parse BHT segment
+        if let Some(bht_pos) = remaining_content.find("BHT*") {
+            let bht_end = remaining_content[bht_pos..].find('~').unwrap_or(remaining_content.len()) + bht_pos;
+            edi837p.table1.table1.bht = remaining_content[bht_pos..=bht_end].to_string();
+            remaining_content = remaining_content[bht_end + 1..].to_string();
+        } else {
+            return Err(EdiError::MissingSegment("BHT segment not found".to_string()));
+        }
+        
+        // For now, we'll return a basic structure with just the header segments
+        // In a complete implementation, we would parse all loops and segments
+        
+        Ok((edi837p, remaining_content))
     }
     
     fn to_edi(&self) -> String {
@@ -335,12 +375,13 @@ impl TransactionSet for Edi837D {
 }
 
 /// Parse EDI837P content
-pub fn get_837p(_content: &str) -> EdiResult<Edi837P> {
+pub fn get_837p(content: &str) -> EdiResult<Edi837P> {
     info!("Parsing EDI837P content");
     
-    // Implementation will be added later
-    
-    Err(EdiError::UnsupportedFormat("EDI837P parsing not yet implemented".to_string()))
+    match Edi837P::parse(content.to_string()) {
+        Ok((edi837p, _)) => Ok(edi837p),
+        Err(e) => Err(e)
+    }
 }
 
 /// Generate EDI837P content

@@ -2,7 +2,7 @@
  * EDI Parser and Processor for Healthcare X12 Formats
  * 
  * This application provides functionality to parse and generate EDI files
- * for healthcare X12 formats including 835, 999, 270/271, and 276/277.
+ * for healthcare X12 formats including 835, 999, 270/271, 276/277, and 837.
  * 
  * The main module handles command line arguments and routes processing
  * to the appropriate controller based on the EDI format.
@@ -16,6 +16,7 @@ use crate::edi270::controller::*;
 use crate::edi271::controller::*;
 use crate::edi276::controller::*;
 use crate::edi277::controller::*;
+use crate::edi837::controller::*;
 
 mod helper;
 mod segments;
@@ -25,6 +26,7 @@ mod edi270;
 mod edi271;
 mod edi276;
 mod edi277;
+mod edi837;
 mod error;
 mod transaction_processor;
 mod segment_config;
@@ -92,6 +94,33 @@ fn main() {
                 let new_edi = write_277(&edi277);
                 write_to_file(new_edi, args.output_file);
             }
+            // Check if the content is JSON for 837P format
+            else if contents.contains("\"transaction_set_id\":\"837P\"") {
+                info!("Writing 837P format");
+                let edi837p: Edi837P = serde_json::from_str(&contents).unwrap();
+                match write_837p(&edi837p) {
+                    Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                    Err(e) => warn!("Error writing 837P format: {:?}", e)
+                }
+            }
+            // Check if the content is JSON for 837I format
+            else if contents.contains("\"transaction_set_id\":\"837I\"") {
+                info!("Writing 837I format");
+                let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
+                match write_837i(&edi837i) {
+                    Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                    Err(e) => warn!("Error writing 837I format: {:?}", e)
+                }
+            }
+            // Check if the content is JSON for 837D format
+            else if contents.contains("\"transaction_set_id\":\"837D\"") {
+                info!("Writing 837D format");
+                let edi837d: Edi837D = serde_json::from_str(&contents).unwrap();
+                match write_837d(&edi837d) {
+                    Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                    Err(e) => warn!("Error writing 837D format: {:?}", e)
+                }
+            }
             else {
                 warn!("Unknown format for writing");
             }
@@ -136,6 +165,21 @@ fn main() {
                     },
                     Err(e) => {
                         warn!("Error processing 271 format: {:?}", e);
+                    }
+                }
+            }
+            // Check if the content is raw EDI for 837P format
+            else if contents.contains("ST*837*") && contents.contains("BHT*0019*00*") {
+                info!("Writing 837P format from raw EDI");
+                match get_837p(&contents) {
+                    Ok(edi837p) => {
+                        match write_837p(&edi837p) {
+                            Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                            Err(e) => warn!("Error writing 837P format: {:?}", e)
+                        }
+                    },
+                    Err(e) => {
+                        warn!("Error processing 837P format: {:?}", e);
                     }
                 }
             }
@@ -200,8 +244,25 @@ fn main() {
                     warn!("Error processing 277 format: {:?}", e);
                 }
             }
+        } else if contents.contains("~ST*837*") || contents.contains("ST*837*") {
+            info!("File is 837");
+            // Try to determine the specific 837 variant
+            if contents.contains("BHT*0019*00*") {
+                info!("File is 837P");
+                match get_837p(&contents) {
+                    Ok(edi837p) => {
+                        let serialized_edi = serde_json::to_string(&edi837p).unwrap();
+                        write_to_file(serialized_edi.clone(), args.output_file);
+                    },
+                    Err(e) => {
+                        warn!("Error processing 837P format: {:?}", e);
+                    }
+                }
+            } else {
+                warn!("Unable to determine specific 837 variant. Currently supporting 837P.");
+            }
         } else {
-            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, and 277 formats.");
+            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, and 837 formats.");
         }
     }
 }
