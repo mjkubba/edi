@@ -73,8 +73,8 @@
 - [x] Implement parsing for Loop2010AC
 - [x] Implement parsing for Loop2000B and nested loops
 - [x] Implement parsing for Loop2000C and nested loops
-- [ ] Implement parsing for Loop2300
-- [ ] Implement parsing for Loop2400
+- [x] Implement parsing for Loop2300
+- [x] Implement parsing for Loop2400
 - [ ] Complete implementation of parse method for 837I
 - [ ] Complete implementation of parse method for 837D
 - [ ] Implement variant-specific components for 837P

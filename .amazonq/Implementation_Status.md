@@ -9,7 +9,7 @@
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
-| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parsing for Loop2000A, Loop2010AA, Loop2010AB, Loop2010AC, Loop2000B, and Loop2000C implemented |
+| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parsing for Loop2000A, Loop2010AA, Loop2010AB, Loop2010AC, Loop2000B, Loop2000C, Loop2300, and Loop2400 implemented |
 
 ## Recent Improvements
 
@@ -76,9 +76,14 @@
 - Implemented parsing for Loop2010AC (Pay-to Plan Name)
 - Implemented parsing for Loop2000B (Subscriber Hierarchical Level)
 - Implemented parsing for Loop2000C (Patient Hierarchical Level)
+- Implemented parsing for Loop2300 (Claim Information)
+- Implemented parsing for Loop2400 (Service Line Information)
 - Updated main.rs to recognize and process 837 formats
 - Improved segment detection logic to handle nested loops correctly
 - Enhanced hierarchical level detection for subscriber and patient loops
+- Fixed compilation errors related to type mismatches
+- Updated BHT field in Table1s to use String instead of BHT struct
+- Added support for parsing claims and their service lines
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -97,11 +102,10 @@
 ## Next Development Tasks
 
 1. **EDI837 Implementation**:
-   - Implement parsing for Loop2300 (Claim Information)
-   - Implement parsing for Loop2400 (Service Line Information)
    - Complete implementation of parse methods for 837I and 837D
    - Implement variant-specific components for each format
    - Add tests for EDI837
+   - Update main.rs to fully support 837 formats
 
 2. **Performance Optimization**:
    - Optimize parsing algorithms
