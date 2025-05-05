@@ -138,10 +138,28 @@ impl TransactionSet for Edi837P {
         }
         
         // Parse Loop2000B (Subscriber Hierarchical Level)
-        // This would be implemented in a complete version
+        let mut loop2000b_vec = Vec::new();
+        while remaining_content.contains("HL*") && remaining_content.contains("*22*") {
+            let (loop2000b, remaining) = parse_loop2000b(&remaining_content);
+            if loop2000b.hl.is_empty() {
+                break;
+            }
+            loop2000b_vec.push(loop2000b);
+            remaining_content = remaining;
+        }
+        edi837p.loop2000b = loop2000b_vec;
         
         // Parse Loop2000C (Patient Hierarchical Level)
-        // This would be implemented in a complete version
+        let mut loop2000c_vec = Vec::new();
+        while remaining_content.contains("HL*") && remaining_content.contains("*23*") {
+            let (loop2000c, remaining) = parse_loop2000c(&remaining_content);
+            if loop2000c.hl.is_empty() {
+                break;
+            }
+            loop2000c_vec.push(loop2000c);
+            remaining_content = remaining;
+        }
+        edi837p.loop2000c = loop2000c_vec;
         
         // Parse Loop2300 (Claim Information)
         // This would be implemented in a complete version

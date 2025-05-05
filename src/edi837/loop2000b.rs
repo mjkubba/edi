@@ -81,33 +81,111 @@ pub fn write_loop2000b(loop2000b: &Loop2000b) -> String {
 }
 
 /// Parse Loop2000B from EDI content
-pub fn parse_loop2000b(content: &str) -> Loop2000b {
+pub fn parse_loop2000b(content: &str) -> (Loop2000b, String) {
     let mut loop2000b = Loop2000b::default();
-    let segments: Vec<&str> = content.split('\n').collect();
+    let mut remaining_content = content.to_string();
     
-    for segment in segments {
-        if segment.starts_with("HL*") {
-            loop2000b.hl = segment.to_string();
-        } else if segment.starts_with("SBR*") {
-            loop2000b.sbr = segment.to_string();
-        } else if segment.starts_with("PAT*") {
-            loop2000b.pat = Some(segment.to_string());
-        } else if segment.starts_with("DMG*") {
-            loop2000b.dmg = Some(segment.to_string());
-        } else if segment.starts_with("NM1*IL*") {
-            loop2000b.nm1_subscriber = Some(segment.to_string());
-        } else if segment.starts_with("N3*") {
-            loop2000b.n3 = Some(segment.to_string());
-        } else if segment.starts_with("N4*") {
-            loop2000b.n4 = Some(segment.to_string());
-        } else if segment.starts_with("REF*") {
-            loop2000b.ref_subscriber.push(segment.to_string());
-        } else if segment.starts_with("DTP*") {
-            loop2000b.dtp.push(segment.to_string());
+    // Parse HL segment for subscriber
+    if let Some(hl_pos) = remaining_content.find("HL*") {
+        // Check if this is a subscriber HL (hierarchical level code 22)
+        let hl_segment = &remaining_content[hl_pos..];
+        if hl_segment.contains("*22*") {
+            let hl_end = remaining_content[hl_pos..].find('~').unwrap_or(remaining_content.len()) + hl_pos;
+            loop2000b.hl = remaining_content[hl_pos..=hl_end].to_string();
+            remaining_content = remaining_content[hl_end + 1..].to_string();
+        } else {
+            // Not a subscriber HL, return empty loop
+            return (loop2000b, remaining_content);
         }
     }
     
-    loop2000b
+    // Parse SBR segment
+    if let Some(sbr_pos) = remaining_content.find("SBR*") {
+        let sbr_end = remaining_content[sbr_pos..].find('~').unwrap_or(remaining_content.len()) + sbr_pos;
+        loop2000b.sbr = remaining_content[sbr_pos..=sbr_end].to_string();
+        remaining_content = remaining_content[sbr_end + 1..].to_string();
+    }
+    
+    // Parse PAT segment if present
+    if let Some(pat_pos) = remaining_content.find("PAT*") {
+        // Check if this PAT belongs to this loop or the next one
+        if !remaining_content[..pat_pos].contains("HL*") {
+            let pat_end = remaining_content[pat_pos..].find('~').unwrap_or(remaining_content.len()) + pat_pos;
+            loop2000b.pat = Some(remaining_content[pat_pos..=pat_end].to_string());
+            remaining_content = remaining_content[pat_end + 1..].to_string();
+        }
+    }
+    
+    // Parse DMG segment if present
+    if let Some(dmg_pos) = remaining_content.find("DMG*") {
+        // Check if this DMG belongs to this loop or the next one
+        if !remaining_content[..dmg_pos].contains("HL*") && 
+           !remaining_content[..dmg_pos].contains("NM1*") {
+            let dmg_end = remaining_content[dmg_pos..].find('~').unwrap_or(remaining_content.len()) + dmg_pos;
+            loop2000b.dmg = Some(remaining_content[dmg_pos..=dmg_end].to_string());
+            remaining_content = remaining_content[dmg_end + 1..].to_string();
+        }
+    }
+    
+    // Parse NM1 segment for subscriber
+    if let Some(nm1_pos) = remaining_content.find("NM1*IL*") {
+        // Check if this NM1 belongs to this loop or the next one
+        if !remaining_content[..nm1_pos].contains("HL*") {
+            let nm1_end = remaining_content[nm1_pos..].find('~').unwrap_or(remaining_content.len()) + nm1_pos;
+            loop2000b.nm1_subscriber = Some(remaining_content[nm1_pos..=nm1_end].to_string());
+            remaining_content = remaining_content[nm1_end + 1..].to_string();
+        }
+    }
+    
+    // Parse N3 segment if present
+    if let Some(n3_pos) = remaining_content.find("N3*") {
+        // Check if this N3 belongs to this loop or the next one
+        if !remaining_content[..n3_pos].contains("HL*") && 
+           !remaining_content[..n3_pos].contains("NM1*") {
+            let n3_end = remaining_content[n3_pos..].find('~').unwrap_or(remaining_content.len()) + n3_pos;
+            loop2000b.n3 = Some(remaining_content[n3_pos..=n3_end].to_string());
+            remaining_content = remaining_content[n3_end + 1..].to_string();
+        }
+    }
+    
+    // Parse N4 segment if present
+    if let Some(n4_pos) = remaining_content.find("N4*") {
+        // Check if this N4 belongs to this loop or the next one
+        if !remaining_content[..n4_pos].contains("HL*") && 
+           !remaining_content[..n4_pos].contains("NM1*") {
+            let n4_end = remaining_content[n4_pos..].find('~').unwrap_or(remaining_content.len()) + n4_pos;
+            loop2000b.n4 = Some(remaining_content[n4_pos..=n4_end].to_string());
+            remaining_content = remaining_content[n4_end + 1..].to_string();
+        }
+    }
+    
+    // Parse REF segments
+    while let Some(ref_pos) = remaining_content.find("REF*") {
+        // Check if this REF belongs to this loop or the next one
+        if remaining_content[..ref_pos].contains("HL*") || 
+           remaining_content[..ref_pos].contains("NM1*") {
+            break;
+        }
+        
+        let ref_end = remaining_content[ref_pos..].find('~').unwrap_or(remaining_content.len()) + ref_pos;
+        loop2000b.ref_subscriber.push(remaining_content[ref_pos..=ref_end].to_string());
+        remaining_content = remaining_content[ref_end + 1..].to_string();
+    }
+    
+    // Parse DTP segments
+    while let Some(dtp_pos) = remaining_content.find("DTP*") {
+        // Check if this DTP belongs to this loop or the next one
+        if remaining_content[..dtp_pos].contains("HL*") || 
+           remaining_content[..dtp_pos].contains("NM1*") {
+            break;
+        }
+        
+        let dtp_end = remaining_content[dtp_pos..].find('~').unwrap_or(remaining_content.len()) + dtp_pos;
+        loop2000b.dtp.push(remaining_content[dtp_pos..=dtp_end].to_string());
+        remaining_content = remaining_content[dtp_end + 1..].to_string();
+    }
+    
+    (loop2000b, remaining_content)
 }
 
 #[cfg(test)]
