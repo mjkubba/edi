@@ -10,7 +10,8 @@
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
 | EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
-| EDI837I/D (Health Care Claim Institutional/Dental) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added |
+| EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I |
+| EDI837D (Health Care Claim Dental) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added |
 
 ## Recent Improvements
 
@@ -88,6 +89,9 @@
 - Added unit tests for EDI837P parsing and generation
 - Updated lib.rs exports to include only implemented EDI837 functionality
 - Updated mod.rs to export necessary types and functions
+- Implemented parsing for EDI837I (Institutional) format
+- Added tests for EDI837I parsing and generation
+- Updated main.rs to support EDI837I format detection and processing
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -105,11 +109,11 @@
 
 ## Next Development Tasks
 
-1. **EDI837I/D Implementation**:
-   - Complete implementation of parse methods for 837I and 837D
+1. **EDI837D Implementation**:
+   - Complete implementation of parse method for 837D
    - Implement variant-specific components for each format
-   - Add tests for EDI837I and EDI837D
-   - Update main.rs to fully support 837I and 837D formats
+   - Add tests for EDI837D
+   - Update main.rs to fully support 837D format
 
 2. **Performance Optimization**:
    - Optimize parsing algorithms
