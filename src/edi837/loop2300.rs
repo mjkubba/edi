@@ -26,6 +26,9 @@ pub struct Loop2300 {
     pub hcp: Option<String>,
     /// Service Line Information
     pub loop2400: Vec<Loop2400>,
+    // Add fields for specialized segments
+    pub too_segments: Vec<String>,
+    pub cl1_segments: Vec<String>,
 }
 
 /// Write Loop2300 to EDI format
@@ -87,6 +90,18 @@ pub fn write_loop2300(loop2300: &Loop2300) -> String {
     // Write HCP segment if present
     if let Some(hcp) = &loop2300.hcp {
         result.push_str(hcp);
+        result.push_str("\n");
+    }
+    
+    // Write TOO segments (specific to 837D)
+    for too in &loop2300.too_segments {
+        result.push_str(too);
+        result.push_str("\n");
+    }
+    
+    // Write CL1 segments (specific to 837I)
+    for cl1 in &loop2300.cl1_segments {
+        result.push_str(cl1);
         result.push_str("\n");
     }
     
@@ -216,6 +231,30 @@ pub fn parse_loop2300(content: &str) -> (Loop2300, String) {
             loop2300.hcp = Some(remaining_content[hcp_pos..=hcp_end].to_string());
             remaining_content = remaining_content[hcp_end + 1..].to_string();
         }
+    }
+    
+    // Parse TOO segments (specific to 837D)
+    while let Some(too_pos) = remaining_content.find("TOO*") {
+        // Check if this TOO belongs to this loop or the next one
+        if remaining_content[..too_pos].contains("LX*") {
+            break;
+        }
+        
+        let too_end = remaining_content[too_pos..].find('~').unwrap_or(remaining_content.len()) + too_pos;
+        loop2300.too_segments.push(remaining_content[too_pos..=too_end].to_string());
+        remaining_content = remaining_content[too_end + 1..].to_string();
+    }
+    
+    // Parse CL1 segments (specific to 837I)
+    while let Some(cl1_pos) = remaining_content.find("CL1*") {
+        // Check if this CL1 belongs to this loop or the next one
+        if remaining_content[..cl1_pos].contains("LX*") {
+            break;
+        }
+        
+        let cl1_end = remaining_content[cl1_pos..].find('~').unwrap_or(remaining_content.len()) + cl1_pos;
+        loop2300.cl1_segments.push(remaining_content[cl1_pos..=cl1_end].to_string());
+        remaining_content = remaining_content[cl1_end + 1..].to_string();
     }
     
     (loop2300, remaining_content)

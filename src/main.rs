@@ -247,7 +247,7 @@ fn main() {
         } else if contents.contains("~ST*837*") || contents.contains("ST*837*") {
             info!("File is 837");
             // Try to determine the specific 837 variant
-            if contents.contains("BHT*0019*00*") {
+            if contents.contains("005010X222") {
                 info!("File is 837P");
                 match get_837p(&contents) {
                     Ok(edi837p) => {
@@ -269,8 +269,19 @@ fn main() {
                         warn!("Error processing 837I format: {:?}", e);
                     }
                 }
+            } else if contents.contains("005010X224") {
+                info!("File is 837D");
+                match get_837d(&contents) {
+                    Ok(edi837d) => {
+                        let serialized_edi = serde_json::to_string(&edi837d).unwrap();
+                        write_to_file(serialized_edi.clone(), args.output_file);
+                    },
+                    Err(e) => {
+                        warn!("Error processing 837D format: {:?}", e);
+                    }
+                }
             } else {
-                warn!("Unable to determine specific 837 variant. Currently supporting 837P and 837I.");
+                warn!("Unable to determine specific 837 variant. Currently supporting 837P, 837I, and 837D.");
             }
         } else {
             warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, and 837 formats.");

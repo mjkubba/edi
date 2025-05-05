@@ -397,10 +397,36 @@ impl TransactionSet for Edi837I {
         // Parse Loop2300 (Claim Information)
         let mut loop2300_vec = Vec::new();
         while remaining_content.contains("CLM*") {
-            let (loop2300, remaining) = parse_loop2300(&remaining_content);
+            let (mut loop2300, remaining) = parse_loop2300(&remaining_content);
             if loop2300.clm.is_empty() {
                 break;
             }
+            
+            // Look for CL1 segments (specific to 837I)
+            let mut cl1_segments = Vec::new();
+            let mut temp_content = remaining.clone();
+            let mut segment_end = 0;
+            
+            while let Some(segment_start) = temp_content[segment_end..].find("CL1*") {
+                let start_pos = segment_end + segment_start;
+                let end_pos = temp_content[start_pos..].find('~').unwrap_or(temp_content.len()) + start_pos;
+                let segment = temp_content[start_pos..=end_pos].to_string();
+                
+                if let Some(cl1_segment) = parse_cl1_segment(&segment) {
+                    cl1_segments.push(cl1_segment);
+                }
+                
+                segment_end = end_pos + 1;
+                
+                // Break if we've reached the next LX segment
+                if temp_content[segment_end..].contains("LX*") {
+                    break;
+                }
+            }
+            
+            // Add CL1 segments to Loop2300
+            loop2300.cl1_segments = cl1_segments;
+            
             loop2300_vec.push(loop2300);
             remaining_content = remaining;
             
@@ -612,10 +638,36 @@ impl TransactionSet for Edi837D {
         // Parse Loop2300 (Claim Information)
         let mut loop2300_vec = Vec::new();
         while remaining_content.contains("CLM*") {
-            let (loop2300, remaining) = parse_loop2300(&remaining_content);
+            let (mut loop2300, remaining) = parse_loop2300(&remaining_content);
             if loop2300.clm.is_empty() {
                 break;
             }
+            
+            // Look for TOO segments (specific to 837D)
+            let mut too_segments = Vec::new();
+            let mut temp_content = remaining.clone();
+            let mut segment_end = 0;
+            
+            while let Some(segment_start) = temp_content[segment_end..].find("TOO*") {
+                let start_pos = segment_end + segment_start;
+                let end_pos = temp_content[start_pos..].find('~').unwrap_or(temp_content.len()) + start_pos;
+                let segment = temp_content[start_pos..=end_pos].to_string();
+                
+                if let Some(too_segment) = parse_too_segment(&segment) {
+                    too_segments.push(too_segment);
+                }
+                
+                segment_end = end_pos + 1;
+                
+                // Break if we've reached the next LX segment
+                if temp_content[segment_end..].contains("LX*") {
+                    break;
+                }
+            }
+            
+            // Add TOO segments to Loop2300
+            loop2300.too_segments = too_segments;
+            
             loop2300_vec.push(loop2300);
             remaining_content = remaining;
             
@@ -950,4 +1002,19 @@ pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
     info!("Generating EDI837D content");
     
     Ok(edi837d.to_edi())
+}
+/// Implement specialized handling for TOO segment in 837D
+fn parse_too_segment(segment: &str) -> Option<String> {
+    if segment.starts_with("TOO*") {
+        return Some(segment.to_string());
+    }
+    None
+}
+
+/// Implement specialized handling for CL1 segment in 837I
+fn parse_cl1_segment(segment: &str) -> Option<String> {
+    if segment.starts_with("CL1*") {
+        return Some(segment.to_string());
+    }
+    None
 }
