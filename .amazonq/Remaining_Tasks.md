@@ -66,10 +66,17 @@
 - [x] Set up table1.rs with basic segment structures
 - [x] Create initial loop structure in loop2000a.rs
 - [x] Implement TransactionSet trait for 837P, 837I, and 837D
-- [ ] Complete implementation of parse method for 837P
+- [x] Start implementation of parse method for 837P
+- [x] Implement parsing for Loop2000A
+- [x] Implement parsing for Loop2010AA
+- [x] Implement parsing for Loop2010AB
+- [x] Implement parsing for Loop2010AC
+- [ ] Implement parsing for Loop2000B and nested loops
+- [ ] Implement parsing for Loop2000C and nested loops
+- [ ] Implement parsing for Loop2300
+- [ ] Implement parsing for Loop2400
 - [ ] Complete implementation of parse method for 837I
 - [ ] Complete implementation of parse method for 837D
-- [ ] Implement parsing for all required loops and segments
 - [ ] Implement variant-specific components for 837P
 - [ ] Implement variant-specific components for 837I
 - [ ] Implement variant-specific components for 837D

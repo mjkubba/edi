@@ -9,7 +9,7 @@
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
-| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parse method implementation started |
+| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parsing for Loop2000A, Loop2010AA, Loop2010AB, and Loop2010AC implemented |
 
 ## Recent Improvements
 
@@ -71,7 +71,11 @@
 - Updated controller functions to use EdiResult type for better error handling
 - Started implementation of parse method for Edi837P
 - Added parse_loop2000a function to handle parsing of Loop2000A
+- Implemented parsing for Loop2010AA (Billing Provider Name)
+- Implemented parsing for Loop2010AB (Pay-to Address)
+- Implemented parsing for Loop2010AC (Pay-to Plan Name)
 - Updated main.rs to recognize and process 837 formats
+- Improved segment detection logic to handle nested loops correctly
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -90,8 +94,10 @@
 ## Next Development Tasks
 
 1. **EDI837 Implementation**:
-   - Complete implementation of parse methods for 837P, 837I, and 837D
-   - Implement parsing for all required loops and segments
+   - Implement parsing for Loop2000B and its nested loops
+   - Implement parsing for Loop2000C and its nested loops
+   - Implement parsing for Loop2300 and Loop2400
+   - Complete implementation of parse methods for 837I and 837D
    - Implement variant-specific components for each format
    - Add tests for EDI837
 
