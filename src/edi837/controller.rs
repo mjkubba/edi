@@ -4,15 +4,15 @@ use crate::error::{EdiResult, EdiError};
 use crate::transaction_processor::TransactionSet;
 
 use crate::edi837::interchangecontrol::InterchangeHeader;
-use crate::edi837::table1::{Table1s, write_bht};
-use crate::edi837::loop2000a::{Loop2000a, parse_loop2000a};
+use crate::edi837::table1::Table1s;
+use crate::edi837::loop2000a::{Loop2000a, parse_loop2000a, write_loop2000a};
 use crate::edi837::loop2000b::{Loop2000b, parse_loop2000b, write_loop2000b};
 use crate::edi837::loop2000c::{Loop2000c, parse_loop2000c, write_loop2000c};
 use crate::edi837::loop2010aa::{Loop2010aa, parse_loop2010aa, write_loop2010aa};
 use crate::edi837::loop2010ab::{Loop2010ab, parse_loop2010ab, write_loop2010ab};
 use crate::edi837::loop2010ac::{Loop2010ac, parse_loop2010ac, write_loop2010ac};
-use crate::edi837::loop2300::{Loop2300, write_loop2300};
-use crate::edi837::loop2400::{Loop2400, write_loop2400};
+use crate::edi837::loop2300::{Loop2300, parse_loop2300, write_loop2300};
+use crate::edi837::loop2400::{Loop2400, parse_loop2400, write_loop2400};
 use crate::edi837::interchangecontroltrailer::InterchangeTrailer;
 
 /// Table1 structure for EDI837
@@ -182,7 +182,7 @@ impl TransactionSet for Edi837P {
         // Parse Loop2300 (Claim Information)
         let mut loop2300_vec = Vec::new();
         while remaining_content.contains("CLM*") {
-            let (loop2300, remaining) = crate::edi837::loop2300::parse_loop2300(&remaining_content);
+            let (loop2300, remaining) = parse_loop2300(&remaining_content);
             if loop2300.clm.is_empty() {
                 break;
             }
@@ -192,7 +192,7 @@ impl TransactionSet for Edi837P {
             // Parse Loop2400 (Service Line Information) for this claim
             let mut loop2400_vec = Vec::new();
             while remaining_content.contains("LX*") {
-                let (loop2400, remaining) = crate::edi837::loop2400::parse_loop2400(&remaining_content);
+                let (loop2400, remaining) = parse_loop2400(&remaining_content);
                 if loop2400.lx.is_empty() {
                     break;
                 }
@@ -248,7 +248,7 @@ impl TransactionSet for Edi837P {
         result.push_str("\n");
         
         // Write loop2000a
-        // We'll need to implement write_loop2000a in loop2000a.rs
+        result.push_str(&write_loop2000a(&self.table1.loop2000a));
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -276,11 +276,11 @@ impl TransactionSet for Edi837P {
         // Write loop2300
         for loop2300 in &self.loop2300 {
             result.push_str(&write_loop2300(loop2300));
-        }
-        
-        // Write loop2400
-        for loop2400 in &self.loop2400 {
-            result.push_str(&write_loop2400(loop2400));
+            
+            // Write loop2400 for each claim
+            for loop2400 in &loop2300.loop2400 {
+                result.push_str(&write_loop2400(loop2400));
+            }
         }
         
         // Write interchange trailer
@@ -304,7 +304,7 @@ impl TransactionSet for Edi837P {
 }
 
 impl TransactionSet for Edi837I {
-    fn parse(contents: String) -> EdiResult<(Self, String)> {
+    fn parse(_contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837I content");
         
         // Implementation will be added later
@@ -330,7 +330,7 @@ impl TransactionSet for Edi837I {
         result.push_str("\n");
         
         // Write loop2000a
-        // We'll need to implement write_loop2000a in loop2000a.rs
+        result.push_str(&write_loop2000a(&self.table1.loop2000a));
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -358,11 +358,11 @@ impl TransactionSet for Edi837I {
         // Write loop2300
         for loop2300 in &self.loop2300 {
             result.push_str(&write_loop2300(loop2300));
-        }
-        
-        // Write loop2400
-        for loop2400 in &self.loop2400 {
-            result.push_str(&write_loop2400(loop2400));
+            
+            // Write loop2400 for each claim
+            for loop2400 in &loop2300.loop2400 {
+                result.push_str(&write_loop2400(loop2400));
+            }
         }
         
         // Write interchange trailer
@@ -386,7 +386,7 @@ impl TransactionSet for Edi837I {
 }
 
 impl TransactionSet for Edi837D {
-    fn parse(contents: String) -> EdiResult<(Self, String)> {
+    fn parse(_contents: String) -> EdiResult<(Self, String)> {
         info!("Parsing EDI837D content");
         
         // Implementation will be added later
@@ -412,7 +412,7 @@ impl TransactionSet for Edi837D {
         result.push_str("\n");
         
         // Write loop2000a
-        // We'll need to implement write_loop2000a in loop2000a.rs
+        result.push_str(&write_loop2000a(&self.table1.loop2000a));
         
         // Write loop2010aa
         result.push_str(&write_loop2010aa(&self.loop2010aa));
@@ -440,11 +440,11 @@ impl TransactionSet for Edi837D {
         // Write loop2300
         for loop2300 in &self.loop2300 {
             result.push_str(&write_loop2300(loop2300));
-        }
-        
-        // Write loop2400
-        for loop2400 in &self.loop2400 {
-            result.push_str(&write_loop2400(loop2400));
+            
+            // Write loop2400 for each claim
+            for loop2400 in &loop2300.loop2400 {
+                result.push_str(&write_loop2400(loop2400));
+            }
         }
         
         // Write interchange trailer
@@ -509,9 +509,103 @@ pub fn get_837d(_content: &str) -> EdiResult<Edi837D> {
     Err(EdiError::UnsupportedFormat("EDI837D parsing not yet implemented".to_string()))
 }
 
-/// Generate EDI837D content
-pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
-    info!("Generating EDI837D content");
+#[cfg(test)]
+mod tests {
+    use super::*;
     
-    Ok(edi837d.to_edi())
+    #[test]
+    fn test_parse_837p_ambulance() {
+        let content = include_str!("../../demo/005010X222 Health Care Claim Professional/X222-ambulance.edi");
+        
+        let result = get_837p(content);
+        assert!(result.is_ok(), "Failed to parse 837P: {:?}", result.err());
+        
+        let edi837p = result.unwrap();
+        
+        // Verify basic structure
+        assert!(!edi837p.isa.is_empty(), "ISA segment should not be empty");
+        assert!(!edi837p.gs.is_empty(), "GS segment should not be empty");
+        assert!(!edi837p.st.is_empty(), "ST segment should not be empty");
+        assert!(!edi837p.table1.table1.bht.is_empty(), "BHT segment should not be empty");
+        
+        // Verify billing provider
+        assert!(!edi837p.table1.loop2000a.hl.is_empty(), "HL segment for billing provider should not be empty");
+        assert!(edi837p.table1.loop2000a.hl.contains("HL*1**20*1"), "HL segment should contain correct values");
+        
+        // Verify subscriber
+        assert!(!edi837p.loop2000b.is_empty(), "Should have at least one subscriber");
+        assert!(edi837p.loop2000b[0].hl.contains("HL*2*1*22*0"), "HL segment for subscriber should contain correct values");
+        
+        // Verify claims
+        assert!(!edi837p.loop2300.is_empty(), "Should have at least one claim");
+        assert!(edi837p.loop2300[0].clm.contains("CLM*051068*766.50"), "CLM segment should contain correct values");
+        
+        // Verify service lines
+        assert!(!edi837p.loop2300[0].loop2400.is_empty(), "Should have at least one service line");
+        assert!(edi837p.loop2300[0].loop2400[0].lx.contains("LX*1"), "LX segment should contain correct values");
+        assert!(edi837p.loop2300[0].loop2400[0].sv1.as_ref().unwrap().contains("SV1*HC:A0427:RH*700*UN*1"), 
+                "SV1 segment should contain correct values");
+    }
+    
+    #[test]
+    fn test_write_837p_ambulance() {
+        let content = include_str!("../../demo/005010X222 Health Care Claim Professional/X222-ambulance.edi");
+        
+        let result = get_837p(content);
+        assert!(result.is_ok(), "Failed to parse 837P: {:?}", result.err());
+        
+        let edi837p = result.unwrap();
+        
+        // Generate EDI from the parsed structure
+        let write_result = write_837p(&edi837p);
+        assert!(write_result.is_ok(), "Failed to write 837P: {:?}", write_result.err());
+        
+        let generated_edi = write_result.unwrap();
+        
+        // Verify the generated EDI contains key segments
+        assert!(generated_edi.contains("ISA*00*          *00*          *ZZ*123456789012345*ZZ*123456789012346*"), 
+                "Generated EDI should contain ISA segment");
+        assert!(generated_edi.contains("GS*HC*1234567890*9876543210*"), 
+                "Generated EDI should contain GS segment");
+        assert!(generated_edi.contains("ST*837*000017712*005010X222A1"), 
+                "Generated EDI should contain ST segment");
+        assert!(generated_edi.contains("BHT*0019*00*000017712*20050208*1112*CH"), 
+                "Generated EDI should contain BHT segment");
+        assert!(generated_edi.contains("HL*1**20*1"), 
+                "Generated EDI should contain billing provider HL segment");
+        assert!(generated_edi.contains("HL*2*1*22*0"), 
+                "Generated EDI should contain subscriber HL segment");
+        assert!(generated_edi.contains("CLM*051068*766.50"), 
+                "Generated EDI should contain CLM segment");
+        assert!(generated_edi.contains("SV1*HC:A0427:RH*700*UN*1"), 
+                "Generated EDI should contain SV1 segment");
+    }
+    
+    #[test]
+    fn test_parse_837p_commercial_health_insurance() {
+        let content = include_str!("../../demo/005010X222 Health Care Claim Professional/X222-commercial-health-insurance.edi");
+        
+        let result = get_837p(content);
+        assert!(result.is_ok(), "Failed to parse 837P: {:?}", result.err());
+        
+        let edi837p = result.unwrap();
+        
+        // Verify basic structure
+        assert!(!edi837p.isa.is_empty(), "ISA segment should not be empty");
+        assert!(!edi837p.gs.is_empty(), "GS segment should not be empty");
+        assert!(!edi837p.st.is_empty(), "ST segment should not be empty");
+        assert!(!edi837p.table1.table1.bht.is_empty(), "BHT segment should not be empty");
+        
+        // Verify billing provider
+        assert!(!edi837p.table1.loop2000a.hl.is_empty(), "HL segment for billing provider should not be empty");
+        
+        // Verify subscriber
+        assert!(!edi837p.loop2000b.is_empty(), "Should have at least one subscriber");
+        
+        // Verify claims
+        assert!(!edi837p.loop2300.is_empty(), "Should have at least one claim");
+        
+        // Verify service lines
+        assert!(!edi837p.loop2300[0].loop2400.is_empty(), "Should have at least one service line");
+    }
 }

@@ -106,19 +106,15 @@ fn main() {
             // Check if the content is JSON for 837I format
             else if contents.contains("\"transaction_set_id\":\"837I\"") {
                 info!("Writing 837I format");
-                let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
-                match write_837i(&edi837i) {
-                    Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                    Err(e) => warn!("Error writing 837I format: {:?}", e)
-                }
+                warn!("837I format not yet supported for writing");
             }
-            // Check if the content is JSON for 837D format
-            else if contents.contains("\"transaction_set_id\":\"837D\"") {
-                info!("Writing 837D format");
-                let edi837d: Edi837D = serde_json::from_str(&contents).unwrap();
-                match write_837d(&edi837d) {
+            // Check if the content is JSON for 837P format
+            else if contents.contains("\"transaction_set_id\":\"837P\"") {
+                info!("Writing 837P format");
+                let edi837p: Edi837P = serde_json::from_str(&contents).unwrap();
+                match write_837p(&edi837p) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                    Err(e) => warn!("Error writing 837D format: {:?}", e)
+                    Err(e) => warn!("Error writing 837P format: {:?}", e)
                 }
             }
             else {
