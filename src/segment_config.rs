@@ -28,6 +28,7 @@ pub struct SegmentRegistry {
 
 impl SegmentRegistry {
     /// Create a new empty registry
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             segments: HashMap::new(),
@@ -40,6 +41,7 @@ impl SegmentRegistry {
     }
     
     /// Get a segment configuration by ID
+    #[allow(dead_code)]
     pub fn get_config(&self, segment_id: &str) -> Option<&SegmentConfig> {
         self.segments.get(segment_id)
     }
@@ -50,6 +52,7 @@ impl SegmentRegistry {
     }
     
     /// Get all registered segment IDs
+    #[allow(dead_code)]
     pub fn get_segment_ids(&self) -> Vec<String> {
         self.segments.keys().cloned().collect()
     }

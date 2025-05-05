@@ -1,9 +1,10 @@
 use serde::{Serialize, de::DeserializeOwned};
+use crate::error::{EdiResult, EdiError};
 
 /// Trait defining common behavior for all transaction sets
 pub trait TransactionSet: Serialize + DeserializeOwned + Default {
     /// Parse EDI content into this transaction set
-    fn parse(contents: String) -> (Self, String) where Self: Sized;
+    fn parse(contents: String) -> EdiResult<(Self, String)> where Self: Sized;
     
     /// Convert this transaction set to EDI format
     fn to_edi(&self) -> String;
@@ -16,25 +17,31 @@ pub trait TransactionSet: Serialize + DeserializeOwned + Default {
 }
 
 /// Generic processor for transaction sets
+#[allow(dead_code)]
 pub struct TransactionProcessor;
 
 impl TransactionProcessor {
     /// Process EDI content into a specific transaction set
-    pub fn process<T: TransactionSet>(contents: String) -> T {
+    #[allow(dead_code)]
+    pub fn process<T: TransactionSet>(contents: String) -> EdiResult<T> {
         if !T::detect(&contents) {
-            panic!("Content does not match transaction set {}", T::get_transaction_type());
+            return Err(EdiError::UnsupportedFormat(format!(
+                "Content does not match transaction set {}", 
+                T::get_transaction_type()
+            )));
         }
         
-        let (transaction, remaining) = T::parse(contents);
+        let (transaction, remaining) = T::parse(contents)?;
         
         if !remaining.is_empty() {
             log::warn!("Unprocessed segments: {}", remaining);
         }
         
-        transaction
+        Ok(transaction)
     }
     
     /// Convert a transaction set to EDI format
+    #[allow(dead_code)]
     pub fn write<T: TransactionSet>(transaction: T) -> String {
         transaction.to_edi()
     }

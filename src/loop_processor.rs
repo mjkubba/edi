@@ -26,6 +26,7 @@ pub struct LoopRegistry {
 
 impl LoopRegistry {
     /// Create a new empty registry
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             loops: HashMap::new(),
@@ -53,6 +54,7 @@ impl LoopRegistry {
     }
     
     /// Get all loop IDs for a transaction set
+    #[allow(dead_code)]
     pub fn get_loops_for_transaction(&self, transaction_set: &str) -> Vec<String> {
         self.loops_by_transaction
             .get(transaction_set)
@@ -61,6 +63,7 @@ impl LoopRegistry {
     }
     
     /// Detect which loop the content belongs to
+    #[allow(dead_code)]
     pub fn detect_loop(&self, contents: &str, transaction_set: &str) -> Option<&LoopConfig> {
         let loop_ids = self.get_loops_for_transaction(transaction_set);
         
@@ -83,6 +86,8 @@ pub static LOOP_REGISTRY: Lazy<Mutex<LoopRegistry>> = Lazy::new(|| {
     // Register common loops
     register_835_loops(&mut registry);
     register_999_loops(&mut registry);
+    register_270_271_loops(&mut registry);
+    register_276_277_loops(&mut registry);
     
     Mutex::new(registry)
 });
@@ -204,7 +209,100 @@ fn register_999_loops(registry: &mut LoopRegistry) {
     });
 }
 
+/// Register loops for 270/271 transaction sets
+#[allow(dead_code)]
+fn register_270_271_loops(registry: &mut LoopRegistry) {
+    // Common loops for both 270 and 271
+    for transaction_set in &["270", "271"] {
+        // Loop 2000A - Information Source
+        registry.register(LoopConfig {
+            loop_id: format!("2000A_{}", transaction_set),
+            name: "Information Source".to_string(),
+            start_segment: "HL".to_string(),
+            end_segment: None,
+            required_segments: vec!["HL".to_string()],
+            optional_segments: vec![],
+            child_loops: vec![format!("2100A_{}", transaction_set)],
+            max_occurrences: Some(1),
+            transaction_set: transaction_set.to_string(),
+        });
+        
+        // Loop 2100A - Information Source Name
+        registry.register(LoopConfig {
+            loop_id: format!("2100A_{}", transaction_set),
+            name: "Information Source Name".to_string(),
+            start_segment: "NM1".to_string(),
+            end_segment: None,
+            required_segments: vec!["NM1".to_string()],
+            optional_segments: vec!["PER".to_string(), "AAA".to_string()],
+            child_loops: vec![],
+            max_occurrences: Some(1),
+            transaction_set: transaction_set.to_string(),
+        });
+        
+        // Loop 2000B - Information Receiver
+        registry.register(LoopConfig {
+            loop_id: format!("2000B_{}", transaction_set),
+            name: "Information Receiver".to_string(),
+            start_segment: "HL".to_string(),
+            end_segment: None,
+            required_segments: vec!["HL".to_string()],
+            optional_segments: vec![],
+            child_loops: vec![format!("2100B_{}", transaction_set)],
+            max_occurrences: None,
+            transaction_set: transaction_set.to_string(),
+        });
+        
+        // Loop 2100B - Information Receiver Name
+        registry.register(LoopConfig {
+            loop_id: format!("2100B_{}", transaction_set),
+            name: "Information Receiver Name".to_string(),
+            start_segment: "NM1".to_string(),
+            end_segment: None,
+            required_segments: vec!["NM1".to_string()],
+            optional_segments: vec!["REF".to_string(), "AAA".to_string()],
+            child_loops: vec![],
+            max_occurrences: Some(1),
+            transaction_set: transaction_set.to_string(),
+        });
+    }
+}
+
+/// Register loops for 276/277 transaction sets
+#[allow(dead_code)]
+fn register_276_277_loops(registry: &mut LoopRegistry) {
+    // Common loops for both 276 and 277
+    for transaction_set in &["276", "277"] {
+        // Loop 2000A - Information Source
+        registry.register(LoopConfig {
+            loop_id: format!("2000A_{}", transaction_set),
+            name: "Information Source".to_string(),
+            start_segment: "HL".to_string(),
+            end_segment: None,
+            required_segments: vec!["HL".to_string()],
+            optional_segments: vec![],
+            child_loops: vec![format!("2100A_{}", transaction_set)],
+            max_occurrences: Some(1),
+            transaction_set: transaction_set.to_string(),
+        });
+        
+        // Loop 2100A - Information Source Name
+        registry.register(LoopConfig {
+            loop_id: format!("2100A_{}", transaction_set),
+            name: "Information Source Name".to_string(),
+            start_segment: "NM1".to_string(),
+            end_segment: None,
+            required_segments: vec!["NM1".to_string()],
+            optional_segments: vec!["PER".to_string()],
+            child_loops: vec![],
+            max_occurrences: Some(1),
+            transaction_set: transaction_set.to_string(),
+        });
+    }
+}
+
 /// Helper function to extract a loop from EDI content
+#[allow(dead_code)]
 pub fn extract_loop(contents: &str, config: &LoopConfig) -> EdiResult<(String, String)> {
     let start_pos = match contents.find(&config.start_segment) {
         Some(pos) => pos,
