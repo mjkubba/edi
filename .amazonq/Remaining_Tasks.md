@@ -59,10 +59,18 @@
 
 ## Low Priority Tasks
 
+## Low Priority Tasks
+
 ### 1. Begin EDI837 Implementation
-- [ ] Create directory structure for 837P, 837I, and 837D variants
-- [ ] Implement common segments and loops
-- [ ] Implement variant-specific components
+- [x] Create directory structure for 837P, 837I, and 837D variants
+- [x] Create basic module structure (mod.rs, controller.rs)
+- [x] Implement common segments (interchangecontrol.rs, interchangecontroltrailer.rs)
+- [x] Set up table1.rs with basic segment structures
+- [x] Create initial loop structure in loop2000a.rs
+- [ ] Complete implementation of all required loops and segments
+- [ ] Implement variant-specific components for 837P
+- [ ] Implement variant-specific components for 837I
+- [ ] Implement variant-specific components for 837D
 - [ ] Add tests for EDI837
 
 ### 2. Performance Optimization
