@@ -19,10 +19,12 @@ example of testing:
 ```bash
 # Parse EDI to JSON
 cargo run -- -f ./demo/edi835-1.edi -o ./demo/test835-new.json
-
+```
+```bash
 # Generate EDI from JSON
 cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
-
+```
+```bash
 # Compare files
 diff ./demo/edi835-1.edi ./demo/test835-new.edi
 ```
