@@ -71,8 +71,8 @@
 - [x] Implement parsing for Loop2010AA
 - [x] Implement parsing for Loop2010AB
 - [x] Implement parsing for Loop2010AC
-- [ ] Implement parsing for Loop2000B and nested loops
-- [ ] Implement parsing for Loop2000C and nested loops
+- [x] Implement parsing for Loop2000B and nested loops
+- [x] Implement parsing for Loop2000C and nested loops
 - [ ] Implement parsing for Loop2300
 - [ ] Implement parsing for Loop2400
 - [ ] Complete implementation of parse method for 837I

@@ -9,7 +9,7 @@
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
-| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parsing for Loop2000A, Loop2010AA, Loop2010AB, and Loop2010AC implemented |
+| EDI837 (Health Care Claim) | 🔄 In Progress | Basic structure created, TransactionSet trait implemented, controller functions added, parsing for Loop2000A, Loop2010AA, Loop2010AB, Loop2010AC, Loop2000B, and Loop2000C implemented |
 
 ## Recent Improvements
 
@@ -74,8 +74,11 @@
 - Implemented parsing for Loop2010AA (Billing Provider Name)
 - Implemented parsing for Loop2010AB (Pay-to Address)
 - Implemented parsing for Loop2010AC (Pay-to Plan Name)
+- Implemented parsing for Loop2000B (Subscriber Hierarchical Level)
+- Implemented parsing for Loop2000C (Patient Hierarchical Level)
 - Updated main.rs to recognize and process 837 formats
 - Improved segment detection logic to handle nested loops correctly
+- Enhanced hierarchical level detection for subscriber and patient loops
 
 ### Code Quality Improvements
 - Fixed unused imports in multiple files
@@ -94,9 +97,8 @@
 ## Next Development Tasks
 
 1. **EDI837 Implementation**:
-   - Implement parsing for Loop2000B and its nested loops
-   - Implement parsing for Loop2000C and its nested loops
-   - Implement parsing for Loop2300 and Loop2400
+   - Implement parsing for Loop2300 (Claim Information)
+   - Implement parsing for Loop2400 (Service Line Information)
    - Complete implementation of parse methods for 837I and 837D
    - Implement variant-specific components for each format
    - Add tests for EDI837
