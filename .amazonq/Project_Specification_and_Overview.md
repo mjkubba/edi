@@ -121,7 +121,32 @@ edi/
     - CL1 segment in 837I (Institutional)
   - Improved format detection logic to better distinguish between variants
 
-### Phase 3: Advanced Features and Optimizations (PLANNED)
+### Phase 3: Additional Transaction Sets (FUTURE)
+- Transaction Set: 278 (Health Care Services Review) - ASC X12N/005010X217
+  - Create segment definitions specific to 278
+  - Implement loop structures for request and response
+  - Add validation for 278-specific requirements
+  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
+  - Support specialized segments like UM (Health Care Services Review Information)
+  - Handle complex hierarchical structure with multiple service levels
+
+- Transaction Set: 820 (Payroll Deducted and Other Group Premium Payment) - ASC X12N/005010X218
+  - Create segment definitions specific to 820
+  - Implement loop structures for premium payment
+  - Add validation for 820-specific requirements
+  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
+  - Support financial transaction segments like BPR and ADX
+  - Handle both organization and individual premium remittance details
+
+- Transaction Set: 834 (Benefit Enrollment and Maintenance) - ASC X12N/005010X220
+  - Create segment definitions specific to 834
+  - Implement loop structures for enrollment and maintenance
+  - Add validation for 834-specific requirements
+  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
+  - Support member-level detail segments like INS, HD, and DSB
+  - Handle complex member information structures and relationships
+
+### Phase 4: Advanced Features and Optimizations (PLANNED)
 - Performance Optimization
   - Profile the application to identify performance bottlenecks
   - Optimize memory usage for large EDI files
@@ -138,25 +163,6 @@ edi/
   - Implement pretty printing for JSON output
   - Add support for EDI file validation without conversion
   - Implement a command-line interface for advanced options
-
-### Phase 4: Additional Transaction Sets (FUTURE)
-- Transaction Set: 278 (Health Care Services Review) - ASC X12N/005010X217
-  - Create segment definitions specific to 278
-  - Implement loop structures for request and response
-  - Add validation for 278-specific requirements
-  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
-
-- Transaction Set: 820 (Payroll Deducted and Other Group Premium Payment) - ASC X12N/005010X218
-  - Create segment definitions specific to 820
-  - Implement loop structures for premium payment
-  - Add validation for 820-specific requirements
-  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
-
-- Transaction Set: 834 (Benefit Enrollment and Maintenance) - ASC X12N/005010X220
-  - Create segment definitions specific to 834
-  - Implement loop structures for enrollment and maintenance
-  - Add validation for 834-specific requirements
-  - Implement bidirectional conversion (EDI to JSON and JSON to EDI)
 
 ## 4. Implementation Approach
 
@@ -381,65 +387,276 @@ ISA - Interchange Control Header
       Loop 2000A - Information Source
         HL - Information Source Level
         NM1 - Information Source Name
+        Loop 2100A - Payer Name
+          NM1 - Payer Name
+          PER - Payer Contact Information
         Loop 2000B - Information Receiver
           HL - Information Receiver Level
           NM1 - Information Receiver Name
+          Loop 2100B - Information Receiver Name
+            NM1 - Information Receiver Name
           Loop 2000C - Service Provider
             HL - Service Provider Level
             NM1 - Service Provider Name
+            REF - Service Provider Additional Identification
+            Loop 2100C - Service Provider Name
+              NM1 - Service Provider Name
+              REF - Service Provider Additional Identification
             Loop 2000D - Subscriber
               HL - Subscriber Level
               NM1 - Subscriber Name
               DMG - Subscriber Demographic Information
-              Loop 2000E - Dependent
-                HL - Dependent Level
-                NM1 - Dependent Name
-                DMG - Dependent Demographic Information
-                Loop 2200D - Claim Status Tracking Number
-                  TRN - Claim Status Tracking Number
-                  STC - Claim Status Information
-                  REF - Payer Claim Identification Number
-                  DTP - Claim Service Date
-                  Loop 2220D - Service Line Information
-                    SVC - Service Line Information
-                    STC - Service Line Status Information
-                    REF - Service Line Item Identification
-                    DTP - Service Line Date
-              Loop 2200C - Claim Status Tracking Number
+              Loop 2100D - Subscriber Name
+                NM1 - Subscriber Name
+                REF - Subscriber Additional Identification
+              Loop 2200D - Claim Status Tracking Number
                 TRN - Claim Status Tracking Number
                 STC - Claim Status Information
                 REF - Payer Claim Identification Number
                 DTP - Claim Service Date
-                Loop 2220C - Service Line Information
+                Loop 2220D - Service Line Information
                   SVC - Service Line Information
                   STC - Service Line Status Information
                   REF - Service Line Item Identification
                   DTP - Service Line Date
+              Loop 2000E - Dependent
+                HL - Dependent Level
+                NM1 - Dependent Name
+                DMG - Dependent Demographic Information
+                Loop 2100E - Dependent Name
+                  NM1 - Dependent Name
+                  REF - Dependent Additional Identification
+                Loop 2200E - Claim Status Tracking Number
+                  TRN - Claim Status Tracking Number
+                  STC - Claim Status Information
+                  REF - Payer Claim Identification Number
+                  DTP - Claim Service Date
+                  Loop 2220E - Service Line Information
+                    SVC - Service Line Information
+                    STC - Service Line Status Information
+                    REF - Service Line Item Identification
+                    DTP - Service Line Date
     SE - Transaction Set Trailer
   GE - Functional Group Trailer
 IEA - Interchange Control Trailer
 ```
 
-## 6. Assumptions and Constraints
-
-### Technical Assumptions
-1. The application will continue to be developed in Rust.
-2. The application will maintain backward compatibility with existing functionality.
-3. The application will follow the same architectural pattern for new transaction sets.
-4. The application will support both reading (EDI to JSON) and writing (JSON to EDI) operations.
-5. The application will validate input and output according to X12 standards.
-6. The application will handle common EDI delimiters (segment, element, component, repetition).
-7. The application will support the X12 5010 version of the transaction sets.
-
-### Compatibility Requirements
-- Maintain compatibility with existing 835 and 999 implementations
-- Ensure consistent API across all transaction sets
-- Support standard EDI delimiters and formats
-
-### Performance Considerations
-- Handle large EDI files efficiently
-- Minimize memory usage during parsing and generation
-- Provide reasonable performance for batch processing
+### 837P (Health Care Claim: Professional) - ASC X12N/005010X222
+```
+ISA - Interchange Control Header
+  GS - Functional Group Header
+    ST - Transaction Set Header
+      BHT - Beginning of Hierarchical Transaction
+      Loop 2000A - Billing Provider Hierarchical Level
+        HL - Billing Provider Hierarchical Level
+        PRV - Billing Provider Specialty Information
+        CUR - Foreign Currency Information
+        Loop 2010AA - Billing Provider Name
+          NM1 - Billing Provider Name
+          N3 - Billing Provider Address
+          N4 - Billing Provider City/State/ZIP
+          REF - Billing Provider Tax Identification
+          PER - Billing Provider Contact Information
+        Loop 2010AB - Pay-to Address
+          NM1 - Pay-to Provider Name
+          N3 - Pay-to Provider Address
+          N4 - Pay-to Provider City/State/ZIP
+        Loop 2010AC - Pay-to Plan Name
+          NM1 - Pay-to Plan Name
+          N3 - Pay-to Plan Address
+          N4 - Pay-to Plan City/State/ZIP
+          REF - Pay-to Plan Tax Identification
+        Loop 2000B - Subscriber Hierarchical Level
+          HL - Subscriber Hierarchical Level
+          SBR - Subscriber Information
+          PAT - Patient Information
+          Loop 2010BA - Subscriber Name
+            NM1 - Subscriber Name
+            N3 - Subscriber Address
+            N4 - Subscriber City/State/ZIP
+            DMG - Subscriber Demographic Information
+            REF - Subscriber Secondary Identification
+          Loop 2010BB - Payer Name
+            NM1 - Payer Name
+            N3 - Payer Address
+            N4 - Payer City/State/ZIP
+            REF - Payer Secondary Identification
+          Loop 2300 - Claim Information
+            CLM - Claim Information
+            DTP - Date - Onset of Current Illness or Symptom
+            DTP - Date - Initial Treatment Date
+            DTP - Date - Last Seen Date
+            DTP - Date - Acute Manifestation
+            DTP - Date - Accident
+            DTP - Date - Last Menstrual Period
+            DTP - Date - Last X-ray Date
+            DTP - Date - Hearing and Vision Prescription Date
+            DTP - Date - Disability Dates
+            DTP - Date - Last Worked
+            DTP - Date - Authorized Return to Work
+            DTP - Date - Admission
+            DTP - Date - Discharge
+            DTP - Date - Assumed and Relinquished Care Dates
+            DTP - Date - Property and Casualty Date of First Contact
+            PWK - Claim Supplemental Information
+            CN1 - Contract Information
+            AMT - Patient Amount Paid
+            REF - Service Authorization Exception Code
+            REF - Mandatory Medicare Crossover Indicator
+            REF - Mammography Certification Number
+            REF - Prior Authorization
+            REF - Payer Claim Control Number
+            REF - Clinical Laboratory Improvement Amendment Number
+            REF - Referral Number
+            REF - Prior Authorization Reference Number
+            K3 - File Information
+            NTE - Claim Note
+            CR1 - Ambulance Transport Information
+            CR2 - Spinal Manipulation Service Information
+            CRC - Ambulance Certification
+            CRC - Patient Condition Information: Vision
+            CRC - Homebound Indicator
+            CRC - EPSDT Referral
+            HI - Health Care Diagnosis Code
+            HI - Anesthesia Related Procedure
+            HI - Condition Information
+            HCP - Claim Pricing/Repricing Information
+            Loop 2310A - Referring Provider Name
+              NM1 - Referring Provider Name
+              PRV - Referring Provider Specialty Information
+              REF - Referring Provider Secondary Identification
+            Loop 2310B - Rendering Provider Name
+              NM1 - Rendering Provider Name
+              PRV - Rendering Provider Specialty Information
+              REF - Rendering Provider Secondary Identification
+            Loop 2310C - Service Facility Location
+              NM1 - Service Facility Location
+              N3 - Service Facility Location Address
+              N4 - Service Facility Location City/State/ZIP
+              REF - Service Facility Location Secondary Identification
+            Loop 2310D - Supervising Provider Name
+              NM1 - Supervising Provider Name
+              REF - Supervising Provider Secondary Identification
+            Loop 2310E - Ambulance Pick-up Location
+              NM1 - Ambulance Pick-up Location
+              N3 - Ambulance Pick-up Location Address
+              N4 - Ambulance Pick-up Location City/State/ZIP
+            Loop 2310F - Ambulance Drop-off Location
+              NM1 - Ambulance Drop-off Location
+              N3 - Ambulance Drop-off Location Address
+              N4 - Ambulance Drop-off Location City/State/ZIP
+            Loop 2320 - Other Subscriber Information
+              SBR - Other Subscriber Information
+              CAS - Claim Level Adjustments
+              AMT - Coordination of Benefits (COB) Payer Paid Amount
+              AMT - Coordination of Benefits (COB) Total Non-Covered Amount
+              AMT - Remaining Patient Liability
+              OI - Other Insurance Coverage Information
+              MOA - Outpatient Adjudication Information
+              Loop 2330A - Other Subscriber Name
+                NM1 - Other Subscriber Name
+                N3 - Other Subscriber Address
+                N4 - Other Subscriber City/State/ZIP
+                REF - Other Subscriber Secondary Identification
+              Loop 2330B - Other Payer Name
+                NM1 - Other Payer Name
+                N3 - Other Payer Address
+                N4 - Other Payer City/State/ZIP
+                DTP - Claim Check or Remittance Date
+                REF - Other Payer Secondary Identifier
+              Loop 2330C - Other Payer Referring Provider
+                NM1 - Other Payer Referring Provider
+                REF - Other Payer Referring Provider Secondary Identification
+              Loop 2330D - Other Payer Rendering Provider
+                NM1 - Other Payer Rendering Provider
+                REF - Other Payer Rendering Provider Secondary Identification
+              Loop 2330E - Other Payer Service Facility Location
+                NM1 - Other Payer Service Facility Location
+                REF - Other Payer Service Facility Location Secondary Identification
+              Loop 2330F - Other Payer Supervising Provider
+                NM1 - Other Payer Supervising Provider
+                REF - Other Payer Supervising Provider Secondary Identification
+              Loop 2330G - Other Payer Billing Provider
+                NM1 - Other Payer Billing Provider
+                REF - Other Payer Billing Provider Secondary Identification
+            Loop 2400 - Service Line
+              LX - Service Line
+              SV1 - Professional Service
+              SV5 - Durable Medical Equipment Service
+              PWK - Line Supplemental Information
+              CR1 - Ambulance Transport Information
+              CR3 - Durable Medical Equipment Certification
+              CRC - Ambulance Certification
+              CRC - Hospice Employee Indicator
+              DTP - Date - Service Date
+              DTP - Date - Prescription Date
+              DTP - Date - Certification Revision Date
+              DTP - Date - Begin Therapy Date
+              DTP - Date - Last Certification Date
+              QTY - Ambulance Patient Count
+              MEA - Test Result
+              CN1 - Contract Information
+              REF - Repriced Line Item Reference Number
+              REF - Line Item Control Number
+              REF - Mammography Certification Number
+              REF - Clinical Laboratory Improvement Amendment Number
+              REF - Referring Clinical Laboratory Improvement Amendment Number
+              REF - Immunization Batch Number
+              REF - Referral Number
+              REF - Prior Authorization
+              AMT - Sales Tax Amount
+              AMT - Postage Claimed Amount
+              K3 - File Information
+              NTE - Line Note
+              PS1 - Purchased Service Information
+              HCP - Line Pricing/Repricing Information
+              Loop 2410 - Drug Identification
+                LIN - Drug Identification
+                CTP - Drug Pricing
+                REF - Prescription or Compound Drug Association Number
+              Loop 2420A - Rendering Provider Name
+                NM1 - Rendering Provider Name
+                PRV - Rendering Provider Specialty Information
+                REF - Rendering Provider Secondary Identification
+              Loop 2420B - Purchased Service Provider Name
+                NM1 - Purchased Service Provider Name
+                REF - Purchased Service Provider Secondary Identification
+              Loop 2420C - Service Facility Location
+                NM1 - Service Facility Location
+                N3 - Service Facility Location Address
+                N4 - Service Facility Location City/State/ZIP
+                REF - Service Facility Location Secondary Identification
+              Loop 2420D - Supervising Provider Name
+                NM1 - Supervising Provider Name
+                REF - Supervising Provider Secondary Identification
+              Loop 2420E - Ordering Provider Name
+                NM1 - Ordering Provider Name
+                N3 - Ordering Provider Address
+                N4 - Ordering Provider City/State/ZIP
+                REF - Ordering Provider Secondary Identification
+                PER - Ordering Provider Contact Information
+              Loop 2420F - Referring Provider Name
+                NM1 - Referring Provider Name
+                REF - Referring Provider Secondary Identification
+              Loop 2420G - Ambulance Pick-up Location
+                NM1 - Ambulance Pick-up Location
+                N3 - Ambulance Pick-up Location Address
+                N4 - Ambulance Pick-up Location City/State/ZIP
+              Loop 2420H - Ambulance Drop-off Location
+                NM1 - Ambulance Drop-off Location
+                N3 - Ambulance Drop-off Location Address
+                N4 - Ambulance Drop-off Location City/State/ZIP
+              Loop 2430 - Line Adjudication Information
+                SVD - Line Adjudication
+                CAS - Line Adjustment
+                DTP - Line Check or Remittance Date
+              Loop 2440 - Form Identification Code
+                LQ - Form Identification Code
+                FRM - Supporting Documentation
+    SE - Transaction Set Trailer
+  GE - Functional Group Trailer
+IEA - Interchange Control Trailer
+```
 ### 837I (Health Care Claim: Institutional) - ASC X12N/005010X223
 ```
 ISA - Interchange Control Header
@@ -988,7 +1205,6 @@ ISA - Interchange Control Header
   GE - Functional Group Trailer
 IEA - Interchange Control Trailer
 ```
-
 ### 834 (Benefit Enrollment and Maintenance) - ASC X12N/005010X220 (FUTURE)
 ```
 ISA - Interchange Control Header
@@ -1103,32 +1319,39 @@ ISA - Interchange Control Header
   GE - Functional Group Trailer
 IEA - Interchange Control Trailer
 ```
-
 ## 7. Additional Technical Considerations
 
 ### Variant-Specific Components
 - Implement specialized handling for TOO segment in 837D format
 - Implement specialized handling for CL1 segment in 837I format
 - Ensure proper format detection logic to distinguish between 837 variants
+- Support specialized segments like UM in 278 format
+- Handle financial transaction segments like BPR and ADX in 820 format
+- Support member-level detail segments like INS, HD, and DSB in 834 format
 
 ### Line Breaks and Formatting
 - Add line breaks between segments in generated output for better readability
 - Implement consistent formatting for all transaction sets
 - Ensure proper segment ordering in generated output
+- Support configurable formatting options for different output requirements
 
 ### Error Handling and Validation
 - Implement comprehensive error handling for all transaction sets
 - Add validation for required segments and fields
 - Provide clear error messages for malformed input files
+- Support validation against X12 standards for each transaction set
+- Implement context-specific validation rules for different segments
 
 ### Testing Strategy
 - Create unit tests for all new functionality
 - Implement integration tests for end-to-end processing
 - Add regression tests to ensure backward compatibility
 - Test with real-world EDI files from various sources
+- Develop automated test suites for continuous integration
 
 ### Documentation
 - Update README.md with new transaction set information
 - Add usage examples for all transaction sets
 - Document common error scenarios and solutions
 - Provide schema documentation for JSON output
+- Create developer guides for extending the application with new transaction sets
