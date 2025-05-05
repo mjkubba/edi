@@ -75,13 +75,13 @@
 - [x] Implement parsing for Loop2000C and nested loops
 - [x] Implement parsing for Loop2300
 - [x] Implement parsing for Loop2400
+- [x] Add tests for EDI837P
+- [x] Update main.rs to support 837P format
 - [ ] Complete implementation of parse method for 837I
 - [ ] Complete implementation of parse method for 837D
 - [ ] Implement variant-specific components for 837P
 - [ ] Implement variant-specific components for 837I
 - [ ] Implement variant-specific components for 837D
-- [ ] Add tests for EDI837
-- [ ] Update main.rs to fully support 837 formats
 
 ### 2. Performance Optimization
 - [ ] Optimize parsing algorithms
