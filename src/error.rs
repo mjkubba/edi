@@ -30,6 +30,9 @@ pub enum EdiError {
     /// Invalid field value
     InvalidFieldValue(String),
     
+    /// Not implemented
+    NotImplemented(String),
+    
     /// Invalid segment order
     InvalidSegmentOrder(String),
 }
@@ -45,6 +48,7 @@ impl fmt::Display for EdiError {
             EdiError::UnsupportedFormat(format) => write!(f, "Unsupported format: {}", format),
             EdiError::MissingField(field) => write!(f, "Missing required field: {}", field),
             EdiError::InvalidFieldValue(msg) => write!(f, "Invalid field value: {}", msg),
+            EdiError::NotImplemented(msg) => write!(f, "Not implemented: {}", msg),
             EdiError::InvalidSegmentOrder(msg) => write!(f, "Invalid segment order: {}", msg),
         }
     }

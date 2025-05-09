@@ -2,12 +2,12 @@
  * EDI Parser and Processor for Healthcare X12 Formats
  * 
  * This application provides functionality to parse and generate EDI files
- * for healthcare X12 formats including 835, 999, 270/271, 276/277, and 837.
+ * for healthcare X12 formats including 835, 999, 270/271, 276/277, 837, and 278.
  * 
  * The main module handles command line arguments and routes processing
  * to the appropriate controller based on the EDI format.
  */
-use log::{info, warn};
+use crate::transaction_processor::TransactionSet;
 
 use crate::helper::helper::*;
 use crate::edi835::controller::*;
@@ -17,6 +17,7 @@ use crate::edi271::controller::*;
 use crate::edi276::controller::*;
 use crate::edi277::controller::*;
 use crate::edi837::controller::*;
+use crate::edi278::controller::*;
 
 mod helper;
 mod segments;
@@ -27,6 +28,7 @@ mod edi271;
 mod edi276;
 mod edi277;
 mod edi837;
+mod edi278;
 mod error;
 mod transaction_processor;
 mod segment_config;
@@ -120,6 +122,13 @@ fn main() {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
                     Err(e) => warn!("Error writing 837P format: {:?}", e)
                 }
+            }
+            // Check if the content is JSON for 278 format
+            else if contents.contains("\"transaction_set_id\":\"278\"") {
+                info!("Writing 278 format");
+                let edi278: Edi278 = serde_json::from_str(&contents).unwrap();
+                let new_edi = write_278(&edi278);
+                write_to_file(new_edi, args.output_file);
             }
             else {
                 warn!("Unknown format for writing");
@@ -283,8 +292,20 @@ fn main() {
             } else {
                 warn!("Unable to determine specific 837 variant. Currently supporting 837P, 837I, and 837D.");
             }
+        } else if contents.contains("~ST*278*") || contents.contains("ST*278*") {
+            info!("File is 278");
+            match Edi278::parse(contents.clone()) {
+                Ok((edi278, _)) => {
+                    let serialized_edi = serde_json::to_string(&edi278).unwrap();
+                    write_to_file(serialized_edi.clone(), args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 278 format: {:?}", e);
+                }
+            }
         } else {
-            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, and 837 formats.");
+            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, 837, and 278 formats.");
         }
     }
 }
+use log::{info, warn};

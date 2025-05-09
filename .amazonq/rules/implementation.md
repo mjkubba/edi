@@ -69,3 +69,7 @@ queues and maintains the same functionality as the original.
 
 🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
 ```
+
+
+## Do not change hte rules dir.
+You can create files in the .amazonq but do not create any new or change the .amazonq/rules dir.
