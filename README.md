@@ -1,6 +1,6 @@
 # EDI Parser and Processor for Healthcare X12 Formats in Rust
 
-This project provides a robust Electronic Data Interchange (EDI) parser and processor specifically designed for healthcare X12 formats. It supports multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), and 837P/I/D (Claims).
+This project provides a robust Electronic Data Interchange (EDI) parser and processor specifically designed for healthcare X12 formats. It supports multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), 278 (Health Care Services Review), and 837P/I/D (Claims).
 
 ## Project Status
 
@@ -11,6 +11,7 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
+| EDI278 (Health Care Services Review) | ✅ Complete | Full implementation with all loops and segments, support for AR/HS prefixes in UM segment, facility address handling, service provider details, and comprehensive tests |
 | EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
 | EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I, specialized handling for CL1 segment |
 | EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D, specialized handling for TOO segment |
@@ -25,6 +26,7 @@ edi/
 │   ├── edi271/                  # Eligibility Benefit Response format implementation
 │   ├── edi276/                  # Health Care Claim Status Request implementation
 │   ├── edi277/                  # Health Care Claim Status Response implementation
+│   ├── edi278/                  # Health Care Services Review implementation
 │   ├── edi837/                  # Health Care Claim implementation (Professional, Institutional, Dental)
 │   ├── helper/                  # Utility functions and shared helpers
 │   ├── segments/                # EDI segment definitions and processors
@@ -40,13 +42,14 @@ edi/
 
 ## Features
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 837P/I/D
+- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 278, 837P/I/D
 - **Configuration-Driven Architecture**: Segment and loop definitions are configurable
 - **Robust Error Handling**: Comprehensive error types and validation
 - **Bidirectional Conversion**: EDI to JSON and JSON to EDI
 - **Extensible Design**: Easy to add new transaction sets and segments
 - **Special Format Handling**: Support for complex CTX segments and other special formats
 - **Variant-Specific Components**: Specialized handling for format-specific segments like TOO in 837D and CL1 in 837I
+- **Prefix Support**: Handling for special prefixes like AR/HS in UM segments for 278 transaction sets
 
 ## Usage Instructions
 ### Prerequisites
@@ -116,6 +119,11 @@ diff ./demo/edi835-1.edi ./demo/test835-new.edi
   - ✅ Standardized error handling
 - ✅ Transaction Set 270/271 (Health Care Eligibility)
 - ✅ Transaction Set 276/277 (Health Care Claim Status)
+- ✅ Transaction Set 278 (Health Care Services Review)
+  - ✅ Implemented all loops and segments
+  - ✅ Added support for AR/HS prefixes in UM segment
+  - ✅ Added facility address handling
+  - ✅ Added service provider details
 - ✅ Transaction Set 837P/I/D (Health Care Claim)
   - ✅ Implemented variant-specific components
   - ✅ Added specialized handling for TOO segment in 837D
