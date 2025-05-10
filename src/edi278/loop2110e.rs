@@ -43,7 +43,8 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
             // Parse PRV segment
             if contents.contains("PRV") && check_if_segement_in_loop("PRV", "NM1", contents.clone()) {
                 info!("PRV segment found, ");
-                prv_segments = Some(get_prv(get_segment_contents("PRV", &contents)));
+                let prv_content = get_segment_contents("PRV", &contents);
+                prv_segments = Some(get_prv(&prv_content));
                 info!("PRV segment parsed");
                 
                 contents = content_trim("PRV", contents);
@@ -71,7 +72,7 @@ pub fn write_loop2110e(loop2110e: Loop2110E) -> String {
     }
     
     if let Some(prv) = loop2110e.prv_segments {
-        contents.push_str(&write_prv(prv));
+        contents.push_str(&write_prv(&prv));
     }
     
     return contents
@@ -98,9 +99,9 @@ mod tests {
         
         assert!(loop2110e.prv_segments.is_some());
         let prv = loop2110e.prv_segments.unwrap();
-        assert_eq!(prv.provider_code, "PE");
-        assert_eq!(prv.reference_identification_qualifier, "ZZ");
-        assert_eq!(prv.reference_identification, "207Q00000X");
+        assert_eq!(prv.prv01_provider_code, "PE");
+        assert_eq!(prv.prv02_reference_identification_qualifier, "ZZ");
+        assert_eq!(prv.prv03_reference_identification, "207Q00000X");
         
         assert_eq!(contents, "");
     }
@@ -129,9 +130,13 @@ mod tests {
                 }
             ],
             prv_segments: Some(PRV {
-                provider_code: "PE".to_string(),
-                reference_identification_qualifier: "ZZ".to_string(),
-                reference_identification: "207Q00000X".to_string(),
+                segment_id: "PRV".to_string(),
+                prv01_provider_code: "PE".to_string(),
+                prv02_reference_identification_qualifier: "ZZ".to_string(),
+                prv03_reference_identification: "207Q00000X".to_string(),
+                prv04_state_or_province_code: None,
+                prv05_provider_specialty_information: None,
+                prv06_provider_organization_code: None,
             }),
         };
         
