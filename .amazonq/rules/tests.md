@@ -32,12 +32,15 @@ diff ./demo/edi835-1.edi ./demo/test835-new.edi
 you don't have to create new files for testing, it's better to run these commands one by one with less files
 
 demo files are in the demo dir   
-for 270 and 271 look in the dir with 005010X279 in the name   
-for 835 look in the dir 005010X221 in the name   
-for 999 look in the dir 005010X231  in the name   
 for 277 and 276 look in the dir 005010X212 in the name    
-for 837d look in the dir 005010X224 in the name   
-for 837i look in the dir 005010X223 and 005010X292 and 005010X299 in the name   
+for 278 look in the dir 005010X217 and 008010X327 and 008010X328 and 008010X342 in the name   
+for 834 look in the dir 005010X220 and 005010X307 and 005010X318 in the name   
+for 835 look in the dir 005010X221 in the name   
 for 837p look in the dir 005010X222 and 005010X291 and 005010X298 in the name   
+for 837i look in the dir 005010X223 and 005010X292 and 005010X299 in the name   
+for 837d look in the dir 005010X224 in the name   
+for 999 look in the dir 005010X231  in the name   
+for 270 and 271 look in the dir with 005010X279 in the name  
+for 820 look in the dir with 005010X306 in the name
 
 after running the tests make sure to update any tasks or status documentations based on results
