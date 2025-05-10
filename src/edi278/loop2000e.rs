@@ -43,8 +43,9 @@ pub fn get_loop2000e(mut contents: String) -> (Loop2000E, String) {
             // Parse UM segment
             if contents.contains("UM") {
                 info!("UM segment found, ");
-                um_segments = Some(get_um(get_segment_contents("UM", &contents)));
-                info!("UM segment parsed");
+                let um_content = get_segment_contents("UM", &contents);
+                um_segments = Some(get_um(um_content));
+                info!("Parsed UM segment: {:?}", um_segments);
                 
                 contents = content_trim("UM", contents);
             }
@@ -82,8 +83,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_loop2000e() {
-        let contents = String::from("HL*5*4*SS*0~TRN*1*12345*1512345678~UM*HS*I*1*2*3*4*5*6*7*Y~");
+    fn test_get_loop2000e_with_full_um() {
+        let contents = String::from("HL*5*4*SS*0~TRN*1*12345*1512345678~UM*AR*I*2*21:B*****Y~");
         let (loop2000e, contents) = get_loop2000e(contents);
         assert_eq!(loop2000e.hl_segments.hl01_hierarchical_id_number, "5");
         assert_eq!(loop2000e.hl_segments.hl02_hierarchical_parent_id_number, "4");
@@ -97,9 +98,27 @@ mod tests {
         
         assert!(loop2000e.um_segments.is_some());
         let um = loop2000e.um_segments.unwrap();
+        assert_eq!(um.um01_request_category_code, "AR");
+        assert_eq!(um.um02_certification_type_code, "I");
+        assert_eq!(um.um03_service_type_code, "2");
+        assert_eq!(um.um04_health_care_service_location_information, "21:B");
+        assert_eq!(um.um08_prognosis_code, "Y");
+        
+        assert_eq!(contents, "");
+    }
+    
+    #[test]
+    fn test_get_loop2000e_with_minimal_um() {
+        let contents = String::from("HL*5*4*SS*0~TRN*1*12345*1512345678~UM*HS*I*2~");
+        let (loop2000e, contents) = get_loop2000e(contents);
+        
+        assert!(loop2000e.um_segments.is_some());
+        let um = loop2000e.um_segments.unwrap();
         assert_eq!(um.um01_request_category_code, "HS");
         assert_eq!(um.um02_certification_type_code, "I");
-        assert_eq!(um.um03_service_type_code, "1");
+        assert_eq!(um.um03_service_type_code, "2");
+        assert_eq!(um.um04_health_care_service_location_information, "");
+        assert_eq!(um.um08_prognosis_code, "");
         
         assert_eq!(contents, "");
     }
@@ -122,22 +141,22 @@ mod tests {
                 }
             ],
             um_segments: Some(UM {
-                um01_request_category_code: "HS".to_string(),
+                um01_request_category_code: "AR".to_string(),
                 um02_certification_type_code: "I".to_string(),
-                um03_service_type_code: "1".to_string(),
-                um04_health_care_service_location_information: "2".to_string(),
-                um05_related_causes_information: "3".to_string(),
-                um06_level_of_service_code: "4".to_string(),
-                um07_current_health_condition_code: "5".to_string(),
-                um08_prognosis_code: "6".to_string(),
-                um09_release_of_information_code: "7".to_string(),
-                um10_delay_reason_code: "Y".to_string(),
+                um03_service_type_code: "2".to_string(),
+                um04_health_care_service_location_information: "21:B".to_string(),
+                um05_related_causes_information: "".to_string(),
+                um06_level_of_service_code: "".to_string(),
+                um07_current_health_condition_code: "".to_string(),
+                um08_prognosis_code: "Y".to_string(),
+                um09_release_of_information_code: "".to_string(),
+                um10_delay_reason_code: "".to_string(),
             }),
         };
         
         let contents = write_loop2000e(loop2000e);
         assert!(contents.contains("HL*5*4*SS*0"));
         assert!(contents.contains("TRN*1*12345*1512345678"));
-        assert!(contents.contains("UM*HS*I*1*2*3*4*5*6*7*Y"));
+        assert!(contents.contains("UM*AR*I*2*21:B****Y"));
     }
 }
