@@ -30,7 +30,8 @@ pub fn get_loop2100f(mut contents: String) -> (Loop2100F, String) {
     // Parse SV2 segment
     if contents.contains("SV2") && check_if_segement_in_loop("SV2", "NM1", contents.clone()) {
         info!("SV2 segment found, ");
-        sv2_segments = Some(get_sv2(get_segment_contents("SV2", &contents)));
+        let sv2_content = get_segment_contents("SV2", &contents);
+        sv2_segments = Some(get_sv2(sv2_content));
         info!("SV2 segment parsed");
         
         contents = content_trim("SV2", contents);
