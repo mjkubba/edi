@@ -12,6 +12,9 @@ use crate::edi278::loop2010c::*;
 use crate::edi278::loop2000d::*;
 use crate::edi278::loop2010d::*;
 use crate::edi278::loop2000e::*;
+use crate::edi278::loop2110e::*;
+use crate::edi278::loop2000f::*;
+use crate::edi278::loop2010f::*;
 use crate::edi278::interchangecontroltrailer::*;
 use crate::error::EdiResult;
 use crate::transaction_processor::TransactionSet;
@@ -34,6 +37,9 @@ pub struct Edi278 {
     pub loop2000d: Option<Loop2000D>,
     pub loop2010d: Option<Loop2010D>,
     pub loop2000e: Option<Loop2000E>,
+    pub loop2110e: Option<Loop2110E>,
+    pub loop2000f: Option<Loop2000F>,
+    pub loop2010f: Option<Loop2010F>,
     pub interchange_trailer: InterchangeTrailer,
     pub transaction_set_id: String,
 }
@@ -124,6 +130,27 @@ impl TransactionSet for Edi278 {
         if loop2000e.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000e = Some(loop2000e);
             contents = new_contents;
+            
+            // Parse Loop 2110E (Service Provider)
+            let (loop2110e, new_contents) = get_loop2110e(contents.clone());
+            if loop2110e.nm1_segments.entity_id != "" {
+                edi278.loop2110e = Some(loop2110e);
+                contents = new_contents;
+            }
+        }
+        
+        // Parse Loop 2000F (Service Provider Level)
+        let (loop2000f, new_contents) = get_loop2000f(contents.clone());
+        if loop2000f.hl_segments.hl01_hierarchical_id_number != "" {
+            edi278.loop2000f = Some(loop2000f);
+            contents = new_contents;
+            
+            // Parse Loop 2010F (Service Provider Name)
+            let (loop2010f, new_contents) = get_loop2010f(contents.clone());
+            if loop2010f.nm1_segments.entity_id != "" {
+                edi278.loop2010f = Some(loop2010f);
+                contents = new_contents;
+            }
         }
         
         // Parse interchange control trailer
@@ -185,6 +212,21 @@ impl TransactionSet for Edi278 {
         // Write Loop 2000E (Service Level)
         if let Some(loop2000e) = &self.loop2000e {
             new_edi.push_str(&write_loop2000e(loop2000e.clone()));
+            
+            // Write Loop 2110E (Service Provider)
+            if let Some(loop2110e) = &self.loop2110e {
+                new_edi.push_str(&write_loop2110e(loop2110e.clone()));
+            }
+        }
+        
+        // Write Loop 2000F (Service Provider Level)
+        if let Some(loop2000f) = &self.loop2000f {
+            new_edi.push_str(&write_loop2000f(loop2000f.clone()));
+            
+            // Write Loop 2010F (Service Provider Name)
+            if let Some(loop2010f) = &self.loop2010f {
+                new_edi.push_str(&write_loop2010f(loop2010f.clone()));
+            }
         }
         
         // Write interchange trailer
@@ -338,7 +380,14 @@ DMG*D8*20100519*F~
 HL*5*4*SS*0~
 TRN*1*12345*1512345678~
 UM*HS*I*1*2*3*4*5*6*7*Y~
-SE*23*0001~
+NM1*71*1*SMITH*JOHN*A***XX*1234567890~
+REF*1J*12345~
+PRV*PE*ZZ*207Q00000X~
+HL*6*5*PT*0~
+NM1*1P*2*PROVIDER GROUP*****XX*1234567890~
+REF*TJ*123456789~
+PRV*PE*ZZ*207Q00000X~
+SE*33*0001~
 GE*1*1~
 IEA*1*000000001~";
 
@@ -381,6 +430,28 @@ IEA*1*000000001~";
         assert_eq!(loop2000e.hl_segments.hl03_hierarchical_level_code, "SS");
         assert!(loop2000e.um_segments.is_some());
         assert_eq!(loop2000e.um_segments.as_ref().unwrap().um01_request_category_code, "HS");
+        
+        // Check Loop 2110E
+        assert!(edi278.loop2110e.is_some());
+        let loop2110e = edi278.loop2110e.unwrap();
+        assert_eq!(loop2110e.nm1_segments.entity_id, "71");
+        assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
+        assert_eq!(loop2110e.nm1_segments.firstname, "JOHN");
+        assert!(loop2110e.prv_segments.is_some());
+        assert_eq!(loop2110e.prv_segments.as_ref().unwrap().provider_code, "PE");
+        
+        // Check Loop 2000F
+        assert!(edi278.loop2000f.is_some());
+        let loop2000f = edi278.loop2000f.unwrap();
+        assert_eq!(loop2000f.hl_segments.hl03_hierarchical_level_code, "PT");
+        
+        // Check Loop 2010F
+        assert!(edi278.loop2010f.is_some());
+        let loop2010f = edi278.loop2010f.unwrap();
+        assert_eq!(loop2010f.nm1_segments.entity_id, "1P");
+        assert_eq!(loop2010f.nm1_segments.lastname, "PROVIDER GROUP");
+        assert!(loop2010f.prv_segments.is_some());
+        assert_eq!(loop2010f.prv_segments.as_ref().unwrap().provider_code, "PE");
     }
     
     #[test]
