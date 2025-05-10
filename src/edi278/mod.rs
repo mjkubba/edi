@@ -10,9 +10,11 @@ pub mod loop2010c;
 pub mod loop2000d;
 pub mod loop2010d;
 pub mod loop2000e;
+pub mod loop2100e;
 pub mod loop2110e;
 pub mod loop2000f;
 pub mod loop2010f;
+pub mod loop2100f;
 pub mod controller;
 
 pub use controller::Edi278;

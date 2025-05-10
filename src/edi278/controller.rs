@@ -12,9 +12,11 @@ use crate::edi278::loop2010c::*;
 use crate::edi278::loop2000d::*;
 use crate::edi278::loop2010d::*;
 use crate::edi278::loop2000e::*;
+use crate::edi278::loop2100e::*;
 use crate::edi278::loop2110e::*;
 use crate::edi278::loop2000f::*;
 use crate::edi278::loop2010f::*;
+use crate::edi278::loop2100f::*;
 use crate::edi278::interchangecontroltrailer::*;
 use crate::error::EdiResult;
 use crate::transaction_processor::TransactionSet;
@@ -37,9 +39,11 @@ pub struct Edi278 {
     pub loop2000d: Option<Loop2000D>,
     pub loop2010d: Option<Loop2010D>,
     pub loop2000e: Option<Loop2000E>,
+    pub loop2100e: Option<Loop2100E>,
     pub loop2110e: Option<Loop2110E>,
     pub loop2000f: Option<Loop2000F>,
     pub loop2010f: Option<Loop2010F>,
+    pub loop2100f: Option<Loop2100F>,
     pub interchange_trailer: InterchangeTrailer,
     pub transaction_set_id: String,
 }
@@ -131,6 +135,14 @@ impl TransactionSet for Edi278 {
             edi278.loop2000e = Some(loop2000e);
             contents = new_contents;
             
+            // Parse Loop 2100E (Service Level Detail)
+            let (loop2100e, new_contents) = get_loop2100e(contents.clone());
+            if !loop2100e.dtp_segments.is_empty() || loop2100e.hi_segments.is_some() || 
+               loop2100e.hsd_segments.is_some() || loop2100e.cl1_segments.is_some() {
+                edi278.loop2100e = Some(loop2100e);
+                contents = new_contents;
+            }
+            
             // Parse Loop 2110E (Service Provider)
             let (loop2110e, new_contents) = get_loop2110e(contents.clone());
             if loop2110e.nm1_segments.entity_id != "" {
@@ -149,6 +161,13 @@ impl TransactionSet for Edi278 {
             let (loop2010f, new_contents) = get_loop2010f(contents.clone());
             if loop2010f.nm1_segments.entity_id != "" {
                 edi278.loop2010f = Some(loop2010f);
+                contents = new_contents;
+            }
+            
+            // Parse Loop 2100F (Service Provider Detail)
+            let (loop2100f, new_contents) = get_loop2100f(contents.clone());
+            if !loop2100f.dtp_segments.is_empty() || loop2100f.sv2_segments.is_some() {
+                edi278.loop2100f = Some(loop2100f);
                 contents = new_contents;
             }
         }
@@ -213,6 +232,11 @@ impl TransactionSet for Edi278 {
         if let Some(loop2000e) = &self.loop2000e {
             new_edi.push_str(&write_loop2000e(loop2000e.clone()));
             
+            // Write Loop 2100E (Service Level Detail)
+            if let Some(loop2100e) = &self.loop2100e {
+                new_edi.push_str(&write_loop2100e(loop2100e.clone()));
+            }
+            
             // Write Loop 2110E (Service Provider)
             if let Some(loop2110e) = &self.loop2110e {
                 new_edi.push_str(&write_loop2110e(loop2110e.clone()));
@@ -226,6 +250,11 @@ impl TransactionSet for Edi278 {
             // Write Loop 2010F (Service Provider Name)
             if let Some(loop2010f) = &self.loop2010f {
                 new_edi.push_str(&write_loop2010f(loop2010f.clone()));
+            }
+            
+            // Write Loop 2100F (Service Provider Detail)
+            if let Some(loop2100f) = &self.loop2100f {
+                new_edi.push_str(&write_loop2100f(loop2100f.clone()));
             }
         }
         
@@ -380,6 +409,10 @@ DMG*D8*20100519*F~
 HL*5*4*SS*0~
 TRN*1*12345*1512345678~
 UM*HS*I*1*2*3*4*5*6*7*Y~
+DTP*435*D8*20050516~
+HI*BF:41090:D8:20050125~
+HSD*DY*7~
+CL1*2~
 NM1*71*1*SMITH*JOHN*A***XX*1234567890~
 REF*1J*12345~
 PRV*PE*ZZ*207Q00000X~
@@ -387,6 +420,8 @@ HL*6*5*PT*0~
 NM1*1P*2*PROVIDER GROUP*****XX*1234567890~
 REF*TJ*123456789~
 PRV*PE*ZZ*207Q00000X~
+DTP*472*D8*20050516~
+SV2**HC:33510~
 SE*33*0001~
 GE*1*1~
 IEA*1*000000001~";
@@ -431,6 +466,15 @@ IEA*1*000000001~";
         assert!(loop2000e.um_segments.is_some());
         assert_eq!(loop2000e.um_segments.as_ref().unwrap().um01_request_category_code, "HS");
         
+        // Check Loop 2100E
+        assert!(edi278.loop2100e.is_some());
+        let loop2100e = edi278.loop2100e.unwrap();
+        assert_eq!(loop2100e.dtp_segments.len(), 1);
+        assert_eq!(loop2100e.dtp_segments[0].dtp01_date_time_qualifier, "435");
+        assert!(loop2100e.hi_segments.is_some());
+        assert!(loop2100e.hsd_segments.is_some());
+        assert!(loop2100e.cl1_segments.is_some());
+        
         // Check Loop 2110E
         assert!(edi278.loop2110e.is_some());
         let loop2110e = edi278.loop2110e.unwrap();
@@ -452,6 +496,14 @@ IEA*1*000000001~";
         assert_eq!(loop2010f.nm1_segments.lastname, "PROVIDER GROUP");
         assert!(loop2010f.prv_segments.is_some());
         assert_eq!(loop2010f.prv_segments.as_ref().unwrap().provider_code, "PE");
+        
+        // Check Loop 2100F
+        assert!(edi278.loop2100f.is_some());
+        let loop2100f = edi278.loop2100f.unwrap();
+        assert_eq!(loop2100f.dtp_segments.len(), 1);
+        assert_eq!(loop2100f.dtp_segments[0].dtp01_date_time_qualifier, "472");
+        assert!(loop2100f.sv2_segments.is_some());
+        assert_eq!(loop2100f.sv2_segments.as_ref().unwrap().sv202_procedure_code, "HC:33510");
     }
     
     #[test]
