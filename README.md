@@ -6,15 +6,15 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 
 | Transaction Set | Status | Description |
 |----------------|--------|-------------|
-| EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with all segments correctly processed and generated |
-| EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Core functionality working, REF segments included in output, DTP segments fixed |
-| EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Core functionality working, PER/REF/DTP segments included in output, line breaks added |
-| EDI999 (Implementation Acknowledgment) | ✅ Complete | Core functionality working, CTX segment formatting fixed, trailer segments fixed, line breaks added |
-| EDI276/277 (Health Care Claim Status) | ✅ Complete | Basic structure implemented, controller functions added, parsing working, generation improved, segment ID fixes implemented, functional tests added |
-| EDI278 (Health Care Services Review) | ✅ Complete | Full implementation with all loops and segments, support for AR/HS prefixes in UM segment, facility address handling, service provider details, and comprehensive tests |
-| EDI837P (Health Care Claim Professional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837P |
-| EDI837I (Health Care Claim Institutional) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, tests added, main.rs updated to support 837I, specialized handling for CL1 segment |
-| EDI837D (Health Care Claim Dental) | ✅ Complete | Basic structure created, TransactionSet trait implemented, parsing for all major loops implemented, main.rs updated to support 837D, specialized handling for TOO segment |
+| EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with minor formatting differences in output (missing empty fields in SVC segments) |
+| EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed |
+| EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed including LS/LE |
+| EDI999 (Implementation Acknowledgment) | ✅ Complete | Fully functional with special CTX segment handling for both standard and special formats |
+| EDI276/277 (Health Care Claim Status) | ⚠️ Partial | Parsing works correctly but generation has issues with TRN and STC segments in 277 |
+| EDI278 (Health Care Services Review) | ✅ Complete | Fully functional with support for AR/HS prefixes in UM segment, some segments missing in output (DTP, SV2, PRV) |
+| EDI837P (Health Care Claim Professional) | ⚠️ Partial | Parsing works correctly but generation not yet fully implemented |
+| EDI837I (Health Care Claim Institutional) | ⚠️ Partial | Parsing works correctly with specialized handling for CL1 segment, generation not yet implemented |
+| EDI837D (Health Care Claim Dental) | ⚠️ Partial | Parsing works correctly with specialized handling for TOO segment, generation not yet implemented |
 
 ## Repository Structure
 ```
@@ -131,8 +131,20 @@ diff ./demo/edi835-1.edi ./demo/test835-new.edi
   - ✅ Improved format detection logic
 
 ### Planned
+- Complete 837 Generation
+  - Implement write functionality for 837P/I/D formats
+  - Ensure proper handling of variant-specific segments during generation
+  - Add comprehensive tests for generation functionality
+- Fix 276/277 Generation
+  - Address missing segments in 276/277 generation process
+  - Implement proper handling of TRN and STC segments in 277
+  - Ensure complete segment processing for both formats
+- Code Cleanup
+  - Address compiler warnings, particularly unused imports and functions
+  - Fix unused variable warnings
+  - Improve code organization and documentation
 - Performance Optimization
-  - Optimize parsing algorithms
+  - Optimize parsing algorithms for better performance with large files
   - Implement caching for frequently used segments
   - Reduce memory usage for large files
 - Additional Features
