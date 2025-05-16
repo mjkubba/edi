@@ -799,7 +799,73 @@ pub fn get_837p(content: &str) -> EdiResult<Edi837P> {
 pub fn write_837p(edi837p: &Edi837P) -> EdiResult<String> {
     info!("Generating EDI837P content");
     
-    Ok(edi837p.to_edi())
+    let mut result = String::new();
+    
+    // Write ISA segment
+    result.push_str(&edi837p.isa);
+    result.push('~');
+    
+    // Write GS segment
+    result.push_str(&edi837p.gs);
+    result.push('~');
+    
+    // Write ST segment
+    result.push_str(&edi837p.st);
+    result.push('~');
+    
+    // Write BHT segment
+    result.push_str(&edi837p.table1.table1.bht);
+    result.push('~');
+    
+    // Write Loop2000A (Billing Provider Hierarchical Level)
+    result.push_str(&write_loop2000a(&edi837p.table1.loop2000a));
+    
+    // Write Loop2010AA (Billing Provider Name)
+    result.push_str(&write_loop2010aa(&edi837p.loop2010aa));
+    
+    // Write Loop2010AB (Pay-to Address) if present
+    if let Some(loop2010ab) = &edi837p.loop2010ab {
+        result.push_str(&write_loop2010ab(loop2010ab));
+    }
+    
+    // Write Loop2010AC (Pay-to Plan Name) if present
+    if let Some(loop2010ac) = &edi837p.loop2010ac {
+        result.push_str(&write_loop2010ac(loop2010ac));
+    }
+    
+    // Write Loop2000B (Subscriber Hierarchical Level)
+    for loop2000b in &edi837p.loop2000b {
+        result.push_str(&write_loop2000b(loop2000b));
+    }
+    
+    // Write Loop2000C (Patient Hierarchical Level)
+    for loop2000c in &edi837p.loop2000c {
+        result.push_str(&write_loop2000c(loop2000c));
+    }
+    
+    // Write Loop2300 (Claim Information)
+    for loop2300 in &edi837p.loop2300 {
+        result.push_str(&write_loop2300(loop2300));
+    }
+    
+    // Write Loop2400 (Service Line)
+    for loop2400 in &edi837p.loop2400 {
+        result.push_str(&write_loop2400(loop2400));
+    }
+    
+    // Write SE segment
+    result.push_str(&edi837p.se);
+    result.push('~');
+    
+    // Write GE segment
+    result.push_str(&edi837p.ge);
+    result.push('~');
+    
+    // Write IEA segment
+    result.push_str(&edi837p.iea);
+    result.push('~');
+    
+    Ok(result)
 }
 
 /// Parse EDI837I content
@@ -816,7 +882,83 @@ pub fn get_837i(content: &str) -> EdiResult<Edi837I> {
 pub fn write_837i(edi837i: &Edi837I) -> EdiResult<String> {
     info!("Generating EDI837I content");
     
-    Ok(edi837i.to_edi())
+    let mut result = String::new();
+    
+    // Write ISA segment
+    result.push_str(&edi837i.isa);
+    result.push('~');
+    
+    // Write GS segment
+    result.push_str(&edi837i.gs);
+    result.push('~');
+    
+    // Write ST segment
+    result.push_str(&edi837i.st);
+    result.push('~');
+    
+    // Write BHT segment
+    result.push_str(&edi837i.table1.table1.bht);
+    result.push('~');
+    
+    // Write Loop2000A (Billing Provider Hierarchical Level)
+    result.push_str(&write_loop2000a(&edi837i.table1.loop2000a));
+    
+    // Write Loop2010AA (Billing Provider Name)
+    result.push_str(&write_loop2010aa(&edi837i.loop2010aa));
+    
+    // Write Loop2010AB (Pay-to Address) if present
+    if let Some(loop2010ab) = &edi837i.loop2010ab {
+        result.push_str(&write_loop2010ab(loop2010ab));
+    }
+    
+    // Write Loop2010AC (Pay-to Plan Name) if present
+    if let Some(loop2010ac) = &edi837i.loop2010ac {
+        result.push_str(&write_loop2010ac(loop2010ac));
+    }
+    
+    // Write Loop2000B (Subscriber Hierarchical Level)
+    for loop2000b in &edi837i.loop2000b {
+        result.push_str(&write_loop2000b(loop2000b));
+    }
+    
+    // Write Loop2000C (Patient Hierarchical Level)
+    for loop2000c in &edi837i.loop2000c {
+        result.push_str(&write_loop2000c(loop2000c));
+    }
+    
+    // Write Loop2300 (Claim Information)
+    for loop2300 in &edi837i.loop2300 {
+        let mut loop2300_str = write_loop2300(loop2300);
+        
+        // Check for CL1 segment in the raw segments
+        for ref_seg in &loop2300.ref_segments {
+            if ref_seg.starts_with("CL1*") {
+                loop2300_str.push_str(ref_seg);
+                loop2300_str.push('~');
+            }
+        }
+        
+        result.push_str(&loop2300_str);
+    }
+    
+    // Write Loop2400 (Service Line)
+    for loop2400 in &edi837i.loop2400 {
+        result.push_str(&write_loop2400(loop2400));
+    }
+    
+    // Write SE segment
+    result.push_str(&edi837i.se);
+    result.push('~');
+    
+    // Write GE segment
+    result.push_str(&edi837i.ge);
+    result.push('~');
+    
+    // Write IEA segment
+    result.push_str(&edi837i.iea);
+    result.push('~');
+    
+    Ok(result)
 }
 
 /// Parse EDI837D content
@@ -1001,7 +1143,81 @@ mod tests {
 pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
     info!("Generating EDI837D content");
     
-    Ok(edi837d.to_edi())
+    let mut result = String::new();
+    
+    // Write ISA segment
+    result.push_str(&edi837d.isa);
+    result.push('~');
+    
+    // Write GS segment
+    result.push_str(&edi837d.gs);
+    result.push('~');
+    
+    // Write ST segment
+    result.push_str(&edi837d.st);
+    result.push('~');
+    
+    // Write BHT segment
+    result.push_str(&edi837d.table1.table1.bht);
+    result.push('~');
+    
+    // Write Loop2000A (Billing Provider Hierarchical Level)
+    result.push_str(&write_loop2000a(&edi837d.table1.loop2000a));
+    
+    // Write Loop2010AA (Billing Provider Name)
+    result.push_str(&write_loop2010aa(&edi837d.loop2010aa));
+    
+    // Write Loop2010AB (Pay-to Address) if present
+    if let Some(loop2010ab) = &edi837d.loop2010ab {
+        result.push_str(&write_loop2010ab(loop2010ab));
+    }
+    
+    // Write Loop2010AC (Pay-to Plan Name) if present
+    if let Some(loop2010ac) = &edi837d.loop2010ac {
+        result.push_str(&write_loop2010ac(loop2010ac));
+    }
+    
+    // Write Loop2000B (Subscriber Hierarchical Level)
+    for loop2000b in &edi837d.loop2000b {
+        result.push_str(&write_loop2000b(loop2000b));
+    }
+    
+    // Write Loop2000C (Patient Hierarchical Level)
+    for loop2000c in &edi837d.loop2000c {
+        result.push_str(&write_loop2000c(loop2000c));
+    }
+    
+    // Write Loop2300 (Claim Information)
+    for loop2300 in &edi837d.loop2300 {
+        let mut loop2300_str = write_loop2300(loop2300);
+        
+        // Add TOO segments if present (specific to 837D)
+        for too in &loop2300.too_segments {
+            loop2300_str.push_str(too);
+            loop2300_str.push('~');
+        }
+        
+        result.push_str(&loop2300_str);
+    }
+    
+    // Write Loop2400 (Service Line)
+    for loop2400 in &edi837d.loop2400 {
+        result.push_str(&write_loop2400(loop2400));
+    }
+    
+    // Write SE segment
+    result.push_str(&edi837d.se);
+    result.push('~');
+    
+    // Write GE segment
+    result.push_str(&edi837d.ge);
+    result.push('~');
+    
+    // Write IEA segment
+    result.push_str(&edi837d.iea);
+    result.push('~');
+    
+    Ok(result)
 }
 /// Implement specialized handling for TOO segment in 837D
 fn parse_too_segment(segment: &str) -> Option<String> {
