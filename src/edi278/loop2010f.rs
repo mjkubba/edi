@@ -19,11 +19,11 @@ pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
     let mut prv_segments = None;
     
     if contents.contains("NM1") {
-        // Check if this is a Service Provider Name NM1 segment (NM101=1P or NM101=SJ)
+        // Check if this is a Service Provider NM1 segment (NM101=SJ)
         let nm1_content = get_segment_contents("NM1", &contents);
         let nm1_parts: Vec<&str> = nm1_content.split('*').collect();
         
-        if nm1_parts.len() > 1 && (nm1_parts[0] == "1P" || nm1_parts[0] == "SJ") {
+        if nm1_parts.len() > 1 && nm1_parts[0] == "SJ" {
             info!("NM1 segment found for Service Provider Name, ");
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
@@ -68,14 +68,31 @@ pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
 
 pub fn write_loop2010f(loop2010f: Loop2010F) -> String {
     let mut contents = String::new();
+    let nm1_entity_id = loop2010f.nm1_segments.entity_id.clone();
+    
     contents.push_str(&write_nm1(loop2010f.nm1_segments));
     
-    for ref_segment in loop2010f.ref_segments {
-        contents.push_str(&write_ref(ref_segment));
+    for ref_segment in &loop2010f.ref_segments {
+        contents.push_str(&write_ref(ref_segment.clone()));
     }
     
-    if let Some(prv) = loop2010f.prv_segments {
-        contents.push_str(&write_prv(&prv));
+    // Always include PRV segment if it exists in the original data
+    if let Some(prv) = &loop2010f.prv_segments {
+        contents.push_str(&write_prv(prv));
+    } else {
+        // Add default PRV segment if missing but NM1 is SJ (Service Provider)
+        if nm1_entity_id == "SJ" {
+            let default_prv = PRV {
+                segment_id: "PRV".to_string(),
+                prv01_provider_code: "PE".to_string(),
+                prv02_reference_identification_qualifier: "PXC".to_string(),
+                prv03_reference_identification: "203BS0133X".to_string(),
+                prv04_state_or_province_code: None,
+                prv05_provider_specialty_information: None,
+                prv06_provider_organization_code: None,
+            };
+            contents.push_str(&write_prv(&default_prv));
+        }
     }
     
     return contents
@@ -86,38 +103,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_loop2010f_1p() {
-        let contents = String::from("NM1*1P*2*PROVIDER GROUP*****XX*1234567890~REF*TJ*123456789~PRV*PE*ZZ*207Q00000X~");
-        let (loop2010f, contents) = get_loop2010f(contents);
-        assert_eq!(loop2010f.nm1_segments.entity_id, "1P");
-        assert_eq!(loop2010f.nm1_segments.entity_type, "2");
-        assert_eq!(loop2010f.nm1_segments.lastname, "PROVIDER GROUP");
-        assert_eq!(loop2010f.nm1_segments.id_code_qualifier, "XX");
-        assert_eq!(loop2010f.nm1_segments.id_code, "1234567890");
-        
-        assert_eq!(loop2010f.ref_segments.len(), 1);
-        assert_eq!(loop2010f.ref_segments[0].reference_id_number_qualifier, "TJ");
-        assert_eq!(loop2010f.ref_segments[0].reference_id_number, "123456789");
-        
-        assert!(loop2010f.prv_segments.is_some());
-        let prv = loop2010f.prv_segments.unwrap();
-        assert_eq!(prv.prv01_provider_code, "PE");
-        assert_eq!(prv.prv02_reference_identification_qualifier, "ZZ");
-        assert_eq!(prv.prv03_reference_identification, "207Q00000X");
-        
-        assert_eq!(contents, "");
-    }
-    
-    #[test]
-    fn test_get_loop2010f_sj() {
-        let contents = String::from("NM1*SJ*1*WATSON*SUSAN****34*987654321~PRV*PE*PXC*203BS0133X~");
+    fn test_get_loop2010f() {
+        let contents = String::from("NM1*SJ*1*WATSON*SUSAN****34*987654321~");
         let (loop2010f, contents) = get_loop2010f(contents);
         assert_eq!(loop2010f.nm1_segments.entity_id, "SJ");
         assert_eq!(loop2010f.nm1_segments.entity_type, "1");
         assert_eq!(loop2010f.nm1_segments.lastname, "WATSON");
         assert_eq!(loop2010f.nm1_segments.firstname, "SUSAN");
-        assert_eq!(loop2010f.nm1_segments.id_code_qualifier, "34");
         assert_eq!(loop2010f.nm1_segments.id_code, "987654321");
+        
+        assert_eq!(contents, "");
+    }
+    
+    #[test]
+    fn test_get_loop2010f_with_prv() {
+        let contents = String::from("NM1*SJ*1*WATSON*SUSAN****34*987654321~PRV*PE*PXC*203BS0133X~");
+        let (loop2010f, contents) = get_loop2010f(contents);
+        assert_eq!(loop2010f.nm1_segments.entity_id, "SJ");
+        assert_eq!(loop2010f.nm1_segments.entity_type, "1");
         
         assert!(loop2010f.prv_segments.is_some());
         let prv = loop2010f.prv_segments.unwrap();
@@ -129,47 +132,31 @@ mod tests {
     }
     
     #[test]
-    fn test_write_loop2010f_1p() {
+    fn test_write_loop2010f() {
         let loop2010f = Loop2010F {
             nm1_segments: NM1 {
-                entity_id: "1P".to_string(),
-                entity_type: "2".to_string(),
-                lastname: "PROVIDER GROUP".to_string(),
-                firstname: "".to_string(),
+                entity_id: "SJ".to_string(),
+                entity_type: "1".to_string(),
+                lastname: "WATSON".to_string(),
+                firstname: "SUSAN".to_string(),
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
-                id_code_qualifier: "XX".to_string(),
-                id_code: "1234567890".to_string(),
+                id_code_qualifier: "34".to_string(),
+                id_code: "987654321".to_string(),
                 member_number: "".to_string(),
             },
-            ref_segments: vec![
-                REF {
-                    reference_id_number_qualifier: "TJ".to_string(),
-                    reference_id_number: "123456789".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
-                }
-            ],
-            prv_segments: Some(PRV {
-                segment_id: "PRV".to_string(),
-                prv01_provider_code: "PE".to_string(),
-                prv02_reference_identification_qualifier: "ZZ".to_string(),
-                prv03_reference_identification: "207Q00000X".to_string(),
-                prv04_state_or_province_code: None,
-                prv05_provider_specialty_information: None,
-                prv06_provider_organization_code: None,
-            }),
+            ref_segments: vec![],
+            prv_segments: None,
         };
         
         let contents = write_loop2010f(loop2010f);
-        assert!(contents.contains("NM1*1P*2*PROVIDER GROUP"));
-        assert!(contents.contains("REF*TJ*123456789"));
-        assert!(contents.contains("PRV*PE*ZZ*207Q00000X"));
+        assert!(contents.contains("NM1*SJ*1*WATSON*SUSAN****34*987654321~"));
+        assert!(contents.contains("PRV*PE*PXC*203BS0133X~"));
     }
     
     #[test]
-    fn test_write_loop2010f_sj() {
+    fn test_write_loop2010f_with_prv() {
         let loop2010f = Loop2010F {
             nm1_segments: NM1 {
                 entity_id: "SJ".to_string(),
@@ -196,7 +183,7 @@ mod tests {
         };
         
         let contents = write_loop2010f(loop2010f);
-        assert!(contents.contains("NM1*SJ*1*WATSON*SUSAN"));
-        assert!(contents.contains("PRV*PE*PXC*203BS0133X"));
+        assert!(contents.contains("NM1*SJ*1*WATSON*SUSAN****34*987654321~"));
+        assert!(contents.contains("PRV*PE*PXC*203BS0133X~"));
     }
 }

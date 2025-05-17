@@ -8,6 +8,7 @@ pub mod edi276;
 pub mod edi277;
 pub mod edi837;
 pub mod edi278;
+pub mod edi820;
 pub mod error;
 pub mod transaction_processor;
 pub mod segment_config;

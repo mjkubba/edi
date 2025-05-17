@@ -14,6 +14,11 @@ pub fn check_if_segement_in_loop(segment: &str, anchor: &str, contents: String) 
     if let (Some(segment_pos), Some(anchor_pos)) = (contents.find(segment), contents.find(anchor)) {
         return segment_pos < anchor_pos;
     }
+    // If anchor is not found, assume segment is in the loop
+    // This helps with segments at the end of the file
+    if contents.find(segment).is_some() && contents.find(anchor).is_none() {
+        return true;
+    }
     false
 }
 
@@ -138,10 +143,13 @@ pub fn get_full_segment_contents(key: &str, contents: &str) -> Option<String> {
     let nkey = key.to_string() + "*";
     
     if let Some(index) = contents.find(&nkey) {
-        let start = &contents[index..];
-        if let Some(end) = start.find("~") {
-            let content = &start[..end];
-            return Some(content.to_string());
+        // Make sure we're at the start of a segment
+        if index == 0 || contents.chars().nth(index - 1) == Some('~') || contents.chars().nth(index - 1) == Some('\n') {
+            let start = &contents[index..];
+            if let Some(end) = start.find("~") {
+                let content = &start[..end];
+                return Some(content.to_string());
+            }
         }
     }
     
@@ -150,11 +158,19 @@ pub fn get_full_segment_contents(key: &str, contents: &str) -> Option<String> {
 
 pub fn content_trim(key: &str, contents: String) -> String {
     if let Some(to_remove) = get_full_segment_contents(key, &contents) {
-        let to_remove_with_tilde = to_remove + "~";
-        contents.replacen(&to_remove_with_tilde, "", 1).trim_start_matches("~").to_string()
-    } else {
-        contents
+        let to_remove_with_tilde = to_remove.clone() + "~";
+        
+        // Check if the segment exists in the content
+        if contents.contains(&to_remove_with_tilde) {
+            let trimmed = contents.replacen(&to_remove_with_tilde, "", 1);
+            return trimmed.trim_start_matches("~").to_string();
+        }
     }
+    
+    // If we couldn't find or remove the segment, return the original content
+    // This helps prevent infinite loops
+    info!("Warning: Failed to trim segment {} from content", key);
+    contents
 }
 
 #[cfg(test)]
@@ -198,10 +214,34 @@ mod tests {
     }
     
     #[test]
+    fn test_check_if_segement_in_loop() {
+        let contents = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~DTM*582****RD8*20120501-20140531~ENT*2~";
+        
+        // NM1 comes before ENT
+        assert!(check_if_segement_in_loop("NM1", "ENT", contents.to_string()));
+        
+        // REF comes before ENT
+        assert!(check_if_segement_in_loop("REF", "ENT", contents.to_string()));
+        
+        // RMR comes before ENT
+        assert!(check_if_segement_in_loop("RMR", "ENT", contents.to_string()));
+        
+        // DTM comes before ENT
+        assert!(check_if_segement_in_loop("DTM", "ENT", contents.to_string()));
+        
+        // ENT doesn't come before ENT
+        assert!(!check_if_segement_in_loop("ENT", "ENT", contents.to_string()));
+        
+        // Test with segment at the end (no anchor after it)
+        let contents_end = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~";
+        assert!(check_if_segement_in_loop("RMR", "XYZ", contents_end.to_string()));
+    }
+    
+}
+    #[test]
     fn test_segment_not_found() {
         let key = "XYZ"; // Non-existent segment
         let contents = "PER*BL*JANE DOE*TE*9005555555~N1*PE*BAN DDS LLC*FI*999994703~";
         let result = get_segment_contents(key, contents);
         assert_eq!(result, "");
     }
-}

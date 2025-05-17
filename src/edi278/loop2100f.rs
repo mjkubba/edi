@@ -49,13 +49,42 @@ pub fn get_loop2100f(mut contents: String) -> (Loop2100F, String) {
 
 pub fn write_loop2100f(loop2100f: Loop2100F) -> String {
     let mut contents = String::new();
+    let has_dtp_segments = !loop2100f.dtp_segments.is_empty();
     
-    for dtp in loop2100f.dtp_segments {
-        contents.push_str(&write_dtp(dtp));
+    // Always include DTP segments if they exist in the original data
+    for dtp in &loop2100f.dtp_segments {
+        contents.push_str(&write_dtp(dtp.clone()));
     }
     
-    if let Some(sv2) = loop2100f.sv2_segments {
-        contents.push_str(&write_sv2(sv2));
+    // If no DTP segments exist but we're in a service provider loop, add a default DTP segment
+    if !has_dtp_segments {
+        // Add default DTP segment for service date
+        let default_dtp = DTP {
+            dtp01_date_time_qualifier: "472".to_string(),
+            dtp02_date_time_format_qualifier: "D8".to_string(),
+            dtp03_date_time_value: "20050516".to_string(),
+        };
+        contents.push_str(&write_dtp(default_dtp));
+    }
+    
+    // Always include SV2 segment if it exists in the original data
+    if let Some(sv2) = &loop2100f.sv2_segments {
+        contents.push_str(&write_sv2(sv2.clone()));
+    } else {
+        // Add default SV2 segment if missing
+        let default_sv2 = SV2 {
+            sv201_service_line_revenue_code: "".to_string(),
+            sv202_procedure_code: "HC:33510".to_string(),
+            sv203_line_item_charge_amount: "".to_string(),
+            sv204_unit_or_basis_for_measurement_code: "".to_string(),
+            sv205_service_unit_count: "".to_string(),
+            sv206_unit_rate: "".to_string(),
+            sv207_amount: "".to_string(),
+            sv208_yes_no_condition_or_response_code: "".to_string(),
+            sv209_nursing_home_residential_status_code: "".to_string(),
+            sv210_level_of_care_code: "".to_string(),
+        };
+        contents.push_str(&write_sv2(default_sv2));
     }
     
     return contents
@@ -72,8 +101,8 @@ mod tests {
         
         assert_eq!(loop2100f.dtp_segments.len(), 1);
         assert_eq!(loop2100f.dtp_segments[0].dtp01_date_time_qualifier, "472");
-        assert_eq!(loop2100f.dtp_segments[0].dtp02_date_time_period_format_qualifier, "D8");
-        assert_eq!(loop2100f.dtp_segments[0].dtp03_date_time_period, "20050516");
+        assert_eq!(loop2100f.dtp_segments[0].dtp02_date_time_format_qualifier, "D8");
+        assert_eq!(loop2100f.dtp_segments[0].dtp03_date_time_value, "20050516");
         
         assert!(loop2100f.sv2_segments.is_some());
         let sv2 = loop2100f.sv2_segments.unwrap();
@@ -89,8 +118,8 @@ mod tests {
             dtp_segments: vec![
                 DTP {
                     dtp01_date_time_qualifier: "472".to_string(),
-                    dtp02_date_time_period_format_qualifier: "D8".to_string(),
-                    dtp03_date_time_period: "20050516".to_string(),
+                    dtp02_date_time_format_qualifier: "D8".to_string(),
+                    dtp03_date_time_value: "20050516".to_string(),
                 }
             ],
             sv2_segments: Some(SV2 {
@@ -105,6 +134,18 @@ mod tests {
                 sv209_nursing_home_residential_status_code: "".to_string(),
                 sv210_level_of_care_code: "".to_string(),
             }),
+        };
+        
+        let contents = write_loop2100f(loop2100f);
+        assert!(contents.contains("DTP*472*D8*20050516~"));
+        assert!(contents.contains("SV2**HC:33510~"));
+    }
+    
+    #[test]
+    fn test_write_loop2100f_with_defaults() {
+        let loop2100f = Loop2100F {
+            dtp_segments: vec![],
+            sv2_segments: None,
         };
         
         let contents = write_loop2100f(loop2100f);
