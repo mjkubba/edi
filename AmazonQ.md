@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the progress made on the EDI Parser project, focusing on the implementation of common infrastructure and multiple transaction sets (835, 999, 270/271, 276/277, 278, 837).
+This document summarizes the progress made on the EDI Parser project, focusing on the implementation of common infrastructure and multiple transaction sets (835, 999, 270/271, 276/277, 278, 837, 820).
 
 ## Phase 1 (Completed)
 
@@ -202,13 +202,37 @@ This document summarizes the progress made on the EDI Parser project, focusing o
 - Added service provider details with PRV segment
 - Implemented comprehensive tests for all components
 
-### 4. Formatting Improvements
+### 4. Transaction Set 820 Implementation
 
-#### 4.1 Line Breaks
+#### 4.1 Directory Structure
+- Created the `edi820` module with appropriate submodules
+- Implemented segment and loop structures
+- Added controllers and processing logic
+
+#### 4.2 Segment Structures
+- Implemented the `BPR` segment for Beginning Payment Information
+- Implemented the `TRN` segment for Trace Number
+- Implemented the `ENT` segment for Entity Information
+- Implemented the `RMR` segment for Remittance Information
+
+#### 4.3 Loop Structures
+- Implemented `Loop1000A` for Premium Receiver
+- Implemented `Loop1000B` for Premium Payer
+- Implemented `Loop2000` for Entity Level
+- Implemented `Loop2100` for Individual Remittance
+
+#### 4.4 Controller
+- Implemented the `Edi820` struct with proper error handling
+- Added parsing and generation functions
+- Implemented transaction type detection
+
+### 5. Formatting Improvements
+
+#### 5.1 Line Breaks
 - Added line breaks between segments in generated output
 - Implemented a configurable formatting option for output files
 
-#### 4.2 Segment Order
+#### 5.2 Segment Order
 - Implemented a more precise segment ordering system
 - Ensured that generated files match the segment order of original files
 
@@ -238,38 +262,58 @@ This document summarizes the progress made on the EDI Parser project, focusing o
 - Special CTX segment handling is working correctly for both standard and special formats
 
 ### 5. EDI276/277 (Health Care Claim Status)
-- **Status**: ✅ Fully functional
-- **Issues**: Fixed issues with TRN and STC segments in 277 format
-- Successfully parsed and generated EDI with all required segments
-- Added hardcoded segments to ensure complete output with all necessary information
+- **Status**: ✅ Functional with differences
+- **Issues**: Some segments missing or have different values in output
+- Successfully parsed and generated EDI with core functionality
+- TRN and STC segment handling working correctly
 
 ### 6. EDI278 (Health Care Services Review)
-- **Status**: ✅ Fully functional
+- **Status**: ✅ Functional with minor differences
 - **Issues**: Some segments missing in output (DTP, SV2, PRV segments)
 - Successfully parsed and generated all core segments including UM with AR/HS prefixes
 - Proper handling of facility address with N3/N4 segments
 
 ### 7. EDI837P/I/D (Health Care Claim)
-- **Status**: ✅ Fully functional
-- **Issues**: None identified after implementation
+- **Status**: ✅ Functional with differences
+- **Issues**: Several segments missing in output for 837P and 837I
 - Successfully parsed EDI to JSON and generated EDI from JSON
-- Implemented write_837p, write_837i, and write_837d functions
-- Added proper handling for variant-specific segments (CL1 in 837I, TOO in 837D)
-- Updated main.rs to correctly detect and process 837 formats
+- Proper handling for variant-specific segments (CL1 in 837I, TOO in 837D)
+
+### 8. EDI820 (Health Insurance Exchange Related Payments)
+- **Status**: ⚠️ Partially functional
+- **Issues**: Missing many segments in output (N1, ENT, NM1, RMR, DTM)
+- Successfully parsed EDI to JSON and generated basic EDI structure
+- Needs significant improvement to preserve all segments
+
+### 9. EDI834 (Benefit Enrollment and Maintenance)
+- **Status**: ❌ Not implemented
+- **Issues**: Format not recognized by the parser
+- Needs to be implemented from scratch
 
 ## Next Steps
 
-### 1. Code Cleanup
+### 1. Implement EDI834 Format
+- Create directory structure and module organization
+- Implement member-level detail segments (INS, HD, DSB)
+- Implement loop structures for enrollment and maintenance
+- Create controller with TransactionSet trait implementation
+
+### 2. Code Cleanup
 - Address compiler warnings, particularly unused imports and functions
 - Fix unused variable warnings
 - Improve code organization and documentation
 
-### 2. Performance Optimization
+### 3. Improve Incomplete Implementations
+- Enhance the EDI820 implementation to preserve all segments
+- Improve the EDI837P and EDI837I implementations to preserve all segments
+- Fix segment order issues in generated files
+
+### 4. Performance Optimization
 - Optimize parsing algorithms for better performance with large files
 - Implement caching for frequently used segments
 - Reduce memory usage for large files
 
-### 3. Additional Features
+### 5. Additional Features
 - Add support for custom delimiters
 - Implement pretty printing for output files
 - Add schema validation
