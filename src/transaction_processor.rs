@@ -62,6 +62,8 @@ impl TransactionProcessor {
             Some("277")
         } else if contents.contains("ST*837*") {
             Some("837")
+        } else if contents.contains("ST*834*") {
+            Some("834")
         } else {
             None
         }

@@ -19,6 +19,7 @@ use crate::edi277::controller::*;
 use crate::edi837::controller::*;
 use crate::edi278::controller::*;
 use crate::edi820::controller::*;
+use crate::edi834::controller::*;
 
 mod helper;
 mod segments;
@@ -31,6 +32,7 @@ mod edi277;
 mod edi837;
 mod edi278;
 mod edi820;
+mod edi834;
 mod error;
 mod transaction_processor;
 mod segment_config;
@@ -137,6 +139,13 @@ fn main() {
                 info!("Writing 820 format");
                 let edi820: Edi820 = serde_json::from_str(&contents).unwrap();
                 let new_edi = write_820(&edi820);
+                write_to_file(new_edi, args.output_file);
+            }
+            // Check if the content is JSON for 834 format
+            else if contents.contains("\"transaction_set_id\":\"834\"") {
+                info!("Writing 834 format");
+                let edi834: Edi834 = serde_json::from_str(&contents).unwrap();
+                let new_edi = write_834(&edi834);
                 write_to_file(new_edi, args.output_file);
             }
             else {
@@ -323,8 +332,19 @@ fn main() {
                     warn!("Error processing 820 format: {:?}", e);
                 }
             }
+        } else if contents.contains("~ST*834*") || contents.contains("ST*834*") {
+            info!("File is 834");
+            match Edi834::parse(contents.clone()) {
+                Ok((edi834, _)) => {
+                    let serialized_edi = serde_json::to_string(&edi834).unwrap();
+                    write_to_file(serialized_edi.clone(), args.output_file);
+                },
+                Err(e) => {
+                    warn!("Error processing 834 format: {:?}", e);
+                }
+            }
         } else {
-            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, 837, 278, and 820 formats.");
+            warn!("File format not recognized. Currently supporting 835, 999, 270, 271, 276, 277, 837, 278, 820, and 834 formats.");
         }
     }
 }

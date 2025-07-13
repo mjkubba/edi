@@ -9,6 +9,7 @@ pub mod edi277;
 pub mod edi837;
 pub mod edi278;
 pub mod edi820;
+pub mod edi834;
 pub mod error;
 pub mod transaction_processor;
 pub mod segment_config;
@@ -27,6 +28,7 @@ pub use edi276::controller::Edi276;
 pub use edi277::controller::Edi277;
 pub use edi837::controller::{Edi837P, Edi837I, Edi837D};
 pub use edi278::controller::Edi278;
+pub use edi834::controller::Edi834;
 
 // Re-export transaction set functions
 pub use edi835::controller::{get_835, write_835};
@@ -37,3 +39,4 @@ pub use edi276::controller::{get_276, write_276};
 pub use edi277::controller::{get_277, write_277};
 pub use edi837::controller::{get_837p, write_837p, get_837i, write_837i, get_837d, write_837d};
 pub use edi278::controller::{get_278, write_278};
+pub use edi834::controller::{get_834, write_834};

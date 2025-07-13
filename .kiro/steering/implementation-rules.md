@@ -71,5 +71,5 @@ Replace Node.js Lambda function with Go implementation to reduce cold
 start times. The new implementation supports forwarding to multiple SQS
 queues and maintains the same functionality as the original.
 
-🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
+🤖 Assisted by [Kiro](https://kiro.dev)
 ```
