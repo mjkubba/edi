@@ -1,9 +1,13 @@
-## Rust Best Practices
+---
+inclusion: always
+---
 
-when you implement new code, keep the current structure, mimic what was already created, don't create a new stucture.
-make sure the changes to an existing code or file will not impact the existing functionality and keep the code backward compatible 
+# Rust Implementation Rules
 
-### File Operations
+When you implement new code, keep the current structure, mimic what was already created, don't create a new structure.
+Make sure the changes to an existing code or file will not impact the existing functionality and keep the code backward compatible.
+
+## File Operations
 
 When working with file operations in Rust:
 
@@ -12,11 +16,11 @@ When working with file operations in Rust:
 3. Use `serde_json::to_string_pretty()` + `fs::write()` instead of creating a file and then writing to it with `serde_json::to_writer_pretty()`
 4. Keep imports organized by functionality (e.g., group path-related imports together)
 
-## Git
+## Git Best Practices
 
 ### Committing Changes
 
-Follow the git best practice of committing early and often. Run `git commit` often, but DO NOT ever run `git push`
+Follow the git best practice of committing early and often. Run `git commit` often, but DO NOT ever run `git push`.
 
 BEFORE committing a change, ALWAYS do the following steps:
 
@@ -27,7 +31,7 @@ BEFORE committing a change, ALWAYS do the following steps:
 
 ### Commit Messages
 
-All commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/) specification and include best practices:
+All commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
 ```
 <type>[optional scope]: <description>
@@ -69,7 +73,3 @@ queues and maintains the same functionality as the original.
 
 🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
 ```
-
-
-## Do not change hte rules dir.
-You can create files in the .amazonq but do not create any new or change the .amazonq/rules dir.
