@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Auto Commit Staged Files",
+  "description": "Automatically creates a commit message for staged files and runs the git commit command",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "**/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Generate a conventional commit message for the currently staged files in git and then run the git commit command. Follow the Conventional Commits specification with format: <type>[optional scope]: <description>. Use types like feat, fix, docs, style, refactor, perf, test, chore, ci. Keep the subject line under 50 characters, use imperative mood, and add \"🤖 Assisted by Kiro\" at the end. After generating the message, execute the git commit with that message."
+  }
+}
