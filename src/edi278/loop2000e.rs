@@ -141,6 +141,7 @@ mod tests {
                 }
             ],
             um_segments: Some(UM {
+                um00_request_category_code_prefix: "".to_string(),
                 um01_request_category_code: "AR".to_string(),
                 um02_certification_type_code: "I".to_string(),
                 um03_service_type_code: "2".to_string(),

@@ -112,8 +112,8 @@ mod tests {
         
         assert_eq!(loop2100e.dtp_segments.len(), 1);
         assert_eq!(loop2100e.dtp_segments[0].dtp01_date_time_qualifier, "435");
-        assert_eq!(loop2100e.dtp_segments[0].dtp02_date_time_period_format_qualifier, "D8");
-        assert_eq!(loop2100e.dtp_segments[0].dtp03_date_time_period, "20050516");
+        assert_eq!(loop2100e.dtp_segments[0].dtp02_date_time_format_qualifier, "D8");
+        assert_eq!(loop2100e.dtp_segments[0].dtp03_date_time_value, "20050516");
         
         assert!(loop2100e.hi_segments.is_some());
         let hi = loop2100e.hi_segments.unwrap();
@@ -138,8 +138,8 @@ mod tests {
             dtp_segments: vec![
                 DTP {
                     dtp01_date_time_qualifier: "435".to_string(),
-                    dtp02_date_time_period_format_qualifier: "D8".to_string(),
-                    dtp03_date_time_period: "20050516".to_string(),
+                    dtp02_date_time_format_qualifier: "D8".to_string(),
+                    dtp03_date_time_value: "20050516".to_string(),
                 }
             ],
             hi_segments: Some(HI {
@@ -159,11 +159,11 @@ mod tests {
             hsd_segments: Some(HSD {
                 hsd01_quantity_qualifier: "DY".to_string(),
                 hsd02_quantity: "7".to_string(),
-                hsd03_unit_or_basis_for_measurement_code: "".to_string(),
+                hsd03_unit_of_measure_code: "".to_string(),
                 hsd04_sample_selection_modulus: "".to_string(),
                 hsd05_time_period_qualifier: "".to_string(),
                 hsd06_period_count: "".to_string(),
-                hsd07_delivery_pattern_time_code: "".to_string(),
+                hsd07_delivery_frequency_code: "".to_string(),
                 hsd08_delivery_pattern_time_code: "".to_string(),
             }),
             cl1_segments: Some(CL1 {

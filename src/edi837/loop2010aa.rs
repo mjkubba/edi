@@ -107,7 +107,7 @@ mod tests {
     fn test_parse_loop2010aa() {
         let content = "NM1*85*2*ACME MEDICAL GROUP****XX*1234567890\nN3*100 MAIN STREET\nN4*ANYTOWN*AL*35242\nREF*EI*123456789\nPER*IC*JANE SMITH*TE*5551234567";
         
-        let loop2010aa = parse_loop2010aa(content);
+        let (loop2010aa, _remaining) = parse_loop2010aa(content);
         
         assert_eq!(loop2010aa.nm1, "NM1*85*2*ACME MEDICAL GROUP****XX*1234567890");
         assert_eq!(loop2010aa.n3, "N3*100 MAIN STREET");

@@ -196,7 +196,7 @@ mod tests {
     fn test_parse_loop2000b() {
         let content = "HL*2*1*22*0\nSBR*P*18*******MC\nNM1*IL*1*DOE*JOHN****MI*123456789A\nN3*123 MAIN ST\nN4*ANYTOWN*PA*17111\nREF*SY*123456789\nDTP*307*D8*20230101";
         
-        let loop2000b = parse_loop2000b(content);
+        let (loop2000b, _remaining) = parse_loop2000b(content);
         
         assert_eq!(loop2000b.hl, "HL*2*1*22*0");
         assert_eq!(loop2000b.sbr, "SBR*P*18*******MC");

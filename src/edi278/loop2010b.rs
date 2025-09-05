@@ -89,7 +89,7 @@ mod tests {
         assert_eq!(loop2010b.nm1_segments.entity_id, "1P");
         assert_eq!(loop2010b.nm1_segments.entity_type, "2");
         assert_eq!(loop2010b.nm1_segments.lastname, "BONE AND JOINT CLINIC");
-        assert_eq!(loop2010b.nm1_segments.id_code_qualifier, "SV");
+        assert_eq!(loop2010b.nm1_segments.id_code, "SV");
         assert_eq!(loop2010b.nm1_segments.id_code, "2000035");
         
         assert_eq!(loop2010b.ref_segments.len(), 1);
@@ -118,8 +118,6 @@ mod tests {
                 REF {
                     reference_id_number_qualifier: "XZ".to_string(),
                     reference_id_number: "7654321".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
                 }
             ],
         };

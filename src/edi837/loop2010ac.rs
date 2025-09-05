@@ -100,7 +100,7 @@ mod tests {
     fn test_parse_loop2010ac() {
         let content = "NM1*PE*2*INSURANCE COMPANY****PI*12345\nN3*300 MAIN STREET\nN4*ANYTOWN*AL*35242\nREF*2U*123456789";
         
-        let loop2010ac = parse_loop2010ac(content);
+        let (loop2010ac, _remaining) = parse_loop2010ac(content);
         
         assert_eq!(loop2010ac.nm1, "NM1*PE*2*INSURANCE COMPANY****PI*12345");
         assert_eq!(loop2010ac.n3, Some("N3*300 MAIN STREET".to_string()));

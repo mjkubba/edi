@@ -213,7 +213,7 @@ mod tests {
     fn test_parse_loop2400_professional() {
         let content = "LX*1\nSV1*HC:99213*85*UN*1***1\nDTP*472*D8*20230115\nREF*6R*12345\nAMT*AAE*85\nQTY*NE*1";
         
-        let loop2400 = parse_loop2400(content);
+        let (loop2400, _remaining) = parse_loop2400(content);
         
         assert_eq!(loop2400.lx, "LX*1");
         assert_eq!(loop2400.sv1, Some("SV1*HC:99213*85*UN*1***1".to_string()));
@@ -227,7 +227,7 @@ mod tests {
     fn test_parse_loop2400_institutional() {
         let content = "LX*1\nSV2*0450*HC:99283*150*UN*1\nDTP*472*D8*20230115\nREF*6R*12345";
         
-        let loop2400 = parse_loop2400(content);
+        let (loop2400, _remaining) = parse_loop2400(content);
         
         assert_eq!(loop2400.lx, "LX*1");
         assert_eq!(loop2400.sv2, Some("SV2*0450*HC:99283*150*UN*1".to_string()));
@@ -239,7 +239,7 @@ mod tests {
     fn test_parse_loop2400_dental() {
         let content = "LX*1\nSV3*AD:D2150*85*UN*1*2\nDTP*472*D8*20230115\nREF*6R*12345\nNTE*ADD*COMPOSITE FILLING";
         
-        let loop2400 = parse_loop2400(content);
+        let (loop2400, _remaining) = parse_loop2400(content);
         
         assert_eq!(loop2400.lx, "LX*1");
         assert_eq!(loop2400.sv3, Some("SV3*AD:D2150*85*UN*1*2".to_string()));

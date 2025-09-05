@@ -444,7 +444,7 @@ IEA*1*000000001~";
         assert_eq!(loop2010c.nm1_segments.lastname, "DOE");
         assert_eq!(loop2010c.nm1_segments.firstname, "JOHN");
         assert!(loop2010c.dmg_segments.is_some());
-        assert_eq!(loop2010c.dmg_segments.as_ref().unwrap().gender_code, "M");
+        assert_eq!(loop2010c.dmg_segments.as_ref().unwrap().dmg03_gender_code, "M");
         
         // Check Loop 2000D
         assert!(edi278.loop2000d.is_some());
@@ -457,7 +457,7 @@ IEA*1*000000001~";
         assert_eq!(loop2010d.nm1_segments.lastname, "DOE");
         assert_eq!(loop2010d.nm1_segments.firstname, "JANE");
         assert!(loop2010d.dmg_segments.is_some());
-        assert_eq!(loop2010d.dmg_segments.as_ref().unwrap().gender_code, "F");
+        assert_eq!(loop2010d.dmg_segments.as_ref().unwrap().dmg03_gender_code, "F");
         
         // Check Loop 2000E
         assert!(edi278.loop2000e.is_some());
@@ -482,7 +482,7 @@ IEA*1*000000001~";
         assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
         assert_eq!(loop2110e.nm1_segments.firstname, "JOHN");
         assert!(loop2110e.prv_segments.is_some());
-        assert_eq!(loop2110e.prv_segments.as_ref().unwrap().provider_code, "PE");
+        assert_eq!(loop2110e.prv_segments.as_ref().unwrap().prv01_provider_code, "PE");
         
         // Check Loop 2000F
         assert!(edi278.loop2000f.is_some());
@@ -495,7 +495,7 @@ IEA*1*000000001~";
         assert_eq!(loop2010f.nm1_segments.entity_id, "1P");
         assert_eq!(loop2010f.nm1_segments.lastname, "PROVIDER GROUP");
         assert!(loop2010f.prv_segments.is_some());
-        assert_eq!(loop2010f.prv_segments.as_ref().unwrap().provider_code, "PE");
+        assert_eq!(loop2010f.prv_segments.as_ref().unwrap().prv01_provider_code, "PE");
         
         // Check Loop 2100F
         assert!(edi278.loop2100f.is_some());

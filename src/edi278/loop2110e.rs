@@ -134,8 +134,8 @@ mod tests {
         assert_eq!(loop2110e.nm1_segments.entity_type, "1");
         assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
         assert_eq!(loop2110e.nm1_segments.firstname, "JOHN");
-        assert_eq!(loop2110e.nm1_segments.id_code_qualifier, "XX");
-        assert_eq!(loop2110e.nm1_segments.id_code, "1234567890");
+        assert_eq!(loop2110e.nm1_segments.id_code, "XX");
+        assert_eq!(loop2110e.nm1_segments.member_number, "1234567890");
         
         assert_eq!(loop2110e.ref_segments.len(), 1);
         assert_eq!(loop2110e.ref_segments[0].reference_id_number_qualifier, "1J");
@@ -157,18 +157,18 @@ mod tests {
         assert_eq!(loop2110e.nm1_segments.entity_id, "FA");
         assert_eq!(loop2110e.nm1_segments.entity_type, "2");
         assert_eq!(loop2110e.nm1_segments.lastname, "MONTGOMERY HOSPITAL");
-        assert_eq!(loop2110e.nm1_segments.id_code_qualifier, "24");
-        assert_eq!(loop2110e.nm1_segments.id_code, "000012121");
+        assert_eq!(loop2110e.nm1_segments.id_code, "24");
+        assert_eq!(loop2110e.nm1_segments.member_number, "000012121");
         
         assert!(loop2110e.n3_segments.is_some());
         let n3 = loop2110e.n3_segments.unwrap();
-        assert_eq!(n3.address, "475 MAIN STREET");
+        assert_eq!(n3.payee_address, "475 MAIN STREET");
         
         assert!(loop2110e.n4_segments.is_some());
         let n4 = loop2110e.n4_segments.unwrap();
-        assert_eq!(n4.city, "ANYTOWN");
-        assert_eq!(n4.state, "PA");
-        assert_eq!(n4.zip, "19087");
+        assert_eq!(n4.payee_city, "ANYTOWN");
+        assert_eq!(n4.payee_state, "PA");
+        assert_eq!(n4.payee_zip, "19087");
         
         assert_eq!(contents, "");
     }
@@ -184,16 +184,13 @@ mod tests {
                 middle_initial: "A".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
-                id_code_qualifier: "XX".to_string(),
-                id_code: "1234567890".to_string(),
-                member_number: "".to_string(),
+                id_code: "XX".to_string(),
+                member_number: "1234567890".to_string(),
             },
             ref_segments: vec![
                 REF {
                     reference_id_number_qualifier: "1J".to_string(),
                     reference_id_number: "12345".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
                 }
             ],
             n3_segments: None,
@@ -226,23 +223,20 @@ mod tests {
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
-                id_code_qualifier: "24".to_string(),
-                id_code: "000012121".to_string(),
-                member_number: "".to_string(),
+                id_code: "24".to_string(),
+                member_number: "000012121".to_string(),
             },
             ref_segments: vec![],
             n3_segments: Some(N3 {
-                address: "475 MAIN STREET".to_string(),
-                address2: "".to_string(),
+                payee_address: "475 MAIN STREET".to_string(),
+                payee_address2: "".to_string(),
             }),
             n4_segments: Some(N4 {
-                city: "ANYTOWN".to_string(),
-                state: "PA".to_string(),
-                zip: "19087".to_string(),
-                country_code: "".to_string(),
-                country_subdivision_code: "".to_string(),
-                location_qualifier: "".to_string(),
-                location_identifier: "".to_string(),
+                payee_city: "ANYTOWN".to_string(),
+                payee_state: "PA".to_string(),
+                payee_zip: "19087".to_string(),
+                payee_country_code: "".to_string(),
+                payee_country_sub_code: "".to_string(),
             }),
             prv_segments: None,
         };

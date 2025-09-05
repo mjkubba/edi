@@ -2,6 +2,7 @@ use log::info;
 use serde::{Serialize, Deserialize};
 
 use crate::segments::ik3::*;
+use crate::segments::ik4::*;
 use crate::segments::ctx::*;
 use crate::edi999::loop2110::*;
 use crate::helper::edihelper::*;

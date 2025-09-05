@@ -268,7 +268,7 @@ mod tests {
     fn test_parse_loop2300() {
         let content = "CLM*12345*100***11:B:1*Y*A*Y*Y*P\nDTP*434*RD8*20230101-20230131\nHI*BK:J4500*BF:R6889\nREF*D9*12345\nAMT*AU*100\nQTY*CA*1\nPRV*BI*PXC*207RC0000X\nHCP*01*100**1";
         
-        let loop2300 = parse_loop2300(content);
+        let (loop2300, _remaining) = parse_loop2300(content);
         
         assert_eq!(loop2300.clm, "CLM*12345*100***11:B:1*Y*A*Y*Y*P");
         assert_eq!(loop2300.dtp, vec!["DTP*434*RD8*20230101-20230131".to_string()]);
