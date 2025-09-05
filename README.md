@@ -4,6 +4,9 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 
 ## Project Status
 
+> **📊 Current Status**: See [VALIDATION_REPORT.md](./VALIDATION_REPORT.md) for comprehensive testing results and current system validation  
+> **📚 Implementation Details**: See [AmazonQ.md](./AmazonQ.md) for detailed development history and technical architecture
+
 | Transaction Set | Status | Description |
 |----------------|--------|-------------|
 | EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with minor formatting differences in output (missing empty fields in SVC segments) |
@@ -108,7 +111,25 @@ cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
 diff ./demo/edi835-1.edi ./demo/test835-new.edi
 ```
 
+## Documentation
+
+### 📊 [VALIDATION_REPORT.md](./VALIDATION_REPORT.md)
+**Current System Status & Testing Results**
+- Comprehensive validation of all implemented formats
+- Real-time testing results and system health
+- Production readiness assessment
+- Quality assurance methodology and findings
+
+### 📚 [AmazonQ.md](./AmazonQ.md) 
+**Implementation History & Technical Details**
+- Phase-by-phase development process
+- Technical architecture and design decisions
+- Detailed segment and loop structures
+- Development roadmap and next steps
+
 ## Development Roadmap
+
+> **📋 Status**: All items below have been validated through comprehensive testing. See [VALIDATION_REPORT.md](./VALIDATION_REPORT.md) for current results.
 
 ### Completed
 - ✅ Fixed CTX segment implementation in 999 format
