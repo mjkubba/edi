@@ -7,3 +7,4 @@ notes.md
 *.edi
 .amazonq/markdown*
 test_results*
+/local
