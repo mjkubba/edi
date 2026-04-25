@@ -7,6 +7,18 @@ inclusion: always
 When you implement new code, keep the current structure, mimic what was already created, don't create a new structure.
 Make sure the changes to an existing code or file will not impact the existing functionality and keep the code backward compatible.
 
+## EDI Segment Parsing Rules
+
+1. **`get_segment_contents(key, contents)` strips the segment ID prefix** (e.g., `get_segment_contents("NM1", ...)` returns content AFTER `NM1*`). Parsers like `get_nm1`, `get_hl`, `get_prv` expect content WITHOUT the segment ID at index 0. If you extract a segment manually with `find("HL")`, you must strip the prefix (e.g., `&segment[3..]` for `HL*`) before passing to the parser.
+
+2. **The edi837 module stores raw segment strings WITH the `~` terminator** (e.g., `"HL*2*1*22*0~"`). This is by design — the write functions output the stored value directly followed by `\n`. All other modules use parsed structs (NM1, HL, etc.) and the write functions add `~`. Do not mix these patterns.
+
+3. **Loop boundary detection must include ALL segment types that start a new loop or section.** When parsing segments in a loop (e.g., REF, DTP), the boundary check must include not just `HL*` and `NM1*` but also `CLM*`, `LX*`, `SE*`, and any other segment that signals the current loop has ended. Missing boundaries causes the parser to consume segments belonging to the next loop.
+
+4. **Segment parse order must match the expected X12 segment order in the data.** If REF appears before AMT in the EDI data, parse REF before AMT. Using `find()` to locate a segment skips over everything between the current position and the found segment — any unparsed segments in between are lost when `remaining_content` advances.
+
+5. **Use `count_segment_starts()` and `find_next_segment_start()` from edihelper** when counting or finding segments. Naive `contents.matches("IK3").count()` can match segment IDs inside other segment data values (e.g., "IK3" inside a CTX value), causing infinite loops or incorrect splitting.
+
 ## File Operations
 
 When working with file operations in Rust:
@@ -40,7 +52,7 @@ All commit messages should follow the [Conventional Commits](https://www.convent
 
 [optional footer(s)]
 
-🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
+🤖 Assisted by [Kiro](https://kiro.dev)
 ```
 
 Types:
