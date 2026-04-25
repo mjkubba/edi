@@ -1,9 +1,8 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
-
+use serde::{Deserialize, Serialize};
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct MOA {
     pub moa01_reimbursement_rate: String,
@@ -17,19 +16,17 @@ pub struct MOA {
     pub moa09_nonpayable_professional_component_amount: String,
 }
 
-
-
 pub fn get_moa(moa_content: String) -> MOA {
     let moa_parts: Vec<&str> = moa_content.split("*").collect();
-    let mut moa01_reimbursement_rate: String ="".to_string();
-    let mut moa02_claim_hcpcs_payable_amount: String ="".to_string();
-    let mut moa03_claim_payment_remark_code: String ="".to_string();
-    let mut moa04_claim_payment_remark_code: String ="".to_string();
-    let mut moa05_claim_payment_remark_code: String ="".to_string();
-    let mut moa06_claim_payment_remark_code: String ="".to_string();
-    let mut moa07_claim_payment_remark_code: String ="".to_string();
-    let mut moa08_claim_esrd_payment_amount: String ="".to_string();
-    let mut moa09_nonpayable_professional_component_amount: String ="".to_string();
+    let mut moa01_reimbursement_rate: String = "".to_string();
+    let mut moa02_claim_hcpcs_payable_amount: String = "".to_string();
+    let mut moa03_claim_payment_remark_code: String = "".to_string();
+    let mut moa04_claim_payment_remark_code: String = "".to_string();
+    let mut moa05_claim_payment_remark_code: String = "".to_string();
+    let mut moa06_claim_payment_remark_code: String = "".to_string();
+    let mut moa07_claim_payment_remark_code: String = "".to_string();
+    let mut moa08_claim_esrd_payment_amount: String = "".to_string();
+    let mut moa09_nonpayable_professional_component_amount: String = "".to_string();
 
     if moa_parts.get(0).is_some() {
         moa01_reimbursement_rate = moa_parts[0].to_string();
@@ -71,7 +68,7 @@ pub fn get_moa(moa_content: String) -> MOA {
     }
 }
 
-pub fn write_moa(moa:MOA) -> String {
+pub fn write_moa(moa: MOA) -> String {
     if moa.moa01_reimbursement_rate.is_empty() {
         return String::new();
     }
@@ -85,14 +82,14 @@ pub fn write_moa(moa:MOA) -> String {
     moa_content.push_str(&stiuational_element(moa.moa06_claim_payment_remark_code));
     moa_content.push_str(&stiuational_element(moa.moa07_claim_payment_remark_code));
     moa_content.push_str(&stiuational_element(moa.moa08_claim_esrd_payment_amount));
-    moa_content.push_str(&stiuational_element(moa.moa09_nonpayable_professional_component_amount));
+    moa_content.push_str(&stiuational_element(
+        moa.moa09_nonpayable_professional_component_amount,
+    ));
     moa_content.push_str("~");
     moa_content
-
 }
 
 // unit test
-
 
 #[cfg(test)]
 
@@ -113,7 +110,3 @@ mod tests {
         assert_eq!(moa.moa09_nonpayable_professional_component_amount, "1");
     }
 }
-
-
-
-

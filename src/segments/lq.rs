@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct LQ {
     pub lq01_code_list_qualifier: String,
@@ -15,7 +15,7 @@ pub fn get_lq(lq_content: String) -> LQ {
     }
 }
 
-pub fn write_lq(lq:LQ) -> String {
+pub fn write_lq(lq: LQ) -> String {
     let mut lq_content: String = String::new();
     lq_content.push_str("LQ*");
     lq_content.push_str(&lq.lq01_code_list_qualifier);
@@ -26,7 +26,6 @@ pub fn write_lq(lq:LQ) -> String {
 }
 
 // unit test
-
 
 #[cfg(test)]
 

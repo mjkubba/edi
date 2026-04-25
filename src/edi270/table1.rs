@@ -1,10 +1,10 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::st::*;
-use crate::segments::bht::*;
+use crate::error::{EdiError, EdiResult};
 use crate::helper::edihelper::*;
-use crate::error::{EdiResult, EdiError};
+use crate::segments::bht::*;
+use crate::segments::st::*;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Table1 {
@@ -14,7 +14,7 @@ pub struct Table1 {
 
 pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     let mut table1 = Table1::default();
-    
+
     // Process ST segment (required)
     if contents.contains("ST") {
         info!("ST segment found");
@@ -28,7 +28,7 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     } else {
         return Err(EdiError::MissingSegment("ST".to_string()));
     }
-    
+
     // Process BHT segment (required)
     if contents.contains("BHT") {
         info!("BHT segment found");
@@ -42,48 +42,55 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
     } else {
         return Err(EdiError::MissingSegment("BHT".to_string()));
     }
-    
+
     info!("Table 1 parsed");
     Ok((table1, contents))
 }
 
 pub fn write_table1(table1: &Table1) -> String {
     let mut contents = String::new();
-    
+
     // Write ST segment
     contents.push_str(&write_st(table1.st_segments.clone()));
-    
+
     // Write BHT segment
     contents.push_str(&write_bht(table1.bht_segments.clone()));
-    
+
     contents
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_table1() -> EdiResult<()> {
-        let contents = "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~".to_string();
+        let contents =
+            "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~".to_string();
         let (table1, remaining) = get_table1(contents)?;
-        
+
         assert_eq!(table1.st_segments.transaction_set_id, "270");
         assert_eq!(table1.st_segments.transaction_set_control_number, "1234");
         assert_eq!(table1.st_segments.implementation_conven_ref, "005010X279A1");
-        
-        assert_eq!(table1.bht_segments.bht01_hierarchical_structure_code, "0022");
+
+        assert_eq!(
+            table1.bht_segments.bht01_hierarchical_structure_code,
+            "0022"
+        );
         assert_eq!(table1.bht_segments.bht02_transaction_set_purpose_code, "13");
-        assert_eq!(table1.bht_segments.bht03_reference_identification, "10001234");
+        assert_eq!(
+            table1.bht_segments.bht03_reference_identification,
+            "10001234"
+        );
         assert_eq!(table1.bht_segments.bht04_date, "20060501");
         assert_eq!(table1.bht_segments.bht05_time, "1319");
         assert_eq!(table1.bht_segments.bht06_transaction_type_code, "00");
-        
+
         assert_eq!(remaining, "");
-        
+
         Ok(())
     }
-    
+
     #[test]
     fn test_write_table1() -> EdiResult<()> {
         let table1 = Table1 {
@@ -101,10 +108,13 @@ mod tests {
                 bht06_transaction_type_code: "00".to_string(),
             },
         };
-        
+
         let contents = write_table1(&table1);
-        assert_eq!(contents, "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~");
-        
+        assert_eq!(
+            contents,
+            "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~"
+        );
+
         Ok(())
     }
 }

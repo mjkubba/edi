@@ -1,21 +1,20 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::clp::*;
+use crate::edi835::loop2110::*;
+use crate::helper::edihelper::*;
+use crate::segments::amt::*;
 use crate::segments::cas::*;
-use crate::segments::nm1::*;
+use crate::segments::clp::*;
+use crate::segments::dtm::*;
 use crate::segments::mia::*;
 use crate::segments::moa::*;
-use crate::segments::r#ref::*;
-use crate::segments::dtm::*;
+use crate::segments::nm1::*;
 use crate::segments::per::*;
-use crate::segments::amt::*;
 use crate::segments::qty::*;
-use crate::helper::edihelper::*;
-use crate::edi835::loop2110::*;
+use crate::segments::r#ref::*;
 
-
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2100s {
     pub clp_segments: CLP,
     pub cas_segments: Vec<CAS>,
@@ -39,10 +38,30 @@ pub struct Loop2100s {
     pub loop2110s: Vec<Loop2110s>,
 }
 
-
-
-
-pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1, NM1, NM1, NM1, MIA, MOA, Vec<REF>, Vec<REF>, Vec<DTM>, DTM, DTM, Vec<PER>, Vec<AMT>, Vec<QTY>, String) {
+pub fn get_loop_2100(
+    mut contents: String,
+) -> (
+    CLP,
+    Vec<CAS>,
+    NM1,
+    NM1,
+    NM1,
+    NM1,
+    NM1,
+    NM1,
+    NM1,
+    MIA,
+    MOA,
+    Vec<REF>,
+    Vec<REF>,
+    Vec<DTM>,
+    DTM,
+    DTM,
+    Vec<PER>,
+    Vec<AMT>,
+    Vec<QTY>,
+    String,
+) {
     // Loop 2100 Claim Payment Information (>1)
     // R: required
     // S: optional (situational)
@@ -92,9 +111,8 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         info!("CLP segment found, ");
         clp_segments = get_clp(get_segment_contents("CLP", &contents));
         info!("CLP segment parsed");
-        contents = content_trim("CLP",contents);
+        contents = content_trim("CLP", contents);
     }
-
 
     if contents.contains("CAS") {
         let cas_count = contents.matches("CAS").count();
@@ -104,8 +122,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
                 info!("CAS segment found, ");
                 cas_segments.push(cas_tmp);
                 info!("CAS segment parsed");
-                contents = content_trim("CAS",contents);
-
+                contents = content_trim("CAS", contents);
             }
         }
     }
@@ -114,79 +131,85 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         info!("NM1 segment found, ");
         nm1_patint_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_insured_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_corrected_patient_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
-    } 
+        contents = content_trim("NM1", contents);
+    }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_service_provider_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_crossover_carrier_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_corrected_priority_payer_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("NM1") {
         info!("NM1 segment found, ");
         nm1_other_subscriber_segments = get_nm1(get_segment_contents("NM1", &contents));
         info!("NM1 segment parsed");
-        contents = content_trim("NM1",contents);
+        contents = content_trim("NM1", contents);
     }
     if contents.contains("MIA") {
         info!("MIA segment found, ");
         mia_segments = get_mia(get_segment_contents("MIA", &contents));
         info!("MIA segment parsed");
-        contents = content_trim("MIA",contents);
+        contents = content_trim("MIA", contents);
     }
     if contents.contains("MOA") {
         info!("MOA segment found, ");
         moa_segments = get_moa(get_segment_contents("MOA", &contents));
         info!("MOA segment parsed");
-        contents = content_trim("MOA",contents);
+        contents = content_trim("MOA", contents);
     }
     if contents.contains("REF") {
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
-            if check_for_expected_codes("1L,1W,28,6P,9A,9C,BB,CE,EA,F8,G1,G3,IG,SY", ref_tmp.reference_id_number_qualifier.clone()) {
+            if check_for_expected_codes(
+                "1L,1W,28,6P,9A,9C,BB,CE,EA,F8,G1,G3,IG,SY",
+                ref_tmp.reference_id_number_qualifier.clone(),
+            ) {
                 info!("REF segment found, ");
                 ref_other_claim_segments.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF",contents);
+                contents = content_trim("REF", contents);
             }
         }
     }
 
-
     if contents.contains("REF") {
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
-            if check_for_expected_codes("0B,1A,1B,1C,1D,1G,1H,,1J,D3,G2,LU", ref_tmp.reference_id_number_qualifier.clone()) {
+            if check_for_expected_codes(
+                "0B,1A,1B,1C,1D,1G,1H,,1J,D3,G2,LU",
+                ref_tmp.reference_id_number_qualifier.clone(),
+            ) {
                 info!("REF segment found, ");
-                ref_rendering_provider_segments.push(get_ref(get_segment_contents("REF", &contents)));
+                ref_rendering_provider_segments
+                    .push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF",contents);
+                contents = content_trim("REF", contents);
             }
         }
     }
@@ -200,7 +223,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
                 info!("DTM segment found, and in the correct loop");
                 dtm_statement_from_segments.push(dtm_tmp);
                 info!("DTM segment parsed");
-                contents = content_trim("DTM",contents);
+                contents = content_trim("DTM", contents);
             }
         }
     }
@@ -211,7 +234,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         if check_for_expected_codes("036", dtm_tmp.date_time_qualifier.clone()) {
             dtm_coverage_expiration_segments = dtm_tmp;
             info!("DTM segment parsed");
-            contents = content_trim("DTM",contents);
+            contents = content_trim("DTM", contents);
         }
     }
     if contents.contains("DTM") {
@@ -219,8 +242,8 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
         if check_for_expected_codes("050", dtm_tmp.date_time_qualifier.clone()) {
             dtm_claim_received_segments = dtm_tmp;
-             info!("DTM segment parsed");
-             contents = content_trim("DTM",contents);
+            info!("DTM segment parsed");
+            contents = content_trim("DTM", contents);
         }
     }
     if contents.contains("PER") {
@@ -230,7 +253,7 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
             info!("PER segment found, ");
             per_segments.push(per_tmp);
             info!("PER segment parsed");
-            contents = content_trim("PER",contents);
+            contents = content_trim("PER", contents);
         }
     }
 
@@ -238,11 +261,14 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         let amt_count = contents.matches("AMT").count();
         for _ in 0..amt_count {
             let amt_tmp = get_amt(get_segment_contents("AMT", &contents));
-            if check_for_expected_codes("AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO", amt_tmp.amt01_amount_qualifier_code.clone()) {
+            if check_for_expected_codes(
+                "AU,D8,DY,F5,NLI,T,T2,ZK,ZL,ZM,ZN,ZO",
+                amt_tmp.amt01_amount_qualifier_code.clone(),
+            ) {
                 info!("AMT segment found, ");
                 amt_segments.push(amt_tmp);
                 info!("AMT segment parsed");
-                contents = content_trim("AMT",contents);
+                contents = content_trim("AMT", contents);
             }
         }
     }
@@ -251,42 +277,99 @@ pub fn get_loop_2100(mut contents:String) -> (CLP, Vec<CAS>, NM1, NM1, NM1, NM1,
         let qty_count = contents.matches("QTY").count();
         for _ in 0..qty_count {
             let qty = get_qty(get_segment_contents("QTY", &contents));
-            if check_for_expected_codes("CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO", qty.qty01_quantity_qualifier.clone()) {
+            if check_for_expected_codes(
+                "CA,CD,LA,LE,NE,NR,OU,PS,VS,ZK,ZL,ZM,ZN,ZO",
+                qty.qty01_quantity_qualifier.clone(),
+            ) {
                 info!("QTY segment found, ");
                 qty_segments.push(qty);
                 info!("QTY segment parsed");
-                contents = content_trim("QTY",contents);
+                contents = content_trim("QTY", contents);
             }
         }
     }
 
     info!("Loop 2100 parsed\n");
 
-    return (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments,
-            nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, 
-            per_segments, amt_segments, qty_segments, contents)
-
+    return (
+        clp_segments,
+        cas_segments,
+        nm1_patint_segments,
+        nm1_insured_segments,
+        nm1_corrected_patient_segments,
+        nm1_service_provider_segments,
+        nm1_crossover_carrier_segments,
+        nm1_corrected_priority_payer_segments,
+        nm1_other_subscriber_segments,
+        mia_segments,
+        moa_segments,
+        ref_other_claim_segments,
+        ref_rendering_provider_segments,
+        dtm_statement_from_segments,
+        dtm_coverage_expiration_segments,
+        dtm_claim_received_segments,
+        per_segments,
+        amt_segments,
+        qty_segments,
+        contents,
+    );
 }
 
-pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
-    let clp_count= contents.matches("CLP").count();
+pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100s>, String) {
+    let clp_count = contents.matches("CLP").count();
     let mut loop_2100_array = vec![];
-    info!("Number of loops in loop 2100: {:?}",clp_count);
+    info!("Number of loops in loop 2100: {:?}", clp_count);
     for _ in 0..clp_count {
-        let (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, 
-            nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments, nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, 
-            ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, per_segments, 
-            amt_segments, qty_segments, loop2110s, rem_contents, inner_rem_contents);
-        
+        let (
+            clp_segments,
+            cas_segments,
+            nm1_patint_segments,
+            nm1_insured_segments,
+            nm1_corrected_patient_segments,
+            nm1_service_provider_segments,
+            nm1_crossover_carrier_segments,
+            nm1_corrected_priority_payer_segments,
+            nm1_other_subscriber_segments,
+            mia_segments,
+            moa_segments,
+            ref_other_claim_segments,
+            ref_rendering_provider_segments,
+            dtm_statement_from_segments,
+            dtm_coverage_expiration_segments,
+            dtm_claim_received_segments,
+            per_segments,
+            amt_segments,
+            qty_segments,
+            loop2110s,
+            rem_contents,
+            inner_rem_contents,
+        );
+
         let tmp_contents = get_table2(contents.clone());
 
-        (clp_segments, cas_segments, nm1_patint_segments, nm1_insured_segments, nm1_corrected_patient_segments, nm1_service_provider_segments, nm1_crossover_carrier_segments, nm1_corrected_priority_payer_segments,
-        nm1_other_subscriber_segments, mia_segments, moa_segments, ref_other_claim_segments, ref_rendering_provider_segments, dtm_statement_from_segments, dtm_coverage_expiration_segments, dtm_claim_received_segments, 
-        per_segments, amt_segments, qty_segments, rem_contents) = get_loop_2100(tmp_contents.clone());
-        
+        (
+            clp_segments,
+            cas_segments,
+            nm1_patint_segments,
+            nm1_insured_segments,
+            nm1_corrected_patient_segments,
+            nm1_service_provider_segments,
+            nm1_crossover_carrier_segments,
+            nm1_corrected_priority_payer_segments,
+            nm1_other_subscriber_segments,
+            mia_segments,
+            moa_segments,
+            ref_other_claim_segments,
+            ref_rendering_provider_segments,
+            dtm_statement_from_segments,
+            dtm_coverage_expiration_segments,
+            dtm_claim_received_segments,
+            per_segments,
+            amt_segments,
+            qty_segments,
+            rem_contents,
+        ) = get_loop_2100(tmp_contents.clone());
 
-
-        
         (loop2110s, inner_rem_contents) = get_loop_2110s(rem_contents.clone());
 
         let loop2100 = Loop2100s {
@@ -311,7 +394,7 @@ pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
             qty_segments,
             loop2110s,
         };
-        contents = contents.replacen(&tmp_contents, "",1);
+        contents = contents.replacen(&tmp_contents, "", 1);
         contents.push_str(&inner_rem_contents);
         loop_2100_array.push(loop2100);
     }
@@ -319,7 +402,7 @@ pub fn get_loop_2100s(mut contents:String) -> (Vec<Loop2100s>, String) {
     (loop_2100_array, contents)
 }
 
-pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
+pub fn write_loop2100(loop2100: Vec<Loop2100s>) -> String {
     let mut contents = String::new();
     for loop2100 in loop2100 {
         contents.push_str(&write_clp(loop2100.clp_segments));
@@ -339,19 +422,21 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
             contents.push_str(&write_ref(loop2100.ref_other_claim_segments[n].clone()));
         }
         for n in 0..loop2100.ref_rendering_provider_segments.len() {
-            contents.push_str(&write_ref(loop2100.ref_rendering_provider_segments[n].clone()));
+            contents.push_str(&write_ref(
+                loop2100.ref_rendering_provider_segments[n].clone(),
+            ));
         }
         for n in 0..loop2100.dtm_statement_from_segments.len() {
             contents.push_str(&write_dtm(loop2100.dtm_statement_from_segments[n].clone()));
         }
         contents.push_str(&write_dtm(loop2100.dtm_coverage_expiration_segments));
         contents.push_str(&write_dtm(loop2100.dtm_claim_received_segments));
-        
+
         // Write AMT segments before PER segments to match original order
         for n in 0..loop2100.amt_segments.len() {
             contents.push_str(&write_amt(loop2100.amt_segments[n].clone()));
         }
-        
+
         // Write PER segments with proper formatting
         for n in 0..loop2100.per_segments.len() {
             // Ensure the BL qualifier is present if missing
@@ -361,7 +446,7 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
             }
             contents.push_str(&write_per(per));
         }
-        
+
         for n in 0..loop2100.qty_segments.len() {
             contents.push_str(&write_qty(loop2100.qty_segments[n].clone()));
         }
@@ -370,25 +455,43 @@ pub fn write_loop2100(loop2100:Vec<Loop2100s>) -> String {
     return contents;
 }
 
-
 // unit tests
 
 #[cfg(test)]
 
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_get_loop_2100() {
         let contents = String::from("CLP*EXAMPLE9*3*500*100**12*05090256390*11*1~NM1*QC*1*TOWNSEND*WILLIAM*P***MI*XXX123456789~NM1*82*2*ACME MEDICAL CENTER*****XX*98765432111~NM1**3*ACME*****XX*98765432111~NM1*11*3*ACME*****XX*91~NM1*21*31*ACME*John****XX*91~DTM*232*20190303~DTM*036*20190304~AMT*AU*500~");
-        let (clp, cas, nm1_patient, nm1_insured, nm1_corrected_patient, nm1_service_provider, nm1_crossover_carrier, nm1_corrected_priority_payer,
-        nm1_other_subscriber, mia, moa, ref_other_claim, ref_rendering_provider, dtm_statement_from, dtm_coverage_expiration, dtm_claim_received,
-        per, amt, qty, contents) = get_loop_2100(contents);
+        let (
+            clp,
+            cas,
+            nm1_patient,
+            nm1_insured,
+            nm1_corrected_patient,
+            nm1_service_provider,
+            nm1_crossover_carrier,
+            nm1_corrected_priority_payer,
+            nm1_other_subscriber,
+            mia,
+            moa,
+            ref_other_claim,
+            ref_rendering_provider,
+            dtm_statement_from,
+            dtm_coverage_expiration,
+            dtm_claim_received,
+            per,
+            amt,
+            qty,
+            contents,
+        ) = get_loop_2100(contents);
         assert_eq!(clp.clp03_total_claim_charge_amount, "500");
         assert_eq!(cas, vec![]);
         assert_eq!(nm1_patient.lastname, "TOWNSEND");
         assert_eq!(nm1_insured.entity_id, "82");
-        assert_eq!(nm1_corrected_patient.member_number, "98765432111");
+        assert_eq!(nm1_corrected_patient.id_code, "98765432111");
         assert_eq!(nm1_service_provider.entity_type, "3");
         assert_eq!(nm1_crossover_carrier.firstname, "John");
         assert_eq!(nm1_corrected_priority_payer, NM1::default());
@@ -404,6 +507,5 @@ mod tests {
         assert_eq!(amt[0].amt01_amount_qualifier_code, "AU");
         assert_eq!(qty, vec![]);
         assert_eq!(contents, "");
-
     }
 }

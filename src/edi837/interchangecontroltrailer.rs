@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// IEA - Interchange Control Trailer
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -27,11 +27,11 @@ pub struct TransactionSetTrailer {
 /// Parse IEA segment
 pub fn parse_iea(segment: &str) -> Result<InterchangeTrailer, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 3 {
         return Err(format!("Invalid IEA segment: {}", segment));
     }
-    
+
     Ok(InterchangeTrailer {
         segment_id: fields[0].to_string(),
         number_of_included_functional_groups: fields[1].to_string(),
@@ -43,20 +43,18 @@ pub fn parse_iea(segment: &str) -> Result<InterchangeTrailer, String> {
 pub fn write_iea(iea: &InterchangeTrailer) -> String {
     format!(
         "{}*{}*{}",
-        iea.segment_id,
-        iea.number_of_included_functional_groups,
-        iea.interchange_control_number
+        iea.segment_id, iea.number_of_included_functional_groups, iea.interchange_control_number
     )
 }
 
 /// Parse GE segment
 pub fn parse_ge(segment: &str) -> Result<FunctionalGroupTrailer, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 3 {
         return Err(format!("Invalid GE segment: {}", segment));
     }
-    
+
     Ok(FunctionalGroupTrailer {
         segment_id: fields[0].to_string(),
         number_of_transaction_sets_included: fields[1].to_string(),
@@ -68,20 +66,18 @@ pub fn parse_ge(segment: &str) -> Result<FunctionalGroupTrailer, String> {
 pub fn write_ge(ge: &FunctionalGroupTrailer) -> String {
     format!(
         "{}*{}*{}",
-        ge.segment_id,
-        ge.number_of_transaction_sets_included,
-        ge.group_control_number
+        ge.segment_id, ge.number_of_transaction_sets_included, ge.group_control_number
     )
 }
 
 /// Parse SE segment
 pub fn parse_se(segment: &str) -> Result<TransactionSetTrailer, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 3 {
         return Err(format!("Invalid SE segment: {}", segment));
     }
-    
+
     Ok(TransactionSetTrailer {
         segment_id: fields[0].to_string(),
         number_of_included_segments: fields[1].to_string(),
@@ -93,8 +89,6 @@ pub fn parse_se(segment: &str) -> Result<TransactionSetTrailer, String> {
 pub fn write_se(se: &TransactionSetTrailer) -> String {
     format!(
         "{}*{}*{}",
-        se.segment_id,
-        se.number_of_included_segments,
-        se.transaction_set_control_number
+        se.segment_id, se.number_of_included_segments, se.transaction_set_control_number
     )
 }

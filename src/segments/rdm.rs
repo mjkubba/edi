@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct RDM {
     pub rdm01_report_transmission_code: String,
@@ -8,14 +8,14 @@ pub struct RDM {
     pub rdm03_communication_number: String,
 }
 
-// both rdm02 and 03 are optional, 
+// both rdm02 and 03 are optional,
 // 2 is needed when rdm01 is BM
 // 3 is needed when rdm01 is EM,FT or OL
 
 pub fn get_rdm(rdm_content: String) -> RDM {
     let rdm_parts: Vec<&str> = rdm_content.split("*").collect();
-    let mut rdm02_name: String ="".to_string();
-    let mut rdm03_communication_number: String ="".to_string();
+    let mut rdm02_name: String = "".to_string();
+    let mut rdm03_communication_number: String = "".to_string();
 
     if rdm_parts.get(1).is_some() {
         rdm02_name = rdm_parts[1].to_string();
@@ -30,14 +30,14 @@ pub fn get_rdm(rdm_content: String) -> RDM {
     }
 }
 
-pub fn write_rdm(rdm:RDM) -> String {
+pub fn write_rdm(rdm: RDM) -> String {
     if rdm.rdm01_report_transmission_code.is_empty() {
         return String::new();
     }
     let mut rdm_content: String = String::new();
     rdm_content.push_str("RDM*");
     rdm_content.push_str(&rdm.rdm01_report_transmission_code);
-    
+
     // Add name if present or if communication number is present
     if !rdm.rdm02_name.is_empty() {
         rdm_content.push_str("*");
@@ -45,13 +45,13 @@ pub fn write_rdm(rdm:RDM) -> String {
     } else if !rdm.rdm03_communication_number.is_empty() {
         rdm_content.push_str("*");
     }
-    
+
     // Add communication number if present
     if !rdm.rdm03_communication_number.is_empty() {
         rdm_content.push_str("*");
         rdm_content.push_str(&rdm.rdm03_communication_number);
     }
-    
+
     rdm_content.push_str("~");
     rdm_content
 }

@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct ST {
     pub transaction_set_id: String,

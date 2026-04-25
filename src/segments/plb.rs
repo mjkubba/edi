@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct PLB {
     pub plb01_provider_identifier: String,
@@ -17,24 +17,21 @@ pub struct PLB {
     pub plb12_provider_adjustment_amount: String,
     pub plb13_provider_adjustment_identifier: String,
     pub plb14_provider_adjustment_amount: String,
-    
 }
-
 
 pub fn get_plb(plb_content: String) -> PLB {
     let plb_parts: Vec<&str> = plb_content.split("*").collect();
 
-    let mut plb05_provider_adjustment_identifier: String ="".to_string();
-    let mut plb06_provider_adjustment_amount: String ="".to_string();
-    let mut plb07_provider_adjustment_identifier: String ="".to_string();
-    let mut plb08_provider_adjustment_amount: String ="".to_string();
-    let mut plb09_provider_adjustment_identifier: String ="".to_string();
-    let mut plb10_provider_adjustment_amount: String ="".to_string();
-    let mut plb11_provider_adjustment_identifier: String ="".to_string();
-    let mut plb12_provider_adjustment_amount: String ="".to_string();
-    let mut plb13_provider_adjustment_identifier: String ="".to_string();
-    let mut plb14_provider_adjustment_amount: String ="".to_string();
-
+    let mut plb05_provider_adjustment_identifier: String = "".to_string();
+    let mut plb06_provider_adjustment_amount: String = "".to_string();
+    let mut plb07_provider_adjustment_identifier: String = "".to_string();
+    let mut plb08_provider_adjustment_amount: String = "".to_string();
+    let mut plb09_provider_adjustment_identifier: String = "".to_string();
+    let mut plb10_provider_adjustment_amount: String = "".to_string();
+    let mut plb11_provider_adjustment_identifier: String = "".to_string();
+    let mut plb12_provider_adjustment_amount: String = "".to_string();
+    let mut plb13_provider_adjustment_identifier: String = "".to_string();
+    let mut plb14_provider_adjustment_amount: String = "".to_string();
 
     if plb_parts.get(4).is_some() {
         plb05_provider_adjustment_identifier = plb_parts[4].to_string();
@@ -67,7 +64,6 @@ pub fn get_plb(plb_content: String) -> PLB {
         plb14_provider_adjustment_amount = plb_parts[13].to_string();
     }
 
-    
     PLB {
         plb01_provider_identifier: plb_parts[0].to_string(),
         plb02_fiscal_period_date: plb_parts[1].to_string(),
@@ -118,11 +114,9 @@ pub fn write_plb(plb: PLB) -> String {
     plb_string.push_str(&plb.plb14_provider_adjustment_amount);
     plb_string.push_str("~");
     plb_string
-    
 }
 
 // unit test
-
 
 #[cfg(test)]
 
@@ -130,7 +124,9 @@ mod tests {
     use super::*;
     #[test]
     fn test_get_plb() {
-        let plb_content = "PLB*202208*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*".to_string();
+        let plb_content =
+            "PLB*202208*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*PLB*0.00*"
+                .to_string();
         let plb = get_plb(plb_content);
         assert_eq!(plb.plb01_provider_identifier, "PLB".to_string());
         assert_eq!(plb.plb02_fiscal_period_date, "202208".to_string());

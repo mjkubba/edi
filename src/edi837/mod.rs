@@ -1,6 +1,6 @@
+pub mod controller;
 pub mod interchangecontrol;
 pub mod interchangecontroltrailer;
-pub mod table1;
 pub mod loop2000a;
 pub mod loop2000b;
 pub mod loop2000c;
@@ -12,6 +12,8 @@ pub mod loop2010bb;
 pub mod loop2010ca;
 pub mod loop2300;
 pub mod loop2400;
-pub mod controller;
+pub mod table1;
 
-pub use controller::{Edi837P, Edi837I, Edi837D, get_837p, write_837p, get_837i, write_837i, get_837d, write_837d};
+pub use controller::{
+    get_837d, get_837i, get_837p, write_837d, write_837i, write_837p, Edi837D, Edi837I, Edi837P,
+};

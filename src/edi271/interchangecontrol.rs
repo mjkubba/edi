@@ -1,11 +1,11 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::isa::*;
-use crate::segments::gs::*;
-use crate::segments::ge::*;
-use crate::segments::iea::*;
 use crate::helper::edihelper::*;
+use crate::segments::ge::*;
+use crate::segments::gs::*;
+use crate::segments::iea::*;
+use crate::segments::isa::*;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeHeader {
@@ -21,7 +21,7 @@ pub struct InterchangeTrailer {
 
 pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
     let mut interchange_header = InterchangeHeader::default();
-    
+
     // Process ISA segment
     if contents.contains("ISA") {
         info!("ISA segment found");
@@ -32,7 +32,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     } else {
         info!("Warning: Required ISA segment not found");
     }
-    
+
     // Process GS segment
     if contents.contains("GS") {
         info!("GS segment found");
@@ -43,14 +43,14 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     } else {
         info!("Warning: Required GS segment not found");
     }
-    
+
     info!("Interchange Control parsed\n    ");
     (interchange_header, contents)
 }
 
 pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, String) {
     let mut interchange_trailer = InterchangeTrailer::default();
-    
+
     // Process GE segment
     if contents.contains("GE") {
         info!("GE segment found");
@@ -61,7 +61,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
     } else {
         info!("Warning: Required GE segment not found");
     }
-    
+
     // Process IEA segment
     if contents.contains("IEA") {
         info!("IEA segment found");
@@ -72,31 +72,31 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
     } else {
         info!("Warning: Required IEA segment not found");
     }
-    
+
     info!("Interchange Control Trailer parsed\n    ");
     (interchange_trailer, contents)
 }
 
 pub fn write_interchange_control(interchange_header: &InterchangeHeader) -> String {
     let mut contents = String::new();
-    
+
     // Write ISA segment
     contents.push_str(&write_isa(interchange_header.isa_segments.clone()));
-    
+
     // Write GS segment
     contents.push_str(&write_gs(interchange_header.gs_segments.clone()));
-    
+
     contents
 }
 
 pub fn write_interchange_trailer(interchange_trailer: &InterchangeTrailer) -> String {
     let mut contents = String::new();
-    
+
     // Write GE segment
     contents.push_str(&write_ge(interchange_trailer.ge_segments.clone()));
-    
+
     // Write IEA segment
     contents.push_str(&write_iea(interchange_trailer.iea_segments.clone()));
-    
+
     contents
 }

@@ -1,5 +1,5 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::segments::dsb::*;
 
@@ -10,7 +10,7 @@ pub struct Loop2330 {
 
 pub fn get_loop2330(mut contents: String) -> (Loop2330, String) {
     let mut loop2330 = Loop2330::default();
-    
+
     // Parse DSB segment (required)
     if let Some(dsb_start) = contents.find("DSB*") {
         if let Some(dsb_end) = contents[dsb_start..].find("~") {
@@ -19,16 +19,16 @@ pub fn get_loop2330(mut contents: String) -> (Loop2330, String) {
             contents = contents[dsb_start + dsb_end + 1..].to_string();
         }
     }
-    
+
     info!("Parsed Loop2330: {:?}", loop2330);
     (loop2330, contents)
 }
 
 pub fn write_loop2330(loop2330: Loop2330) -> String {
     let mut result = String::new();
-    
+
     result.push_str(&write_dsb(loop2330.dsb));
     result.push_str("\n");
-    
+
     result
 }

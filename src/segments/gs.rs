@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct GS {
     pub functional_id_code: String,
@@ -27,7 +27,7 @@ pub fn get_gs(gs_content: String) -> GS {
     }
 }
 
-pub fn write_gs(gs:GS) -> String {
+pub fn write_gs(gs: GS) -> String {
     let mut gs_content = String::new();
     gs_content.push_str("GS*");
     gs_content.push_str(&gs.functional_id_code);

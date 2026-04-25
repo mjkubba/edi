@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct CAS{ 
+pub struct CAS {
     pub cas01_claim_adjustsment_group_code: String,
     pub cas02_adjustsment_reason_code: String,
     pub cas03_adjustsment_amt: String,
@@ -27,22 +27,22 @@ pub struct CAS{
 
 pub fn get_cas(cas_content: String) -> CAS {
     let cas_parts: Vec<&str> = cas_content.split("*").collect();
-    let mut cas04_adjustsment_qty: String ="".to_string();
-    let mut cas05_adjustment_reason_code: String ="".to_string();
-    let mut cas06_adjustment_amt: String ="".to_string();
-    let mut cas07_adjustment_qty: String ="".to_string();
-    let mut cas08_adjustment_reason_code: String ="".to_string();
-    let mut cas09_adjustment_amt: String ="".to_string();
-    let mut cas10_adjustment_qty: String ="".to_string();
-    let mut cas11_adjustment_reason_code: String ="".to_string();
-    let mut cas12_adjustment_amt: String ="".to_string();
-    let mut cas13_adjustment_qty: String ="".to_string();
-    let mut cas14_adjustment_reason_code: String ="".to_string();
-    let mut cas15_adjustment_amt: String ="".to_string();
-    let mut cas16_adjustment_qty: String ="".to_string();
-    let mut cas17_adjustment_reason_code: String ="".to_string();
-    let mut cas18_adjustment_amt: String ="".to_string();
-    let mut cas19_adjustment_qty: String ="".to_string();
+    let mut cas04_adjustsment_qty: String = "".to_string();
+    let mut cas05_adjustment_reason_code: String = "".to_string();
+    let mut cas06_adjustment_amt: String = "".to_string();
+    let mut cas07_adjustment_qty: String = "".to_string();
+    let mut cas08_adjustment_reason_code: String = "".to_string();
+    let mut cas09_adjustment_amt: String = "".to_string();
+    let mut cas10_adjustment_qty: String = "".to_string();
+    let mut cas11_adjustment_reason_code: String = "".to_string();
+    let mut cas12_adjustment_amt: String = "".to_string();
+    let mut cas13_adjustment_qty: String = "".to_string();
+    let mut cas14_adjustment_reason_code: String = "".to_string();
+    let mut cas15_adjustment_amt: String = "".to_string();
+    let mut cas16_adjustment_qty: String = "".to_string();
+    let mut cas17_adjustment_reason_code: String = "".to_string();
+    let mut cas18_adjustment_amt: String = "".to_string();
+    let mut cas19_adjustment_qty: String = "".to_string();
 
     if cas_parts.get(3).is_some() {
         cas04_adjustsment_qty = cas_parts[3].to_string();
@@ -119,7 +119,7 @@ pub fn write_cas(cas: CAS) -> String {
     if cas.cas01_claim_adjustsment_group_code.is_empty() {
         return String::new();
     }
-    let mut cas_content =  String::new();
+    let mut cas_content = String::new();
     cas_content.push_str("CAS*");
     cas_content.push_str(&cas.cas01_claim_adjustsment_group_code);
     cas_content.push_str("*");
@@ -145,8 +145,6 @@ pub fn write_cas(cas: CAS) -> String {
     cas_content.push_str("~");
     cas_content
 }
-
-
 
 // unit test
 

@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// ISA - Interchange Control Header
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -60,11 +60,11 @@ pub struct BHT {
 /// Parse ISA segment
 pub fn parse_isa(segment: &str) -> Result<InterchangeHeader, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 17 {
         return Err(format!("Invalid ISA segment: {}", segment));
     }
-    
+
     Ok(InterchangeHeader {
         segment_id: fields[0].to_string(),
         authorization_information_qualifier: fields[1].to_string(),

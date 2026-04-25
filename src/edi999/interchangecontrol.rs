@@ -1,11 +1,11 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::isa::*;
-use crate::segments::gs::*;
 use crate::helper::edihelper::*;
+use crate::segments::gs::*;
+use crate::segments::isa::*;
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeHeader {
     pub isa_segments: ISA,
     pub gs_segments: GS,
@@ -13,7 +13,7 @@ pub struct InterchangeHeader {
 
 pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
     let mut interchange_header = InterchangeHeader::default();
-    
+
     // Process ISA segment (required)
     if contents.contains("ISA") {
         info!("ISA segment found");
@@ -24,7 +24,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     } else {
         info!("Warning: Required ISA segment not found");
     }
-    
+
     // Process GS segment (required)
     if contents.contains("GS") {
         info!("GS segment found");
@@ -35,19 +35,19 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     } else {
         info!("Warning: Required GS segment not found");
     }
-    
+
     info!("Interchange Control parsed\n");
     (interchange_header, contents)
 }
 
 pub fn write_interchange_control(interchange_header: &InterchangeHeader) -> String {
     let mut contents = String::new();
-    
+
     // Write ISA segment
     contents.push_str(&write_isa(interchange_header.isa_segments.clone()));
-    
+
     // Write GS segment
     contents.push_str(&write_gs(interchange_header.gs_segments.clone()));
-    
+
     contents
 }

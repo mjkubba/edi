@@ -1,5 +1,5 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // COB segment doesn't exist yet, so we'll create a placeholder
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ pub struct Loop2320 {
 
 pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
     let mut loop2320 = Loop2320::default();
-    
+
     // For now, just skip COB segments since we don't have the implementation
     if let Some(cob_start) = contents.find("COB*") {
         if let Some(cob_end) = contents[cob_start..].find("~") {
@@ -25,7 +25,7 @@ pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
             contents = contents[cob_start + cob_end + 1..].to_string();
         }
     }
-    
+
     info!("Parsed Loop2320: {:?}", loop2320);
     (loop2320, contents)
 }

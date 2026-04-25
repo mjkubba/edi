@@ -1,63 +1,63 @@
 /**
  * EDI Parser and Processor for Healthcare X12 Formats
- * 
+ *
  * This application provides functionality to parse and generate EDI files
  * for healthcare X12 formats including 835, 999, 270/271, 276/277, 837, 278, and 820.
- * 
+ *
  * The main module handles command line arguments and routes processing
  * to the appropriate controller based on the EDI format.
  */
 use crate::transaction_processor::TransactionSet;
 
-use crate::helper::helper::*;
-use crate::edi835::controller::*;
-use crate::edi999::controller::*;
 use crate::edi270::controller::*;
 use crate::edi271::controller::*;
 use crate::edi276::controller::*;
 use crate::edi277::controller::*;
-use crate::edi837::controller::*;
 use crate::edi278::controller::*;
 use crate::edi820::controller::*;
 use crate::edi834::controller::*;
+use crate::edi835::controller::*;
+use crate::edi837::controller::*;
+use crate::edi999::controller::*;
+use crate::helper::helper::*;
 
-mod helper;
-mod segments;
-mod edi835;
-mod edi999;
 mod edi270;
 mod edi271;
 mod edi276;
 mod edi277;
-mod edi837;
 mod edi278;
 mod edi820;
 mod edi834;
+mod edi835;
+mod edi837;
+mod edi999;
 mod error;
-mod transaction_processor;
-mod segment_config;
+mod helper;
 mod loop_processor;
+mod segment_config;
+mod segments;
+mod transaction_processor;
 
 /**
  * Main entry point for the EDI Parser application
- * 
+ *
  * Processes command line arguments and routes to the appropriate
  * controller based on the EDI format and operation.
  */
 fn main() {
     set_logger();
     info!("Starting EDI Parser");
-    
+
     let args = process_args();
     let contents = get_file_contents(args.clone());
     let _clean_contents = clean_contents(contents.clone());
-    
+
     if args.operation == "write" {
         info!("Write EDI Operation");
-        
+
         if args.is_json {
             info!("Input is JSON");
-            
+
             // Check if the content is JSON for 835 format
             if contents.contains("\"transaction_set_id\":\"835\"") {
                 info!("Writing 835 format");
@@ -101,12 +101,14 @@ fn main() {
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 837P format
-            else if contents.contains("\"st\":\"ST*837*") || contents.contains("\"table1\":{\"table1\":{\"bht\":\"BHT*0019*00*") {
+            else if contents.contains("\"st\":\"ST*837*")
+                || contents.contains("\"table1\":{\"table1\":{\"bht\":\"BHT*0019*00*")
+            {
                 info!("Writing 837P format");
                 let edi837p: Edi837P = serde_json::from_str(&contents).unwrap();
                 match write_837p(&edi837p) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                    Err(e) => warn!("Error writing 837P format: {:?}", e)
+                    Err(e) => warn!("Error writing 837P format: {:?}", e),
                 }
             }
             // Check if the content is JSON for 837I format
@@ -115,16 +117,18 @@ fn main() {
                 let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
                 match write_837i(&edi837i) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                    Err(e) => warn!("Error writing 837I format: {:?}", e)
+                    Err(e) => warn!("Error writing 837I format: {:?}", e),
                 }
             }
             // Check if the content is JSON for 837D format
-            else if contents.contains("\"st\":\"ST*837*") || contents.contains("\"too_segments\":") {
+            else if contents.contains("\"st\":\"ST*837*")
+                || contents.contains("\"too_segments\":")
+            {
                 info!("Writing 837D format");
                 let edi837d: Edi837D = serde_json::from_str(&contents).unwrap();
                 match write_837d(&edi837d) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                    Err(e) => warn!("Error writing 837D format: {:?}", e)
+                    Err(e) => warn!("Error writing 837D format: {:?}", e),
                 }
             }
             // Check if the content is JSON for 278 format
@@ -147,13 +151,12 @@ fn main() {
                 let edi834: Edi834 = serde_json::from_str(&contents).unwrap();
                 let new_edi = write_834(&edi834);
                 write_to_file(new_edi, args.output_file);
-            }
-            else {
+            } else {
                 warn!("Unknown format for writing");
             }
         } else {
             info!("Input is raw EDI");
-            
+
             // Check if the content is raw EDI for 835 format
             if contents.contains("ST*835*") {
                 info!("Writing 835 format from raw EDI");
@@ -170,26 +173,30 @@ fn main() {
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is raw EDI for 270 format
-            else if contents.contains("BHT*0022*13") || (contents.contains("HL*") && contents.contains("*20*")) {
+            else if contents.contains("BHT*0022*13")
+                || (contents.contains("HL*") && contents.contains("*20*"))
+            {
                 info!("Writing 270 format from raw EDI");
                 match get_270(contents.clone()) {
                     Ok((edi270, _)) => {
                         let new_edi = write_270(&edi270);
                         write_to_file(new_edi, args.output_file);
-                    },
+                    }
                     Err(e) => {
                         warn!("Error processing 270 format: {:?}", e);
                     }
                 }
             }
             // Check if the content is raw EDI for 271 format
-            else if contents.contains("BHT*0022*11") || (contents.contains("EB*") && contents.contains("HL*")) {
+            else if contents.contains("BHT*0022*11")
+                || (contents.contains("EB*") && contents.contains("HL*"))
+            {
                 info!("Writing 271 format from raw EDI");
                 match get_271(contents.clone()) {
                     Ok((edi271, _)) => {
                         let new_edi = write_271(&edi271);
                         write_to_file(new_edi, args.output_file);
-                    },
+                    }
                     Err(e) => {
                         warn!("Error processing 271 format: {:?}", e);
                     }
@@ -199,24 +206,21 @@ fn main() {
             else if contents.contains("ST*837*") && contents.contains("BHT*0019*00*") {
                 info!("Writing 837P format from raw EDI");
                 match get_837p(&contents) {
-                    Ok(edi837p) => {
-                        match write_837p(&edi837p) {
-                            Ok(new_edi) => write_to_file(new_edi, args.output_file),
-                            Err(e) => warn!("Error writing 837P format: {:?}", e)
-                        }
+                    Ok(edi837p) => match write_837p(&edi837p) {
+                        Ok(new_edi) => write_to_file(new_edi, args.output_file),
+                        Err(e) => warn!("Error writing 837P format: {:?}", e),
                     },
                     Err(e) => {
                         warn!("Error processing 837P format: {:?}", e);
                     }
                 }
-            }
-            else {
+            } else {
                 warn!("Unknown format for writing");
             }
         }
     } else if args.operation == "read" {
         info!("Read EDI Operation");
-        
+
         if contents.contains("~ST*835*") || contents.contains("ST*835*") {
             info!("File is 835");
             let edi835 = get_835(contents.clone());
@@ -233,7 +237,7 @@ fn main() {
                 Ok((edi270, _)) => {
                     let serialized_edi = serde_json::to_string(&edi270).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 270 format: {:?}", e);
                 }
@@ -244,7 +248,7 @@ fn main() {
                 Ok((edi271, _)) => {
                     let serialized_edi = serde_json::to_string(&edi271).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 271 format: {:?}", e);
                 }
@@ -255,7 +259,7 @@ fn main() {
                 Ok(edi276) => {
                     let serialized_edi = serde_json::to_string(&edi276).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 276 format: {:?}", e);
                 }
@@ -266,7 +270,7 @@ fn main() {
                 Ok(edi277) => {
                     let serialized_edi = serde_json::to_string(&edi277).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 277 format: {:?}", e);
                 }
@@ -280,7 +284,7 @@ fn main() {
                     Ok(edi837p) => {
                         let serialized_edi = serde_json::to_string(&edi837p).unwrap();
                         write_to_file(serialized_edi.clone(), args.output_file);
-                    },
+                    }
                     Err(e) => {
                         warn!("Error processing 837P format: {:?}", e);
                     }
@@ -291,7 +295,7 @@ fn main() {
                     Ok(edi837i) => {
                         let serialized_edi = serde_json::to_string(&edi837i).unwrap();
                         write_to_file(serialized_edi.clone(), args.output_file);
-                    },
+                    }
                     Err(e) => {
                         warn!("Error processing 837I format: {:?}", e);
                     }
@@ -302,7 +306,7 @@ fn main() {
                     Ok(edi837d) => {
                         let serialized_edi = serde_json::to_string(&edi837d).unwrap();
                         write_to_file(serialized_edi.clone(), args.output_file);
-                    },
+                    }
                     Err(e) => {
                         warn!("Error processing 837D format: {:?}", e);
                     }
@@ -316,7 +320,7 @@ fn main() {
                 Ok((edi278, _)) => {
                     let serialized_edi = serde_json::to_string(&edi278).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 278 format: {:?}", e);
                 }
@@ -327,7 +331,7 @@ fn main() {
                 Ok((edi820, _)) => {
                     let serialized_edi = serde_json::to_string(&edi820).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 820 format: {:?}", e);
                 }
@@ -338,7 +342,7 @@ fn main() {
                 Ok((edi834, _)) => {
                     let serialized_edi = serde_json::to_string(&edi834).unwrap();
                     write_to_file(serialized_edi.clone(), args.output_file);
-                },
+                }
                 Err(e) => {
                     warn!("Error processing 834 format: {:?}", e);
                 }

@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-// EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+// EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct AMT {
     pub amt01_amount_qualifier_code: String,
@@ -16,7 +16,7 @@ pub fn get_amt(amt_content: String) -> AMT {
     }
 }
 
-pub fn write_amt(amt:AMT) -> String {
+pub fn write_amt(amt: AMT) -> String {
     let mut amt_content = String::new();
     amt_content.push_str("AMT*");
     amt_content.push_str(&amt.amt01_amount_qualifier_code);
@@ -25,7 +25,6 @@ pub fn write_amt(amt:AMT) -> String {
     amt_content.push_str("~");
     amt_content
 }
-
 
 // unit test
 

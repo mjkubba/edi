@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct SVC {
     pub svc01_1_product_or_service_is_qualifier: String,
@@ -11,29 +11,25 @@ pub struct SVC {
     pub svc05_unit_of_service_paid_count: String,
     pub svc06_composite_medical_procedure_id: String,
     pub svc07_original_units_of_service_count: String,
-
-
-
 }
 
 pub fn get_svc(svc_content: String) -> SVC {
     let svc_parts: Vec<&str> = svc_content.split("*").collect();
-    let mut scv04_product_service_id: String ="".to_string();
-    let mut svc05_unit_of_service_paid_count: String ="".to_string();
-    let mut svc06_composite_medical_procedure_id: String ="".to_string();
-    let mut svc07_original_units_of_service_count: String ="".to_string();
-    
-    
-    if svc_parts.get(3).is_some()  {
+    let mut scv04_product_service_id: String = "".to_string();
+    let mut svc05_unit_of_service_paid_count: String = "".to_string();
+    let mut svc06_composite_medical_procedure_id: String = "".to_string();
+    let mut svc07_original_units_of_service_count: String = "".to_string();
+
+    if svc_parts.get(3).is_some() {
         scv04_product_service_id = svc_parts[3].to_string();
     }
-    if svc_parts.get(4).is_some()  {
+    if svc_parts.get(4).is_some() {
         svc05_unit_of_service_paid_count = svc_parts[4].to_string();
     }
-    if svc_parts.get(5).is_some()  {
+    if svc_parts.get(5).is_some() {
         svc06_composite_medical_procedure_id = svc_parts[5].to_string();
     }
-    if svc_parts.get(6).is_some()  {
+    if svc_parts.get(6).is_some() {
         svc07_original_units_of_service_count = svc_parts[6].to_string();
     }
 
@@ -58,12 +54,15 @@ pub fn write_svc(svc: SVC) -> String {
     svc_string.push_str(&svc.svc03_line_item_provider_payment_amount);
     svc_string.push_str(&stiuational_element(svc.scv04_product_service_id));
     svc_string.push_str(&stiuational_element(svc.svc05_unit_of_service_paid_count));
-    svc_string.push_str(&stiuational_element(svc.svc06_composite_medical_procedure_id));
-    svc_string.push_str(&stiuational_element(svc.svc07_original_units_of_service_count));
+    svc_string.push_str(&stiuational_element(
+        svc.svc06_composite_medical_procedure_id,
+    ));
+    svc_string.push_str(&stiuational_element(
+        svc.svc07_original_units_of_service_count,
+    ));
     svc_string.push_str("~");
     svc_string
 }
-
 
 #[cfg(test)]
 

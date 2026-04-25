@@ -1,6 +1,6 @@
-use log::info;
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::*;
+use log::info;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeHeader {
@@ -42,15 +42,15 @@ pub struct GS {
 
 pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
     let mut interchange_header = InterchangeHeader::default();
-    
+
     // Parse ISA segment
     if contents.contains("ISA") {
         info!("ISA segment found, ");
         let isa_content = get_segment_contents("ISA", &contents);
         info!("segment_content: {}", isa_content);
-        
+
         let isa_parts: Vec<&str> = isa_content.split('*').collect();
-        
+
         if isa_parts.len() >= 16 {
             interchange_header.isa_segments = ISA {
                 information_qualifier: isa_parts[1].to_string(),
@@ -68,22 +68,26 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
                 control_number: isa_parts[13].to_string(),
                 ack_indicator: isa_parts[14].to_string(),
                 usage_indicator: isa_parts[15].to_string(),
-                component_element_separator: if isa_parts.len() > 16 { isa_parts[16].to_string() } else { String::new() },
+                component_element_separator: if isa_parts.len() > 16 {
+                    isa_parts[16].to_string()
+                } else {
+                    String::new()
+                },
             };
         }
-        
+
         info!("ISA segment parsed");
         contents = content_trim("ISA", contents);
     }
-    
+
     // Parse GS segment
     if contents.contains("GS") {
         info!("GS segment found, ");
         let gs_content = get_segment_contents("GS", &contents);
         info!("segment_content: {}", gs_content);
-        
+
         let gs_parts: Vec<&str> = gs_content.split('*').collect();
-        
+
         if gs_parts.len() >= 8 {
             interchange_header.gs_segments = GS {
                 functional_id_code: gs_parts[1].to_string(),
@@ -93,29 +97,37 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
                 time: gs_parts[5].to_string(),
                 group_control_number: gs_parts[6].to_string(),
                 responsible_agency: gs_parts[7].to_string(),
-                version_number: if gs_parts.len() > 8 { gs_parts[8].to_string() } else { String::new() },
+                version_number: if gs_parts.len() > 8 {
+                    gs_parts[8].to_string()
+                } else {
+                    String::new()
+                },
             };
         }
-        
+
         info!("GS segment parsed");
         contents = content_trim("GS", contents);
     }
-    
+
     info!("Interchange Control parsed\n");
-    
+
     return (interchange_header, contents);
 }
 
 pub fn write_interchange_control(interchange_header: InterchangeHeader) -> String {
     let mut result = String::new();
-    
+
     // Write ISA segment
     result.push_str("ISA*");
     result.push_str(&interchange_header.isa_segments.information_qualifier);
     result.push_str("*");
     result.push_str(&interchange_header.isa_segments.authorization_information);
     result.push_str("*");
-    result.push_str(&interchange_header.isa_segments.security_information_qualifier);
+    result.push_str(
+        &interchange_header
+            .isa_segments
+            .security_information_qualifier,
+    );
     result.push_str("*");
     result.push_str(&interchange_header.isa_segments.security_information);
     result.push_str("*");
@@ -143,7 +155,7 @@ pub fn write_interchange_control(interchange_header: InterchangeHeader) -> Strin
     result.push_str("*");
     result.push_str(&interchange_header.isa_segments.component_element_separator);
     result.push_str("~\n");
-    
+
     // Write GS segment
     result.push_str("GS*");
     result.push_str(&interchange_header.gs_segments.functional_id_code);
@@ -162,6 +174,6 @@ pub fn write_interchange_control(interchange_header: InterchangeHeader) -> Strin
     result.push_str("*");
     result.push_str(&interchange_header.gs_segments.version_number);
     result.push_str("~\n");
-    
+
     return result;
 }

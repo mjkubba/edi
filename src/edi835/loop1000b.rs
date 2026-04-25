@@ -1,14 +1,14 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
+use crate::helper::edihelper::*;
 use crate::segments::n1::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
 use crate::segments::r#ref::*;
 use crate::segments::rdm::*;
-use crate::helper::edihelper::*;
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop1000bs {
     pub n1_segments: N1,
     pub n3_segments: N3,
@@ -17,8 +17,7 @@ pub struct Loop1000bs {
     pub rdm_segments: RDM,
 }
 
-
-pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, Vec<REF>, RDM, String) {
+pub fn get_loop_1000_b(mut contents: String) -> (N1, N3, N4, Vec<REF>, RDM, String) {
     // Loop 1000B Payee Identification (1)
     // N1 Payee Identification R 1
     // N3 Payee Address S 1
@@ -39,19 +38,19 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, Vec<REF>, RDM, Strin
         info!("N1 segment found, ");
         n1_segments = get_n1(get_segment_contents("N1", &contents));
         info!("N1 segment parsed");
-        contents = content_trim("N1",contents);
+        contents = content_trim("N1", contents);
     }
     if contents.contains("N3") {
         info!("N3 segment found, ");
         n3_segments = get_n3(get_segment_contents("N3", &contents));
         info!("N3 segment parsed");
-        contents = content_trim("N3",contents);
+        contents = content_trim("N3", contents);
     }
     if contents.contains("N4") {
         info!("N4 segment found, ");
         n4_segments = get_n4(get_segment_contents("N4", &contents));
         info!("N4 segment parsed");
-        contents = content_trim("N4",contents);
+        contents = content_trim("N4", contents);
     }
 
     if contents.contains("REF") {
@@ -61,7 +60,7 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, Vec<REF>, RDM, Strin
                 info!("REF segment found, ");
                 ref_segments.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF",contents);
+                contents = content_trim("REF", contents);
             }
         }
     }
@@ -69,27 +68,34 @@ pub fn get_loop_1000_b(mut contents:String) -> (N1, N3, N4, Vec<REF>, RDM, Strin
         info!("RDM segment found, ");
         rdm_segments = get_rdm(get_segment_contents("RDM", &contents));
         info!("RDM segment parsed");
-        contents = content_trim("RDM",contents);
+        contents = content_trim("RDM", contents);
     }
 
     info!("Loop 1000B parsed\n");
-    return (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents)
+    return (
+        n1_segments,
+        n3_segments,
+        n4_segments,
+        ref_segments,
+        rdm_segments,
+        contents,
+    );
 }
 
-
-pub fn get_1000bs(contents:String) -> (Loop1000bs, String) {
-    let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents);
-    let header  = Loop1000bs {
+pub fn get_1000bs(contents: String) -> (Loop1000bs, String) {
+    let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) =
+        get_loop_1000_b(contents);
+    let header = Loop1000bs {
         n1_segments,
         n3_segments,
         n4_segments,
         ref_segments,
         rdm_segments,
     };
-    return (header,contents)
+    return (header, contents);
 }
 
-pub fn write_loop1000b(loop1000b:Loop1000bs) -> String {
+pub fn write_loop1000b(loop1000b: Loop1000bs) -> String {
     let mut contents = String::new();
     contents.push_str(&write_n1(loop1000b.n1_segments));
     contents.push_str(&write_n3(loop1000b.n3_segments));
@@ -101,8 +107,6 @@ pub fn write_loop1000b(loop1000b:Loop1000bs) -> String {
     return contents;
 }
 
-
-
 // unit tests
 
 #[cfg(test)]
@@ -112,7 +116,8 @@ mod tests {
     #[test]
     fn test_loop1000b() {
         let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD~N4*ANY CITY*CA*12211~REF*TJ*123456789~CLP*");
-        let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) = get_loop_1000_b(contents.to_string());
+        let (n1_segments, n3_segments, n4_segments, ref_segments, rdm_segments, contents) =
+            get_loop_1000_b(contents.to_string());
         assert_eq!(n1_segments.payer_id_code, "PE");
         assert_eq!(n1_segments.payee_name, "PROVIDER");
         assert_eq!(n1_segments.payee_identification_code_qualifier, "XX");
@@ -130,7 +135,8 @@ mod tests {
     #[test]
     fn test_loop1000b2() {
         let contents = String::from("N1*PE*PROVIDER*XX*1123454567~N3*2255 ANY ROAD*unit 500~N4*ANY CITY*CA*12211~REF*TJ*123456789~RDM*BM~CLP*");
-        let (_n1_segments, n3_segments, _n4_segments, _ref_segments, rdm_segments, contents) = get_loop_1000_b(contents.to_string());
+        let (_n1_segments, n3_segments, _n4_segments, _ref_segments, rdm_segments, contents) =
+            get_loop_1000_b(contents.to_string());
         assert_eq!(n3_segments.payee_address, "2255 ANY ROAD");
         assert_eq!(n3_segments.payee_address2, "unit 500");
         assert_eq!(rdm_segments.rdm01_report_transmission_code, "BM");

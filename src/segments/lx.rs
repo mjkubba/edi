@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct LX {
     pub lx01_claim_sequence_number: String,
@@ -13,7 +13,7 @@ pub fn get_lx(lx_content: String) -> LX {
     }
 }
 
-pub fn write_lx(lx:LX) -> String {
+pub fn write_lx(lx: LX) -> String {
     let mut lx_content: String = String::new();
     lx_content.push_str("LX*");
     lx_content.push_str(&lx.lx01_claim_sequence_number);

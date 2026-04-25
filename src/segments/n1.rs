@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct N1{
+pub struct N1 {
     pub payer_id_code: String,
     pub payee_name: String,
     pub payee_identification_code_qualifier: String,
@@ -12,8 +12,8 @@ pub struct N1{
 
 pub fn get_n1(n1_content: String) -> N1 {
     let n1_parts: Vec<&str> = n1_content.split("*").collect();
-    let mut payee_identification_code_qualifier: String ="".to_string();
-    let mut payee_identification_code: String ="".to_string();
+    let mut payee_identification_code_qualifier: String = "".to_string();
+    let mut payee_identification_code: String = "".to_string();
     if n1_parts.get(2).is_some() {
         payee_identification_code_qualifier = n1_parts[2].to_string();
     }
@@ -28,7 +28,7 @@ pub fn get_n1(n1_content: String) -> N1 {
     }
 }
 
-pub fn write_n1(n1:N1) -> String {
+pub fn write_n1(n1: N1) -> String {
     let mut n1_content: String = String::new();
     n1_content.push_str("N1*");
     n1_content.push_str(&n1.payer_id_code);

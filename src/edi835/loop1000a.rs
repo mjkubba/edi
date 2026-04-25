@@ -1,14 +1,14 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
+use crate::helper::edihelper::*;
 use crate::segments::n1::*;
 use crate::segments::n3::*;
 use crate::segments::n4::*;
 use crate::segments::per::*;
 use crate::segments::r#ref::*;
-use crate::helper::edihelper::*;
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop1000as {
     pub n1_segments: N1,
     pub n3_segments: N3,
@@ -19,8 +19,7 @@ pub struct Loop1000as {
     pub per_web_site: PER,
 }
 
-pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<PER>, PER, String) {
-    
+pub fn get_loop_1000_a(mut contents: String) -> (N1, N3, N4, Vec<REF>, PER, Vec<PER>, PER, String) {
     // Loop 1000A Payer Identification (1)
     // N1 Payer Identification R 1
     // N3 Payer Address R 1
@@ -39,7 +38,7 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<P
     let mut n1_segments = N1::default();
     let mut n3_segments = N3::default();
     let mut n4_segments = N4::default();
-    let mut ref_segments: Vec<REF>  = vec![];
+    let mut ref_segments: Vec<REF> = vec![];
     let mut per_payer_business = PER::default();
     let mut per_technical_contact: Vec<PER> = vec![];
     let mut per_web_site = PER::default();
@@ -48,21 +47,21 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<P
         info!("N1 segment found, ");
         n1_segments = get_n1(get_segment_contents("N1", &contents));
         info!("N1 segment parsed");
-        contents = content_trim("N1",contents);
-    } 
+        contents = content_trim("N1", contents);
+    }
 
     if contents.contains("N3") {
         info!("N3 segment found, ");
         n3_segments = get_n3(get_segment_contents("N3", &contents));
         info!("N3 segment parsedm");
-        contents = content_trim("N3",contents);
+        contents = content_trim("N3", contents);
     }
 
     if contents.contains("N4") {
         info!("N4 segment found, ");
         n4_segments = get_n4(get_segment_contents("N4", &contents));
-        info!("N4 segment parsed"); 
-        contents = content_trim("N4",contents);
+        info!("N4 segment parsed");
+        contents = content_trim("N4", contents);
     }
 
     if contents.contains("REF") {
@@ -72,11 +71,10 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<P
                 info!("REF segment found, ");
                 ref_segments.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF",contents);
+                contents = content_trim("REF", contents);
             }
         }
     }
-
 
     if contents.contains("PER") {
         let per_count = contents.matches("PER").count();
@@ -84,39 +82,57 @@ pub fn get_loop_1000_a(mut contents:String) -> (N1, N3, N4, Vec<REF>, PER, Vec<P
         for _ in 0..per_count {
             if check_if_segement_in_loop("PER", "N1", contents.clone()) {
                 let per_segment = get_per(get_segment_contents("PER", &contents));
-                match &per_segment.per01_contact_function_code as &str{
+                match &per_segment.per01_contact_function_code as &str {
                     "CX" => {
                         per_payer_business = per_segment.clone();
-                        contents = content_trim("PER",contents);
+                        contents = content_trim("PER", contents);
                         info!("PER segment parsed");
-                    },
+                    }
                     "BL" => {
                         per_technical_contact.push(per_segment.clone());
-                        contents = content_trim("PER",contents);
+                        contents = content_trim("PER", contents);
                         info!("PER segment parsed");
-                    },
+                    }
                     "IC" => {
                         per_web_site = per_segment.clone();
-                        contents = content_trim("PER",contents);
+                        contents = content_trim("PER", contents);
                         info!("PER segment parsed");
-                    },
+                    }
                     _ => {
-                        info!("PER segment parsed, no matches found for expected codes in this loop");
+                        info!(
+                            "PER segment parsed, no matches found for expected codes in this loop"
+                        );
                     }
                 }
             }
         }
     }
 
-
-
     info!("Loop 1000A parsed\n");
-    return (n1_segments, n3_segments, n4_segments, ref_segments, per_payer_business, per_technical_contact, per_web_site, contents)
+    return (
+        n1_segments,
+        n3_segments,
+        n4_segments,
+        ref_segments,
+        per_payer_business,
+        per_technical_contact,
+        per_web_site,
+        contents,
+    );
 }
 
-pub fn get_1000as(contents:String) -> (Loop1000as, String) {
-    let (n1_segments, n3_segments, n4_segments, ref_segments, per_payer_business, per_technical_contact, per_web_site, contents) = get_loop_1000_a(contents);
-    let header  = Loop1000as {
+pub fn get_1000as(contents: String) -> (Loop1000as, String) {
+    let (
+        n1_segments,
+        n3_segments,
+        n4_segments,
+        ref_segments,
+        per_payer_business,
+        per_technical_contact,
+        per_web_site,
+        contents,
+    ) = get_loop_1000_a(contents);
+    let header = Loop1000as {
         n1_segments,
         n3_segments,
         n4_segments,
@@ -125,26 +141,30 @@ pub fn get_1000as(contents:String) -> (Loop1000as, String) {
         per_technical_contact,
         per_web_site,
     };
-    return (header,contents)
+    return (header, contents);
 }
 
-pub fn write_loop1000a(loop1000a:Loop1000as) -> String {
+pub fn write_loop1000a(loop1000a: Loop1000as) -> String {
     let mut contents = String::new();
     contents.push_str(&write_n1(loop1000a.n1_segments));
     contents.push_str(&write_n3(loop1000a.n3_segments));
     contents.push_str(&write_n4(loop1000a.n4_segments));
-    
+
     // Write REF segments
     for n in 0..loop1000a.ref_segments.len() {
         contents.push_str(&write_ref(loop1000a.ref_segments[n].clone()));
     }
-    
+
     // Write PER segments with proper formatting
     // First, write the business contact if present
-    if !loop1000a.per_payer_business.per01_contact_function_code.is_empty() {
+    if !loop1000a
+        .per_payer_business
+        .per01_contact_function_code
+        .is_empty()
+    {
         contents.push_str(&write_per(loop1000a.per_payer_business));
     }
-    
+
     // Then write technical contacts
     for n in 0..loop1000a.per_technical_contact.len() {
         // Ensure the BL qualifier is present
@@ -154,12 +174,16 @@ pub fn write_loop1000a(loop1000a:Loop1000as) -> String {
         }
         contents.push_str(&write_per(per));
     }
-    
+
     // Finally write web site contact if present
-    if !loop1000a.per_web_site.per01_contact_function_code.is_empty() {
+    if !loop1000a
+        .per_web_site
+        .per01_contact_function_code
+        .is_empty()
+    {
         contents.push_str(&write_per(loop1000a.per_web_site));
     }
-    
+
     return contents;
 }
 
@@ -172,7 +196,16 @@ mod tests {
     #[test]
     fn test_loop1000a() {
         let contents = String::from("N1*PR*DELTA DENTAL OF ABC~N3*225 MAIN STREET~N4*CENTERVILLE*PA*17111~PER*BL*JANE DOE*TE*9005555555~N1*");
-        let (n1_segments, n3_segments, n4_segments,  ref_segments, per_payer_business, per_technical_contact, per_web_site, contents) = get_loop_1000_a(contents);
+        let (
+            n1_segments,
+            n3_segments,
+            n4_segments,
+            ref_segments,
+            per_payer_business,
+            per_technical_contact,
+            per_web_site,
+            contents,
+        ) = get_loop_1000_a(contents);
         assert_eq!(n1_segments.payer_id_code, "PR");
         assert_eq!(n1_segments.payee_name, "DELTA DENTAL OF ABC");
         assert_eq!(n3_segments.payee_address, "225 MAIN STREET");

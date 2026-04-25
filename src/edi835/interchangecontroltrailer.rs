@@ -1,20 +1,17 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::iea::*;
-use crate::segments::ge::*;
 use crate::helper::edihelper::*;
+use crate::segments::ge::*;
+use crate::segments::iea::*;
 
-
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeTrailer {
     pub ge_segments: GE,
     pub iea_segments: IEA,
 }
 
-
 pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String) {
-
     // Interchange Control Trailer
     // IEA Interchange Control Trailer R 1
     // GE FUNCTIONAL GROUP TRAILER R 1
@@ -26,35 +23,35 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
         info!("GE segment found, ");
         ge_segments = get_ge(get_segment_contents("GE", &contents));
         info!("GE segment parsed");
-        contents = content_trim("GE",contents);
+        contents = content_trim("GE", contents);
     }
 
     if contents.contains("IEA") {
         info!("IEA segment found, ");
         iea_segments = get_iea(get_segment_contents("IEA", &contents));
         info!("IEA segment parsed");
-        contents = content_trim("IEA",contents);
+        contents = content_trim("IEA", contents);
     }
 
     info!("Interchange Control Trailer parsed\n");
 
-    return (ge_segments,iea_segments, contents)
+    return (ge_segments, iea_segments, contents);
 }
 
-pub fn get_interchange_trailer(contents:String) -> (InterchangeTrailer, String) {
-    let (ge_segments,iea_segments, contents) = get_interchange_control_trailer(contents);
+pub fn get_interchange_trailer(contents: String) -> (InterchangeTrailer, String) {
+    let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(contents);
     let header = InterchangeTrailer {
         ge_segments,
         iea_segments,
     };
-    return (header, contents)
+    return (header, contents);
 }
 
-pub fn write_interchange_trailer(trailer:InterchangeTrailer) -> String {
+pub fn write_interchange_trailer(trailer: InterchangeTrailer) -> String {
     let mut contents = String::new();
     contents.push_str(&write_ge(trailer.ge_segments));
     contents.push_str(&write_iea(trailer.iea_segments));
-    return contents
+    return contents;
 }
 
 // unit tests
@@ -71,5 +68,4 @@ mod tests {
         assert_eq!(iea_segments.interchange_control_number, "000000905");
         assert_eq!(contents, "");
     }
-
 }

@@ -1,40 +1,37 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
 // EDI 835 TS3 - PROVIDER SUMMARY INFORMATION
-#[derive(Debug, Default, PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct TS3 {
-    pub ts301_provider_identifier : String,
-    pub ts302_facility_type_code : String,
-    pub ts303_fiscal_period_date : String,
-    pub ts304_total_claim_count : String,
-    pub ts305_total_claim_charge_amount : String,
-    pub ts313_total_msp_payer_amount : String,
-    pub ts315_total_non_lab_charge_amount : String,
-    pub ts317_total_hcpcs_reported_charge_amount : String,
-    pub ts318_total_hcpcs_payable_amount : String,
-    pub ts320_total_professional_component_amount : String,
-    pub ts321_total_msp_patient_liability_met_amount : String,
-    pub ts322_total_patient_reimbursement_amount : String,  
-    pub ts323_total_pip_claim_count : String,
-    pub ts324_total_pip_adjustment_amount : String,
-    
+    pub ts301_provider_identifier: String,
+    pub ts302_facility_type_code: String,
+    pub ts303_fiscal_period_date: String,
+    pub ts304_total_claim_count: String,
+    pub ts305_total_claim_charge_amount: String,
+    pub ts313_total_msp_payer_amount: String,
+    pub ts315_total_non_lab_charge_amount: String,
+    pub ts317_total_hcpcs_reported_charge_amount: String,
+    pub ts318_total_hcpcs_payable_amount: String,
+    pub ts320_total_professional_component_amount: String,
+    pub ts321_total_msp_patient_liability_met_amount: String,
+    pub ts322_total_patient_reimbursement_amount: String,
+    pub ts323_total_pip_claim_count: String,
+    pub ts324_total_pip_adjustment_amount: String,
 }
-
-
 
 pub fn get_ts3(ts3_content: String) -> TS3 {
     let ts3_parts: Vec<&str> = ts3_content.split("*").collect();
-    let mut ts313_total_msp_payer_amount: String ="".to_string();
-    let mut ts315_total_non_lab_charge_amount: String ="".to_string();
-    let mut ts317_total_hcpcs_reported_charge_amount: String ="".to_string();
-    let mut ts318_total_hcpcs_payable_amount: String ="".to_string();
-    let mut ts320_total_professional_component_amount: String ="".to_string();
-    let mut ts321_total_msp_patient_liability_met_amount: String ="".to_string();
-    let mut ts322_total_patient_reimbursement_amount: String ="".to_string();
-    let mut ts323_total_pip_claim_count: String ="".to_string();
-    let mut ts324_total_pip_adjustment_amount: String ="".to_string();
+    let mut ts313_total_msp_payer_amount: String = "".to_string();
+    let mut ts315_total_non_lab_charge_amount: String = "".to_string();
+    let mut ts317_total_hcpcs_reported_charge_amount: String = "".to_string();
+    let mut ts318_total_hcpcs_payable_amount: String = "".to_string();
+    let mut ts320_total_professional_component_amount: String = "".to_string();
+    let mut ts321_total_msp_patient_liability_met_amount: String = "".to_string();
+    let mut ts322_total_patient_reimbursement_amount: String = "".to_string();
+    let mut ts323_total_pip_claim_count: String = "".to_string();
+    let mut ts324_total_pip_adjustment_amount: String = "".to_string();
 
     if ts3_parts.get(5).is_some() {
         ts313_total_msp_payer_amount = ts3_parts[5].to_string();
@@ -78,14 +75,10 @@ pub fn get_ts3(ts3_content: String) -> TS3 {
         ts322_total_patient_reimbursement_amount,
         ts323_total_pip_claim_count,
         ts324_total_pip_adjustment_amount,
-        
     }
-
 }
 
-
-
-pub fn write_ts3(ts3:TS3) -> String {
+pub fn write_ts3(ts3: TS3) -> String {
     if ts3.ts301_provider_identifier.is_empty() {
         return String::new();
     }
@@ -105,27 +98,32 @@ pub fn write_ts3(ts3:TS3) -> String {
     // ts3_content.push_str("*");
     ts3_content.push_str(&stiuational_element(ts3.ts315_total_non_lab_charge_amount));
     // ts3_content.push_str("*");
-    ts3_content.push_str(&stiuational_element(ts3.ts317_total_hcpcs_reported_charge_amount));
+    ts3_content.push_str(&stiuational_element(
+        ts3.ts317_total_hcpcs_reported_charge_amount,
+    ));
     // ts3_content.push_str("*");
     ts3_content.push_str(&stiuational_element(ts3.ts318_total_hcpcs_payable_amount));
     // ts3_content.push_str("*");
-    ts3_content.push_str(&stiuational_element(ts3.ts320_total_professional_component_amount));
+    ts3_content.push_str(&stiuational_element(
+        ts3.ts320_total_professional_component_amount,
+    ));
     // ts3_content.push_str("*");
-    ts3_content.push_str(&stiuational_element(ts3.ts321_total_msp_patient_liability_met_amount));
+    ts3_content.push_str(&stiuational_element(
+        ts3.ts321_total_msp_patient_liability_met_amount,
+    ));
     // ts3_content.push_str("*");
-    ts3_content.push_str(&stiuational_element(ts3.ts322_total_patient_reimbursement_amount));
+    ts3_content.push_str(&stiuational_element(
+        ts3.ts322_total_patient_reimbursement_amount,
+    ));
     // ts3_content.push_str("*");
     ts3_content.push_str(&stiuational_element(ts3.ts323_total_pip_claim_count));
     // ts3_content.push_str("*");
     ts3_content.push_str(&stiuational_element(ts3.ts324_total_pip_adjustment_amount));
     ts3_content.push_str("~");
     ts3_content
-    
 }
 
-
 // unit test
-
 
 #[cfg(test)]
 

@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct GE {
     pub number_of_transitions: String,
@@ -15,8 +15,7 @@ pub fn get_ge(ge_content: String) -> GE {
     }
 }
 
-
-pub fn write_ge(ge:GE) -> String {
+pub fn write_ge(ge: GE) -> String {
     let mut ge_string = String::new();
     ge_string.push_str("GE*");
     ge_string.push_str(&ge.number_of_transitions);

@@ -1,11 +1,11 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::st::*;
-use crate::segments::ak1::*;
 use crate::helper::edihelper::*;
+use crate::segments::ak1::*;
+use crate::segments::st::*;
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Table1s {
     pub st_segments: ST,
     pub ak1_segments: AK1,
@@ -14,7 +14,7 @@ pub struct Table1s {
 pub fn get_first_table_header(mut contents: String) -> (ST, AK1, String) {
     let mut st_segments = ST::default();
     let mut ak1_segments = AK1::default();
-   
+
     // Process ST segment (required)
     if contents.contains("ST") {
         info!("ST segment found");
@@ -52,12 +52,12 @@ pub fn get_table1s(contents: String) -> (Table1s, String) {
 
 pub fn write_table1(table1: &Table1s) -> String {
     let mut contents = String::new();
-    
+
     // Write ST segment
     contents.push_str(&write_st(table1.st_segments.clone()));
-    
+
     // Write AK1 segment
     contents.push_str(&write_ak1(table1.ak1_segments.clone()));
-    
+
     contents
 }

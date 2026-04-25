@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// HL - Hierarchical Level for Billing/Pay-to Provider
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -337,37 +337,43 @@ pub struct SV3 {
 pub fn parse_loop2000a(content: &str) -> (Loop2000a, String) {
     let mut loop2000a = Loop2000a::default();
     let mut remaining_content = content.to_string();
-    
+
     // Parse HL segment for billing provider
     if let Some(hl_pos) = remaining_content.find("HL*") {
-        let hl_end = remaining_content[hl_pos..].find('~').unwrap_or(remaining_content.len()) + hl_pos;
+        let hl_end = remaining_content[hl_pos..]
+            .find('~')
+            .unwrap_or(remaining_content.len())
+            + hl_pos;
         loop2000a.hl = remaining_content[hl_pos..=hl_end].to_string();
         remaining_content = remaining_content[hl_end + 1..].to_string();
     }
-    
+
     // Parse PRV segment if present
     if let Some(prv_pos) = remaining_content.find("PRV*") {
-        let prv_end = remaining_content[prv_pos..].find('~').unwrap_or(remaining_content.len()) + prv_pos;
+        let prv_end = remaining_content[prv_pos..]
+            .find('~')
+            .unwrap_or(remaining_content.len())
+            + prv_pos;
         loop2000a.prv = Some(remaining_content[prv_pos..=prv_end].to_string());
         remaining_content = remaining_content[prv_end + 1..].to_string();
     }
-    
+
     (loop2000a, remaining_content)
 }
 
 /// Write Loop2000A to EDI format
 pub fn write_loop2000a(loop2000a: &Loop2000a) -> String {
     let mut result = String::new();
-    
+
     // Write HL segment
     result.push_str(&loop2000a.hl);
     result.push_str("\n");
-    
+
     // Write PRV segment if present
     if let Some(prv) = &loop2000a.prv {
         result.push_str(prv);
         result.push_str("\n");
     }
-    
+
     result
 }

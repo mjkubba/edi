@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct AK9 {
     pub ak901_functional_ack_code: String,
@@ -13,7 +13,6 @@ pub struct AK9 {
     pub ak907_fn_group_err_code: String,
     pub ak908_fn_group_err_code: String,
     pub ak909_fn_group_err_code: String,
-    
 }
 
 pub fn get_ak9(ak9_content: String) -> AK9 {
@@ -36,10 +35,8 @@ pub fn get_ak9(ak9_content: String) -> AK9 {
         ak909_fn_group_err_code,
     }
 }
- 
 
-
-pub fn write_ak9(ak9:AK9) -> String {
+pub fn write_ak9(ak9: AK9) -> String {
     let mut ak9_content = String::new();
     ak9_content.push_str("AK9*");
     ak9_content.push_str(&ak9.ak901_functional_ack_code);

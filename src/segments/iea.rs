@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct IEA {
     pub number_of_included_group: String,
@@ -15,8 +15,7 @@ pub fn get_iea(iea_content: String) -> IEA {
     }
 }
 
-
-pub fn write_iea(iea:IEA) -> String {
+pub fn write_iea(iea: IEA) -> String {
     let mut iea_content = String::new();
     iea_content.push_str("IEA*");
     iea_content.push_str(&iea.number_of_included_group);
@@ -24,5 +23,4 @@ pub fn write_iea(iea:IEA) -> String {
     iea_content.push_str(&iea.interchange_control_number);
     iea_content.push_str("~");
     iea_content
-
 }

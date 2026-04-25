@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // EDI 835 BPR segment
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct BPR {
     pub bpr01_transaction_handling_code: String,
@@ -28,17 +28,17 @@ pub struct BPR {
 
 pub fn get_bpr(bpr_content: String) -> BPR {
     let bpr_parts: Vec<&str> = bpr_content.split("*").collect();
-    let mut bpr05_payment_format_code: String ="".to_string();
-    let mut bpr06_id_number_qualifier: String ="".to_string();
-    let mut bpr07_id_number: String ="".to_string();
-    let mut bpr08_account_number_qualifier: String ="".to_string();
-    let mut bpr09_account_number: String ="".to_string();
-    let mut bpr10_originating_company_identifier: String ="".to_string();
-    let mut bpr11_originating_company_supplemental_code: String ="".to_string();
-    let mut bpr12_dfi_identification_number_qualifier: String ="".to_string();
-    let mut bpr13_dfi_identification_number: String ="".to_string();
-    let mut bpr14_account_number_qualifier: String ="".to_string();
-    let mut bpr15_account_number: String ="".to_string();
+    let mut bpr05_payment_format_code: String = "".to_string();
+    let mut bpr06_id_number_qualifier: String = "".to_string();
+    let mut bpr07_id_number: String = "".to_string();
+    let mut bpr08_account_number_qualifier: String = "".to_string();
+    let mut bpr09_account_number: String = "".to_string();
+    let mut bpr10_originating_company_identifier: String = "".to_string();
+    let mut bpr11_originating_company_supplemental_code: String = "".to_string();
+    let mut bpr12_dfi_identification_number_qualifier: String = "".to_string();
+    let mut bpr13_dfi_identification_number: String = "".to_string();
+    let mut bpr14_account_number_qualifier: String = "".to_string();
+    let mut bpr15_account_number: String = "".to_string();
 
     if bpr_parts.get(4).is_some() {
         bpr05_payment_format_code = bpr_parts[4].to_string();
@@ -133,7 +133,6 @@ pub fn write_bpr(bpr: BPR) -> String {
 }
 
 // unit test
-
 
 #[cfg(test)]
 

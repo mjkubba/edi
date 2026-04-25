@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::edi837::interchangecontrol::*;
 
@@ -13,11 +13,11 @@ pub struct Table1s {
 /// Parse GS segment
 pub fn parse_gs(segment: &str) -> Result<FunctionalGroupHeader, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 9 {
         return Err(format!("Invalid GS segment: {}", segment));
     }
-    
+
     Ok(FunctionalGroupHeader {
         segment_id: fields[0].to_string(),
         functional_identifier_code: fields[1].to_string(),
@@ -50,17 +50,17 @@ pub fn write_gs(gs: &FunctionalGroupHeader) -> String {
 /// Parse ST segment
 pub fn parse_st(segment: &str) -> Result<TransactionSetHeader, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 3 {
         return Err(format!("Invalid ST segment: {}", segment));
     }
-    
+
     let implementation_convention_reference = if fields.len() > 3 {
         Some(fields[3].to_string())
     } else {
         None
     };
-    
+
     Ok(TransactionSetHeader {
         segment_id: fields[0].to_string(),
         transaction_set_identifier_code: fields[1].to_string(),
@@ -82,9 +82,7 @@ pub fn write_st(st: &TransactionSetHeader) -> String {
     } else {
         format!(
             "{}*{}*{}",
-            st.segment_id,
-            st.transaction_set_identifier_code,
-            st.transaction_set_control_number
+            st.segment_id, st.transaction_set_identifier_code, st.transaction_set_control_number
         )
     }
 }
@@ -92,17 +90,17 @@ pub fn write_st(st: &TransactionSetHeader) -> String {
 /// Parse BHT segment
 pub fn parse_bht(segment: &str) -> Result<BHT, String> {
     let fields: Vec<&str> = segment.split('*').collect();
-    
+
     if fields.len() < 7 {
         return Err(format!("Invalid BHT segment: {}", segment));
     }
-    
+
     let time = if !fields[5].is_empty() {
         Some(fields[5].to_string())
     } else {
         None
     };
-    
+
     Ok(BHT {
         segment_id: fields[0].to_string(),
         hierarchical_structure_code: fields[1].to_string(),

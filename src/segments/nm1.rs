@@ -1,8 +1,8 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct NM1{
+pub struct NM1 {
     pub entity_id: String,
     pub entity_type: String,
     pub lastname: String,
@@ -17,7 +17,7 @@ pub struct NM1{
 
 pub fn get_nm1(nm1_content: String) -> NM1 {
     let nm1_parts: Vec<&str> = nm1_content.split("*").collect();
-    
+
     // Safely access elements with bounds checking
     let get_element = |index: usize| -> String {
         if index < nm1_parts.len() {
@@ -26,7 +26,7 @@ pub fn get_nm1(nm1_content: String) -> NM1 {
             String::new()
         }
     };
-    
+
     NM1 {
         entity_id: get_element(0),
         entity_type: get_element(1),
@@ -41,18 +41,11 @@ pub fn get_nm1(nm1_content: String) -> NM1 {
     }
 }
 
-pub fn write_nm1(nm1:NM1) -> String {
+pub fn write_nm1(nm1: NM1) -> String {
     if nm1.entity_id.is_empty() {
         return String::new();
     }
-    
-    // For NM1*03*1*SMITH*MARY format in the original file, we need to trim trailing empty fields
-    if nm1.entity_id == "03" && nm1.lastname == "SMITH" && nm1.firstname == "MARY" && 
-       nm1.middle_initial.is_empty() && nm1.suffix.is_empty() && nm1.title.is_empty() && 
-       nm1.id_code.is_empty() && nm1.member_number.is_empty() {
-        return "NM1*03*1*SMITH*MARY~".to_string();
-    }
-    
+
     // Don't include the segment ID in the entity_id field
     let entity_id = if nm1.entity_id == "NM1" {
         match nm1.entity_type.as_str() {
@@ -61,12 +54,12 @@ pub fn write_nm1(nm1:NM1) -> String {
             "1P" => "1P",
             "IL" => "IL",
             "QC" => "QC",
-            _ => &nm1.entity_id
+            _ => &nm1.entity_id,
         }
     } else {
         &nm1.entity_id
     };
-    
+
     let mut nm1_content: String = String::new();
     nm1_content.push_str("NM1*");
     nm1_content.push_str(entity_id);
@@ -88,6 +81,9 @@ pub fn write_nm1(nm1:NM1) -> String {
     nm1_content.push_str(&nm1.id_code);
     nm1_content.push_str("*");
     nm1_content.push_str(&nm1.member_number);
-    nm1_content.push_str("~");
+    while nm1_content.ends_with('*') {
+        nm1_content.pop();
+    }
+    nm1_content.push('~');
     nm1_content
 }

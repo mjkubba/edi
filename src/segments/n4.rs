@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct N4{
+pub struct N4 {
     pub payee_city: String,
     pub payee_state: String,
     pub payee_zip: String,
@@ -13,10 +13,10 @@ pub struct N4{
 
 pub fn get_n4(n4_content: String) -> N4 {
     let n4_parts: Vec<&str> = n4_content.split("*").collect();
-    let mut payee_state: String ="".to_string();
-    let mut payee_zip: String ="".to_string();
-    let mut payee_country_code: String ="".to_string();
-    let mut payee_country_sub_code: String ="".to_string();
+    let mut payee_state: String = "".to_string();
+    let mut payee_zip: String = "".to_string();
+    let mut payee_country_code: String = "".to_string();
+    let mut payee_country_sub_code: String = "".to_string();
     if n4_parts.get(1).is_some() {
         payee_state = n4_parts[1].to_string();
     }
@@ -25,7 +25,7 @@ pub fn get_n4(n4_content: String) -> N4 {
     }
     if n4_parts.get(3).is_some() {
         payee_country_code = n4_parts[3].to_string();
-    } 
+    }
     if n4_parts.get(4).is_some() {
         payee_country_sub_code = n4_parts[4].to_string();
     }
@@ -39,7 +39,7 @@ pub fn get_n4(n4_content: String) -> N4 {
     }
 }
 
-pub fn write_n4(n4:N4) -> String {
+pub fn write_n4(n4: N4) -> String {
     if n4.payee_city.is_empty() {
         return String::new();
     }
@@ -58,7 +58,6 @@ pub fn write_n4(n4:N4) -> String {
     n4_content.push_str("~");
     n4_content
 }
-
 
 #[cfg(test)]
 mod tests {

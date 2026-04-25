@@ -1,12 +1,12 @@
 use log::info;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::segments::ik3::*;
-use crate::segments::ctx::*;
 use crate::edi999::loop2110::*;
 use crate::helper::edihelper::*;
+use crate::segments::ctx::*;
+use crate::segments::ik3::*;
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2100 {
     pub ik3_segments: IK3,
     pub ctx_segments: Vec<CTX>,
@@ -35,7 +35,11 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
         let ctx = get_ctx(ctx_content);
         info!("CTX segment parsed: {:?}", ctx);
         ctx_segments.push(ctx);
-        contents = content_trim("CTX", contents);
+        let trimmed = content_trim("CTX", contents.clone());
+        if trimmed == contents {
+            break;
+        }
+        contents = trimmed;
     }
 
     loop2100.ctx_segments = ctx_segments;
@@ -46,12 +50,12 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
     contents = new_contents;
 
     info!("Loop 2100 parsed");
-    
+
     (loop2100, contents)
 }
 
 pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
-    let ik3_count = contents.matches("IK3").count();
+    let ik3_count = count_segment_starts("IK3", &contents);
     let mut loop_2100_array = vec![];
     info!("Number of loops in loop 2100: {:?}", ik3_count);
 
@@ -60,22 +64,22 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
         // Find the next IK3 segment
         if contents.contains("IK3") {
             // Extract the content for this IK3 loop
-            let end_pos = if let Some(next_ik3_pos) = contents[3..].find("IK3") {
-                // If there's another IK3, extract up to that point
-                3 + next_ik3_pos
-            } else if let Some(ik5_pos) = contents.find("IK5") {
-                // If there's an IK5, extract up to that point
+            let end_pos = if let Some(next_ik3_pos) = find_next_segment_start("IK3", &contents, 3) {
+                // If there's another IK3 at a segment boundary, extract up to that point
+                next_ik3_pos
+            } else if let Some(ik5_pos) = find_next_segment_start("IK5", &contents, 0) {
+                // If there's an IK5 at a segment boundary, extract up to that point
                 ik5_pos
             } else {
                 // Otherwise, use all remaining content
                 contents.len()
             };
-            
+
             let loop_content = contents[..end_pos].to_string();
             let (loop2100, _) = get_loop_2100(loop_content);
-            
+
             loop_2100_array.push(loop2100);
-            
+
             // Remove the processed content
             contents = contents[end_pos..].to_string();
         } else {
@@ -88,47 +92,50 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
 
 pub fn write_loop2100(loop2100s: Vec<Loop2100>) -> String {
     let mut contents = String::new();
-    
+
     for loop2100 in loop2100s {
         // Write IK3 segment
         contents.push_str(&write_ik3(loop2100.ik3_segments));
-        
+
         // Write all CTX segments
         for ctx in loop2100.ctx_segments {
             contents.push_str(&write_ctx(ctx));
         }
-        
+
         // Write all Loop 2110 segments
         contents.push_str(&write_loop2110(loop2100.loop2110s));
     }
-    
+
     contents
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::segments::ik4::*;
-    use crate::segments::ctx::*;
     use crate::edi999::loop2110::*;
-    
+    use crate::segments::ctx::*;
+    use crate::segments::ik4::*;
+
     #[test]
     fn test_get_loop_2100() {
         let contents = "IK3*NM1*1*8~CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~IK4*1*66*1*123~CTX*ELEMENT*IK4*1*2110*2~".to_string();
         let (loop2100, remaining) = get_loop_2100(contents);
-        
+
         assert_eq!(loop2100.ik3_segments.ik301_segment_id_code, "NM1");
         assert_eq!(loop2100.ctx_segments.len(), 1);
-        assert_eq!(loop2100.ctx_segments[0].ctx01_context_name, "SITUATIONAL TRIGGER");
+        assert_eq!(
+            loop2100.ctx_segments[0].ctx01_context_name,
+            "SITUATIONAL TRIGGER"
+        );
         assert_eq!(loop2100.loop2110s.len(), 1);
         assert_eq!(loop2100.loop2110s[0].ctx_segments.len(), 1);
         assert_eq!(remaining, "");
     }
-    
+
     #[test]
     fn test_write_loop2100() {
         let mut loop2100 = Loop2100::default();
-        
+
         // Set up IK3
         loop2100.ik3_segments = IK3 {
             ik301_segment_id_code: "NM1".to_string(),
@@ -136,7 +143,7 @@ mod tests {
             ik303_loop_identifier_code: "8".to_string(),
             ik304_implementation_segment_syntax_error_code: "".to_string(),
         };
-        
+
         // Add CTX
         let ctx = CTX {
             ctx01_context_name: "SITUATIONAL TRIGGER".to_string(),
@@ -146,9 +153,9 @@ mod tests {
             ctx05_position_in_segment: "1".to_string(),
             ctx06_reference_in_segment: "".to_string(),
         };
-        
+
         loop2100.ctx_segments.push(ctx);
-        
+
         // Add Loop 2110
         let mut loop2110 = Loop2110::default();
         loop2110.ik4_segments = IK4 {
@@ -157,7 +164,7 @@ mod tests {
             ik403_implementation_data_element_syntax_error_code: "1".to_string(),
             ik404_copy_of_bad_data_element: "123".to_string(),
         };
-        
+
         let ctx2110 = CTX {
             ctx01_context_name: "ELEMENT".to_string(),
             ctx02_segment_id_code: "IK4".to_string(),
@@ -166,10 +173,10 @@ mod tests {
             ctx05_position_in_segment: "2".to_string(),
             ctx06_reference_in_segment: "".to_string(),
         };
-        
+
         loop2110.ctx_segments.push(ctx2110);
         loop2100.loop2110s.push(loop2110);
-        
+
         let result = write_loop2100(vec![loop2100]);
         assert!(result.contains("IK3*NM1*1*8~"));
         assert!(result.contains("CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~"));

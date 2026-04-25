@@ -1,6 +1,7 @@
+use log::{info, warn};
 /**
  * Helper module for EDI processing
- * 
+ *
  * This module provides utility functions for handling EDI files, including:
  * - Command line argument processing
  * - File operations (reading and writing)
@@ -10,14 +11,13 @@
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
-use log::{info, warn};
 
 /**
  * Command line arguments structure
- * 
+ *
  * Holds the parsed command line arguments for the EDI processor
  */
-#[derive(Debug, Default,Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct Args {
     pub file_path: String,
     pub output_file: String,
@@ -27,29 +27,29 @@ pub struct Args {
 
 /**
  * Set up the logger for the application
- * 
+ *
  * Configures the logger to display info level messages without timestamps or targets
  */
-pub fn set_logger(){
+pub fn set_logger() {
     env_logger::builder()
-    .filter_level(log::LevelFilter::Info)
-    .format_target(false)
-    .format_timestamp(None)
-    .init();
+        .filter_level(log::LevelFilter::Info)
+        .format_target(false)
+        .format_timestamp(None)
+        .init();
 }
 
 /**
  * Process command line arguments
- * 
+ *
  * Parses the command line arguments and returns an Args structure
- * 
+ *
  * Arguments:
  * - -f: Input file path
  * - -o: Output file path
  * - -w: Write mode (convert JSON to EDI)
  * - -j: Input is JSON
  * - -h/--help: Show help information
- * 
+ *
  * Returns:
  * - Args structure with parsed arguments
  */
@@ -57,7 +57,7 @@ pub fn process_args() -> Args {
     let mut args = Args::default();
     let mut args_iter = std::env::args().skip(1);
     let mut operation = String::from("read");
-    
+
     while let Some(arg) = args_iter.next() {
         match arg.as_str() {
             "-f" => {
@@ -91,7 +91,7 @@ pub fn process_args() -> Args {
             "-h" | "--help" => {
                 println!("Usage:");
                 println!();
-                println!("To provide EDI file use '-f'"); 
+                println!("To provide EDI file use '-f'");
                 println!("To specify the output file use '-o'");
                 println!("To write EDI from JSON use '-w'");
                 println!("To specify input is JSON use '-j'");
@@ -100,20 +100,20 @@ pub fn process_args() -> Args {
             _ => {}
         }
     }
-    
+
     args.operation = operation;
-    
+
     if args.operation == "write" {
         info!("Using operation: Write EDI from JSON");
     } else {
         info!("Using operation: Create JSON from EDI");
     }
-    
+
     if args.file_path.is_empty() {
         warn!("No file provided, please use -f to pass in the file name");
         std::process::exit(1);
     }
-    
+
     if args.output_file.is_empty() {
         if args.operation == "read" {
             args.output_file = String::from("out.json");
@@ -122,25 +122,25 @@ pub fn process_args() -> Args {
         }
         info!("Using default output file: {}", args.output_file);
     }
-    
+
     args
 }
 
 /**
  * Read file contents
- * 
+ *
  * Reads the contents of a file specified in the Args structure
- * 
+ *
  * Parameters:
  * - args: Args structure with file_path
- * 
+ *
  * Returns:
  * - String containing the file contents
  */
 pub fn get_file_contents(args: Args) -> String {
     let mut contents = String::new();
     let file_path = Path::new(&args.file_path);
-    
+
     if file_path.exists() {
         info!("File exists");
         let mut file = File::open(file_path).unwrap();
@@ -154,12 +154,12 @@ pub fn get_file_contents(args: Args) -> String {
 
 /**
  * Clean file contents
- * 
+ *
  * Removes line breaks and normalizes delimiters in EDI content
- * 
+ *
  * Parameters:
  * - contents: String to clean
- * 
+ *
  * Returns:
  * - Cleaned string
  */
@@ -173,9 +173,9 @@ pub fn clean_contents(contents: String) -> String {
 
 /**
  * Write content to file
- * 
+ *
  * Writes the provided content to the specified file
- * 
+ *
  * Parameters:
  * - write_contents: Content to write
  * - write_file: Path to the output file
@@ -187,7 +187,7 @@ pub fn write_to_file(write_contents: String, write_file: String) {
     } else {
         Path::new(&write_file)
     };
-    
+
     match File::create(write_file_path) {
         Ok(mut file) => {
             if let Err(e) = file.write_all(write_contents.as_bytes()) {
@@ -195,7 +195,7 @@ pub fn write_to_file(write_contents: String, write_file: String) {
                 std::process::exit(1);
             }
             info!("Successfully wrote to file: {:?}", write_file_path);
-        },
+        }
         Err(e) => {
             warn!("Failed to create file: {}", e);
             std::process::exit(1);

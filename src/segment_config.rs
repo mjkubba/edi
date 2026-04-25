@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
 use once_cell::sync::Lazy;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::sync::Mutex;
 
 /// Configuration for an EDI segment element
@@ -34,23 +34,23 @@ impl SegmentRegistry {
             segments: HashMap::new(),
         }
     }
-    
+
     /// Register a segment configuration
     pub fn register(&mut self, config: SegmentConfig) {
         self.segments.insert(config.segment_id.clone(), config);
     }
-    
+
     /// Get a segment configuration by ID
     #[allow(dead_code)]
     pub fn get_config(&self, segment_id: &str) -> Option<&SegmentConfig> {
         self.segments.get(segment_id)
     }
-    
+
     /// Check if a segment ID is registered
     pub fn has_segment(&self, segment_id: &str) -> bool {
         self.segments.contains_key(segment_id)
     }
-    
+
     /// Get all registered segment IDs
     #[allow(dead_code)]
     pub fn get_segment_ids(&self) -> Vec<String> {
@@ -61,10 +61,10 @@ impl SegmentRegistry {
 // Global segment registry
 pub static SEGMENT_REGISTRY: Lazy<Mutex<SegmentRegistry>> = Lazy::new(|| {
     let mut registry = SegmentRegistry::new();
-    
+
     // Register common segments
     register_common_segments(&mut registry);
-    
+
     Mutex::new(registry)
 });
 
@@ -91,23 +91,26 @@ fn register_common_segments(registry: &mut SegmentRegistry) {
             // Add other ISA elements...
         ],
     });
-    
+
     // GS - Functional Group Header
     registry.register(SegmentConfig {
         segment_id: "GS".to_string(),
         name: "Functional Group Header".to_string(),
-        description: "To indicate the beginning of a functional group and to provide control information".to_string(),
+        description:
+            "To indicate the beginning of a functional group and to provide control information"
+                .to_string(),
         elements: vec![
             ElementConfig {
                 name: "functional_identifier_code".to_string(),
                 required: true,
                 max_length: 2,
-                description: "Code identifying a group of application related transaction sets".to_string(),
+                description: "Code identifying a group of application related transaction sets"
+                    .to_string(),
             },
             // Add other GS elements...
         ],
     });
-    
+
     // ST - Transaction Set Header
     registry.register(SegmentConfig {
         segment_id: "ST".to_string(),
@@ -129,7 +132,7 @@ fn register_common_segments(registry: &mut SegmentRegistry) {
             // Add other ST elements...
         ],
     });
-    
+
     // SE - Transaction Set Trailer
     registry.register(SegmentConfig {
         segment_id: "SE".to_string(),
@@ -150,7 +153,7 @@ fn register_common_segments(registry: &mut SegmentRegistry) {
             },
         ],
     });
-    
+
     // GE - Functional Group Trailer
     registry.register(SegmentConfig {
         segment_id: "GE".to_string(),
@@ -171,7 +174,7 @@ fn register_common_segments(registry: &mut SegmentRegistry) {
             },
         ],
     });
-    
+
     // IEA - Interchange Control Trailer
     registry.register(SegmentConfig {
         segment_id: "IEA".to_string(),
@@ -197,11 +200,11 @@ fn register_common_segments(registry: &mut SegmentRegistry) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_segment_registry() {
         let registry = SEGMENT_REGISTRY.lock().unwrap();
-        
+
         // Test common segments are registered
         assert!(registry.has_segment("ISA"));
         assert!(registry.has_segment("GS"));
@@ -209,15 +212,18 @@ mod tests {
         assert!(registry.has_segment("SE"));
         assert!(registry.has_segment("GE"));
         assert!(registry.has_segment("IEA"));
-        
+
         // Test segment retrieval
         let isa_config = registry.get_config("ISA").unwrap();
         assert_eq!(isa_config.segment_id, "ISA");
         assert_eq!(isa_config.name, "Interchange Control Header");
-        
+
         // Test element configuration
         assert!(!isa_config.elements.is_empty());
-        assert_eq!(isa_config.elements[0].name, "authorization_information_qualifier");
+        assert_eq!(
+            isa_config.elements[0].name,
+            "authorization_information_qualifier"
+        );
         assert!(isa_config.elements[0].required);
     }
 }

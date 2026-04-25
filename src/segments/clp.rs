@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct CLP{
+pub struct CLP {
     pub clp01_patient_control_number: String,
     pub clp02_claim_status_code: String,
     pub clp03_total_claim_charge_amount: String,
@@ -27,12 +27,12 @@ pub struct CLP{
 
 pub fn get_clp(bpr_content: String) -> CLP {
     let clp_parts: Vec<&str> = bpr_content.split("*").collect();
-    let mut clp05_patient_responsibility_amount: String ="".to_string();
-    let mut clp08_facility_type_code: String ="".to_string();
-    let mut clp09_claim_frequency_code: String ="".to_string();
-    let mut clp11_diagnosis_related_group: String ="".to_string();
-    let mut clp12_drg_weight: String ="".to_string();
-    let mut clp13_percent_discharge_fraction: String ="".to_string();
+    let mut clp05_patient_responsibility_amount: String = "".to_string();
+    let mut clp08_facility_type_code: String = "".to_string();
+    let mut clp09_claim_frequency_code: String = "".to_string();
+    let mut clp11_diagnosis_related_group: String = "".to_string();
+    let mut clp12_drg_weight: String = "".to_string();
+    let mut clp13_percent_discharge_fraction: String = "".to_string();
     if clp_parts.get(4).is_some() {
         clp05_patient_responsibility_amount = clp_parts[4].to_string();
     }
@@ -69,7 +69,7 @@ pub fn get_clp(bpr_content: String) -> CLP {
     }
 }
 
-pub fn write_clp(clp:CLP) -> String {
+pub fn write_clp(clp: CLP) -> String {
     if clp.clp01_patient_control_number.is_empty() {
         return String::new();
     }
@@ -96,9 +96,6 @@ pub fn write_clp(clp:CLP) -> String {
     clp_content.push_str("~");
     clp_content
 }
-
-
-
 
 // unit test
 

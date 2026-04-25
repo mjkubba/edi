@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeHeader {
@@ -40,7 +40,8 @@ pub fn get_interchange_header(contents: String) -> (InterchangeHeader, String) {
             interchange_header.isa09_interchange_date = isa_elements[9].to_string();
             interchange_header.isa10_interchange_time = isa_elements[10].to_string();
             interchange_header.isa11_repetition_separator = isa_elements[11].to_string();
-            interchange_header.isa12_interchange_control_version_number = isa_elements[12].to_string();
+            interchange_header.isa12_interchange_control_version_number =
+                isa_elements[12].to_string();
             interchange_header.isa13_interchange_control_number = isa_elements[13].to_string();
             interchange_header.isa14_acknowledgment_requested = isa_elements[14].to_string();
             interchange_header.isa15_usage_indicator = isa_elements[15].to_string();

@@ -8,31 +8,31 @@ pub type EdiResult<T> = Result<T, EdiError>;
 pub enum EdiError {
     /// Error parsing EDI content
     ParseError(String),
-    
+
     /// Error validating EDI content
     ValidationError(String),
-    
+
     /// I/O error
     IoError(std::io::Error),
-    
+
     /// Missing required segment
     MissingSegment(String),
-    
+
     /// Malformed segment
     MalformedSegment(String),
-    
+
     /// Unsupported format
     UnsupportedFormat(String),
-    
+
     /// Missing required field
     MissingField(String),
-    
+
     /// Invalid field value
     InvalidFieldValue(String),
-    
+
     /// Not implemented
     NotImplemented(String),
-    
+
     /// Invalid segment order
     InvalidSegmentOrder(String),
 }

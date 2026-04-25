@@ -1,9 +1,9 @@
-use serde::{Serialize, Deserialize};
 use crate::helper::edihelper::stiuational_element;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct N3{
+pub struct N3 {
     pub payee_address: String,
     pub payee_address2: String,
 }
@@ -23,7 +23,7 @@ pub fn get_n3(n3_content: String) -> N3 {
     }
 }
 
-pub fn write_n3(n3:N3) -> String {
+pub fn write_n3(n3: N3) -> String {
     if n3.payee_address.is_empty() {
         return String::new();
     }

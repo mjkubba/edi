@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct DTM {
     pub date_time_qualifier: String,
@@ -15,7 +15,7 @@ pub fn get_dtm(dtm_content: String) -> DTM {
     }
 }
 
-pub fn write_dtm(dtm:DTM) -> String {
+pub fn write_dtm(dtm: DTM) -> String {
     if dtm.date_time_qualifier.is_empty() {
         return String::new();
     }
@@ -27,4 +27,3 @@ pub fn write_dtm(dtm:DTM) -> String {
     dtm_content.push_str("~");
     dtm_content
 }
- 

@@ -1,6 +1,6 @@
-use log::info;
-use serde::{Serialize, Deserialize};
 use crate::segments::nm1::*;
+use log::info;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Loop2100D {
@@ -9,7 +9,7 @@ pub struct Loop2100D {
 
 pub fn get_loop2100d(mut contents: String) -> (Loop2100D, String) {
     let mut loop2100d = Loop2100D::default();
-    
+
     if let Some(nm1_start) = contents.find("NM1*36*") {
         if let Some(nm1_end) = contents[nm1_start..].find("~") {
             let nm1_content = &contents[nm1_start + 3..nm1_start + nm1_end];
@@ -17,7 +17,7 @@ pub fn get_loop2100d(mut contents: String) -> (Loop2100D, String) {
             contents = contents[nm1_start + nm1_end + 1..].to_string();
         }
     }
-    
+
     info!("Parsed Loop2100D: {:?}", loop2100d);
     (loop2100d, contents)
 }

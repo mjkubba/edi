@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct AK1 {
     pub ak01_functional_id_group: String,
@@ -16,10 +16,8 @@ pub fn get_ak1(ak1_content: String) -> AK1 {
         ak03_ver_release_id_code: ak1_parts[2].to_string(),
     }
 }
- 
 
-
-pub fn write_ak1(amt:AK1) -> String {
+pub fn write_ak1(amt: AK1) -> String {
     let mut ak1_content = String::new();
     ak1_content.push_str("AK1*");
     ak1_content.push_str(&amt.ak01_functional_id_group);

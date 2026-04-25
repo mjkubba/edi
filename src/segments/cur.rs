@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // EDI 835 CUR segment
-#[derive(Debug, Default,PartialEq,Clone,Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 
 pub struct CUR {
@@ -17,7 +17,7 @@ pub fn get_cur(cur_content: String) -> CUR {
     }
 }
 
-pub fn write_cur(cur:CUR) -> String {
+pub fn write_cur(cur: CUR) -> String {
     if cur.identity_identifier_code.is_empty() {
         return String::new();
     }
@@ -28,7 +28,6 @@ pub fn write_cur(cur:CUR) -> String {
     cur_content.push_str(&cur.currency_code);
     cur_content.push_str("~");
     cur_content
-    
 }
 
 // unit test
