@@ -7,10 +7,9 @@ fileMatchPattern: 'README*'
 
 ## Project Purpose and Scope
 - Convert EDI formats to JSON and vice versa
-- Support multiple healthcare X12 transaction sets (835, 999, 270/271, 276/277, 837P/I/D)
+- Support multiple healthcare X12 transaction sets (835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834)
 - Provide robust error handling and validation
 - Maintain a modular and extensible architecture
-- Support future implementation of additional transaction sets (278, 820, 834)
 
 ## Architecture Overview
 
@@ -102,5 +101,5 @@ impl TransactionSet for TransactionSetName {
 - **278** (Health Care Services Review) - ASC X12N/005010X217
 - **820** (Payroll Deducted and Other Group Premium Payment) - ASC X12N/005010X218
 
-### Planned for Implementation
-- **834** (Benefit Enrollment and Maintenance) - ASC X12N/005010X220
+### Needs Verification
+- **834** (Benefit Enrollment and Maintenance) - ASC X12N/005010X220 — code exists but not yet verified against real files
