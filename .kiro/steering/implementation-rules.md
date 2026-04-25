@@ -7,6 +7,23 @@ inclusion: always
 When you implement new code, keep the current structure, mimic what was already created, don't create a new structure.
 Make sure the changes to an existing code or file will not impact the existing functionality and keep the code backward compatible.
 
+## X12 Reference Documentation
+
+Before implementing a new transaction set, segment, or loop — or when something about the X12 structure is unclear — **search the knowledge base first**. It contains the full X12 implementation guides for all supported transaction sets:
+
+- 270/271 (Eligibility) — `270-271v5010X279.md`
+- 276/277 (Claim Status) — files with `005010X212` in the name
+- 278 (Services Review) — `278v5010X217.md`
+- 820 (Premium Payment) — `820v5010X218.md`
+- 834 (Enrollment) — `834v5010X220.md`
+- 835 (Payment/Remittance) — `835v5010X221.md`
+- 837P (Claim Professional) — `837Pv5010X222.md`
+- 837I (Claim Institutional) — files with `005010X223` in the name
+- 837D (Claim Dental) — `837Dv5010X224.md`
+- 999 (Acknowledgment) — `999v5010X231.md`
+
+These guides contain segment element definitions, loop hierarchies, situational rules, and valid code values. Use them to verify correct field mappings and segment ordering.
+
 ## EDI Segment Parsing Rules
 
 1. **`get_segment_contents(key, contents)` strips the segment ID prefix** (e.g., `get_segment_contents("NM1", ...)` returns content AFTER `NM1*`). Parsers like `get_nm1`, `get_hl`, `get_prv` expect content WITHOUT the segment ID at index 0. If you extract a segment manually with `find("HL")`, you must strip the prefix (e.g., `&segment[3..]` for `HL*`) before passing to the parser.
