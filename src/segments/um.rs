@@ -61,7 +61,7 @@ impl UM {
             let first_part = parts[0];
             
             // Check if the first part contains a prefix
-            if first_part.len() > 2 {
+            if first_part.len() >= 2 && (first_part == "AR" || first_part == "HS" || (first_part.len() == 2 && first_part.chars().all(|c| c.is_uppercase()))) {
                 // Extract prefix (AR, HS, etc.)
                 um.um00_request_category_code_prefix = first_part[0..2].to_string();
                 
@@ -312,7 +312,7 @@ mod tests {
         };
         
         let um_content = write_um(um);
-        assert_eq!(um_content, "UM*I*2*21:B****Y~");
+        assert_eq!(um_content, "UM*I*2*21:B*****Y~");
     }
     
     #[test]

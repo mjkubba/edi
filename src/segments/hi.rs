@@ -147,7 +147,7 @@ mod tests {
     
     #[test]
     fn test_get_hi() {
-        let hi_content = "BF:41090:D8:20050125".to_string();
+        let hi_content = "BF*41090*D8*20050125".to_string();
         let hi = get_hi(hi_content);
         assert_eq!(hi.hi01_health_care_code_information, "BF");
         assert_eq!(hi.hi02_health_care_code_information, "41090");

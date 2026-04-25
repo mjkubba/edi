@@ -10,6 +10,7 @@ pub struct NM1{
     pub middle_initial: String,
     pub suffix: String,
     pub title: String,
+    pub id_code_qualifier: String,
     pub id_code: String,
     pub member_number: String,
 }
@@ -34,8 +35,9 @@ pub fn get_nm1(nm1_content: String) -> NM1 {
         middle_initial: get_element(4),
         suffix: get_element(5),
         title: get_element(6),
-        id_code: get_element(7),
-        member_number: get_element(8),
+        id_code_qualifier: get_element(7),
+        id_code: get_element(8),
+        member_number: get_element(9),
     }
 }
 
@@ -80,6 +82,8 @@ pub fn write_nm1(nm1:NM1) -> String {
     nm1_content.push_str(&nm1.suffix);
     nm1_content.push_str("*");
     nm1_content.push_str(&nm1.title);
+    nm1_content.push_str("*");
+    nm1_content.push_str(&nm1.id_code_qualifier);
     nm1_content.push_str("*");
     nm1_content.push_str(&nm1.id_code);
     nm1_content.push_str("*");

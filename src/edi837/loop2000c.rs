@@ -176,9 +176,9 @@ mod tests {
     
     #[test]
     fn test_parse_loop2000c() {
-        let content = "HL*3*2*23*0\nPAT*19\nDMG*D8*19800519*M\nNM1*QC*1*DOE*JANE****MI*123456789B\nN3*123 MAIN ST\nN4*ANYTOWN*PA*17111\nREF*SY*987654321\nDTP*304*D8*20230101";
+        let content = "HL*3*2*23*0~PAT*19~DMG*D8*19800519*M~NM1*QC*1*DOE*JANE****MI*123456789B~N3*123 MAIN ST~N4*ANYTOWN*PA*17111~REF*SY*987654321~DTP*304*D8*20230101~";
         
-        let loop2000c = parse_loop2000c(content);
+        let (loop2000c, _) = parse_loop2000c(content);
         
         assert_eq!(loop2000c.hl, "HL*3*2*23*0");
         assert_eq!(loop2000c.pat, "PAT*19");

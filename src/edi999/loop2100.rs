@@ -108,6 +108,9 @@ pub fn write_loop2100(loop2100s: Vec<Loop2100>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::segments::ik4::*;
+    use crate::segments::ctx::*;
+    use crate::edi999::loop2110::*;
     
     #[test]
     fn test_get_loop_2100() {

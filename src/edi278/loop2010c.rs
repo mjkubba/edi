@@ -98,9 +98,9 @@ mod tests {
         
         assert!(loop2010c.dmg_segments.is_some());
         let dmg = loop2010c.dmg_segments.unwrap();
-        assert_eq!(dmg.date_time_period_format_qualifier, "D8");
-        assert_eq!(dmg.date_time_period, "19800519");
-        assert_eq!(dmg.gender_code, "M");
+        assert_eq!(dmg.dmg01_date_time_qualifier, "D8");
+        assert_eq!(dmg.dmg02_date_time_period, "19800519");
+        assert_eq!(dmg.dmg03_gender_code, "M");
         
         assert_eq!(contents, "");
     }
@@ -116,6 +116,7 @@ mod tests {
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
+                id_code_qualifier: "MI".to_string(),
                 id_code: "123456789A".to_string(),
                 member_number: "".to_string(),
             },
@@ -123,14 +124,18 @@ mod tests {
                 REF {
                     reference_id_number_qualifier: "SY".to_string(),
                     reference_id_number: "123456789".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
                 }
             ],
             dmg_segments: Some(DMG {
-                date_time_period_format_qualifier: "D8".to_string(),
-                date_time_period: "19800519".to_string(),
-                gender_code: "M".to_string(),
+                dmg01_date_time_qualifier: "D8".to_string(),
+                dmg02_date_time_period: "19800519".to_string(),
+                dmg03_gender_code: "M".to_string(),
+                dmg04_marital_status_code: "".to_string(),
+                dmg05_race_or_ethnicity_code: "".to_string(),
+                dmg06_citizenship_status_code: "".to_string(),
+                dmg07_country_code: "".to_string(),
+                dmg08_basis_of_verification_code: "".to_string(),
+                dmg09_quantity: "".to_string(),
             }),
         };
         

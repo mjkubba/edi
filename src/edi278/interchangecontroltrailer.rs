@@ -73,9 +73,9 @@ mod tests {
         let (trailer, contents) = get_interchange_trailer(contents);
         assert_eq!(trailer.se_segments.number_of_segment, "10");
         assert_eq!(trailer.se_segments.transaction_set_control_number, "0001");
-        assert_eq!(trailer.ge_segments.number_of_transaction_sets, "1");
+        assert_eq!(trailer.ge_segments.number_of_transitions, "1");
         assert_eq!(trailer.ge_segments.group_control_number, "1");
-        assert_eq!(trailer.iea_segments.number_of_included_functional_groups, "1");
+        assert_eq!(trailer.iea_segments.number_of_included_group, "1");
         assert_eq!(trailer.iea_segments.interchange_control_number, "000000001");
         assert_eq!(contents, "");
     }
@@ -88,11 +88,11 @@ mod tests {
                 transaction_set_control_number: "0001".to_string(),
             },
             ge_segments: GE {
-                number_of_transaction_sets: "1".to_string(),
+                number_of_transitions: "1".to_string(),
                 group_control_number: "1".to_string(),
             },
             iea_segments: IEA {
-                number_of_included_functional_groups: "1".to_string(),
+                number_of_included_group: "1".to_string(),
                 interchange_control_number: "000000001".to_string(),
             },
         };

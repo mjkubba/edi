@@ -164,4 +164,4 @@ diff ./demo/edi835-1.edi ./demo/test835-new.edi
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
-[Specify your license here]
+MIT

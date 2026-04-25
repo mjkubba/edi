@@ -110,6 +110,7 @@ mod tests {
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
+                id_code_qualifier: "SV".to_string(),
                 id_code: "2000035".to_string(),
                 member_number: "".to_string(),
             },
@@ -118,8 +119,6 @@ mod tests {
                 REF {
                     reference_id_number_qualifier: "XZ".to_string(),
                     reference_id_number: "7654321".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
                 }
             ],
         };

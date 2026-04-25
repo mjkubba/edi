@@ -101,6 +101,10 @@ pub fn write_loop2000(loop2000s: Vec<Loop2000>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::segments::ik3::*;
+    use crate::segments::ik4::*;
+    use crate::segments::ctx::*;
+    use crate::edi999::loop2110::*;
     
     #[test]
     fn test_get_loop_2000() {

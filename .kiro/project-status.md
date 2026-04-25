@@ -31,27 +31,27 @@
   - Successfully parses and generates basic EDI820 structure
   - Missing many segments in output (N1, ENT, NM1, RMR, DTM)
   - Needs significant improvement to preserve all segments
-
-### Not Implemented
-- ❌ EDI834 (Benefit Enrollment and Maintenance) - Not implemented
-  - Format not recognized by the parser
-  - Needs to be implemented from scratch
+- ✅ EDI834 (Benefit Enrollment and Maintenance) - Implemented
+  - Directory structure and module organization complete
+  - Member-level detail segments implemented (INS, HD, DSB)
+  - Loop structures for enrollment and maintenance implemented (2000, 2100a-h, 2300, 2320, 2330)
+  - Controller with TransactionSet trait implemented
+  - Wired up in lib.rs and main.rs for both read and write operations
+  - Functional status not yet verified against real EDI834 files
 
 ### Next Steps
-1. Implement Transaction Set 834
-   - Create directory structure and module organization
-   - Implement member-level detail segments (INS, HD, DSB)
-   - Implement loop structures for enrollment and maintenance
-   - Create controller with TransactionSet trait implementation
-2. Improve Incomplete Implementations
-   - Enhance the EDI820 implementation to preserve all segments
-   - Improve the EDI837P and EDI837I implementations to preserve all segments
+1. Fix EDI820 Missing Segments (N1, ENT, NM1, RMR, DTM)
+   - Most broken existing implementation, needs significant work
+2. Fix EDI278 Missing Segments (DTP, SV2, PRV)
+   - Nearly complete, small targeted fixes needed
+3. Fix EDI837P and EDI837I Missing Segments
+   - Both functional but lossy on round-trip
    - Fix segment order issues in generated files
-3. Code Cleanup
+4. Code Cleanup
    - Address compiler warnings, particularly unused imports and functions
    - Fix unused variable warnings
    - Improve code organization and documentation
-4. Performance Optimization
+5. Performance Optimization
    - Optimize parsing algorithms for better performance with large files
    - Implement caching for frequently used segments
    - Reduce memory usage for large files

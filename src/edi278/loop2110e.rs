@@ -162,13 +162,13 @@ mod tests {
         
         assert!(loop2110e.n3_segments.is_some());
         let n3 = loop2110e.n3_segments.unwrap();
-        assert_eq!(n3.address, "475 MAIN STREET");
+        assert_eq!(n3.payee_address, "475 MAIN STREET");
         
         assert!(loop2110e.n4_segments.is_some());
         let n4 = loop2110e.n4_segments.unwrap();
-        assert_eq!(n4.city, "ANYTOWN");
-        assert_eq!(n4.state, "PA");
-        assert_eq!(n4.zip, "19087");
+        assert_eq!(n4.payee_city, "ANYTOWN");
+        assert_eq!(n4.payee_state, "PA");
+        assert_eq!(n4.payee_zip, "19087");
         
         assert_eq!(contents, "");
     }
@@ -192,8 +192,6 @@ mod tests {
                 REF {
                     reference_id_number_qualifier: "1J".to_string(),
                     reference_id_number: "12345".to_string(),
-                    description: "".to_string(),
-                    reference_identifier: "".to_string(),
                 }
             ],
             n3_segments: None,
@@ -232,17 +230,15 @@ mod tests {
             },
             ref_segments: vec![],
             n3_segments: Some(N3 {
-                address: "475 MAIN STREET".to_string(),
-                address2: "".to_string(),
+                payee_address: "475 MAIN STREET".to_string(),
+                payee_address2: "".to_string(),
             }),
             n4_segments: Some(N4 {
-                city: "ANYTOWN".to_string(),
-                state: "PA".to_string(),
-                zip: "19087".to_string(),
-                country_code: "".to_string(),
-                country_subdivision_code: "".to_string(),
-                location_qualifier: "".to_string(),
-                location_identifier: "".to_string(),
+                payee_city: "ANYTOWN".to_string(),
+                payee_state: "PA".to_string(),
+                payee_zip: "19087".to_string(),
+                payee_country_code: "".to_string(),
+                payee_country_sub_code: "".to_string(),
             }),
             prv_segments: None,
         };
