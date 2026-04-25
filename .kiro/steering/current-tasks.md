@@ -4,55 +4,31 @@ inclusion: manual
 
 # Current Development Tasks
 
-## High Priority Tasks
+## Completed
+- [x] All transaction sets implemented (835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834)
+- [x] Fix all test failures (237/237 pass)
+- [x] Fix memory crash in edi999 CTX parsing
+- [x] Fix NM1 id_code_qualifier field across all modules
+- [x] Fix UM prefix detection (removed — AR/HS are um01 values)
+- [x] Fix PRV parser off-by-one
+- [x] Fix edi837 loop boundary detection and write functions
+- [x] Fix edi276/277 HL/NM1/BHT parsing
+- [x] Fix edi278 loop2010f to accept NM1*1P
 
-### 1. Phase 3: Additional Transaction Sets
-- [x] Implement Transaction Set 278 (Health Care Services Review)
-  - [x] Create directory structure and module organization
-  - [x] Implement segment structures specific to 278 (UM segment)
-  - [x] Implement basic controller with TransactionSet trait implementation
-  - [x] Restructure implementation to follow EDI835 pattern
-  - [x] Fix test failures and field naming issues
-  - [x] Complete loop structure implementation
-  - [x] Add validation for 278-specific requirements
-  - [x] Add comprehensive tests
-  - [ ] Fix missing segments in output (DTP, SV2, PRV segments)
-- [x] Implement Transaction Set 820 (Health Insurance Exchange Related Payments)
-  - [x] Create directory structure and module organization
-  - [x] Implement financial transaction segments (BPR, TRN)
-  - [x] Implement loop structures for premium payment
-  - [x] Create controller with TransactionSet trait implementation
-  - [ ] Fix missing segments in output (N1, ENT, NM1, RMR, DTM)
-- [x] Implement Transaction Set 834 (Benefit Enrollment and Maintenance)
-  - [x] Create directory structure and module organization
-  - [x] Implement member-level detail segments (INS, HD, DSB)
-  - [x] Implement loop structures for enrollment and maintenance (2000, 2100a-h, 2300, 2320, 2330)
-  - [x] Create controller with TransactionSet trait implementation
-  - [x] Wired up in lib.rs and main.rs
-  - [ ] Verify against real EDI834 files
+## Remaining Work
 
-### 2. Improve Incomplete Implementations
-- [ ] Enhance EDI837P implementation
-  - [ ] Fix missing segments in output
-  - [ ] Ensure correct segment order
-- [ ] Enhance EDI837I implementation
-  - [ ] Fix missing segments in output
-  - [ ] Ensure correct segment order
+### High Priority
+- [ ] Implement Loop2000C/D parsing for EDI276/277
+  - TRN, REF, DMG segments not parsed/written for Provider and Subscriber levels
 - [ ] Enhance EDI820 implementation
-  - [ ] Fix missing segments in output (N1, ENT, NM1, RMR, DTM)
-  - [ ] Ensure correct segment order
+  - Fix missing segments (N1, ENT, NM1, RMR, DTM)
+- [ ] Verify EDI834 against real files
 
-### 3. Code Cleanup
-- [ ] Address compiler warnings
-  - [ ] Fix unused imports warnings
-  - [ ] Fix unused variables warnings
-  - [ ] Fix unused functions warnings
-- [ ] Improve code organization and documentation
-  - [ ] Add more comprehensive comments
-  - [ ] Update README with latest implementation details
-  - [ ] Create better examples in documentation
+### Medium Priority
+- [ ] Clean up compiler warnings (unused imports, dead code, unused mut)
+- [ ] Improve EDI837P/I segment coverage on round-trip
 
-### 4. Performance Optimization
-- [ ] Optimize parsing algorithms for better performance with large files
-- [ ] Implement caching for frequently used segments
-- [ ] Reduce memory usage for large files
+### Low Priority
+- [ ] Performance optimization for large files
+- [ ] Add support for custom delimiters
+- [ ] Add schema validation

@@ -31,7 +31,7 @@ This project implements a comprehensive Electronic Data Interchange (EDI) parser
 - ✅ EDI837D (Health Care Claim Dental) - Functional
 - ✅ EDI820 (Health Insurance Exchange Related Payments) - Partially functional
 
-### Not Implemented
+### Implemented, unverified
 - ❌ EDI834 (Benefit Enrollment and Maintenance) - Not implemented
 
 ## Project Structure

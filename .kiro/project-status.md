@@ -5,53 +5,43 @@
 - ✅ EDI999 (Implementation Acknowledgment) - Fully functional
 - ✅ EDI270 (Health Care Eligibility Benefit Inquiry) - Fully functional
 - ✅ EDI271 (Health Care Eligibility Benefit Response) - Fully functional
-- ✅ EDI276 (Health Care Claim Status Request) - Functional with differences
-  - Successfully parses and generates core EDI276 structure
-  - Some segments missing or have different values in output
-- ✅ EDI277 (Health Care Claim Status Response) - Functional with differences
-  - Successfully parses and generates core EDI277 structure
-  - TRN and STC segment handling working correctly
-  - Some segments missing or have different values in output
-- ✅ EDI278 (Health Care Services Review) - Functional with minor differences
-  - Successfully parses and generates core EDI278 structure
-  - Properly handles UM segments with AR/HS prefixes
-  - Some segments missing in output (DTP, SV2, PRV segments)
-  - Line breaks in generated output (formatting difference only)
-- ✅ EDI837P (Health Care Claim Professional) - Functional with differences
-  - Successfully parses and generates core EDI837P structure
-  - Several segments missing in output
-- ✅ EDI837I (Health Care Claim Institutional) - Functional with differences
-  - Successfully parses and generates core EDI837I structure
-  - Specialized handling for CL1 segment
-  - Several segments missing in output
+- ✅ EDI276 (Health Care Claim Status Request) - Functional
+  - Parses and generates core structure
+  - Loop2000C/D (Provider/Subscriber) not yet parsed from EDI; TRN/REF/DMG not written for those loops
+- ✅ EDI277 (Health Care Claim Status Response) - Functional
+  - Parses and generates core structure
+  - Same Loop2000C/D limitation as 276
+- ✅ EDI278 (Health Care Services Review) - Functional
+  - All loops implemented (2000A-F, 2010A-F, 2100E-F, 2110E)
+  - UM segment correctly parses AR/HS as request category codes (um01)
+  - PRV segment parsing corrected
+- ✅ EDI837P (Health Care Claim Professional) - Functional
+  - Correct round-trip for claims with service lines
+  - Loop2400 properly nested inside Loop2300
+- ✅ EDI837I (Health Care Claim Institutional) - Functional
+  - Specialized CL1 segment handling
+  - Loop2400 properly nested inside Loop2300
 - ✅ EDI837D (Health Care Claim Dental) - Functional
-  - Successfully parses and generates core EDI837D structure
-  - Specialized handling for TOO segment
-- ✅ EDI820 (Health Insurance Exchange Related Payments) - Partially functional
-  - Successfully parses and generates basic EDI820 structure
-  - Missing many segments in output (N1, ENT, NM1, RMR, DTM)
-  - Needs significant improvement to preserve all segments
-- ✅ EDI834 (Benefit Enrollment and Maintenance) - Implemented
-  - Directory structure and module organization complete
-  - Member-level detail segments implemented (INS, HD, DSB)
-  - Loop structures for enrollment and maintenance implemented (2000, 2100a-h, 2300, 2320, 2330)
-  - Controller with TransactionSet trait implemented
-  - Wired up in lib.rs and main.rs for both read and write operations
-  - Functional status not yet verified against real EDI834 files
+  - Specialized TOO segment handling
+- ⚠️ EDI820 (Health Insurance Exchange Related Payments) - Partial
+  - Basic structure parses; many segments missing (N1, ENT, NM1, RMR, DTM)
+- ⚠️ EDI834 (Benefit Enrollment and Maintenance) - Implemented, unverified
+  - All loop structures implemented (2000, 2100a-h, 2300, 2320, 2330)
+  - Wired up in lib.rs and main.rs
+  - Not yet verified against real EDI834 files
+
+### Test Status
+- **237/237 tests pass** — no failures, no memory crashes
+
+### Known Limitations
+- EDI276/277: Loop2000C/D parsing not implemented; TRN/STC/REF not written for deeper loops
+- EDI820: Missing many segments in round-trip
+- EDI834: Not tested against real files
+- Compiler warnings remain (unused imports, dead code) — cosmetic only
 
 ### Next Steps
-1. Fix EDI820 Missing Segments (N1, ENT, NM1, RMR, DTM)
-   - Most broken existing implementation, needs significant work
-2. Fix EDI278 Missing Segments (DTP, SV2, PRV)
-   - Nearly complete, small targeted fixes needed
-3. Fix EDI837P and EDI837I Missing Segments
-   - Both functional but lossy on round-trip
-   - Fix segment order issues in generated files
-4. Code Cleanup
-   - Address compiler warnings, particularly unused imports and functions
-   - Fix unused variable warnings
-   - Improve code organization and documentation
-5. Performance Optimization
-   - Optimize parsing algorithms for better performance with large files
-   - Implement caching for frequently used segments
-   - Reduce memory usage for large files
+1. Implement Loop2000C/D parsing for EDI276/277
+2. Enhance EDI820 to preserve all segments
+3. Verify EDI834 against real files
+4. Clean up compiler warnings
+5. Performance optimization for large files
