@@ -151,8 +151,9 @@ mod tests {
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
-                id_code: "SV".to_string(),
-                member_number: "0202034".to_string(),
+                id_code_qualifier: "SV".to_string(),
+                id_code: "0202034".to_string(),
+                member_number: "".to_string(),
             },
             n3_segments: Some(N3 {
                 payee_address: "123 MAIN ST".to_string(),

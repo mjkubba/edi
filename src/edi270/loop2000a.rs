@@ -132,8 +132,9 @@ mod tests {
                 middle_initial: "".to_string(),
                 suffix: "".to_string(),
                 title: "".to_string(),
-                id_code: "PI".to_string(),
-                member_number: "12345".to_string(),
+                id_code_qualifier: "PI".to_string(),
+                id_code: "12345".to_string(),
+                member_number: "".to_string(),
             },
             per_segments: vec![
                 PER {

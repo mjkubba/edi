@@ -284,8 +284,9 @@ mod tests {
             middle_initial: "".to_string(),
             suffix: "".to_string(),
             title: "".to_string(),
-            id_code: "PI".to_string(),
-            member_number: "12345".to_string(),
+            id_code_qualifier: "PI".to_string(),
+            id_code: "12345".to_string(),
+            member_number: "".to_string(),
         };
         
         // Create a sample Loop 2000D
@@ -304,8 +305,9 @@ mod tests {
             middle_initial: "".to_string(),
             suffix: "".to_string(),
             title: "".to_string(),
-            id_code: "MI".to_string(),
-            member_number: "12345678901".to_string(),
+            id_code_qualifier: "MI".to_string(),
+            id_code: "12345678901".to_string(),
+            member_number: "".to_string(),
         };
         loop_2000d.trn = TRN {
             trace_type_code: "1".to_string(),
