@@ -31,7 +31,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
     // Parse N3 segment (optional)
     if let Some(n3_start) = contents.find("N3*") {
         // Check if this N3 is before the next major segment
-        let next_major = ["N1*", "N4*", "PER*", "REF*", "Loop2000"]
+        let next_major = ["N1*", "N4*", "PER*", "REF*", "INS*", "SE*"]
             .iter()
             .filter_map(|seg| contents.find(seg))
             .min();
@@ -48,7 +48,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
     // Parse N4 segment (optional)
     if let Some(n4_start) = contents.find("N4*") {
         // Check if this N4 is before the next major segment
-        let next_major = ["N1*", "PER*", "REF*", "Loop2000"]
+        let next_major = ["N1*", "PER*", "REF*", "INS*", "SE*"]
             .iter()
             .filter_map(|seg| contents.find(seg))
             .min();
@@ -65,7 +65,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
     // Parse PER segments (optional)
     while let Some(per_start) = contents.find("PER*") {
         // Check if this PER is before the next major segment
-        let next_major = ["N1*", "REF*", "Loop2000"]
+        let next_major = ["N1*", "REF*", "INS*", "SE*"]
             .iter()
             .filter_map(|seg| contents.find(seg))
             .min();
@@ -90,7 +90,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
     // Parse REF segments (optional)
     while let Some(ref_start) = contents.find("REF*") {
         // Check if this REF is before the next major segment
-        let next_major = ["N1*", "Loop2000"]
+        let next_major = ["N1*", "INS*", "SE*"]
             .iter()
             .filter_map(|seg| contents.find(seg))
             .min();

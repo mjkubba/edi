@@ -34,6 +34,14 @@ pub struct Loop2000 {
     pub loop2330_segments: Vec<Loop2330>, // Disability Information
 }
 
+/// Check if segment exists within current member boundary (before next INS* or SE*)
+fn in_current_member(contents: &str, segment: &str) -> bool {
+    let ins_pos = contents.find("INS*").unwrap_or(contents.len());
+    let se_pos = contents.find("SE*").unwrap_or(contents.len());
+    let boundary = ins_pos.min(se_pos);
+    contents[..boundary].contains(segment)
+}
+
 pub fn get_loop2000(mut contents: String) -> (Loop2000, String) {
     let mut loop2000 = Loop2000::default();
 
@@ -93,95 +101,80 @@ pub fn get_loop2000(mut contents: String) -> (Loop2000, String) {
     }
 
     // Parse Loop2100A (Member Name)
-    if contents.contains("NM1*IL*") {
+    if in_current_member(&contents, "NM1*IL*") {
         let (loop2100a, new_contents) = get_loop2100a(contents);
         loop2000.loop2100a = Some(loop2100a);
         contents = new_contents;
     }
 
     // Parse Loop2100B (Incorrect Member Name)
-    if contents.contains("NM1*70*") {
+    if in_current_member(&contents, "NM1*70*") {
         let (loop2100b, new_contents) = get_loop2100b(contents);
         loop2000.loop2100b = Some(loop2100b);
         contents = new_contents;
     }
 
     // Parse Loop2100C (Member Mailing Address)
-    if contents.contains("NM1*31*") {
+    if in_current_member(&contents, "NM1*31*") {
         let (loop2100c, new_contents) = get_loop2100c(contents);
         loop2000.loop2100c = Some(loop2100c);
         contents = new_contents;
     }
 
     // Parse Loop2100D (Member Employer)
-    if contents.contains("NM1*36*") {
+    if in_current_member(&contents, "NM1*36*") {
         let (loop2100d, new_contents) = get_loop2100d(contents);
         loop2000.loop2100d = Some(loop2100d);
         contents = new_contents;
     }
 
     // Parse Loop2100E (Member School)
-    if contents.contains("NM1*M8*") {
+    if in_current_member(&contents, "NM1*M8*") {
         let (loop2100e, new_contents) = get_loop2100e(contents);
         loop2000.loop2100e = Some(loop2100e);
         contents = new_contents;
     }
 
     // Parse Loop2100F (Custodial Parent)
-    if contents.contains("NM1*S1*") {
+    if in_current_member(&contents, "NM1*S1*") {
         let (loop2100f, new_contents) = get_loop2100f(contents);
         loop2000.loop2100f = Some(loop2100f);
         contents = new_contents;
     }
 
     // Parse Loop2100G (Responsible Person)
-    if contents.contains("NM1*6Y*") {
+    if in_current_member(&contents, "NM1*6Y*") {
         let (loop2100g, new_contents) = get_loop2100g(contents);
         loop2000.loop2100g = Some(loop2100g);
         contents = new_contents;
     }
 
     // Parse Loop2100H (Drop Off Location)
-    if contents.contains("NM1*9K*") {
+    if in_current_member(&contents, "NM1*9K*") {
         let (loop2100h, new_contents) = get_loop2100h(contents);
         loop2000.loop2100h = Some(loop2100h);
         contents = new_contents;
     }
 
     // Parse Loop2300 segments (Health Coverage)
-    while contents.contains("HD*") {
+    while in_current_member(&contents, "HD*") {
         let (loop2300, new_contents) = get_loop2300(contents);
         loop2000.loop2300_segments.push(loop2300);
         contents = new_contents;
-
-        // Break if we've reached the end of this member's data
-        if contents.contains("INS*") || contents.contains("SE*") {
-            break;
-        }
     }
 
     // Parse Loop2320 segments (Coordination of Benefits)
-    while contents.contains("COB*") {
+    while in_current_member(&contents, "COB*") {
         let (loop2320, new_contents) = get_loop2320(contents);
         loop2000.loop2320_segments.push(loop2320);
         contents = new_contents;
-
-        // Break if we've reached the end of this member's data
-        if contents.contains("INS*") || contents.contains("SE*") {
-            break;
-        }
     }
 
     // Parse Loop2330 segments (Disability Information)
-    while contents.contains("DSB*") {
+    while in_current_member(&contents, "DSB*") {
         let (loop2330, new_contents) = get_loop2330(contents);
         loop2000.loop2330_segments.push(loop2330);
         contents = new_contents;
-
-        // Break if we've reached the end of this member's data
-        if contents.contains("INS*") || contents.contains("SE*") {
-            break;
-        }
     }
 
     info!("Parsed Loop2000: {:?}", loop2000);

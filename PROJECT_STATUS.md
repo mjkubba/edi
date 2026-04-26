@@ -23,18 +23,17 @@ Last updated: 2026-04-25
 | 837I (Claim Institutional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CL1, NM1*71, SBR, OI, LX, SV2, DTP |
 | 837D (Claim Dental) | ✅ Functional | Minor diffs | Core functionality working |
 | 820 (Premium Payment) | ⚠️ Partial | Major gaps | Missing segments: N1, ENT, NM1, RMR, DTM |
-| 834 (Enrollment) | ❌ Unverified | Unknown | Code exists but was not recognized in May 2025 testing. Loop2320/2330 are stubs. No demo files to test against |
+| 834 (Enrollment) | ⚠️ Functional | Partial | Loop1000B boundary fixed; Loop2320/2330 are stubs |
 
 ## What Needs Work
 
 ### High Priority
 
-1. **EDI834 — Debug and verify**
+1. **EDI834 — Verified and partially fixed**
    - Code exists in `src/edi834/` with controller, loops, segments, and `main.rs` wiring
-   - May 2025 test: "format is not recognized" — detection or parsing bug
+   - Loop1000B boundary detection fixed — no longer consumes INS/REF/DTP belonging to Loop2000
    - `loop2320` and `loop2330` are stub implementations (empty write functions, unused variables)
-   - `loop1000b` detection logic looks fragile (`N1*IN*` checked for both 1000A and 1000B)
-   - Need demo 834 files to test against
+   - Demo file available: `demo/edi834-demo-005010X220.edi`
    - KB has full spec: `834v5010X220.md`
 
 2. **EDI820 — Fix missing segments**
@@ -80,8 +79,27 @@ Last updated: 2026-04-25
 
 ## Recommended Next Steps
 
-1. Get demo 834 files → debug and verify edi834 parsing
+1. ~~Get demo 834 files → debug and verify edi834 parsing~~ ✅ Done
 2. Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)
 3. Implement edi276/277 Loop2000C/D parsing
 4. Wire up edi837 dead code (loop2010ba/bb/ca write functions)
 5. Clean up compiler warnings
+
+## Demo Files
+
+All demo files are in `demo/`:
+
+| File | Transaction Set |
+|------|----------------|
+| `edi835-demo-005010X221.edi` | 835 Payment/Remittance |
+| `edi999-demo-005010X231.edi` | 999 Acknowledgment |
+| `edi270-demo-005010X279.edi` | 270 Eligibility Inquiry |
+| `edi271-demo-005010X279.edi` | 271 Eligibility Response |
+| `edi276-demo-005010X212.edi` | 276 Claim Status Request |
+| `edi277-demo-005010X212.edi` | 277 Claim Status Response |
+| `edi278-demo-005010X217.edi` | 278 Services Review |
+| `edi837P-demo-005010X222.edi` | 837P Professional Claim |
+| `edi837I-demo-005010X223.edi` | 837I Institutional Claim |
+| `edi837D-demo-005010X224.edi` | 837D Dental Claim |
+| `edi820-demo-005010X218.edi` | 820 Premium Payment |
+| `edi834-demo-005010X220.edi` | 834 Enrollment |

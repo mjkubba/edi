@@ -82,11 +82,6 @@ pub fn get_834(mut contents: String) -> EdiResult<(Edi834, String)> {
         let (loop2000, new_contents) = get_loop2000(contents);
         edi834.loop2000_segments.push(loop2000);
         contents = new_contents;
-
-        // Break if we've reached the end
-        if contents.contains("SE*") {
-            break;
-        }
     }
 
     // Parse SE segment

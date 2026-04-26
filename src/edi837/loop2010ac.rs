@@ -134,7 +134,9 @@ mod tests {
         loop2010ac.nm1 = "NM1*PE*2*INSURANCE COMPANY****PI*12345~".to_string();
         loop2010ac.n3 = Some("N3*300 MAIN STREET~".to_string());
         loop2010ac.n4 = Some("N4*ANYTOWN*AL*35242~".to_string());
-        loop2010ac.ref_segments.push("REF*2U*123456789~".to_string());
+        loop2010ac
+            .ref_segments
+            .push("REF*2U*123456789~".to_string());
 
         let result = write_loop2010ac(&loop2010ac);
 

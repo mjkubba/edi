@@ -16,7 +16,7 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI837I (Health Care Claim Institutional) | ✅ Functional | Functional with specialized handling for CL1 segment, missing several segments in output |
 | EDI837D (Health Care Claim Dental) | ✅ Functional | Functional with specialized handling for TOO segment, core functionality working correctly |
 | EDI820 (Health Insurance Exchange Related Payments) | ⚠️ Partial | Partially functional with many missing segments in output (N1, ENT, NM1, RMR, DTM) |
-| EDI834 (Benefit Enrollment and Maintenance) | ❌ Not Implemented | Format not currently recognized by the parser |
+| EDI834 (Benefit Enrollment and Maintenance) | ⚠️ Functional | Parses enrollment data with member-level loops, health coverage, and demographics |
 
 ## Repository Structure
 ```
@@ -31,6 +31,7 @@ edi/
 │   ├── edi278/                  # Health Care Services Review implementation
 │   ├── edi837/                  # Health Care Claim implementation (Professional, Institutional, Dental)
 │   ├── edi820/                  # Health Insurance Exchange Related Payments implementation
+│   ├── edi834/                  # Benefit Enrollment and Maintenance implementation
 │   ├── helper/                  # Utility functions and shared helpers
 │   ├── segments/                # EDI segment definitions and processors
 │   ├── error.rs                 # Error handling module
@@ -45,7 +46,7 @@ edi/
 
 ## Features
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 278, 837P/I/D, 820
+- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834
 - **Configuration-Driven Architecture**: Segment and loop definitions are configurable
 - **Robust Error Handling**: Comprehensive error types and validation
 - **Bidirectional Conversion**: EDI to JSON and JSON to EDI
@@ -99,13 +100,13 @@ cargo run -- -f input.json -o output.edi -w -j
 
 ```bash
 # Parse EDI to JSON
-cargo run -- -f ./demo/edi835-1.edi -o ./demo/test835-new.json
+cargo run -- -f ./demo/edi835-demo-005010X221.edi -o ./demo/test835.json
 
 # Generate EDI from JSON
-cargo run -- -f ./demo/test835-new.json -o ./demo/test835-new.edi -w -j
+cargo run -- -f ./demo/test835.json -o ./demo/test835.edi -w -j
 
 # Compare files
-diff ./demo/edi835-1.edi ./demo/test835-new.edi
+diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
 ```
 
 ## Development Roadmap
@@ -135,13 +136,12 @@ diff ./demo/edi835-1.edi ./demo/test835-new.edi
 - ✅ Transaction Set 820 (Health Insurance Exchange Related Payments)
   - ✅ Implemented basic structure and segments
   - ✅ Added parsing and generation functionality
+- ✅ Transaction Set 834 (Benefit Enrollment and Maintenance)
+  - ✅ Implemented member-level loops and segments (INS, HD, DSB)
+  - ✅ Implemented loop structures for enrollment and maintenance
+  - ✅ Created controller with TransactionSet trait implementation
 
 ### Planned
-- Implement EDI834 Format
-  - Create directory structure and module organization
-  - Implement member-level detail segments (INS, HD, DSB)
-  - Implement loop structures for enrollment and maintenance
-  - Create controller with TransactionSet trait implementation
 - Improve Incomplete Implementations
   - Enhance the EDI820 implementation to preserve all segments
   - Improve the EDI837P and EDI837I implementations to preserve all segments

@@ -24,7 +24,7 @@ pub fn get_loop2100a(mut contents: String) -> (Loop2100A, String) {
     // Parse NM1 segment (required) - looking for IL (Insured or Subscriber)
     if let Some(nm1_start) = contents.find("NM1*IL*") {
         if let Some(nm1_end) = contents[nm1_start..].find("~") {
-            let nm1_content = &contents[nm1_start + 3..nm1_start + nm1_end];
+            let nm1_content = &contents[nm1_start + 4..nm1_start + nm1_end];
             loop2100a.nm1 = get_nm1(nm1_content.to_string());
             contents = contents[nm1_start + nm1_end + 1..].to_string();
         }

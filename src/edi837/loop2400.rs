@@ -271,7 +271,10 @@ mod tests {
         let (loop2400, _) = parse_loop2400(content);
 
         assert_eq!(loop2400.lx, "LX*1~");
-        assert_eq!(loop2400.sv2, Some("SV2*0450*HC:99283*150*UN*1~".to_string()));
+        assert_eq!(
+            loop2400.sv2,
+            Some("SV2*0450*HC:99283*150*UN*1~".to_string())
+        );
         assert_eq!(loop2400.dtp, vec!["DTP*472*D8*20230115~".to_string()]);
         assert_eq!(loop2400.ref_segments, vec!["REF*6R*12345~".to_string()]);
     }

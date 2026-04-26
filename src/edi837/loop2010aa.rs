@@ -150,7 +150,9 @@ mod tests {
         loop2010aa.nm1 = "NM1*85*2*ACME MEDICAL GROUP****XX*1234567890~".to_string();
         loop2010aa.n3 = "N3*100 MAIN STREET~".to_string();
         loop2010aa.n4 = "N4*ANYTOWN*AL*35242~".to_string();
-        loop2010aa.ref_segments.push("REF*EI*123456789~".to_string());
+        loop2010aa
+            .ref_segments
+            .push("REF*EI*123456789~".to_string());
         loop2010aa.per = Some("PER*IC*JANE SMITH*TE*5551234567~".to_string());
 
         let result = write_loop2010aa(&loop2010aa);

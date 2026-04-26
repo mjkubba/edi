@@ -74,7 +74,11 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
 
         if hl_elements.len() >= 4 && hl_elements[3] == "20" {
             // 20 is the code for Information Source
-            let hl_content = if hl_segment.starts_with("HL*") { &hl_segment[3..] } else { hl_segment };
+            let hl_content = if hl_segment.starts_with("HL*") {
+                &hl_segment[3..]
+            } else {
+                hl_segment
+            };
             loop_2000a.hl = get_hl(hl_content.to_string());
 
             // Remove the HL segment from the remaining content
@@ -88,7 +92,11 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
                 let nm1_segment =
                     &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
 
-                let nm1_content = if nm1_segment.starts_with("NM1*") { &nm1_segment[4..] } else { nm1_segment };
+                let nm1_content = if nm1_segment.starts_with("NM1*") {
+                    &nm1_segment[4..]
+                } else {
+                    nm1_segment
+                };
                 loop_2000a.nm1 = get_nm1(nm1_content.to_string());
 
                 // Remove the NM1 segment from the remaining content
@@ -122,7 +130,11 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
         if hl_elements.len() >= 4 && hl_elements[3] == "21" {
             // 21 is the code for Information Receiver
             let mut loop_2000b = Loop2000B::default();
-            let hl_content = if hl_segment.starts_with("HL*") { &hl_segment[3..] } else { hl_segment };
+            let hl_content = if hl_segment.starts_with("HL*") {
+                &hl_segment[3..]
+            } else {
+                hl_segment
+            };
             loop_2000b.hl = get_hl(hl_content.to_string());
 
             // Remove the HL segment from the remaining content
@@ -137,7 +149,11 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
                 let nm1_segment =
                     &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
 
-                let nm1_content = if nm1_segment.starts_with("NM1*") { &nm1_segment[4..] } else { nm1_segment };
+                let nm1_content = if nm1_segment.starts_with("NM1*") {
+                    &nm1_segment[4..]
+                } else {
+                    nm1_segment
+                };
                 loop_2000b.nm1 = get_nm1(nm1_content.to_string());
 
                 // Remove the NM1 segment from the remaining content
