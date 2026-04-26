@@ -63,23 +63,23 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
         let n1_parts: Vec<&str> = n1_content.split('*').collect();
 
         // Check if this is a payer identification segment (N101=PE)
-        if n1_parts.len() > 1 && n1_parts[1] == "PE" {
+        if n1_parts.len() > 0 && n1_parts[0] == "PE" {
             info!("N1 segment found for Payer Identification, ");
 
             loop1000as.n1_segments = N1 {
-                entity_id: n1_parts[1].to_string(),
-                entity_name: if n1_parts.len() > 2 {
+                entity_id: n1_parts[0].to_string(),
+                entity_name: if n1_parts.len() > 1 {
+                    n1_parts[1].to_string()
+                } else {
+                    String::new()
+                },
+                id_code_qualifier: if n1_parts.len() > 2 {
                     n1_parts[2].to_string()
                 } else {
                     String::new()
                 },
-                id_code_qualifier: if n1_parts.len() > 3 {
+                id_code: if n1_parts.len() > 3 {
                     n1_parts[3].to_string()
-                } else {
-                    String::new()
-                },
-                id_code: if n1_parts.len() > 4 {
-                    n1_parts[4].to_string()
                 } else {
                     String::new()
                 },
@@ -100,13 +100,13 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 let n3_parts: Vec<&str> = n3_content.split('*').collect();
 
                 loop1000as.n3_segments = Some(N3 {
-                    address: if n3_parts.len() > 1 {
-                        n3_parts[1].to_string()
+                    address: if n3_parts.len() > 0 {
+                        n3_parts[0].to_string()
                     } else {
                         String::new()
                     },
-                    address2: if n3_parts.len() > 2 {
-                        n3_parts[2].to_string()
+                    address2: if n3_parts.len() > 1 {
+                        n3_parts[1].to_string()
                     } else {
                         String::new()
                     },
@@ -127,33 +127,33 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 let n4_parts: Vec<&str> = n4_content.split('*').collect();
 
                 loop1000as.n4_segments = Some(N4 {
-                    city: if n4_parts.len() > 1 {
+                    city: if n4_parts.len() > 0 {
+                        n4_parts[0].to_string()
+                    } else {
+                        String::new()
+                    },
+                    state: if n4_parts.len() > 1 {
                         n4_parts[1].to_string()
                     } else {
                         String::new()
                     },
-                    state: if n4_parts.len() > 2 {
+                    zip: if n4_parts.len() > 2 {
                         n4_parts[2].to_string()
                     } else {
                         String::new()
                     },
-                    zip: if n4_parts.len() > 3 {
+                    country_code: if n4_parts.len() > 3 {
                         n4_parts[3].to_string()
                     } else {
                         String::new()
                     },
-                    country_code: if n4_parts.len() > 4 {
+                    location_qualifier: if n4_parts.len() > 4 {
                         n4_parts[4].to_string()
                     } else {
                         String::new()
                     },
-                    location_qualifier: if n4_parts.len() > 5 {
+                    location_identifier: if n4_parts.len() > 5 {
                         n4_parts[5].to_string()
-                    } else {
-                        String::new()
-                    },
-                    location_identifier: if n4_parts.len() > 6 {
-                        n4_parts[6].to_string()
                     } else {
                         String::new()
                     },
@@ -173,18 +173,18 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 let ref_parts: Vec<&str> = ref_content.split('*').collect();
 
                 let ref_segment = REF {
-                    reference_id_qualifier: if ref_parts.len() > 1 {
+                    reference_id_qualifier: if ref_parts.len() > 0 {
+                        ref_parts[0].to_string()
+                    } else {
+                        String::new()
+                    },
+                    reference_id: if ref_parts.len() > 1 {
                         ref_parts[1].to_string()
                     } else {
                         String::new()
                     },
-                    reference_id: if ref_parts.len() > 2 {
+                    description: if ref_parts.len() > 2 {
                         ref_parts[2].to_string()
-                    } else {
-                        String::new()
-                    },
-                    description: if ref_parts.len() > 3 {
-                        ref_parts[3].to_string()
                     } else {
                         String::new()
                     },
@@ -205,43 +205,43 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 let per_parts: Vec<&str> = per_content.split('*').collect();
 
                 let per_segment = PER {
-                    contact_function_code: if per_parts.len() > 1 {
+                    contact_function_code: if per_parts.len() > 0 {
+                        per_parts[0].to_string()
+                    } else {
+                        String::new()
+                    },
+                    name: if per_parts.len() > 1 {
                         per_parts[1].to_string()
                     } else {
                         String::new()
                     },
-                    name: if per_parts.len() > 2 {
+                    communication_number_qualifier: if per_parts.len() > 2 {
                         per_parts[2].to_string()
                     } else {
                         String::new()
                     },
-                    communication_number_qualifier: if per_parts.len() > 3 {
+                    communication_number: if per_parts.len() > 3 {
                         per_parts[3].to_string()
                     } else {
                         String::new()
                     },
-                    communication_number: if per_parts.len() > 4 {
+                    communication_number_qualifier2: if per_parts.len() > 4 {
                         per_parts[4].to_string()
                     } else {
                         String::new()
                     },
-                    communication_number_qualifier2: if per_parts.len() > 5 {
+                    communication_number2: if per_parts.len() > 5 {
                         per_parts[5].to_string()
                     } else {
                         String::new()
                     },
-                    communication_number2: if per_parts.len() > 6 {
+                    communication_number_qualifier3: if per_parts.len() > 6 {
                         per_parts[6].to_string()
                     } else {
                         String::new()
                     },
-                    communication_number_qualifier3: if per_parts.len() > 7 {
+                    communication_number3: if per_parts.len() > 7 {
                         per_parts[7].to_string()
-                    } else {
-                        String::new()
-                    },
-                    communication_number3: if per_parts.len() > 8 {
-                        per_parts[8].to_string()
                     } else {
                         String::new()
                     },

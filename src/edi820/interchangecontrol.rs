@@ -53,23 +53,23 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
 
         if isa_parts.len() >= 16 {
             interchange_header.isa_segments = ISA {
-                information_qualifier: isa_parts[1].to_string(),
-                authorization_information: isa_parts[2].to_string(),
-                security_information_qualifier: isa_parts[3].to_string(),
-                security_information: isa_parts[4].to_string(),
-                sender_id_qualifier: isa_parts[5].to_string(),
-                sender_id: isa_parts[6].to_string(),
-                receiver_id_qualifier: isa_parts[7].to_string(),
-                receiver_id: isa_parts[8].to_string(),
-                date: isa_parts[9].to_string(),
-                time: isa_parts[10].to_string(),
-                control_number_identifier: isa_parts[11].to_string(),
-                control_version_number: isa_parts[12].to_string(),
-                control_number: isa_parts[13].to_string(),
-                ack_indicator: isa_parts[14].to_string(),
-                usage_indicator: isa_parts[15].to_string(),
-                component_element_separator: if isa_parts.len() > 16 {
-                    isa_parts[16].to_string()
+                information_qualifier: isa_parts[0].to_string(),
+                authorization_information: isa_parts[1].to_string(),
+                security_information_qualifier: isa_parts[2].to_string(),
+                security_information: isa_parts[3].to_string(),
+                sender_id_qualifier: isa_parts[4].to_string(),
+                sender_id: isa_parts[5].to_string(),
+                receiver_id_qualifier: isa_parts[6].to_string(),
+                receiver_id: isa_parts[7].to_string(),
+                date: isa_parts[8].to_string(),
+                time: isa_parts[9].to_string(),
+                control_number_identifier: isa_parts[10].to_string(),
+                control_version_number: isa_parts[11].to_string(),
+                control_number: isa_parts[12].to_string(),
+                ack_indicator: isa_parts[13].to_string(),
+                usage_indicator: isa_parts[14].to_string(),
+                component_element_separator: if isa_parts.len() > 15 {
+                    isa_parts[15].to_string()
                 } else {
                     String::new()
                 },
@@ -90,15 +90,15 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
 
         if gs_parts.len() >= 8 {
             interchange_header.gs_segments = GS {
-                functional_id_code: gs_parts[1].to_string(),
-                app_sender_id: gs_parts[2].to_string(),
-                app_receiver_id: gs_parts[3].to_string(),
-                date: gs_parts[4].to_string(),
-                time: gs_parts[5].to_string(),
-                group_control_number: gs_parts[6].to_string(),
-                responsible_agency: gs_parts[7].to_string(),
-                version_number: if gs_parts.len() > 8 {
-                    gs_parts[8].to_string()
+                functional_id_code: gs_parts[0].to_string(),
+                app_sender_id: gs_parts[1].to_string(),
+                app_receiver_id: gs_parts[2].to_string(),
+                date: gs_parts[3].to_string(),
+                time: gs_parts[4].to_string(),
+                group_control_number: gs_parts[5].to_string(),
+                responsible_agency: gs_parts[6].to_string(),
+                version_number: if gs_parts.len() > 7 {
+                    gs_parts[7].to_string()
                 } else {
                     String::new()
                 },

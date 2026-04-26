@@ -81,48 +81,48 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
         let nm1_parts: Vec<&str> = nm1_content.split('*').collect();
 
         // Check if this is an individual (NM101=IL)
-        if nm1_parts.len() > 1 && nm1_parts[1] == "IL" {
+        if nm1_parts.len() > 0 && nm1_parts[0] == "IL" {
             info!("NM1 segment found for Individual, ");
 
             let nm1_segment = NM1 {
-                entity_id: nm1_parts[1].to_string(),
-                entity_type: if nm1_parts.len() > 2 {
+                entity_id: nm1_parts[0].to_string(),
+                entity_type: if nm1_parts.len() > 1 {
+                    nm1_parts[1].to_string()
+                } else {
+                    String::new()
+                },
+                lastname: if nm1_parts.len() > 2 {
                     nm1_parts[2].to_string()
                 } else {
                     String::new()
                 },
-                lastname: if nm1_parts.len() > 3 {
+                firstname: if nm1_parts.len() > 3 {
                     nm1_parts[3].to_string()
                 } else {
                     String::new()
                 },
-                firstname: if nm1_parts.len() > 4 {
+                middle_initial: if nm1_parts.len() > 4 {
                     nm1_parts[4].to_string()
                 } else {
                     String::new()
                 },
-                middle_initial: if nm1_parts.len() > 5 {
+                suffix: if nm1_parts.len() > 5 {
                     nm1_parts[5].to_string()
                 } else {
                     String::new()
                 },
-                suffix: if nm1_parts.len() > 6 {
+                title: if nm1_parts.len() > 6 {
                     nm1_parts[6].to_string()
                 } else {
                     String::new()
                 },
-                title: if nm1_parts.len() > 7 {
+                id_code_qualifier: if nm1_parts.len() > 7 {
                     nm1_parts[7].to_string()
                 } else {
                     String::new()
                 },
-                id_code_qualifier: if nm1_parts.len() > 8 {
+                id_code: if nm1_parts.len() > 8 {
                     nm1_parts[8].to_string()
-                } else {
-                    String::new()
-                },
-                id_code: if nm1_parts.len() > 9 {
-                    nm1_parts[9].to_string()
                 } else {
                     String::new()
                 },
@@ -158,18 +158,18 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
                 let ref_parts: Vec<&str> = ref_content.split('*').collect();
 
                 let ref_segment = REF {
-                    reference_id_qualifier: if ref_parts.len() > 1 {
+                    reference_id_qualifier: if ref_parts.len() > 0 {
+                        ref_parts[0].to_string()
+                    } else {
+                        String::new()
+                    },
+                    reference_id: if ref_parts.len() > 1 {
                         ref_parts[1].to_string()
                     } else {
                         String::new()
                     },
-                    reference_id: if ref_parts.len() > 2 {
+                    description: if ref_parts.len() > 2 {
                         ref_parts[2].to_string()
-                    } else {
-                        String::new()
-                    },
-                    description: if ref_parts.len() > 3 {
-                        ref_parts[3].to_string()
                     } else {
                         String::new()
                     },
@@ -204,28 +204,28 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
                 let rmr_parts: Vec<&str> = rmr_content.split('*').collect();
 
                 let rmr_segment = RMR {
-                    rmr01_reference_id_qualifier: if rmr_parts.len() > 1 {
+                    rmr01_reference_id_qualifier: if rmr_parts.len() > 0 {
+                        rmr_parts[0].to_string()
+                    } else {
+                        String::new()
+                    },
+                    rmr02_reference_id: if rmr_parts.len() > 1 {
                         rmr_parts[1].to_string()
                     } else {
                         String::new()
                     },
-                    rmr02_reference_id: if rmr_parts.len() > 2 {
+                    rmr03_payment_action_code: if rmr_parts.len() > 2 {
                         rmr_parts[2].to_string()
                     } else {
                         String::new()
                     },
-                    rmr03_payment_action_code: if rmr_parts.len() > 3 {
+                    rmr04_monetary_amount: if rmr_parts.len() > 3 {
                         rmr_parts[3].to_string()
                     } else {
                         String::new()
                     },
-                    rmr04_monetary_amount: if rmr_parts.len() > 4 {
+                    rmr05_credit_debit_flag_code: if rmr_parts.len() > 4 {
                         rmr_parts[4].to_string()
-                    } else {
-                        String::new()
-                    },
-                    rmr05_credit_debit_flag_code: if rmr_parts.len() > 5 {
-                        rmr_parts[5].to_string()
                     } else {
                         String::new()
                     },
@@ -259,33 +259,33 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
                     let dtm_parts: Vec<&str> = dtm_content.split('*').collect();
 
                     let dtm_segment = DTM {
-                        dtm01_date_time_qualifier: if dtm_parts.len() > 1 {
+                        dtm01_date_time_qualifier: if dtm_parts.len() > 0 {
+                            dtm_parts[0].to_string()
+                        } else {
+                            String::new()
+                        },
+                        dtm02_date: if dtm_parts.len() > 1 {
                             dtm_parts[1].to_string()
                         } else {
                             String::new()
                         },
-                        dtm02_date: if dtm_parts.len() > 2 {
+                        dtm03_time: if dtm_parts.len() > 2 {
                             dtm_parts[2].to_string()
                         } else {
                             String::new()
                         },
-                        dtm03_time: if dtm_parts.len() > 3 {
+                        dtm04_time_code: if dtm_parts.len() > 3 {
                             dtm_parts[3].to_string()
                         } else {
                             String::new()
                         },
-                        dtm04_time_code: if dtm_parts.len() > 4 {
+                        dtm05_date_time_period_format_qualifier: if dtm_parts.len() > 4 {
                             dtm_parts[4].to_string()
                         } else {
                             String::new()
                         },
-                        dtm05_date_time_period_format_qualifier: if dtm_parts.len() > 5 {
+                        dtm06_date_time_period: if dtm_parts.len() > 5 {
                             dtm_parts[5].to_string()
-                        } else {
-                            String::new()
-                        },
-                        dtm06_date_time_period: if dtm_parts.len() > 6 {
-                            dtm_parts[6].to_string()
                         } else {
                             String::new()
                         },

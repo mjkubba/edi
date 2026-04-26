@@ -74,12 +74,12 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
         let st_parts: Vec<&str> = st_content.split('*').collect();
 
-        if st_parts.len() >= 3 {
+        if st_parts.len() >= 2 {
             table1s.st_segments = ST {
-                transaction_set_id: st_parts[1].to_string(),
-                transaction_set_control_number: st_parts[2].to_string(),
-                implementation_conven_ref: if st_parts.len() > 3 {
-                    st_parts[3].to_string()
+                transaction_set_id: st_parts[0].to_string(),
+                transaction_set_control_number: st_parts[1].to_string(),
+                implementation_conven_ref: if st_parts.len() > 2 {
+                    st_parts[2].to_string()
                 } else {
                     String::new()
                 },
@@ -98,85 +98,85 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
         let bpr_parts: Vec<&str> = bpr_content.split('*').collect();
 
-        if bpr_parts.len() >= 1 {
+        if !bpr_parts.is_empty() {
             table1s.bpr_segments = BPR {
-                bpr01_transaction_handling_code: if bpr_parts.len() > 1 {
+                bpr01_transaction_handling_code: if bpr_parts.len() > 0 {
+                    bpr_parts[0].to_string()
+                } else {
+                    String::new()
+                },
+                bpr02_total_payment_amount: if bpr_parts.len() > 1 {
                     bpr_parts[1].to_string()
                 } else {
                     String::new()
                 },
-                bpr02_total_payment_amount: if bpr_parts.len() > 2 {
+                bpr03_credit_debit_flag_code: if bpr_parts.len() > 2 {
                     bpr_parts[2].to_string()
                 } else {
                     String::new()
                 },
-                bpr03_credit_debit_flag_code: if bpr_parts.len() > 3 {
+                bpr04_payment_method_code: if bpr_parts.len() > 3 {
                     bpr_parts[3].to_string()
                 } else {
                     String::new()
                 },
-                bpr04_payment_method_code: if bpr_parts.len() > 4 {
+                bpr05_payment_format_code: if bpr_parts.len() > 4 {
                     bpr_parts[4].to_string()
                 } else {
                     String::new()
                 },
-                bpr05_payment_format_code: if bpr_parts.len() > 5 {
+                bpr06_dfi_id_number_qualifier: if bpr_parts.len() > 5 {
                     bpr_parts[5].to_string()
                 } else {
                     String::new()
                 },
-                bpr06_dfi_id_number_qualifier: if bpr_parts.len() > 6 {
+                bpr07_dfi_id_number: if bpr_parts.len() > 6 {
                     bpr_parts[6].to_string()
                 } else {
                     String::new()
                 },
-                bpr07_dfi_id_number: if bpr_parts.len() > 7 {
+                bpr08_account_number_qualifier: if bpr_parts.len() > 7 {
                     bpr_parts[7].to_string()
                 } else {
                     String::new()
                 },
-                bpr08_account_number_qualifier: if bpr_parts.len() > 8 {
+                bpr09_account_number: if bpr_parts.len() > 8 {
                     bpr_parts[8].to_string()
                 } else {
                     String::new()
                 },
-                bpr09_account_number: if bpr_parts.len() > 9 {
+                bpr10_originating_company_id: if bpr_parts.len() > 9 {
                     bpr_parts[9].to_string()
                 } else {
                     String::new()
                 },
-                bpr10_originating_company_id: if bpr_parts.len() > 10 {
+                bpr11_originating_company_supplemental_code: if bpr_parts.len() > 10 {
                     bpr_parts[10].to_string()
                 } else {
                     String::new()
                 },
-                bpr11_originating_company_supplemental_code: if bpr_parts.len() > 11 {
+                bpr12_dfi_id_number_qualifier: if bpr_parts.len() > 11 {
                     bpr_parts[11].to_string()
                 } else {
                     String::new()
                 },
-                bpr12_dfi_id_number_qualifier: if bpr_parts.len() > 12 {
+                bpr13_dfi_id_number: if bpr_parts.len() > 12 {
                     bpr_parts[12].to_string()
                 } else {
                     String::new()
                 },
-                bpr13_dfi_id_number: if bpr_parts.len() > 13 {
+                bpr14_account_number_qualifier: if bpr_parts.len() > 13 {
                     bpr_parts[13].to_string()
                 } else {
                     String::new()
                 },
-                bpr14_account_number_qualifier: if bpr_parts.len() > 14 {
+                bpr15_account_number: if bpr_parts.len() > 14 {
                     bpr_parts[14].to_string()
                 } else {
                     String::new()
                 },
-                bpr15_account_number: if bpr_parts.len() > 15 {
+                bpr16_payment_effective_date: if bpr_parts.len() > 15 {
                     bpr_parts[15].to_string()
-                } else {
-                    String::new()
-                },
-                bpr16_payment_effective_date: if bpr_parts.len() > 16 {
-                    bpr_parts[16].to_string()
                 } else {
                     String::new()
                 },
@@ -195,17 +195,17 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
         let trn_parts: Vec<&str> = trn_content.split('*').collect();
 
-        if trn_parts.len() >= 3 {
+        if trn_parts.len() >= 2 {
             table1s.trn_segments = Some(TRN {
-                trn01_trace_type_code: trn_parts[1].to_string(),
-                trn02_reference_id: trn_parts[2].to_string(),
-                trn03_originating_company_id: if trn_parts.len() > 3 {
-                    trn_parts[3].to_string()
+                trn01_trace_type_code: trn_parts[0].to_string(),
+                trn02_reference_id: trn_parts[1].to_string(),
+                trn03_originating_company_id: if trn_parts.len() > 2 {
+                    trn_parts[2].to_string()
                 } else {
                     String::new()
                 },
-                trn04_reference_id: if trn_parts.len() > 4 {
-                    trn_parts[4].to_string()
+                trn04_reference_id: if trn_parts.len() > 3 {
+                    trn_parts[3].to_string()
                 } else {
                     String::new()
                 },
@@ -226,16 +226,16 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
         let ref_parts: Vec<&str> = ref_content.split('*').collect();
 
-        if ref_parts.len() >= 2 {
+        if ref_parts.len() >= 1 {
             let ref_segment = REF {
-                ref01_reference_id_qualifier: ref_parts[1].to_string(),
-                ref02_reference_id: if ref_parts.len() > 2 {
-                    ref_parts[2].to_string()
+                ref01_reference_id_qualifier: ref_parts[0].to_string(),
+                ref02_reference_id: if ref_parts.len() > 1 {
+                    ref_parts[1].to_string()
                 } else {
                     String::new()
                 },
-                ref03_description: if ref_parts.len() > 3 {
-                    ref_parts[3].to_string()
+                ref03_description: if ref_parts.len() > 2 {
+                    ref_parts[2].to_string()
                 } else {
                     String::new()
                 },
@@ -255,31 +255,31 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
         let dtm_parts: Vec<&str> = dtm_content.split('*').collect();
 
-        if dtm_parts.len() >= 2 {
+        if dtm_parts.len() >= 1 {
             let dtm_segment = DTM {
-                dtm01_date_time_qualifier: dtm_parts[1].to_string(),
-                dtm02_date: if dtm_parts.len() > 2 {
+                dtm01_date_time_qualifier: dtm_parts[0].to_string(),
+                dtm02_date: if dtm_parts.len() > 1 {
+                    dtm_parts[1].to_string()
+                } else {
+                    String::new()
+                },
+                dtm03_time: if dtm_parts.len() > 2 {
                     dtm_parts[2].to_string()
                 } else {
                     String::new()
                 },
-                dtm03_time: if dtm_parts.len() > 3 {
+                dtm04_time_code: if dtm_parts.len() > 3 {
                     dtm_parts[3].to_string()
                 } else {
                     String::new()
                 },
-                dtm04_time_code: if dtm_parts.len() > 4 {
+                dtm05_date_time_period_format_qualifier: if dtm_parts.len() > 4 {
                     dtm_parts[4].to_string()
                 } else {
                     String::new()
                 },
-                dtm05_date_time_period_format_qualifier: if dtm_parts.len() > 5 {
+                dtm06_date_time_period: if dtm_parts.len() > 5 {
                     dtm_parts[5].to_string()
-                } else {
-                    String::new()
-                },
-                dtm06_date_time_period: if dtm_parts.len() > 6 {
-                    dtm_parts[6].to_string()
                 } else {
                     String::new()
                 },

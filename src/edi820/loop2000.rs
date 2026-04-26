@@ -43,33 +43,33 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Table2>, String) {
         let ent_parts: Vec<&str> = ent_content.split('*').collect();
 
         let ent_segment = ENT {
-            ent01_assigned_number: if ent_parts.len() > 1 {
+            ent01_assigned_number: if ent_parts.len() > 0 {
+                ent_parts[0].to_string()
+            } else {
+                String::new()
+            },
+            ent02_entity_id_code: if ent_parts.len() > 1 {
                 ent_parts[1].to_string()
             } else {
                 String::new()
             },
-            ent02_entity_id_code: if ent_parts.len() > 2 {
+            ent03_identification_code_qualifier: if ent_parts.len() > 2 {
                 ent_parts[2].to_string()
             } else {
                 String::new()
             },
-            ent03_identification_code_qualifier: if ent_parts.len() > 3 {
+            ent04_identification_code: if ent_parts.len() > 3 {
                 ent_parts[3].to_string()
             } else {
                 String::new()
             },
-            ent04_identification_code: if ent_parts.len() > 4 {
+            ent05_entity_type_qualifier: if ent_parts.len() > 4 {
                 ent_parts[4].to_string()
             } else {
                 String::new()
             },
-            ent05_entity_type_qualifier: if ent_parts.len() > 5 {
+            ent06_entity_type: if ent_parts.len() > 5 {
                 ent_parts[5].to_string()
-            } else {
-                String::new()
-            },
-            ent06_entity_type: if ent_parts.len() > 6 {
-                ent_parts[6].to_string()
             } else {
                 String::new()
             },

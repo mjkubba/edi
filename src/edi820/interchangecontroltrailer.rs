@@ -40,12 +40,8 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
 
         if se_parts.len() >= 2 {
             interchange_trailer.se_segments = SE {
-                number_of_segment: se_parts[1].to_string(),
-                transaction_set_control_number: if se_parts.len() > 2 {
-                    se_parts[2].to_string()
-                } else {
-                    String::new()
-                },
+                number_of_segment: se_parts[0].to_string(),
+                transaction_set_control_number: se_parts[1].to_string(),
             };
         }
 
@@ -63,12 +59,8 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
 
         if ge_parts.len() >= 2 {
             interchange_trailer.ge_segments = GE {
-                number_of_transitions: ge_parts[1].to_string(),
-                group_control_number: if ge_parts.len() > 2 {
-                    ge_parts[2].to_string()
-                } else {
-                    String::new()
-                },
+                number_of_transitions: ge_parts[0].to_string(),
+                group_control_number: ge_parts[1].to_string(),
             };
         }
 
@@ -86,12 +78,8 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
 
         if iea_parts.len() >= 2 {
             interchange_trailer.iea_segments = IEA {
-                number_of_included_group: iea_parts[1].to_string(),
-                interchange_control_number: if iea_parts.len() > 2 {
-                    iea_parts[2].to_string()
-                } else {
-                    String::new()
-                },
+                number_of_included_group: iea_parts[0].to_string(),
+                interchange_control_number: iea_parts[1].to_string(),
             };
         }
 
