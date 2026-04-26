@@ -16,8 +16,8 @@ Last updated: 2026-04-25
 | 999 (Acknowledgment) | ✅ Complete | Minor diffs | GE/IEA control numbers differ on round-trip |
 | 270 (Eligibility Inquiry) | ✅ Complete | Line break diffs only | Formatting only |
 | 271 (Eligibility Response) | ✅ Complete | Line break diffs only | Formatting only |
-| 276 (Claim Status Request) | ⚠️ Functional | Data loss | Loop2000C/D not parsed — TRN, REF, DMG missing at Provider/Subscriber levels |
-| 277 (Claim Status Response) | ⚠️ Functional | Data loss | Same Loop2000C/D gap; STC values differ |
+| 276 (Claim Status Request) | ✅ Complete | Minor gaps | AMT, DTP at subscriber level not captured |
+| 277 (Claim Status Response) | ✅ Complete | Identical output | None |
 | 278 (Services Review) | ⚠️ Functional | Minor diffs | DTP, SV2, PRV segments missing in output |
 | 837P (Claim Professional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CR1, CRC, NM1*PW, NM1*45, LX, SV1, QTY, NTE. Dead code: `write_loop2010ba/bb/ca` exist but aren't called |
 | 837I (Claim Institutional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CL1, NM1*71, SBR, OI, LX, SV2, DTP |
@@ -81,7 +81,7 @@ Last updated: 2026-04-25
 
 1. ~~Get demo 834 files → debug and verify edi834 parsing~~ ✅ Done
 2. ~~Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)~~ ✅ Done
-3. Implement edi276/277 Loop2000C/D parsing
+3. ~~Implement edi276/277 Loop2000C/D parsing~~ ✅ Done
 4. Wire up edi837 dead code (loop2010ba/bb/ca write functions)
 5. Clean up compiler warnings
 
