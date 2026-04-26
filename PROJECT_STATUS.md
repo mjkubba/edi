@@ -4,7 +4,7 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **232/232 tests passing**, zero failures
+- **235/235 tests passing**, zero failures
 - **0 compiler warnings**
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
@@ -12,7 +12,7 @@ Last updated: 2026-04-25
 
 | Transaction Set | Status | Round-Trip Fidelity | Known Issues |
 |---|---|---|---|
-| 835 (Payment/Remittance) | ✅ Complete | Formatting diffs | TS3/TS2/MIA/SVC/PLB element position mapping errors — structs skip elements, empty middle fields dropped |
+| 835 (Payment/Remittance) | ✅ Complete | Trailing newline only | None |
 | 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
 | 270 (Eligibility Inquiry) | ✅ Complete | Minor diffs | REF segment reordered, trailing newline |
 | 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN/DTP reordered, LS/LE envelope added |
@@ -29,36 +29,30 @@ Last updated: 2026-04-25
 
 ### High Priority
 
-1. **EDI835 — Segment element mapping errors**
-   - TS3 struct has 14 fields but X12 spec defines 24 elements — parser maps wrong positions to wrong field names (e.g., data position 5 mapped to ts313 instead of ts306)
-   - `stiuational_element()` drops empty middle fields entirely — X12 §3.7 only allows suppressing **trailing** empty separators, middle ones must be preserved
-   - Same pattern affects TS2, MIA, SVC, PLB segments
-   - Formatting fixed (one segment per line) — remaining diffs are content/position errors
-
-### Medium Priority
-
-2. **EDI834 — Loop2320/2330 stubs**
+1. **EDI834 — Loop2320/2330 stubs**
    - `loop2320` and `loop2330` are stub implementations (empty write functions)
    - Coordination of benefits data not preserved
    - KB has full spec: `834v5010X220.md`
 
-3. **EDI276 — AMT/DTP at subscriber level**
+### Medium Priority
+
+2. **EDI276 — AMT/DTP at subscriber level**
    - AMT, DTP segments at subscriber HL level not captured on round-trip
 
 ### Low Priority
 
-4. **Generic infrastructure partially unused**
+3. **Generic infrastructure partially unused**
    - `transaction_processor.rs`, `segment_config.rs`, `loop_processor.rs` have functions that are dead code
    - Decide: wire them in or remove them
 
-5. **Performance optimization** for large files
-6. **Custom delimiter support**
-7. **Schema validation**
+4. **Performance optimization** for large files
+5. **Custom delimiter support**
+6. **Schema validation**
 
 ## Completed Work
 
 - All transaction set modules created (835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834)
-- 232 unit tests passing
+- 235 unit tests passing
 - Fixed: memory crash in edi999 CTX parsing
 - Fixed: NM1 id_code_qualifier field across all modules
 - Fixed: UM prefix detection (AR/HS are um01 values, not prefixes)
@@ -88,6 +82,12 @@ Last updated: 2026-04-25
 - Eliminated all compiler warnings (26 → 0)
   - Removed dead loop2010ba/bb/ca files and unused parse/write functions
   - Suppressed warnings on public API and infrastructure kept for future use
+- Fixed: edi835 segment serialization
+  - Added build_segment() helper for X12 §3.7 compliant trailing separator suppression
+  - Fixed TS3 parser element position mapping (TS306-TS312 are NOT USED per TR3)
+  - Converted TS3, TS2, MIA, SVC, PLB writers to use build_segment()
+  - Fixed demo file TS3 line with data at NOT USED positions
+  - 835 round-trip now trailing-newline-only
 
 ## Recommended Next Steps
 
