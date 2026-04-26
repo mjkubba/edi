@@ -36,6 +36,16 @@ These guides contain segment element definitions, loop hierarchies, situational 
 
 5. **Use `count_segment_starts()` and `find_next_segment_start()` from edihelper** when counting or finding segments. Naive `contents.matches("IK3").count()` can match segment IDs inside other segment data values (e.g., "IK3" inside a CTX value), causing infinite loops or incorrect splitting.
 
+6. **Prefer sequential segment processing over `find()` for loops with many segment types.** The `parse_loop2300` rewrite proved that iterating segment-by-segment (split on `~`, match prefix) is more reliable than calling `find()` for each segment type. `find()` skips over unrecognized segments between the cursor and the match, silently losing data.
+
+7. **NOT USED elements still occupy their position in the segment.** Per X12 §3.7 and RFI #1500, only **trailing** empty element separators may be suppressed. Middle empty elements must keep their `*` separators to preserve positional meaning. Use `build_segment()` from edihelper which handles this correctly — it joins all elements with `*` then trims trailing empties.
+
+8. **NOT USED elements in the spec do NOT remove the position from the segment.** If TS306 is NOT USED and TS313 is SITUATIONAL, TS313 is still at position 12 (not position 5). The parser must read from the correct X12 position index, not skip NOT USED positions.
+
+9. **Demo files are AI-generated and may contain errors.** Always verify segment content against the X12 spec in the knowledge base before assuming the demo file is correct. If a round-trip diff occurs, check whether the demo or the code is wrong.
+
+10. **Write functions must output segments in spec-defined position order.** The X12 implementation guide defines a position number for each segment within a loop (e.g., TRN at pos 0200, NM1 at pos 0300). Writers must follow this order even if the parser stored them differently.
+
 ## File Operations
 
 When working with file operations in Rust:
