@@ -59,10 +59,10 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Loop2000>, String) {
         if contents.contains("AK2") {
             // Extract the content for this AK2 loop
             let end_pos = if let Some(next_ak2_pos) = find_next_segment_start("AK2", &contents, 3) {
-                // If there's another AK2 at a segment boundary, extract up to that point
                 next_ak2_pos
+            } else if let Some(ak9_pos) = find_next_segment_start("AK9", &contents, 0) {
+                ak9_pos
             } else {
-                // Otherwise, use all remaining content
                 contents.len()
             };
 

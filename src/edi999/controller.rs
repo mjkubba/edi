@@ -151,6 +151,19 @@ mod tests {
         // Add the Loop2000 to the Edi999
         edi999.table1_combined.loop2000s.push(loop2000);
 
+        // Set trailer values
+        edi999.table1_combined.table1trailer.ak9_segments = crate::segments::ak9::AK9 {
+            ak901_functional_ack_code: "P".to_string(),
+            ak902_num_of_ts_incl: "3".to_string(),
+            ak903_num_of_recv_ts: "3".to_string(),
+            ak904_num_of_accepted_ts: "1".to_string(),
+            ..Default::default()
+        };
+        edi999.table1_combined.table1trailer.se_segments = crate::segments::se::SE {
+            number_of_segment: "16".to_string(),
+            transaction_set_control_number: "2870001".to_string(),
+        };
+
         // Write the EDI999
         let output = write_999(&edi999);
 

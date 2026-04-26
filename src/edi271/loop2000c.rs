@@ -237,7 +237,12 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
     // Write HL segment
     contents.push_str(&write_hl(loop2000c.hl_segments.clone()));
 
-    // Write NM1 segment
+    // Write TRN segment if present (pos 0200 — before NM1)
+    if let Some(trn) = &loop2000c.trn_segments {
+        contents.push_str(&write_trn(trn.clone()));
+    }
+
+    // Write NM1 segment (pos 0300)
     contents.push_str(&write_nm1(loop2000c.nm1_segments.clone()));
 
     // Write REF segments
@@ -258,11 +263,6 @@ pub fn write_loop_2000c(loop2000c: &Loop2000C) -> String {
     // Write DMG segment if present
     if let Some(dmg) = &loop2000c.dmg_segments {
         contents.push_str(&write_dmg(dmg.clone()));
-    }
-
-    // Write TRN segment if present
-    if let Some(trn) = &loop2000c.trn_segments {
-        contents.push_str(&write_trn(trn.clone()));
     }
 
     // Write AAA segments
