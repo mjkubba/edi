@@ -76,6 +76,16 @@ Last updated: 2026-04-25
 - Fixed: edi837 loop boundary detection and write functions
 - Fixed: edi276/277 HL/NM1/BHT parsing
 - Fixed: edi278 loop2010f to accept NM1*1P
+- Fixed: edi820 off-by-one indexing in all 7 parser files — round-trip now identical
+- Fixed: edi834 Loop1000B boundary detection consuming INS/REF/DTP from Loop2000
+- Fixed: edi834 controller premature break after first member
+- Fixed: edi834 NM1 offset in all 8 loop2100 files
+- Fixed: edi834 cross-member segment consumption with in_current_member()
+- Fixed: edi276/277 missing GS/GE segment handling
+- Fixed: edi276/277 Loop2000C (Service Provider) and Loop2000D (Subscriber) parsing
+- Fixed: edi277 hardcoded TRN/STC/REF segments replaced with parsed data
+- Reduced compiler warnings from 52 to 26
+- Created demo files for all 12 transaction sets
 
 ## Recommended Next Steps
 

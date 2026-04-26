@@ -10,7 +10,7 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed |
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed including LS/LE |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Fully functional with special CTX segment handling for both standard and special formats |
-| EDI276/277 (Health Care Claim Status) | ✅ Functional | Functional with differences in output, core functionality working correctly including TRN and STC segments |
+| EDI276/277 (Health Care Claim Status) | ✅ Complete | Loop2000C/D parsing with TRN, STC, REF, DMG at all HL levels. 277 round-trip identical |
 | EDI278 (Health Care Services Review) | ✅ Functional | Functional with correct handling of AR/HS prefixes in UM segment, some segments missing in output (DTP, SV2, PRV) |
 | EDI837P (Health Care Claim Professional) | ✅ Functional | Functional with differences in output, core functionality working correctly but missing several segments |
 | EDI837I (Health Care Claim Institutional) | ✅ Functional | Functional with specialized handling for CL1 segment, missing several segments in output |
@@ -138,19 +138,29 @@ diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
 - ✅ Transaction Set 820 (Health Insurance Exchange Related Payments)
   - ✅ Implemented basic structure and segments
   - ✅ Added parsing and generation functionality
+  - ✅ Fixed off-by-one indexing in all segment parsers — round-trip identical
 - ✅ Transaction Set 834 (Benefit Enrollment and Maintenance)
   - ✅ Implemented member-level loops and segments (INS, HD, DSB)
   - ✅ Implemented loop structures for enrollment and maintenance
   - ✅ Created controller with TransactionSet trait implementation
+  - ✅ Fixed Loop1000B boundary detection and member parsing bugs
+  - ✅ Fixed NM1 offset in all loop2100 files
+- ✅ Transaction Set 276/277 (Claim Status) Enhancements
+  - ✅ Added GS/GE segment handling
+  - ✅ Implemented Loop2000C (Service Provider) and Loop2000D (Subscriber) parsing
+  - ✅ Removed hardcoded segments from 277 write function
+  - ✅ 277 round-trip now identical
+- ✅ Code Cleanup
+  - ✅ Reduced compiler warnings from 52 to 26
+  - ✅ Created demo files for all 12 transaction sets
 
 ### Planned
 - Improve Incomplete Implementations
-  - Enhance the EDI820 implementation to preserve all segments
-  - Improve the EDI837P and EDI837I implementations to preserve all segments
-  - Fix segment order issues in generated files
+  - Improve the EDI837P/I/D implementations to preserve all segments on round-trip
+  - Wire up dead code (loop2010ba/bb/ca write functions)
+  - Fix envelope segment newline handling in 837 write functions
 - Code Cleanup
-  - Address compiler warnings, particularly unused imports and functions
-  - Fix unused variable warnings
+  - Address remaining 26 compiler warnings (edi837 dead code, EdiError variants)
   - Improve code organization and documentation
 - Performance Optimization
   - Optimize parsing algorithms for better performance with large files
