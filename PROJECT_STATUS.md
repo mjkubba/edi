@@ -4,7 +4,7 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **235/235 tests passing**, zero failures
+- **238/238 tests passing**, zero failures
 - **0 compiler warnings**
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
@@ -30,8 +30,7 @@ Last updated: 2026-04-25
 ### Low Priority
 
 1. **Performance optimization** for large files
-2. **Custom delimiter support**
-3. **Schema validation**
+2. **Schema validation**
 
 ## Completed Work
 
@@ -78,6 +77,8 @@ Last updated: 2026-04-25
   - Moved Loop2320/2330 from Loop2000 level to inside Loop2300 per spec
 - Fixed: edi276 AMT/DTP at subscriber level now captured on round-trip
 - Removed unused generic infrastructure (segment_config.rs, loop_processor.rs, TransactionProcessor)
+- Added custom delimiter support — clean_contents() detects ISA element separator and segment terminator, normalizes to standard * and ~
+- Fixed main.rs clean_contents result being discarded (was stored in unused variable)
 
 ## Recommended Next Steps
 

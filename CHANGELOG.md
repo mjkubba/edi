@@ -10,20 +10,27 @@ All notable changes to this project will be documented in this file.
 - **edi837**: Fixed envelope segment double-tilde in `write_837p`/`write_837i`/`write_837d` — raw segments already contain `~`, write functions no longer add another
 - **edi837**: Removed redundant CL1/TOO parsing from 837I/D controllers — now handled by sequential `parse_loop2300`
 - **edi835**: Fixed output formatting — segments now written one-per-line instead of all on single line
+- **edi835**: Fixed TS3 parser element position mapping — TS306-TS312 are NOT USED per TR3, TS313 now correctly at position 12
+- **edi835**: Added `build_segment()` helper for X12 §3.7 compliant trailing separator suppression — preserves empty middle fields, trims trailing empties
+- **edi835**: Converted TS3, TS2, MIA, SVC, PLB writers to use `build_segment()`
+- **edi834**: Fixed Loop2320/2330 — moved from Loop2000 level to inside Loop2300 per spec; Loop2330 corrected from DSB (disability) to NM1 (COB insurer)
+- **edi276**: AMT/DTP segments at subscriber level now captured on round-trip
+- **main.rs**: Fixed `clean_contents` result being discarded (was stored in unused `_clean_contents` variable)
 
 ### Added
 - **edi837 Loop2000B**: NM1*PR (payer name), DMG after NM1*IL, payer N3/N4/PER/REF
 - **edi837 Loop2000C**: DMG parsing after NM1*QC (handles both before-NM1 and after-NM1 orderings)
 - **edi837 Loop2300**: NM1*82/71/72 (rendering/attending/operating provider) and associated PRV*PE
 - **edi837 Loop2400**: TOO segment parsing for 837D dental claims
+- **edi834 Loop2320**: COB segment + REF + DTP with nested Loop2330 (NM1 + N3 + N4)
+- **Custom delimiter support**: `clean_contents()` detects ISA element separator (position 3) and segment terminator (position 105), normalizes to standard `*` and `~`
 
 ### Changed
-- 232 tests passing, 0 compiler warnings (was 237 tests, 26 warnings)
+- 238 tests passing, 0 compiler warnings (was 237 tests, 26 warnings)
 - Removed dead code: `loop2010ba.rs`, `loop2010bb.rs`, `loop2010ca.rs`, unused parse/write functions from `table1.rs`, `interchangecontrol.rs`, `interchangecontroltrailer.rs`
+- Removed unused generic infrastructure: `segment_config.rs`, `loop_processor.rs`, `TransactionProcessor`
 - Suppressed warnings on public API (`get_278`, `get_820`) and infrastructure kept for future use (`EdiError` variants, `has_segment`)
-- 837P/I/D round-trip now trailing-newline-only (was significant segment loss)
-- 278 confirmed working — status corrected from Functional to Complete
-- 834 round-trip confirmed identical on demo file
+- All 12 transaction sets now round-trip identical or trailing-newline-only
 
 ## [0.1.0] - 2026-04-25
 
