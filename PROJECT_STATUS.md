@@ -27,10 +27,24 @@ Last updated: 2026-04-25
 
 ## What Needs Work
 
+### Medium Priority
+
+1. **Fix minor segment reordering in 270, 271, 999**
+   - 270: REF segment reordered on round-trip
+   - 271: TRN/DTP reordered, LS/LE envelope added
+   - 999: AK9 segment reordered
+   - Not data loss, but not byte-identical
+
+2. **Web interface / REST API**
+   - Spec files in `.kiro/specs/web-ui/`
+   - Wrap parser in Actix or Axum for EDI-to-JSON and JSON-to-EDI as a service
+
 ### Low Priority
 
-1. **Performance optimization** for large files
-2. **Schema validation**
+3. **Performance optimization** for large files
+4. **Schema validation** — verify required elements and code values
+5. **Publish as a crate** — lib.rs already has public exports, ready for crates.io
+6. **Integration tests** — test with real-world EDI files beyond AI-generated demos
 
 ## Completed Work
 
