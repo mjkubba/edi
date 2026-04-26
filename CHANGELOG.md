@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **edi837P/I/D**: Rewrote `parse_loop2300` with sequential segment processing — eliminates `find()` ordering bugs that caused segments to be skipped when they appeared in non-standard order
+- **edi837**: Fixed `parse_loop2000a` PRV boundary — was consuming claim-level PRV*PE from far ahead in content
+- **edi837**: Fixed envelope segment double-tilde in `write_837p`/`write_837i`/`write_837d` — raw segments already contain `~`, write functions no longer add another
+- **edi837**: Removed redundant CL1/TOO parsing from 837I/D controllers — now handled by sequential `parse_loop2300`
+- **edi835**: Fixed output formatting — segments now written one-per-line instead of all on single line
+
+### Added
+- **edi837 Loop2000B**: NM1*PR (payer name), DMG after NM1*IL, payer N3/N4/PER/REF
+- **edi837 Loop2000C**: DMG parsing after NM1*QC (handles both before-NM1 and after-NM1 orderings)
+- **edi837 Loop2300**: NM1*82/71/72 (rendering/attending/operating provider) and associated PRV*PE
+- **edi837 Loop2400**: TOO segment parsing for 837D dental claims
+
+### Changed
+- 232 tests passing, 0 compiler warnings (was 237 tests, 26 warnings)
+- Removed dead code: `loop2010ba.rs`, `loop2010bb.rs`, `loop2010ca.rs`, unused parse/write functions from `table1.rs`, `interchangecontrol.rs`, `interchangecontroltrailer.rs`
+- Suppressed warnings on public API (`get_278`, `get_820`) and infrastructure kept for future use (`EdiError` variants, `has_segment`)
+- 837P/I/D round-trip now trailing-newline-only (was significant segment loss)
+- 278 confirmed working — status corrected from Functional to Complete
+- 834 round-trip confirmed identical on demo file
+
+## [0.1.0] - 2026-04-25
+
+### Fixed
 - **NM1 segment**: Added `id_code_qualifier` field (NM108), fixed `write_nm1` to trim trailing empty fields
 - **edi837**: Fixed loop boundary detection in loop2000b/c to recognize CLM/LX segments, preventing claim data from being consumed by subscriber parsing
 - **edi837**: Fixed `write_837p`, `write_837i`, `write_837d` to write loop2400 (service lines) nested inside each loop2300 (claim) instead of from a separate top-level collection

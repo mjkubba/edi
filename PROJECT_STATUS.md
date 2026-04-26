@@ -58,7 +58,7 @@ Last updated: 2026-04-25
 ## Completed Work
 
 - All transaction set modules created (835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834)
-- 238 unit tests passing
+- 232 unit tests passing
 - Fixed: memory crash in edi999 CTX parsing
 - Fixed: NM1 id_code_qualifier field across all modules
 - Fixed: UM prefix detection (AR/HS are um01 values, not prefixes)
