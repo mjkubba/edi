@@ -403,6 +403,226 @@ pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
     (loop_2100b_vec, remaining_content)
 }
 
+pub fn get_loop_2000c_vec(contents: String) -> (Vec<Loop2000C>, String) {
+    let mut loop_2000c_vec = Vec::new();
+    let mut remaining_content = contents.clone();
+
+    while let Some(hl_segment_start) = remaining_content.find("HL") {
+        let hl_segment_end = remaining_content[hl_segment_start..]
+            .find('~')
+            .unwrap_or(remaining_content.len() - hl_segment_start);
+        let hl_segment = &remaining_content[hl_segment_start..hl_segment_start + hl_segment_end];
+
+        let hl_elements: Vec<&str> = hl_segment.split('*').collect();
+
+        if hl_elements.len() >= 4 && hl_elements[3] == "19" {
+            let mut loop_2000c = Loop2000C::default();
+            let hl_content = if hl_segment.starts_with("HL*") {
+                &hl_segment[3..]
+            } else {
+                hl_segment
+            };
+            loop_2000c.hl = get_hl(hl_content.to_string());
+
+            remaining_content =
+                remaining_content[hl_segment_start + hl_segment_end + 1..].to_string();
+
+            // Process NM1 segment
+            if let Some(nm1_segment_start) = remaining_content.find("NM1") {
+                // Only parse if NM1 comes before next HL or SE
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if nm1_segment_start < next_hl && nm1_segment_start < next_se {
+                    let nm1_segment_end = remaining_content[nm1_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - nm1_segment_start);
+                    let nm1_segment =
+                        &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
+
+                    let nm1_content = if nm1_segment.starts_with("NM1*") {
+                        &nm1_segment[4..]
+                    } else {
+                        nm1_segment
+                    };
+                    loop_2000c.nm1 = get_nm1(nm1_content.to_string());
+
+                    remaining_content =
+                        remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
+                }
+            }
+
+            // Process TRN segment
+            if let Some(trn_segment_start) = remaining_content.find("TRN") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if trn_segment_start < next_hl && trn_segment_start < next_se {
+                    let trn_segment_end = remaining_content[trn_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - trn_segment_start);
+                    let trn_segment =
+                        &remaining_content[trn_segment_start..trn_segment_start + trn_segment_end];
+
+                    loop_2000c.trn = get_trn(trn_segment.to_string());
+
+                    remaining_content =
+                        remaining_content[trn_segment_start + trn_segment_end + 1..].to_string();
+                }
+            }
+
+            // Process REF segments
+            while let Some(ref_segment_start) = remaining_content.find("REF") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if ref_segment_start < next_hl && ref_segment_start < next_se {
+                    let ref_segment_end = remaining_content[ref_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - ref_segment_start);
+                    let ref_segment =
+                        &remaining_content[ref_segment_start..ref_segment_start + ref_segment_end];
+
+                    loop_2000c
+                        .ref_segments
+                        .push(get_ref(ref_segment.to_string()));
+
+                    remaining_content =
+                        remaining_content[ref_segment_start + ref_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+
+            loop_2000c_vec.push(loop_2000c);
+        } else {
+            break;
+        }
+    }
+
+    (loop_2000c_vec, remaining_content)
+}
+
+pub fn get_loop_2000d_vec(contents: String) -> (Vec<Loop2000D>, String) {
+    let mut loop_2000d_vec = Vec::new();
+    let mut remaining_content = contents.clone();
+
+    while let Some(hl_segment_start) = remaining_content.find("HL") {
+        let hl_segment_end = remaining_content[hl_segment_start..]
+            .find('~')
+            .unwrap_or(remaining_content.len() - hl_segment_start);
+        let hl_segment = &remaining_content[hl_segment_start..hl_segment_start + hl_segment_end];
+
+        let hl_elements: Vec<&str> = hl_segment.split('*').collect();
+
+        if hl_elements.len() >= 4 && hl_elements[3] == "22" {
+            let mut loop_2000d = Loop2000D::default();
+            let hl_content = if hl_segment.starts_with("HL*") {
+                &hl_segment[3..]
+            } else {
+                hl_segment
+            };
+            loop_2000d.hl = get_hl(hl_content.to_string());
+
+            remaining_content =
+                remaining_content[hl_segment_start + hl_segment_end + 1..].to_string();
+
+            // Process DMG segment (optional, comes before NM1 in 276)
+            if let Some(dmg_segment_start) = remaining_content.find("DMG") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_nm1 = remaining_content.find("NM1").unwrap_or(usize::MAX);
+                if dmg_segment_start < next_hl
+                    && dmg_segment_start < next_se
+                    && dmg_segment_start < next_nm1
+                {
+                    let dmg_segment_end = remaining_content[dmg_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - dmg_segment_start);
+                    let dmg_segment =
+                        &remaining_content[dmg_segment_start..dmg_segment_start + dmg_segment_end];
+
+                    loop_2000d.dmg = Some(get_dmg(dmg_segment.to_string()));
+
+                    remaining_content =
+                        remaining_content[dmg_segment_start + dmg_segment_end + 1..].to_string();
+                }
+            }
+
+            // Process NM1 segment
+            if let Some(nm1_segment_start) = remaining_content.find("NM1") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if nm1_segment_start < next_hl && nm1_segment_start < next_se {
+                    let nm1_segment_end = remaining_content[nm1_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - nm1_segment_start);
+                    let nm1_segment =
+                        &remaining_content[nm1_segment_start..nm1_segment_start + nm1_segment_end];
+
+                    let nm1_content = if nm1_segment.starts_with("NM1*") {
+                        &nm1_segment[4..]
+                    } else {
+                        nm1_segment
+                    };
+                    loop_2000d.nm1 = get_nm1(nm1_content.to_string());
+
+                    remaining_content =
+                        remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
+                }
+            }
+
+            // Process TRN segment
+            if let Some(trn_segment_start) = remaining_content.find("TRN") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if trn_segment_start < next_hl && trn_segment_start < next_se {
+                    let trn_segment_end = remaining_content[trn_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - trn_segment_start);
+                    let trn_segment =
+                        &remaining_content[trn_segment_start..trn_segment_start + trn_segment_end];
+
+                    loop_2000d.trn = get_trn(trn_segment.to_string());
+
+                    remaining_content =
+                        remaining_content[trn_segment_start + trn_segment_end + 1..].to_string();
+                }
+            }
+
+            // Process REF segments
+            while let Some(ref_segment_start) = remaining_content.find("REF") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if ref_segment_start < next_hl && ref_segment_start < next_se {
+                    let ref_segment_end = remaining_content[ref_segment_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - ref_segment_start);
+                    let ref_segment =
+                        &remaining_content[ref_segment_start..ref_segment_start + ref_segment_end];
+
+                    // Stop if we hit a non-REF segment
+                    if !ref_segment.starts_with("REF") {
+                        break;
+                    }
+
+                    loop_2000d
+                        .ref_segments
+                        .push(get_ref(ref_segment.to_string()));
+
+                    remaining_content =
+                        remaining_content[ref_segment_start + ref_segment_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+
+            loop_2000d_vec.push(loop_2000d);
+        } else {
+            break;
+        }
+    }
+
+    (loop_2000d_vec, remaining_content)
+}
+
 // Function to write Loop 2000D
 #[allow(dead_code)]
 pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {

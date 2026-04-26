@@ -23,6 +23,8 @@ pub struct Edi276 {
     pub table1_combined: Table1Combined,
     pub loop2000a: Loop2000A,
     pub loop2000b: Vec<Loop2000B>,
+    pub loop2000c: Vec<Loop2000C>,
+    pub loop2000d: Vec<Loop2000D>,
     pub se_segment: String,
     pub interchange_trailer: InterchangeTrailer,
 }
@@ -61,6 +63,14 @@ pub fn get_276(mut contents: String) -> EdiResult<Edi276> {
     // Loop 2000B - Information Receiver
     (loop2000b_vec, contents) = get_loop_2000b_vec(contents.clone());
 
+    // Loop 2000C - Service Provider
+    let (loop2000c_vec, new_contents) = get_loop_2000c_vec(contents.clone());
+    contents = new_contents;
+
+    // Loop 2000D - Subscriber
+    let (loop2000d_vec, new_contents) = get_loop_2000d_vec(contents.clone());
+    contents = new_contents;
+
     // Extract SE segment
     if let Some(se_segment_start) = contents.find("SE") {
         let se_segment_end = contents[se_segment_start..]
@@ -85,6 +95,8 @@ pub fn get_276(mut contents: String) -> EdiResult<Edi276> {
         table1_combined,
         loop2000a,
         loop2000b: loop2000b_vec,
+        loop2000c: loop2000c_vec,
+        loop2000d: loop2000d_vec,
         se_segment,
         interchange_trailer,
     };
@@ -176,6 +188,16 @@ pub fn write_276(edi276: &Edi276) -> String {
     // Write Loop 2000B
     let new_loop2000b = write_loop_2000b_vec(&loop2000b);
     new_edi.push_str(&new_loop2000b);
+
+    // Write Loop 2000C
+    for loop2000c in &edi276.loop2000c {
+        new_edi.push_str(&write_loop_2000c(loop2000c));
+    }
+
+    // Write Loop 2000D
+    for loop2000d in &edi276.loop2000d {
+        new_edi.push_str(&write_loop_2000d(loop2000d));
+    }
 
     // Write SE segment
     new_edi.push_str(&edi276.se_segment);
