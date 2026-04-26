@@ -10,8 +10,6 @@ pub mod edi837;
 pub mod edi999;
 pub mod error;
 pub mod helper;
-pub mod loop_processor;
-pub mod segment_config;
 pub mod segments;
 pub mod transaction_processor;
 

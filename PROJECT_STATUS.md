@@ -4,7 +4,7 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **235/235 tests passing**, zero failures
+- **238/238 tests passing**, zero failures
 - **0 compiler warnings**
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
@@ -16,7 +16,7 @@ Last updated: 2026-04-25
 | 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
 | 270 (Eligibility Inquiry) | ✅ Complete | Minor diffs | REF segment reordered, trailing newline |
 | 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN/DTP reordered, LS/LE envelope added |
-| 276 (Claim Status Request) | ✅ Complete | Minor gaps | AMT, DTP at subscriber level not captured |
+| 276 (Claim Status Request) | ✅ Complete | Identical output | None |
 | 277 (Claim Status Response) | ✅ Complete | Identical output | None |
 | 278 (Services Review) | ✅ Complete | Trailing newline only | None |
 | 837P (Claim Professional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip |
@@ -27,27 +27,15 @@ Last updated: 2026-04-25
 
 ## What Needs Work
 
-### High Priority
-
-1. **EDI834 — Loop2320/2330 stubs**
-   - `loop2320` and `loop2330` are stub implementations (empty write functions)
-   - Coordination of benefits data not preserved
-   - KB has full spec: `834v5010X220.md`
-
-### Medium Priority
-
-2. **EDI276 — AMT/DTP at subscriber level**
-   - AMT, DTP segments at subscriber HL level not captured on round-trip
-
 ### Low Priority
 
-3. **Generic infrastructure partially unused**
+1. **Generic infrastructure partially unused**
    - `transaction_processor.rs`, `segment_config.rs`, `loop_processor.rs` have functions that are dead code
    - Decide: wire them in or remove them
 
-4. **Performance optimization** for large files
-5. **Custom delimiter support**
-6. **Schema validation**
+2. **Performance optimization** for large files
+3. **Custom delimiter support**
+4. **Schema validation**
 
 ## Completed Work
 

@@ -33,8 +33,6 @@ mod edi837;
 mod edi999;
 mod error;
 mod helper;
-mod loop_processor;
-mod segment_config;
 mod segments;
 mod transaction_processor;
 
