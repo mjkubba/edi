@@ -12,7 +12,7 @@ Last updated: 2026-04-25
 
 | Transaction Set | Status | Round-Trip Fidelity | Known Issues |
 |---|---|---|---|
-| 835 (Payment/Remittance) | ✅ Complete | Formatting diffs | Output on single line vs one-segment-per-line |
+| 835 (Payment/Remittance) | ✅ Complete | Formatting diffs | TS3/TS2/MIA/SVC/PLB element position mapping errors — structs skip elements, empty middle fields dropped |
 | 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
 | 270 (Eligibility Inquiry) | ✅ Complete | Minor diffs | REF segment reordered, trailing newline |
 | 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN/DTP reordered, LS/LE envelope added |
@@ -29,9 +29,11 @@ Last updated: 2026-04-25
 
 ### High Priority
 
-1. **EDI835 — Output formatting**
-   - Round-trip produces all segments on a single line instead of one-segment-per-line
-   - Content is correct, only formatting differs
+1. **EDI835 — Segment element mapping errors**
+   - TS3 struct has 14 fields but X12 spec defines 24 elements — parser maps wrong positions to wrong field names (e.g., data position 5 mapped to ts313 instead of ts306)
+   - `stiuational_element()` drops empty middle fields entirely — X12 §3.7 only allows suppressing **trailing** empty separators, middle ones must be preserved
+   - Same pattern affects TS2, MIA, SVC, PLB segments
+   - Formatting fixed (one segment per line) — remaining diffs are content/position errors
 
 ### Medium Priority
 
