@@ -149,12 +149,10 @@ pub fn write_276(edi276: &Edi276) -> String {
     // Write interchange header
     let new_ich = write_interchange_control(&edi276.interchange_header);
     new_edi.push_str(&new_ich);
-    new_edi.push('\n');
 
     // Write Table 1
     let new_table1s = write_table1(&edi276.table1_combined.table1);
     new_edi.push_str(&new_table1s);
-    new_edi.push('\n');
 
     // Create a modified copy of loop2000a to fix segment IDs
     let mut loop2000a = edi276.loop2000a.clone();

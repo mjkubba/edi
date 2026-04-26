@@ -18,6 +18,14 @@ pub struct InterchangeHeader {
     pub isa14_acknowledgment_requested: String,
     pub isa15_usage_indicator: String,
     pub isa16_component_element_separator: String,
+    pub gs01_functional_identifier_code: String,
+    pub gs02_application_sender_code: String,
+    pub gs03_application_receiver_code: String,
+    pub gs04_date: String,
+    pub gs05_time: String,
+    pub gs06_group_control_number: String,
+    pub gs07_responsible_agency_code: String,
+    pub gs08_version_release_industry_identifier_code: String,
 }
 
 pub fn get_interchange_header(contents: String) -> (InterchangeHeader, String) {
@@ -55,12 +63,40 @@ pub fn get_interchange_header(contents: String) -> (InterchangeHeader, String) {
         }
     }
 
+    // Parse GS segment
+    if let Some(gs_start) = remaining_content.find("GS") {
+        let gs_segment = remaining_content[gs_start..]
+            .split('~')
+            .next()
+            .unwrap_or("");
+        let gs_elements: Vec<&str> = gs_segment.split('*').collect();
+
+        if gs_elements.len() >= 9 {
+            interchange_header.gs01_functional_identifier_code = gs_elements[1].to_string();
+            interchange_header.gs02_application_sender_code = gs_elements[2].to_string();
+            interchange_header.gs03_application_receiver_code = gs_elements[3].to_string();
+            interchange_header.gs04_date = gs_elements[4].to_string();
+            interchange_header.gs05_time = gs_elements[5].to_string();
+            interchange_header.gs06_group_control_number = gs_elements[6].to_string();
+            interchange_header.gs07_responsible_agency_code = gs_elements[7].to_string();
+            interchange_header.gs08_version_release_industry_identifier_code =
+                gs_elements[8].to_string();
+        }
+
+        // Remove the GS segment from the remaining content
+        let gs_end = gs_start + gs_segment.len();
+        remaining_content = remaining_content[gs_end..].to_string();
+        if remaining_content.starts_with("~") {
+            remaining_content = remaining_content[1..].to_string();
+        }
+    }
+
     (interchange_header, remaining_content)
 }
 
 pub fn write_interchange_control(interchange_header: &InterchangeHeader) -> String {
     format!(
-        "ISA*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}~",
+        "ISA*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}~\nGS*{}*{}*{}*{}*{}*{}*{}*{}~\n",
         interchange_header.isa01_authorization_qualifier,
         interchange_header.isa02_authorization_information,
         interchange_header.isa03_security_qualifier,
@@ -76,6 +112,14 @@ pub fn write_interchange_control(interchange_header: &InterchangeHeader) -> Stri
         interchange_header.isa13_interchange_control_number,
         interchange_header.isa14_acknowledgment_requested,
         interchange_header.isa15_usage_indicator,
-        interchange_header.isa16_component_element_separator
+        interchange_header.isa16_component_element_separator,
+        interchange_header.gs01_functional_identifier_code,
+        interchange_header.gs02_application_sender_code,
+        interchange_header.gs03_application_receiver_code,
+        interchange_header.gs04_date,
+        interchange_header.gs05_time,
+        interchange_header.gs06_group_control_number,
+        interchange_header.gs07_responsible_agency_code,
+        interchange_header.gs08_version_release_industry_identifier_code
     )
 }

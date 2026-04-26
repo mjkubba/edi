@@ -299,6 +299,12 @@ pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
 
     // Process NM1 segments for Loop 2100B
     while let Some(nm1_segment_start) = remaining_content.find("NM1") {
+        // Stop if there's an HL segment before this NM1 (belongs to next loop)
+        if let Some(hl_pos) = remaining_content.find("HL") {
+            if hl_pos < nm1_segment_start {
+                break;
+            }
+        }
         let nm1_segment_end = remaining_content[nm1_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - nm1_segment_start);
@@ -462,7 +468,11 @@ pub fn get_loop_2000c_vec(contents: String) -> (Vec<Loop2000C>, String) {
                     let trn_segment =
                         &remaining_content[trn_segment_start..trn_segment_start + trn_segment_end];
 
-                    loop_2000c.trn = get_trn(trn_segment.to_string());
+                    loop_2000c.trn = get_trn(if trn_segment.starts_with("TRN*") {
+                        trn_segment[4..].to_string()
+                    } else {
+                        trn_segment.to_string()
+                    });
 
                     remaining_content =
                         remaining_content[trn_segment_start + trn_segment_end + 1..].to_string();
@@ -539,7 +549,11 @@ pub fn get_loop_2000d_vec(contents: String) -> (Vec<Loop2000D>, String) {
                     let dmg_segment =
                         &remaining_content[dmg_segment_start..dmg_segment_start + dmg_segment_end];
 
-                    loop_2000d.dmg = Some(get_dmg(dmg_segment.to_string()));
+                    loop_2000d.dmg = Some(get_dmg(if dmg_segment.starts_with("DMG*") {
+                        dmg_segment[4..].to_string()
+                    } else {
+                        dmg_segment.to_string()
+                    }));
 
                     remaining_content =
                         remaining_content[dmg_segment_start + dmg_segment_end + 1..].to_string();
@@ -580,7 +594,11 @@ pub fn get_loop_2000d_vec(contents: String) -> (Vec<Loop2000D>, String) {
                     let trn_segment =
                         &remaining_content[trn_segment_start..trn_segment_start + trn_segment_end];
 
-                    loop_2000d.trn = get_trn(trn_segment.to_string());
+                    loop_2000d.trn = get_trn(if trn_segment.starts_with("TRN*") {
+                        trn_segment[4..].to_string()
+                    } else {
+                        trn_segment.to_string()
+                    });
 
                     remaining_content =
                         remaining_content[trn_segment_start + trn_segment_end + 1..].to_string();
@@ -632,23 +650,25 @@ pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
     result.push_str(&write_hl(loop_2000d.hl.clone()));
     result.push('\n');
 
+    // Write DMG segment if present (comes before NM1 in 276)
+    if let Some(dmg) = &loop_2000d.dmg {
+        result.push_str(&write_dmg(dmg.clone()));
+        result.push('\n');
+    }
+
     // Write NM1 segment
     result.push_str(&write_nm1(loop_2000d.nm1.clone()));
     result.push('\n');
 
     // Write TRN segment
-    result.push_str(&write_trn(loop_2000d.trn.clone()));
-    result.push('\n');
+    if !loop_2000d.trn.trace_type_code.is_empty() {
+        result.push_str(&write_trn(loop_2000d.trn.clone()));
+        result.push('\n');
+    }
 
     // Write REF segments
     for ref_seg in &loop_2000d.ref_segments {
         result.push_str(&write_ref(ref_seg.clone()));
-        result.push('\n');
-    }
-
-    // Write DMG segment if present
-    if let Some(dmg) = &loop_2000d.dmg {
-        result.push_str(&write_dmg(dmg.clone()));
         result.push('\n');
     }
 
@@ -678,9 +698,11 @@ pub fn write_loop_2000c(loop_2000c: &Loop2000C) -> String {
     result.push_str(&write_nm1(loop_2000c.nm1.clone()));
     result.push('\n');
 
-    // Write TRN segment
-    result.push_str(&write_trn(loop_2000c.trn.clone()));
-    result.push('\n');
+    // Write TRN segment if present
+    if !loop_2000c.trn.trace_type_code.is_empty() {
+        result.push_str(&write_trn(loop_2000c.trn.clone()));
+        result.push('\n');
+    }
 
     // Write REF segments
     for ref_seg in &loop_2000c.ref_segments {
