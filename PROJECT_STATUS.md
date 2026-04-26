@@ -14,8 +14,8 @@ Last updated: 2026-04-25
 |---|---|---|---|
 | 835 (Payment/Remittance) | ✅ Complete | Trailing newline only | None |
 | 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
-| 270 (Eligibility Inquiry) | ✅ Complete | Minor diffs | REF segment reordered, trailing newline |
-| 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN/DTP reordered, LS/LE envelope added |
+| 270 (Eligibility Inquiry) | ✅ Complete | Identical output | None |
+| 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN written after NM1/N3/N4/DMG instead of before NM1 |
 | 276 (Claim Status Request) | ✅ Complete | Identical output | None |
 | 277 (Claim Status Response) | ✅ Complete | Identical output | None |
 | 278 (Services Review) | ✅ Complete | Trailing newline only | None |
@@ -29,11 +29,11 @@ Last updated: 2026-04-25
 
 ### Medium Priority
 
-1. **Fix minor segment reordering in 270, 271, 999**
-   - 270: REF segment reordered on round-trip
-   - 271: TRN/DTP reordered, LS/LE envelope added
-   - 999: AK9 segment reordered
+1. **Fix minor segment reordering in 271, 999**
+   - 271: TRN written after NM1/N3/N4/DMG — spec says TRN (pos 0200) before NM1 (pos 0300) in Loop 2000C
+   - 999: AK9 written one position late (after instead of before SE)
    - Not data loss, but not byte-identical
+   - 270 is now identical (was previously listed here)
 
 2. **Web interface / REST API**
    - Spec files in `.kiro/specs/web-ui/`
