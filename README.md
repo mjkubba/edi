@@ -98,6 +98,8 @@ cargo run -- -f input.json -o output.edi -w -j
 - Compare original and generated EDI files
 - Identify unprocessed segments and structural differences
 
+Demo files in `demo/` are AI-generated based on public X12 implementation guides and EDI specification documentation, intended for testing and development purposes only.
+
 ```bash
 # Parse EDI to JSON
 cargo run -- -f ./demo/edi835-demo-005010X221.edi -o ./demo/test835.json
