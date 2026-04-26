@@ -105,5 +105,6 @@ pub fn write_835(contents: String) -> String {
         edi_json.interchange_trailer.clone(),
     ));
 
-    new_edi
+    // Add newline after each segment terminator for one-segment-per-line output
+    new_edi.replace("~", "~\n")
 }
