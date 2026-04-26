@@ -6,8 +6,7 @@ use crate::edi834::loop1000a::*;
 use crate::edi834::loop1000b::*;
 use crate::edi834::loop2000::*;
 use crate::edi834::table1::*;
-use crate::error::{EdiError, EdiResult};
-use crate::helper::edihelper::*;
+use crate::error::EdiResult;
 use crate::segments::se::*;
 use crate::transaction_processor::TransactionSet;
 

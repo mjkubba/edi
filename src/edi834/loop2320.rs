@@ -16,7 +16,7 @@ pub struct Loop2320 {
 }
 
 pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
-    let mut loop2320 = Loop2320::default();
+    let loop2320 = Loop2320::default();
 
     // For now, just skip COB segments since we don't have the implementation
     if let Some(cob_start) = contents.find("COB*") {
@@ -30,8 +30,8 @@ pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
     (loop2320, contents)
 }
 
-pub fn write_loop2320(loop2320: Loop2320) -> String {
-    let mut result = String::new();
+pub fn write_loop2320(_loop2320: Loop2320) -> String {
+    let result = String::new();
     // Skip COB segment for now
     result
 }

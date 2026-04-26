@@ -445,7 +445,7 @@ impl TransactionSet for Edi837I {
 
             // Look for CL1 segments (specific to 837I)
             let mut cl1_segments = Vec::new();
-            let mut temp_content = remaining.clone();
+            let temp_content = remaining.clone();
             let mut segment_end = 0;
 
             while let Some(segment_start) = temp_content[segment_end..].find("CL1*") {
@@ -714,7 +714,7 @@ impl TransactionSet for Edi837D {
 
             // Look for TOO segments (specific to 837D)
             let mut too_segments = Vec::new();
-            let mut temp_content = remaining.clone();
+            let temp_content = remaining.clone();
             let mut segment_end = 0;
 
             while let Some(segment_start) = temp_content[segment_end..].find("TOO*") {

@@ -59,6 +59,7 @@ impl SegmentRegistry {
 }
 
 // Global segment registry
+#[allow(dead_code)]
 pub static SEGMENT_REGISTRY: Lazy<Mutex<SegmentRegistry>> = Lazy::new(|| {
     let mut registry = SegmentRegistry::new();
 

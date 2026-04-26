@@ -49,6 +49,7 @@ impl TransactionProcessor {
     }
 
     /// Detect the transaction set type from content
+    #[allow(dead_code)]
     pub fn detect_transaction_type(contents: &str) -> Option<&'static str> {
         if contents.contains("ST*835*") {
             Some("835")

@@ -7,5 +7,3 @@ pub mod loop2000d;
 pub mod table1;
 
 // Re-export commonly used items
-pub use controller::Edi270;
-pub use controller::{get_270, write_270};

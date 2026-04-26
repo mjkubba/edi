@@ -10,5 +10,3 @@ pub mod loop2115c;
 pub mod table1;
 
 // Re-export commonly used items
-pub use controller::Edi271;
-pub use controller::{get_271, write_271};
