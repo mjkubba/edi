@@ -100,7 +100,7 @@ Last updated: 2026-04-25
 2. ~~Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)~~ ✅ Done
 3. ~~Implement edi276/277 Loop2000C/D parsing~~ ✅ Done
 4. ~~Wire up edi837 dead code (loop2010ba/bb/ca write functions)~~ ✅ Done — rewrote with inline parsing
-5. Clean up compiler warnings
+5. ~~Clean up compiler warnings~~ ✅ Done (26 → 0)
 
 ## Demo Files
 
