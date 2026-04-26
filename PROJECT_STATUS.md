@@ -4,7 +4,7 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **238/238 tests passing**, zero failures
+- **235/235 tests passing**, zero failures
 - **0 compiler warnings**
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
@@ -23,19 +23,15 @@ Last updated: 2026-04-25
 | 837I (Claim Institutional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including CL1 |
 | 837D (Claim Dental) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including TOO |
 | 820 (Premium Payment) | ✅ Complete | Trailing newline only | None |
-| 834 (Enrollment) | ✅ Complete | Identical output | Loop2320/2330 are stubs |
+| 834 (Enrollment) | ✅ Complete | Identical output | None |
 
 ## What Needs Work
 
 ### Low Priority
 
-1. **Generic infrastructure partially unused**
-   - `transaction_processor.rs`, `segment_config.rs`, `loop_processor.rs` have functions that are dead code
-   - Decide: wire them in or remove them
-
-2. **Performance optimization** for large files
-3. **Custom delimiter support**
-4. **Schema validation**
+1. **Performance optimization** for large files
+2. **Custom delimiter support**
+3. **Schema validation**
 
 ## Completed Work
 
@@ -76,6 +72,12 @@ Last updated: 2026-04-25
   - Converted TS3, TS2, MIA, SVC, PLB writers to use build_segment()
   - Fixed demo file TS3 line with data at NOT USED positions
   - 835 round-trip now trailing-newline-only
+- Fixed: edi834 Loop2320/2330 coordination of benefits
+  - Loop2320 (COB) now parses COB + REF + DTP with nested Loop2330
+  - Loop2330 corrected from DSB (disability) to NM1 (COB insurer)
+  - Moved Loop2320/2330 from Loop2000 level to inside Loop2300 per spec
+- Fixed: edi276 AMT/DTP at subscriber level now captured on round-trip
+- Removed unused generic infrastructure (segment_config.rs, loop_processor.rs, TransactionProcessor)
 
 ## Recommended Next Steps
 
