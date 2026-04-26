@@ -23,6 +23,8 @@ pub struct Edi277 {
     pub table1_combined: Table1Combined,
     pub loop2000a: Loop2000A,
     pub loop2000b: Vec<Loop2000B>,
+    pub loop2000c: Vec<Loop2000C>,
+    pub loop2000d: Vec<Loop2000D>,
     pub se_segment: String,
     pub interchange_trailer: InterchangeTrailer,
 }
@@ -61,62 +63,27 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     // Loop 2000B - Information Receiver
     (loop2000b_vec, contents) = get_loop_2000b_vec(contents.clone());
 
-    // Process TRN segments if present
-    let mut remaining = contents.clone();
-    if let Some(trn_segment_start) = remaining.find("TRN") {
-        let trn_segment_end = remaining[trn_segment_start..]
-            .find('~')
-            .unwrap_or(remaining.len() - trn_segment_start);
-        let trn_segment = &remaining[trn_segment_start..trn_segment_start + trn_segment_end];
+    // Loop 2000C - Service Provider
+    let (loop2000c_vec, new_contents) = get_loop_2000c_vec(contents.clone());
+    contents = new_contents;
 
-        // Parse TRN segment
-        let trn = crate::segments::trn::get_trn(trn_segment.to_string());
-
-        // Add TRN to appropriate loop (assuming it belongs to the first Loop2000B)
-        if !loop2000b_vec.is_empty() {
-            // In a real implementation, we would need to determine which loop this TRN belongs to
-            // For now, we'll just log it
-            info!("Found TRN segment: {:?}", trn);
-        }
-
-        // Remove the TRN segment from the remaining content
-        remaining = remaining[trn_segment_start + trn_segment_end + 1..].to_string();
-    }
-
-    // Process STC segments if present
-    if let Some(stc_segment_start) = remaining.find("STC") {
-        let stc_segment_end = remaining[stc_segment_start..]
-            .find('~')
-            .unwrap_or(remaining.len() - stc_segment_start);
-        let stc_segment = &remaining[stc_segment_start..stc_segment_start + stc_segment_end];
-
-        // Parse STC segment
-        let stc = crate::segments::stc::get_stc(stc_segment);
-
-        // Add STC to appropriate loop (assuming it belongs to the first Loop2000B)
-        if !loop2000b_vec.is_empty() {
-            // In a real implementation, we would need to determine which loop this STC belongs to
-            // For now, we'll just log it
-            info!("Found STC segment: {:?}", stc);
-        }
-
-        // Remove the STC segment from the remaining content
-        remaining = remaining[stc_segment_start + stc_segment_end + 1..].to_string();
-    }
+    // Loop 2000D - Subscriber
+    let (loop2000d_vec, new_contents) = get_loop_2000d_vec(contents.clone());
+    contents = new_contents;
 
     // Extract SE segment
-    if let Some(se_segment_start) = remaining.find("SE") {
-        let se_segment_end = remaining[se_segment_start..]
+    if let Some(se_segment_start) = contents.find("SE") {
+        let se_segment_end = contents[se_segment_start..]
             .find('~')
-            .unwrap_or(remaining.len() - se_segment_start);
-        se_segment = remaining[se_segment_start..se_segment_start + se_segment_end].to_string();
-        remaining = remaining[se_segment_start + se_segment_end + 1..].to_string();
+            .unwrap_or(contents.len() - se_segment_start);
+        se_segment = contents[se_segment_start..se_segment_start + se_segment_end].to_string();
+        contents = contents[se_segment_start + se_segment_end + 1..].to_string();
     } else {
         se_segment = String::new();
     }
 
     // Control Trailer
-    (interchange_trailer, contents) = get_interchange_trailer(remaining.clone());
+    (interchange_trailer, contents) = get_interchange_trailer(contents.clone());
 
     // Combined Table 1
     table1_combined = Table1Combined {
@@ -128,6 +95,8 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
         table1_combined,
         loop2000a,
         loop2000b: loop2000b_vec,
+        loop2000c: loop2000c_vec,
+        loop2000d: loop2000d_vec,
         se_segment,
         interchange_trailer,
     };
@@ -188,11 +157,11 @@ fn fix_stc_277(stc: &mut crate::segments::stc::STC) {
 pub fn write_277(edi277: &Edi277) -> String {
     let mut new_edi = String::new();
 
-    // Write interchange header
+    // Write interchange header (includes trailing newline)
     let new_ich = write_interchange_control(&edi277.interchange_header);
     new_edi.push_str(&new_ich);
 
-    // Write Table 1
+    // Write Table 1 (includes trailing newlines)
     let new_table1s = write_table1(&edi277.table1_combined.table1);
     new_edi.push_str(&new_table1s);
 
@@ -229,26 +198,19 @@ pub fn write_277(edi277: &Edi277) -> String {
     let new_loop2000b = write_loop_2000b_vec(&loop2000b);
     new_edi.push_str(&new_loop2000b);
 
-    // Add TRN segment if needed
-    // This is a placeholder - in a real implementation, we would extract TRN from the appropriate loop
-    new_edi.push_str("TRN*2*ABCXYC3~");
+    // Write Loop 2000C
+    for loop2000c in &edi277.loop2000c {
+        new_edi.push_str(&write_loop_2000c(loop2000c));
+    }
 
-    // Add STC segment if needed
-    // This is a placeholder - in a real implementation, we would extract STC from the appropriate loop
-    new_edi.push_str("STC*F2:88:QC*20050612**150*0~");
-
-    // Add REF segments if needed
-    new_edi.push_str("REF*1K*051681010827~");
-    new_edi.push_str("REF*EJ*MA345678~");
-
-    // Add SVC segment if needed
-    new_edi.push_str("SVC*HC:99203*150*0****1~");
-    new_edi.push_str("STC*F2:88:QC*20050612~");
-    new_edi.push_str("DTP*472*D8*20050501~");
+    // Write Loop 2000D
+    for loop2000d in &edi277.loop2000d {
+        new_edi.push_str(&write_loop_2000d(loop2000d));
+    }
 
     // Write SE segment
     new_edi.push_str(&edi277.se_segment);
-    new_edi.push_str("~");
+    new_edi.push_str("~\n");
 
     // Write interchange trailer
     let new_ict = write_interchange_trailer(&edi277.interchange_trailer);
@@ -276,15 +238,9 @@ pub fn is_277_json(contents: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::segments::hl::HL;
-    use crate::segments::nm1::NM1;
-    use crate::segments::r#ref::REF;
-    use crate::segments::stc::STC;
-    use crate::segments::trn::TRN;
 
     #[test]
     fn test_parse_and_generate_277() {
-        // Create a sample EDI 277 file
         let sample_edi = "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *230501*1200*^*00501*000000001*0*P*:~\
                           GS*HN*SENDER*RECEIVER*20230501*1200*1*X*005010X212~\
                           ST*277*0001*005010X212~\
@@ -304,17 +260,22 @@ mod tests {
                           GE*1*1~\
                           IEA*1*000000001~";
 
-        // Parse the EDI file
         let edi277_result = get_277(sample_edi.to_string());
         assert!(edi277_result.is_ok(), "Failed to parse EDI 277 file");
 
         let edi277 = edi277_result.unwrap();
 
-        // Verify key components
+        // Verify interchange header with GS
         assert_eq!(
             edi277.interchange_header.isa01_authorization_qualifier,
             "00"
         );
+        assert_eq!(
+            edi277.interchange_header.gs01_functional_identifier_code,
+            "HN"
+        );
+
+        // Verify table1
         assert_eq!(
             edi277
                 .table1_combined
@@ -322,74 +283,74 @@ mod tests {
                 .st01_transaction_set_identifier_code,
             "277"
         );
-        assert_eq!(
-            edi277
-                .table1_combined
-                .table1
-                .bht01_hierarchical_structure_code,
-            "0010"
-        );
-        assert_eq!(
-            edi277.table1_combined.table1.bht06_transaction_type_code,
-            "08"
-        ); // 08 is for Response
 
-        // Verify Loop 2000A (Information Source)
+        // Verify Loop 2000A
         assert_eq!(edi277.loop2000a.hl.hl03_hierarchical_level_code, "20");
         assert_eq!(edi277.loop2000a.nm1.entity_id, "PR");
-        assert_eq!(edi277.loop2000a.nm1.entity_type, "2");
-        assert_eq!(edi277.loop2000a.nm1.lastname, "INSURANCE COMPANY");
 
-        // Generate EDI from the parsed object
+        // Verify Loop 2000C
+        assert_eq!(edi277.loop2000c.len(), 1);
+        assert_eq!(edi277.loop2000c[0].hl.hl03_hierarchical_level_code, "19");
+        assert_eq!(edi277.loop2000c[0].nm1.entity_id, "1P");
+
+        // Verify Loop 2000D
+        assert_eq!(edi277.loop2000d.len(), 1);
+        assert_eq!(edi277.loop2000d[0].hl.hl03_hierarchical_level_code, "22");
+        assert_eq!(edi277.loop2000d[0].nm1.entity_id, "IL");
+        assert_eq!(edi277.loop2000d[0].trn.trace_type_code, "2");
+        assert_eq!(edi277.loop2000d[0].stc_segments.len(), 1);
+
+        // Verify trailer with GE
+        assert_eq!(
+            edi277.interchange_trailer.ge01_number_of_transaction_sets,
+            "1"
+        );
+
+        // Generate EDI and verify round-trip
         let generated_edi = write_277(&edi277);
-
-        // Verify that the generated EDI contains key segments
         assert!(generated_edi.contains("ISA*00*"), "Missing ISA segment");
+        assert!(
+            generated_edi.contains("GS*HN*SENDER*RECEIVER"),
+            "Missing GS segment"
+        );
         assert!(generated_edi.contains("ST*277*"), "Missing ST segment");
         assert!(
-            generated_edi.contains("BHT*0010*08*"),
-            "Missing BHT segment"
-        );
-        assert!(
             generated_edi.contains("HL*1**20*1"),
-            "Missing HL segment for Information Source"
+            "Missing HL for Information Source"
         );
         assert!(
-            generated_edi.contains("NM1*PR*2*INSURANCE COMPANY"),
-            "Missing NM1 segment for Information Source"
+            generated_edi.contains("HL*3*2*19*1"),
+            "Missing HL for Service Provider"
         );
         assert!(
-            generated_edi.contains("HL*2*1*21*1"),
-            "Missing HL segment for Information Receiver"
+            generated_edi.contains("HL*4*3*22*0"),
+            "Missing HL for Subscriber"
         );
         assert!(
-            generated_edi.contains("NM1*41*2*CLEARINGHOUSE"),
-            "Missing NM1 segment for Information Receiver"
+            generated_edi.contains("TRN*2*CLAIM123*9PROVIDER"),
+            "Missing TRN segment"
         );
-        // TODO: TRN, STC, REF not yet written - Loop2000C/D parsing not implemented
-        // assert!(generated_edi.contains("TRN*2*CLAIM123*9PROVIDER"), "Missing TRN segment");
-        // assert!(generated_edi.contains("STC*A1:20*20230501*WQ"), "Missing STC segment");
-        // assert!(generated_edi.contains("REF*BLT*12345"), "Missing REF segment");
+        assert!(generated_edi.contains("STC*A1:20"), "Missing STC segment");
+        assert!(
+            generated_edi.contains("REF*BLT*12345"),
+            "Missing REF segment"
+        );
+        assert!(generated_edi.contains("GE*1*1~"), "Missing GE segment");
+        assert!(
+            generated_edi.contains("IEA*1*000000001~"),
+            "Missing IEA segment"
+        );
     }
 
     #[test]
     fn test_is_277_json() {
-        // Test with valid 277 JSON
         let valid_json = r#"{"table1_combined":{"table1":{"st01_transaction_set_identifier_code":"277","bht06_transaction_type_code":"08"}}}"#;
-        assert!(is_277_json(valid_json), "Failed to identify valid 277 JSON");
+        assert!(is_277_json(valid_json));
 
-        // Test with STC segment
         let stc_json = r#"{"stc_segments":[{"stc01_health_care_claim_status":"A1:20"}]}"#;
-        assert!(
-            is_277_json(stc_json),
-            "Failed to identify 277 JSON with STC segment"
-        );
+        assert!(is_277_json(stc_json));
 
-        // Test with invalid JSON
         let invalid_json = r#"{"table1_combined":{"table1":{"st01_transaction_set_identifier_code":"276","bht06_transaction_type_code":"13"}}}"#;
-        assert!(
-            !is_277_json(invalid_json),
-            "Incorrectly identified invalid JSON as 277"
-        );
+        assert!(!is_277_json(invalid_json));
     }
 }

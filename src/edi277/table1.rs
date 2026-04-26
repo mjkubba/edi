@@ -86,6 +86,7 @@ pub fn write_table1(table1s: &Table1s) -> String {
         table1s.st03_implementation_convention_reference
     );
     result.push_str(&st_segment);
+    result.push('\n');
 
     // Write BHT segment
     let bht_segment = format!(
@@ -98,6 +99,7 @@ pub fn write_table1(table1s: &Table1s) -> String {
         table1s.bht06_transaction_type_code
     );
     result.push_str(&bht_segment);
+    result.push('\n');
 
     result
 }
