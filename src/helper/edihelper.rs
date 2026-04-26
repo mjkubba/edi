@@ -10,6 +10,15 @@ pub fn stiuational_element(value: String) -> String {
     }
 }
 
+/// Build a segment string with proper X12 §3.7 trailing separator suppression.
+/// All elements are joined with `*`, then trailing empty separators are removed
+/// before appending `~`. Middle empty elements are preserved.
+pub fn build_segment(elements: &[&str]) -> String {
+    let joined = elements.join("*");
+    let trimmed = joined.trim_end_matches('*');
+    format!("{}~", trimmed)
+}
+
 pub fn check_if_segement_in_loop(segment: &str, anchor: &str, contents: String) -> bool {
     if let (Some(segment_pos), Some(anchor_pos)) = (contents.find(segment), contents.find(anchor)) {
         return segment_pos < anchor_pos;
