@@ -33,12 +33,6 @@ pub fn write_loop2000c(loop2000c: &Loop2000c) -> String {
     result.push_str(&loop2000c.pat);
     result.push_str("\n");
 
-    // Write DMG segment if present
-    if let Some(dmg) = &loop2000c.dmg {
-        result.push_str(dmg);
-        result.push_str("\n");
-    }
-
     // Write NM1 segment if present
     if let Some(nm1) = &loop2000c.nm1_patient {
         result.push_str(nm1);
@@ -54,6 +48,12 @@ pub fn write_loop2000c(loop2000c: &Loop2000c) -> String {
     // Write N4 segment if present
     if let Some(n4) = &loop2000c.n4 {
         result.push_str(n4);
+        result.push_str("\n");
+    }
+
+    // Write DMG segment if present
+    if let Some(dmg) = &loop2000c.dmg {
+        result.push_str(dmg);
         result.push_str("\n");
     }
 
@@ -79,7 +79,6 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
 
     // Parse HL segment for patient
     if let Some(hl_pos) = remaining_content.find("HL*") {
-        // Check if this is a patient HL (hierarchical level code 23)
         let hl_segment = &remaining_content[hl_pos..];
         if hl_segment.contains("*23*") {
             let hl_end = remaining_content[hl_pos..]
@@ -89,26 +88,30 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
             loop2000c.hl = remaining_content[hl_pos..=hl_end].to_string();
             remaining_content = remaining_content[hl_end + 1..].to_string();
         } else {
-            // Not a patient HL, return empty loop
             return (loop2000c, remaining_content);
         }
     }
 
     // Parse PAT segment
     if let Some(pat_pos) = remaining_content.find("PAT*") {
-        let pat_end = remaining_content[pat_pos..]
-            .find('~')
-            .unwrap_or(remaining_content.len())
-            + pat_pos;
-        loop2000c.pat = remaining_content[pat_pos..=pat_end].to_string();
-        remaining_content = remaining_content[pat_end + 1..].to_string();
+        if !remaining_content[..pat_pos].contains("HL*")
+            && !remaining_content[..pat_pos].contains("NM1*")
+            && !remaining_content[..pat_pos].contains("CLM*")
+        {
+            let pat_end = remaining_content[pat_pos..]
+                .find('~')
+                .unwrap_or(remaining_content.len())
+                + pat_pos;
+            loop2000c.pat = remaining_content[pat_pos..=pat_end].to_string();
+            remaining_content = remaining_content[pat_end + 1..].to_string();
+        }
     }
 
-    // Parse DMG segment if present
+    // Parse DMG before NM1*QC (some files have DMG at Loop2000C level)
     if let Some(dmg_pos) = remaining_content.find("DMG*") {
-        // Check if this DMG belongs to this loop or the next one
         if !remaining_content[..dmg_pos].contains("HL*")
             && !remaining_content[..dmg_pos].contains("NM1*")
+            && !remaining_content[..dmg_pos].contains("CLM*")
         {
             let dmg_end = remaining_content[dmg_pos..]
                 .find('~')
@@ -119,52 +122,69 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
         }
     }
 
-    // Parse NM1 segment for patient
+    // Parse NM1*QC (Patient Name - Loop2010CA)
     if let Some(nm1_pos) = remaining_content.find("NM1*QC*") {
-        // Check if this NM1 belongs to this loop or the next one
-        if !remaining_content[..nm1_pos].contains("HL*") {
+        if !remaining_content[..nm1_pos].contains("HL*")
+            && !remaining_content[..nm1_pos].contains("CLM*")
+        {
             let nm1_end = remaining_content[nm1_pos..]
                 .find('~')
                 .unwrap_or(remaining_content.len())
                 + nm1_pos;
             loop2000c.nm1_patient = Some(remaining_content[nm1_pos..=nm1_end].to_string());
             remaining_content = remaining_content[nm1_end + 1..].to_string();
-        }
-    }
 
-    // Parse N3 segment if present
-    if let Some(n3_pos) = remaining_content.find("N3*") {
-        // Check if this N3 belongs to this loop or the next one
-        if !remaining_content[..n3_pos].contains("HL*")
-            && !remaining_content[..n3_pos].contains("NM1*")
-        {
-            let n3_end = remaining_content[n3_pos..]
-                .find('~')
-                .unwrap_or(remaining_content.len())
-                + n3_pos;
-            loop2000c.n3 = Some(remaining_content[n3_pos..=n3_end].to_string());
-            remaining_content = remaining_content[n3_end + 1..].to_string();
-        }
-    }
+            // Parse N3 after NM1*QC
+            if let Some(n3_pos) = remaining_content.find("N3*") {
+                if !remaining_content[..n3_pos].contains("HL*")
+                    && !remaining_content[..n3_pos].contains("NM1*")
+                    && !remaining_content[..n3_pos].contains("CLM*")
+                {
+                    let n3_end = remaining_content[n3_pos..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len())
+                        + n3_pos;
+                    loop2000c.n3 = Some(remaining_content[n3_pos..=n3_end].to_string());
+                    remaining_content = remaining_content[n3_end + 1..].to_string();
+                }
+            }
 
-    // Parse N4 segment if present
-    if let Some(n4_pos) = remaining_content.find("N4*") {
-        // Check if this N4 belongs to this loop or the next one
-        if !remaining_content[..n4_pos].contains("HL*")
-            && !remaining_content[..n4_pos].contains("NM1*")
-        {
-            let n4_end = remaining_content[n4_pos..]
-                .find('~')
-                .unwrap_or(remaining_content.len())
-                + n4_pos;
-            loop2000c.n4 = Some(remaining_content[n4_pos..=n4_end].to_string());
-            remaining_content = remaining_content[n4_end + 1..].to_string();
+            // Parse N4 after N3
+            if let Some(n4_pos) = remaining_content.find("N4*") {
+                if !remaining_content[..n4_pos].contains("HL*")
+                    && !remaining_content[..n4_pos].contains("NM1*")
+                    && !remaining_content[..n4_pos].contains("CLM*")
+                {
+                    let n4_end = remaining_content[n4_pos..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len())
+                        + n4_pos;
+                    loop2000c.n4 = Some(remaining_content[n4_pos..=n4_end].to_string());
+                    remaining_content = remaining_content[n4_end + 1..].to_string();
+                }
+            }
+
+            // Parse DMG after NM1*QC/N3/N4 if not already found
+            if loop2000c.dmg.is_none() {
+                if let Some(dmg_pos) = remaining_content.find("DMG*") {
+                    if !remaining_content[..dmg_pos].contains("HL*")
+                        && !remaining_content[..dmg_pos].contains("NM1*")
+                        && !remaining_content[..dmg_pos].contains("CLM*")
+                    {
+                        let dmg_end = remaining_content[dmg_pos..]
+                            .find('~')
+                            .unwrap_or(remaining_content.len())
+                            + dmg_pos;
+                        loop2000c.dmg = Some(remaining_content[dmg_pos..=dmg_end].to_string());
+                        remaining_content = remaining_content[dmg_end + 1..].to_string();
+                    }
+                }
+            }
         }
     }
 
     // Parse REF segments
     while let Some(ref_pos) = remaining_content.find("REF*") {
-        // Check if this REF belongs to this loop or the next one
         if remaining_content[..ref_pos].contains("HL*")
             || remaining_content[..ref_pos].contains("NM1*")
             || remaining_content[..ref_pos].contains("CLM*")
@@ -172,7 +192,6 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
         {
             break;
         }
-
         let ref_end = remaining_content[ref_pos..]
             .find('~')
             .unwrap_or(remaining_content.len())
@@ -185,7 +204,6 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
 
     // Parse DTP segments
     while let Some(dtp_pos) = remaining_content.find("DTP*") {
-        // Check if this DTP belongs to this loop or the next one
         if remaining_content[..dtp_pos].contains("HL*")
             || remaining_content[..dtp_pos].contains("NM1*")
             || remaining_content[..dtp_pos].contains("CLM*")
@@ -193,7 +211,6 @@ pub fn parse_loop2000c(content: &str) -> (Loop2000c, String) {
         {
             break;
         }
-
         let dtp_end = remaining_content[dtp_pos..]
             .find('~')
             .unwrap_or(remaining_content.len())

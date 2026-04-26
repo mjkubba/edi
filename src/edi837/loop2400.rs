@@ -23,6 +23,8 @@ pub struct Loop2400 {
     pub nte: Vec<String>,
     /// Service Line Pricing/Repricing Information
     pub hcp: Option<String>,
+    /// Tooth Information (837D)
+    pub too: Vec<String>,
 }
 
 /// Write Loop2400 to EDI format
@@ -48,6 +50,12 @@ pub fn write_loop2400(loop2400: &Loop2400) -> String {
     // Write SV3 segment if present
     if let Some(sv3) = &loop2400.sv3 {
         result.push_str(sv3);
+        result.push_str("\n");
+    }
+
+    // Write TOO segments (837D tooth information)
+    for too in &loop2400.too {
+        result.push_str(too);
         result.push_str("\n");
     }
 
@@ -142,6 +150,23 @@ pub fn parse_loop2400(content: &str) -> (Loop2400, String) {
             loop2400.sv3 = Some(remaining_content[sv3_pos..=sv3_end].to_string());
             remaining_content = remaining_content[sv3_end + 1..].to_string();
         }
+    }
+
+    // Parse TOO segments (837D tooth information)
+    while let Some(too_pos) = remaining_content.find("TOO*") {
+        if remaining_content[..too_pos].contains("LX*")
+            || remaining_content[..too_pos].contains("SE*")
+        {
+            break;
+        }
+        let too_end = remaining_content[too_pos..]
+            .find('~')
+            .unwrap_or(remaining_content.len())
+            + too_pos;
+        loop2400
+            .too
+            .push(remaining_content[too_pos..=too_end].to_string());
+        remaining_content = remaining_content[too_end + 1..].to_string();
     }
 
     // Parse DTP segments

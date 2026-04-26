@@ -4,7 +4,7 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **237/237 tests passing**, zero failures
+- **238/238 tests passing**, zero failures
 - **26 compiler warnings** (edi837 dead code, EdiError variants, infrastructure kept for future use)
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
@@ -19,9 +19,9 @@ Last updated: 2026-04-25
 | 276 (Claim Status Request) | ✅ Complete | Minor gaps | AMT, DTP at subscriber level not captured |
 | 277 (Claim Status Response) | ✅ Complete | Identical output | None |
 | 278 (Services Review) | ⚠️ Functional | Minor diffs | DTP, SV2, PRV segments missing in output |
-| 837P (Claim Professional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CR1, CRC, NM1*PW, NM1*45, LX, SV1, QTY, NTE. Dead code: `write_loop2010ba/bb/ca` exist but aren't called |
-| 837I (Claim Institutional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CL1, NM1*71, SBR, OI, LX, SV2, DTP |
-| 837D (Claim Dental) | ✅ Functional | Minor diffs | Core functionality working |
+| 837P (Claim Professional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip |
+| 837I (Claim Institutional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including CL1 |
+| 837D (Claim Dental) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including TOO |
 | 820 (Premium Payment) | ✅ Complete | Identical output | None |
 | 834 (Enrollment) | ⚠️ Functional | Partial | Loop1000B boundary fixed; Loop2320/2330 are stubs |
 
@@ -47,11 +47,7 @@ Last updated: 2026-04-25
 
 ### Medium Priority
 
-4. **EDI837P/I — Wire up dead code and add missing segments**
-   - `write_loop2010ba`, `write_loop2010bb`, `write_loop2010ca` exist but are never called
-   - Many segments missing on round-trip (see table above)
-
-5. **Clean up 52 compiler warnings**
+4. **Clean up remaining 26 compiler warnings**
    - Most are auto-fixable: `cargo fix --lib -p edi` handles unused imports/mut
    - 25 unused functions — some are dead code, some are from the generic `transaction_processor`/`segment_config` infrastructure that isn't fully wired in
 
@@ -68,7 +64,7 @@ Last updated: 2026-04-25
 ## Completed Work
 
 - All transaction set modules created (835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834)
-- 237 unit tests passing
+- 238 unit tests passing
 - Fixed: memory crash in edi999 CTX parsing
 - Fixed: NM1 id_code_qualifier field across all modules
 - Fixed: UM prefix detection (AR/HS are um01 values, not prefixes)
@@ -86,13 +82,22 @@ Last updated: 2026-04-25
 - Fixed: edi277 hardcoded TRN/STC/REF segments replaced with parsed data
 - Reduced compiler warnings from 52 to 26
 - Created demo files for all 12 transaction sets
+- Fixed: edi837P/I/D round-trip — all segments now preserved
+  - Rewrote parse_loop2300 with sequential segment processing (eliminates find() ordering bugs)
+  - Added NM1*PR (payer) and DMG parsing to Loop2000B
+  - Added DMG parsing after NM1*QC in Loop2000C
+  - Added NM1*82/71/72 (rendering/attending/operating provider) and PRV*PE to Loop2300
+  - Added TOO segment parsing to Loop2400 for 837D
+  - Fixed envelope segment double-tilde in write_837p/i/d
+  - Fixed parse_loop2000a PRV boundary (was consuming claim-level PRV)
+  - Removed redundant CL1/TOO parsing from 837I/D controllers
 
 ## Recommended Next Steps
 
 1. ~~Get demo 834 files → debug and verify edi834 parsing~~ ✅ Done
 2. ~~Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)~~ ✅ Done
 3. ~~Implement edi276/277 Loop2000C/D parsing~~ ✅ Done
-4. Wire up edi837 dead code (loop2010ba/bb/ca write functions)
+4. ~~Wire up edi837 dead code (loop2010ba/bb/ca write functions)~~ ✅ Done — rewrote with inline parsing
 5. Clean up compiler warnings
 
 ## Demo Files

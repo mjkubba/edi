@@ -348,14 +348,18 @@ pub fn parse_loop2000a(content: &str) -> (Loop2000a, String) {
         remaining_content = remaining_content[hl_end + 1..].to_string();
     }
 
-    // Parse PRV segment if present
+    // Parse PRV segment if present (must appear before NM1)
     if let Some(prv_pos) = remaining_content.find("PRV*") {
-        let prv_end = remaining_content[prv_pos..]
-            .find('~')
-            .unwrap_or(remaining_content.len())
-            + prv_pos;
-        loop2000a.prv = Some(remaining_content[prv_pos..=prv_end].to_string());
-        remaining_content = remaining_content[prv_end + 1..].to_string();
+        if !remaining_content[..prv_pos].contains("NM1*")
+            && !remaining_content[..prv_pos].contains("HL*")
+        {
+            let prv_end = remaining_content[prv_pos..]
+                .find('~')
+                .unwrap_or(remaining_content.len())
+                + prv_pos;
+            loop2000a.prv = Some(remaining_content[prv_pos..=prv_end].to_string());
+            remaining_content = remaining_content[prv_end + 1..].to_string();
+        }
     }
 
     (loop2000a, remaining_content)

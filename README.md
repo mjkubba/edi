@@ -12,9 +12,9 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Fully functional with special CTX segment handling for both standard and special formats |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Loop2000C/D parsing with TRN, STC, REF, DMG at all HL levels. 277 round-trip identical |
 | EDI278 (Health Care Services Review) | ✅ Functional | Functional with correct handling of AR/HS prefixes in UM segment, some segments missing in output (DTP, SV2, PRV) |
-| EDI837P (Health Care Claim Professional) | ✅ Functional | Functional with differences in output, core functionality working correctly but missing several segments |
-| EDI837I (Health Care Claim Institutional) | ✅ Functional | Functional with specialized handling for CL1 segment, missing several segments in output |
-| EDI837D (Health Care Claim Dental) | ✅ Functional | Functional with specialized handling for TOO segment, core functionality working correctly |
+| EDI837P (Health Care Claim Professional) | ✅ Complete | Functional with all segments preserved on round-trip, trailing newline only |
+| EDI837I (Health Care Claim Institutional) | ✅ Complete | Functional with all segments preserved on round-trip including CL1 |
+| EDI837D (Health Care Claim Dental) | ✅ Complete | Functional with all segments preserved on round-trip including TOO |
 | EDI820 (Health Insurance Exchange Related Payments) | ✅ Complete | Fully functional with all segments preserved on round-trip |
 | EDI834 (Benefit Enrollment and Maintenance) | ⚠️ Functional | Parses enrollment data with member-level loops, health coverage, and demographics |
 
@@ -135,6 +135,11 @@ diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
   - ✅ Implemented variant-specific components
   - ✅ Added specialized handling for TOO segment in 837D
   - ✅ Added specialized handling for CL1 segment in 837I
+  - ✅ Rewrote parse_loop2300 with sequential segment processing
+  - ✅ Added NM1*PR (payer), DMG, rendering/attending/operating provider parsing
+  - ✅ Added TOO parsing to Loop2400 for 837D
+  - ✅ Fixed envelope segment double-tilde in write functions
+  - ✅ All segments preserved on round-trip
 - ✅ Transaction Set 820 (Health Insurance Exchange Related Payments)
   - ✅ Implemented basic structure and segments
   - ✅ Added parsing and generation functionality
@@ -156,9 +161,7 @@ diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
 
 ### Planned
 - Improve Incomplete Implementations
-  - Improve the EDI837P/I/D implementations to preserve all segments on round-trip
-  - Wire up dead code (loop2010ba/bb/ca write functions)
-  - Fix envelope segment newline handling in 837 write functions
+  - Improve the EDI278 implementation to preserve DTP, SV2, PRV segments on round-trip
 - Code Cleanup
   - Address remaining 26 compiler warnings (edi837 dead code, EdiError variants)
   - Improve code organization and documentation

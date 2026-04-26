@@ -438,38 +438,10 @@ impl TransactionSet for Edi837I {
         // Parse Loop2300 (Claim Information)
         let mut loop2300_vec = Vec::new();
         while remaining_content.contains("CLM*") {
-            let (mut loop2300, remaining) = parse_loop2300(&remaining_content);
+            let (loop2300, remaining) = parse_loop2300(&remaining_content);
             if loop2300.clm.is_empty() {
                 break;
             }
-
-            // Look for CL1 segments (specific to 837I)
-            let mut cl1_segments = Vec::new();
-            let temp_content = remaining.clone();
-            let mut segment_end = 0;
-
-            while let Some(segment_start) = temp_content[segment_end..].find("CL1*") {
-                let start_pos = segment_end + segment_start;
-                let end_pos = temp_content[start_pos..]
-                    .find('~')
-                    .unwrap_or(temp_content.len())
-                    + start_pos;
-                let segment = temp_content[start_pos..=end_pos].to_string();
-
-                if let Some(cl1_segment) = parse_cl1_segment(&segment) {
-                    cl1_segments.push(cl1_segment);
-                }
-
-                segment_end = end_pos + 1;
-
-                // Break if we've reached the next LX segment
-                if temp_content[segment_end..].contains("LX*") {
-                    break;
-                }
-            }
-
-            // Add CL1 segments to Loop2300
-            loop2300.cl1_segments = cl1_segments;
 
             loop2300_vec.push(loop2300);
             remaining_content = remaining;
@@ -707,38 +679,10 @@ impl TransactionSet for Edi837D {
         // Parse Loop2300 (Claim Information)
         let mut loop2300_vec = Vec::new();
         while remaining_content.contains("CLM*") {
-            let (mut loop2300, remaining) = parse_loop2300(&remaining_content);
+            let (loop2300, remaining) = parse_loop2300(&remaining_content);
             if loop2300.clm.is_empty() {
                 break;
             }
-
-            // Look for TOO segments (specific to 837D)
-            let mut too_segments = Vec::new();
-            let temp_content = remaining.clone();
-            let mut segment_end = 0;
-
-            while let Some(segment_start) = temp_content[segment_end..].find("TOO*") {
-                let start_pos = segment_end + segment_start;
-                let end_pos = temp_content[start_pos..]
-                    .find('~')
-                    .unwrap_or(temp_content.len())
-                    + start_pos;
-                let segment = temp_content[start_pos..=end_pos].to_string();
-
-                if let Some(too_segment) = parse_too_segment(&segment) {
-                    too_segments.push(too_segment);
-                }
-
-                segment_end = end_pos + 1;
-
-                // Break if we've reached the next LX segment
-                if temp_content[segment_end..].contains("LX*") {
-                    break;
-                }
-            }
-
-            // Add TOO segments to Loop2300
-            loop2300.too_segments = too_segments;
 
             loop2300_vec.push(loop2300);
             remaining_content = remaining;
@@ -882,21 +826,15 @@ pub fn write_837p(edi837p: &Edi837P) -> EdiResult<String> {
 
     let mut result = String::new();
 
-    // Write ISA segment
+    // Write envelope segments (already contain ~ terminator)
     result.push_str(&edi837p.isa);
-    result.push('~');
-
-    // Write GS segment
+    result.push('\n');
     result.push_str(&edi837p.gs);
-    result.push('~');
-
-    // Write ST segment
+    result.push('\n');
     result.push_str(&edi837p.st);
-    result.push('~');
-
-    // Write BHT segment
+    result.push('\n');
     result.push_str(&edi837p.table1.table1.bht);
-    result.push('~');
+    result.push('\n');
 
     // Write Loop2000A (Billing Provider Hierarchical Level)
     result.push_str(&write_loop2000a(&edi837p.table1.loop2000a));
@@ -934,17 +872,13 @@ pub fn write_837p(edi837p: &Edi837P) -> EdiResult<String> {
         }
     }
 
-    // Write SE segment
+    // Write trailer segments (already contain ~ terminator)
     result.push_str(&edi837p.se);
-    result.push('~');
-
-    // Write GE segment
+    result.push('\n');
     result.push_str(&edi837p.ge);
-    result.push('~');
-
-    // Write IEA segment
+    result.push('\n');
     result.push_str(&edi837p.iea);
-    result.push('~');
+    result.push('\n');
 
     Ok(result)
 }
@@ -965,21 +899,15 @@ pub fn write_837i(edi837i: &Edi837I) -> EdiResult<String> {
 
     let mut result = String::new();
 
-    // Write ISA segment
+    // Write envelope segments (already contain ~ terminator)
     result.push_str(&edi837i.isa);
-    result.push('~');
-
-    // Write GS segment
+    result.push('\n');
     result.push_str(&edi837i.gs);
-    result.push('~');
-
-    // Write ST segment
+    result.push('\n');
     result.push_str(&edi837i.st);
-    result.push('~');
-
-    // Write BHT segment
+    result.push('\n');
     result.push_str(&edi837i.table1.table1.bht);
-    result.push('~');
+    result.push('\n');
 
     // Write Loop2000A (Billing Provider Hierarchical Level)
     result.push_str(&write_loop2000a(&edi837i.table1.loop2000a));
@@ -1009,17 +937,7 @@ pub fn write_837i(edi837i: &Edi837I) -> EdiResult<String> {
 
     // Write Loop2300 (Claim Information)
     for loop2300 in &edi837i.loop2300 {
-        let mut loop2300_str = write_loop2300(loop2300);
-
-        // Check for CL1 segment in the raw segments
-        for ref_seg in &loop2300.ref_segments {
-            if ref_seg.starts_with("CL1*") {
-                loop2300_str.push_str(ref_seg);
-                loop2300_str.push('~');
-            }
-        }
-
-        result.push_str(&loop2300_str);
+        result.push_str(&write_loop2300(loop2300));
 
         // Write Loop2400 (Service Line) for each claim
         for loop2400 in &loop2300.loop2400 {
@@ -1027,17 +945,13 @@ pub fn write_837i(edi837i: &Edi837I) -> EdiResult<String> {
         }
     }
 
-    // Write SE segment
+    // Write trailer segments (already contain ~ terminator)
     result.push_str(&edi837i.se);
-    result.push('~');
-
-    // Write GE segment
+    result.push('\n');
     result.push_str(&edi837i.ge);
-    result.push('~');
-
-    // Write IEA segment
+    result.push('\n');
     result.push_str(&edi837i.iea);
-    result.push('~');
+    result.push('\n');
 
     Ok(result)
 }
@@ -1129,21 +1043,15 @@ pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
 
     let mut result = String::new();
 
-    // Write ISA segment
+    // Write envelope segments (already contain ~ terminator)
     result.push_str(&edi837d.isa);
-    result.push('~');
-
-    // Write GS segment
+    result.push('\n');
     result.push_str(&edi837d.gs);
-    result.push('~');
-
-    // Write ST segment
+    result.push('\n');
     result.push_str(&edi837d.st);
-    result.push('~');
-
-    // Write BHT segment
+    result.push('\n');
     result.push_str(&edi837d.table1.table1.bht);
-    result.push('~');
+    result.push('\n');
 
     // Write Loop2000A (Billing Provider Hierarchical Level)
     result.push_str(&write_loop2000a(&edi837d.table1.loop2000a));
@@ -1173,15 +1081,7 @@ pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
 
     // Write Loop2300 (Claim Information)
     for loop2300 in &edi837d.loop2300 {
-        let mut loop2300_str = write_loop2300(loop2300);
-
-        // Add TOO segments if present (specific to 837D)
-        for too in &loop2300.too_segments {
-            loop2300_str.push_str(too);
-            loop2300_str.push('~');
-        }
-
-        result.push_str(&loop2300_str);
+        result.push_str(&write_loop2300(loop2300));
 
         // Write Loop2400 (Service Line) for each claim
         for loop2400 in &loop2300.loop2400 {
@@ -1189,32 +1089,14 @@ pub fn write_837d(edi837d: &Edi837D) -> EdiResult<String> {
         }
     }
 
-    // Write SE segment
+    // Write trailer segments (already contain ~ terminator)
     result.push_str(&edi837d.se);
-    result.push('~');
-
-    // Write GE segment
+    result.push('\n');
     result.push_str(&edi837d.ge);
-    result.push('~');
-
-    // Write IEA segment
+    result.push('\n');
     result.push_str(&edi837d.iea);
-    result.push('~');
+    result.push('\n');
 
     Ok(result)
 }
-/// Implement specialized handling for TOO segment in 837D
-fn parse_too_segment(segment: &str) -> Option<String> {
-    if segment.starts_with("TOO*") {
-        return Some(segment.to_string());
-    }
-    None
-}
-
-/// Implement specialized handling for CL1 segment in 837I
-fn parse_cl1_segment(segment: &str) -> Option<String> {
-    if segment.starts_with("CL1*") {
-        return Some(segment.to_string());
-    }
-    None
-}
+// Specialized segment parsers removed — CL1 and TOO are now handled by parse_loop2300
