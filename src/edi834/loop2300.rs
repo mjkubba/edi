@@ -1,6 +1,7 @@
 use log::info;
 use serde::{Deserialize, Serialize};
 
+use crate::edi834::loop2320::*;
 use crate::segments::amt::*;
 use crate::segments::dtp::*;
 use crate::segments::hd::*;
@@ -12,6 +13,7 @@ pub struct Loop2300 {
     pub dtp_segments: Vec<DTP>,
     pub amt_segments: Vec<AMT>,
     pub ref_segments: Vec<REF>,
+    pub loop2320_segments: Vec<Loop2320>,
 }
 
 pub fn get_loop2300(mut contents: String) -> (Loop2300, String) {
@@ -95,6 +97,22 @@ pub fn get_loop2300(mut contents: String) -> (Loop2300, String) {
         }
     }
 
+    // Parse Loop2320 segments (Coordination of Benefits) — nested inside Loop2300
+    while contents.contains("COB*") {
+        let boundary = ["HD*", "INS*", "SE*", "LC*"]
+            .iter()
+            .filter_map(|s| contents.find(s))
+            .min()
+            .unwrap_or(contents.len());
+        let cob_pos = contents.find("COB*").unwrap();
+        if cob_pos > boundary {
+            break;
+        }
+        let (loop2320, new_contents) = get_loop2320(contents);
+        loop2300.loop2320_segments.push(loop2320);
+        contents = new_contents;
+    }
+
     info!("Parsed Loop2300: {:?}", loop2300);
     (loop2300, contents)
 }
@@ -118,6 +136,10 @@ pub fn write_loop2300(loop2300: Loop2300) -> String {
     for ref_segment in loop2300.ref_segments {
         result.push_str(&write_ref(ref_segment));
         result.push_str("\n");
+    }
+
+    for loop2320 in loop2300.loop2320_segments {
+        result.push_str(&write_loop2320(loop2320));
     }
 
     result

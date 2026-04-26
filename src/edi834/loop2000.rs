@@ -10,8 +10,6 @@ use crate::edi834::loop2100f::*;
 use crate::edi834::loop2100g::*;
 use crate::edi834::loop2100h::*;
 use crate::edi834::loop2300::*;
-use crate::edi834::loop2320::*;
-use crate::edi834::loop2330::*;
 use crate::segments::dtp::*;
 use crate::segments::ins::*;
 use crate::segments::r#ref::*;
@@ -29,9 +27,7 @@ pub struct Loop2000 {
     pub loop2100f: Option<Loop2100F>,     // Custodial Parent
     pub loop2100g: Option<Loop2100G>,     // Responsible Person
     pub loop2100h: Option<Loop2100H>,     // Drop Off Location
-    pub loop2300_segments: Vec<Loop2300>, // Health Coverage
-    pub loop2320_segments: Vec<Loop2320>, // Coordination of Benefits
-    pub loop2330_segments: Vec<Loop2330>, // Disability Information
+    pub loop2300_segments: Vec<Loop2300>, // Health Coverage (contains Loop2320/2330)
 }
 
 /// Check if segment exists within current member boundary (before next INS* or SE*)
@@ -156,24 +152,10 @@ pub fn get_loop2000(mut contents: String) -> (Loop2000, String) {
         contents = new_contents;
     }
 
-    // Parse Loop2300 segments (Health Coverage)
+    // Parse Loop2300 segments (Health Coverage — contains nested Loop2320/2330)
     while in_current_member(&contents, "HD*") {
         let (loop2300, new_contents) = get_loop2300(contents);
         loop2000.loop2300_segments.push(loop2300);
-        contents = new_contents;
-    }
-
-    // Parse Loop2320 segments (Coordination of Benefits)
-    while in_current_member(&contents, "COB*") {
-        let (loop2320, new_contents) = get_loop2320(contents);
-        loop2000.loop2320_segments.push(loop2320);
-        contents = new_contents;
-    }
-
-    // Parse Loop2330 segments (Disability Information)
-    while in_current_member(&contents, "DSB*") {
-        let (loop2330, new_contents) = get_loop2330(contents);
-        loop2000.loop2330_segments.push(loop2330);
         contents = new_contents;
     }
 
@@ -231,14 +213,6 @@ pub fn write_loop2000(loop2000: Loop2000) -> String {
 
     for loop2300 in loop2000.loop2300_segments {
         result.push_str(&write_loop2300(loop2300));
-    }
-
-    for loop2320 in loop2000.loop2320_segments {
-        result.push_str(&write_loop2320(loop2320));
-    }
-
-    for loop2330 in loop2000.loop2330_segments {
-        result.push_str(&write_loop2330(loop2330));
     }
 
     result
