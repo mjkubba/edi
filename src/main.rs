@@ -48,7 +48,7 @@ fn main() {
 
     let args = process_args();
     let contents = get_file_contents(args.clone());
-    let _clean_contents = clean_contents(contents.clone());
+    let contents = clean_contents(contents);
 
     if args.operation == "write" {
         info!("Write EDI Operation");

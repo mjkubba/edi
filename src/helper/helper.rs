@@ -155,20 +155,42 @@ pub fn get_file_contents(args: Args) -> String {
 /**
  * Clean file contents
  *
- * Removes line breaks and normalizes delimiters in EDI content
+ * Removes line breaks, normalizes delimiters from ISA segment, and cleans EDI content
  *
  * Parameters:
  * - contents: String to clean
  *
  * Returns:
- * - Cleaned string
+ * - Cleaned string with standard * and ~ delimiters
  */
 pub fn clean_contents(contents: String) -> String {
-    let mut clean_contents = contents.replace("\r\n", "");
-    clean_contents = clean_contents.replace("\r", "");
-    clean_contents = clean_contents.replace("\n", "");
-    clean_contents = clean_contents.replace("~ ", "~");
-    clean_contents
+    let mut clean = contents;
+
+    // Detect and normalize custom delimiters from ISA segment BEFORE stripping newlines
+    // ISA is fixed-length: position 3 = element separator, position 105 = segment terminator
+    if clean.starts_with("ISA") && clean.len() >= 106 {
+        let element_sep = clean.as_bytes()[3] as char;
+        let segment_term = clean.as_bytes()[105] as char;
+
+        if element_sep != '*' || segment_term != '~' {
+            info!(
+                "Custom delimiters detected: element='{}' segment='{}'",
+                element_sep, segment_term
+            );
+            if segment_term != '~' {
+                clean = clean.replace(segment_term, "~");
+            }
+            if element_sep != '*' {
+                clean = clean.replace(element_sep, "*");
+            }
+        }
+    }
+
+    clean = clean.replace("\r\n", "");
+    clean = clean.replace("\r", "");
+    clean = clean.replace("\n", "");
+    clean = clean.replace("~ ", "~");
+    clean
 }
 
 /**
@@ -200,5 +222,34 @@ pub fn write_to_file(write_contents: String, write_file: String) {
             warn!("Failed to create file: {}", e);
             std::process::exit(1);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clean_contents_standard_delimiters() {
+        let input = "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *230501*1200*^*00501*000000001*0*T*:~GS*HR*S*R~".to_string();
+        let result = clean_contents(input.clone());
+        assert_eq!(result, input); // no change
+    }
+
+    #[test]
+    fn test_clean_contents_pipe_delimiter() {
+        // Element separator = |, segment terminator = \n (after ISA at pos 105)
+        let input = "ISA|00|          |00|          |ZZ|SENDER         |ZZ|RECEIVER       |230501|1200|^|00501|000000001|0|T|:\nGS|HR|S|R\n".to_string();
+        let result = clean_contents(input);
+        assert!(result.contains("ISA*00*"));
+        assert!(result.contains("~GS*HR*S*R~"));
+    }
+
+    #[test]
+    fn test_clean_contents_removes_newlines() {
+        let input = "ISA*00*          *00*          *ZZ*SENDER         *ZZ*RECEIVER       *230501*1200*^*00501*000000001*0*T*:~\nGS*HR~\n".to_string();
+        let result = clean_contents(input);
+        assert!(!result.contains('\n'));
+        assert!(result.contains("~GS*HR~"));
     }
 }
