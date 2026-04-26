@@ -1,5 +1,6 @@
 use crate::edi276::loop2100::*;
 use crate::edi276::loop2200::*;
+use crate::segments::amt::*;
 use crate::segments::dmg::*;
 use crate::segments::dtp::*;
 use crate::segments::hl::*;
@@ -46,6 +47,8 @@ pub struct Loop2000D {
     pub nm1: NM1,
     pub trn: TRN,
     pub ref_segments: Vec<REF>,
+    pub amt_segments: Vec<AMT>,
+    pub dtp_segments: Vec<DTP>,
     pub dmg: Option<DMG>,
     pub loop2100d: Vec<Loop2100D>,
     pub loop2200d: Vec<Loop2200D>,
@@ -632,6 +635,58 @@ pub fn get_loop_2000d_vec(contents: String) -> (Vec<Loop2000D>, String) {
                 }
             }
 
+            // Process AMT segments
+            while let Some(amt_start) = remaining_content.find("AMT") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if amt_start < next_hl && amt_start < next_se {
+                    let amt_end = remaining_content[amt_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - amt_start);
+                    let amt_segment = &remaining_content[amt_start..amt_start + amt_end];
+                    if !amt_segment.starts_with("AMT") {
+                        break;
+                    }
+                    let amt_content = if amt_segment.starts_with("AMT*") {
+                        &amt_segment[4..]
+                    } else {
+                        amt_segment
+                    };
+                    loop_2000d
+                        .amt_segments
+                        .push(get_amt(amt_content.to_string()));
+                    remaining_content = remaining_content[amt_start + amt_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+
+            // Process DTP segments
+            while let Some(dtp_start) = remaining_content.find("DTP") {
+                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                if dtp_start < next_hl && dtp_start < next_se {
+                    let dtp_end = remaining_content[dtp_start..]
+                        .find('~')
+                        .unwrap_or(remaining_content.len() - dtp_start);
+                    let dtp_segment = &remaining_content[dtp_start..dtp_start + dtp_end];
+                    if !dtp_segment.starts_with("DTP") {
+                        break;
+                    }
+                    let dtp_content = if dtp_segment.starts_with("DTP*") {
+                        &dtp_segment[4..]
+                    } else {
+                        dtp_segment
+                    };
+                    loop_2000d
+                        .dtp_segments
+                        .push(get_dtp(dtp_content.to_string()));
+                    remaining_content = remaining_content[dtp_start + dtp_end + 1..].to_string();
+                } else {
+                    break;
+                }
+            }
+
             loop_2000d_vec.push(loop_2000d);
         } else {
             break;
@@ -669,6 +724,18 @@ pub fn write_loop_2000d(loop_2000d: &Loop2000D) -> String {
     // Write REF segments
     for ref_seg in &loop_2000d.ref_segments {
         result.push_str(&write_ref(ref_seg.clone()));
+        result.push('\n');
+    }
+
+    // Write AMT segments
+    for amt_seg in &loop_2000d.amt_segments {
+        result.push_str(&write_amt(amt_seg.clone()));
+        result.push('\n');
+    }
+
+    // Write DTP segments
+    for dtp_seg in &loop_2000d.dtp_segments {
+        result.push_str(&write_dtp(dtp_seg.clone()));
         result.push('\n');
     }
 
