@@ -4,62 +4,54 @@ Last updated: 2026-04-25
 
 ## Build & Tests
 
-- **238/238 tests passing**, zero failures
-- **26 compiler warnings** (edi837 dead code, EdiError variants, infrastructure kept for future use)
+- **232/232 tests passing**, zero failures
+- **0 compiler warnings**
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
 ## Transaction Set Status
 
 | Transaction Set | Status | Round-Trip Fidelity | Known Issues |
 |---|---|---|---|
-| 835 (Payment/Remittance) | ✅ Complete | Identical output | None |
-| 999 (Acknowledgment) | ✅ Complete | Minor diffs | GE/IEA control numbers differ on round-trip |
-| 270 (Eligibility Inquiry) | ✅ Complete | Line break diffs only | Formatting only |
-| 271 (Eligibility Response) | ✅ Complete | Line break diffs only | Formatting only |
+| 835 (Payment/Remittance) | ✅ Complete | Formatting diffs | Output on single line vs one-segment-per-line |
+| 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
+| 270 (Eligibility Inquiry) | ✅ Complete | Minor diffs | REF segment reordered, trailing newline |
+| 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN/DTP reordered, LS/LE envelope added |
 | 276 (Claim Status Request) | ✅ Complete | Minor gaps | AMT, DTP at subscriber level not captured |
 | 277 (Claim Status Response) | ✅ Complete | Identical output | None |
-| 278 (Services Review) | ⚠️ Functional | Minor diffs | DTP, SV2, PRV segments missing in output |
+| 278 (Services Review) | ✅ Complete | Trailing newline only | None |
 | 837P (Claim Professional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip |
 | 837I (Claim Institutional) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including CL1 |
 | 837D (Claim Dental) | ✅ Complete | Trailing newline only | All segments preserved on round-trip including TOO |
-| 820 (Premium Payment) | ✅ Complete | Identical output | None |
-| 834 (Enrollment) | ⚠️ Functional | Partial | Loop1000B boundary fixed; Loop2320/2330 are stubs |
+| 820 (Premium Payment) | ✅ Complete | Trailing newline only | None |
+| 834 (Enrollment) | ✅ Complete | Identical output | Loop2320/2330 are stubs |
 
 ## What Needs Work
 
 ### High Priority
 
-1. **EDI834 — Verified and partially fixed**
-   - Code exists in `src/edi834/` with controller, loops, segments, and `main.rs` wiring
-   - Loop1000B boundary detection fixed — no longer consumes INS/REF/DTP belonging to Loop2000
-   - `loop2320` and `loop2330` are stub implementations (empty write functions, unused variables)
-   - Demo file available: `demo/edi834-demo-005010X220.edi`
-   - KB has full spec: `834v5010X220.md`
-
-2. **EDI820 — Fix missing segments**
-   - N1, ENT, NM1, RMR, DTM not preserved on round-trip
-   - `loop2000`/`loop2100` parsers need to capture all child segments
-   - KB has full spec: `820v5010X218.md`
-
-3. **EDI276/277 — Implement Loop2000C/D**
-   - TRN, REF, DMG segments at Provider and Subscriber HL levels not parsed/written
-   - Data loss on round-trip for multi-level HL hierarchies
+1. **EDI835 — Output formatting**
+   - Round-trip produces all segments on a single line instead of one-segment-per-line
+   - Content is correct, only formatting differs
 
 ### Medium Priority
 
-4. **Clean up remaining 26 compiler warnings**
-   - Most are auto-fixable: `cargo fix --lib -p edi` handles unused imports/mut
-   - 25 unused functions — some are dead code, some are from the generic `transaction_processor`/`segment_config` infrastructure that isn't fully wired in
+2. **EDI834 — Loop2320/2330 stubs**
+   - `loop2320` and `loop2330` are stub implementations (empty write functions)
+   - Coordination of benefits data not preserved
+   - KB has full spec: `834v5010X220.md`
+
+3. **EDI276 — AMT/DTP at subscriber level**
+   - AMT, DTP segments at subscriber HL level not captured on round-trip
 
 ### Low Priority
 
-6. **Generic infrastructure partially unused**
-   - `transaction_processor.rs`, `segment_config.rs`, `loop_processor.rs` have functions (`register_common_segments`, `parse_isa`, `parse_gs`, etc.) that are dead code
+4. **Generic infrastructure partially unused**
+   - `transaction_processor.rs`, `segment_config.rs`, `loop_processor.rs` have functions that are dead code
    - Decide: wire them in or remove them
 
-7. **Performance optimization** for large files
-8. **Custom delimiter support**
-9. **Schema validation**
+5. **Performance optimization** for large files
+6. **Custom delimiter support**
+7. **Schema validation**
 
 ## Completed Work
 
@@ -91,6 +83,9 @@ Last updated: 2026-04-25
   - Fixed envelope segment double-tilde in write_837p/i/d
   - Fixed parse_loop2000a PRV boundary (was consuming claim-level PRV)
   - Removed redundant CL1/TOO parsing from 837I/D controllers
+- Eliminated all compiler warnings (26 → 0)
+  - Removed dead loop2010ba/bb/ca files and unused parse/write functions
+  - Suppressed warnings on public API and infrastructure kept for future use
 
 ## Recommended Next Steps
 

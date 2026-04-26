@@ -11,7 +11,7 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed including LS/LE |
 | EDI999 (Implementation Acknowledgment) | ✅ Complete | Fully functional with special CTX segment handling for both standard and special formats |
 | EDI276/277 (Health Care Claim Status) | ✅ Complete | Loop2000C/D parsing with TRN, STC, REF, DMG at all HL levels. 277 round-trip identical |
-| EDI278 (Health Care Services Review) | ✅ Functional | Functional with correct handling of AR/HS prefixes in UM segment, some segments missing in output (DTP, SV2, PRV) |
+| EDI278 (Health Care Services Review) | ✅ Complete | Functional with correct handling of AR/HS prefixes in UM segment, trailing newline only |
 | EDI837P (Health Care Claim Professional) | ✅ Complete | Functional with all segments preserved on round-trip, trailing newline only |
 | EDI837I (Health Care Claim Institutional) | ✅ Complete | Functional with all segments preserved on round-trip including CL1 |
 | EDI837D (Health Care Claim Dental) | ✅ Complete | Functional with all segments preserved on round-trip including TOO |
@@ -161,9 +161,10 @@ diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
 
 ### Planned
 - Improve Incomplete Implementations
-  - Improve the EDI278 implementation to preserve DTP, SV2, PRV segments on round-trip
+  - Fix EDI835 output formatting (all segments on single line vs one-per-line)
+  - Implement EDI834 Loop2320/2330 (coordination of benefits)
+  - Capture AMT/DTP at subscriber level in EDI276
 - Code Cleanup
-  - Address remaining 26 compiler warnings (edi837 dead code, EdiError variants)
   - Improve code organization and documentation
 - Performance Optimization
   - Optimize parsing algorithms for better performance with large files
