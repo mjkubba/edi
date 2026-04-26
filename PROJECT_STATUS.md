@@ -87,7 +87,7 @@ Last updated: 2026-04-25
 
 ## Demo Files
 
-All demo files are in `demo/`:
+All demo files are in `demo/`. These files are AI-generated based on public X12 implementation guides and EDI specification documentation. They are intended for testing and development purposes only.
 
 | File | Transaction Set |
 |------|----------------|
