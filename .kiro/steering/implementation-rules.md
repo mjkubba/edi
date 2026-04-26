@@ -58,6 +58,16 @@ BEFORE committing a change, ALWAYS do the following steps:
 3. Run `cargo +nightly fmt` to auto-format the code
 4. Commit the changes
 
+### Pushing Changes
+
+The primary remote for pushing is `origin` using HTTPS. Always push to `main`:
+
+```bash
+git push origin main
+```
+
+**NEVER run `git push` from within the AI agent session** — it hangs due to auth prompts. The user will push manually.
+
 ### Commit Messages
 
 All commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
