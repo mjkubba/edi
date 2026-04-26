@@ -13,9 +13,9 @@ Last updated: 2026-04-25
 | Transaction Set | Status | Round-Trip Fidelity | Known Issues |
 |---|---|---|---|
 | 835 (Payment/Remittance) | ✅ Complete | Trailing newline only | None |
-| 999 (Acknowledgment) | ✅ Complete | Minor diffs | AK9 segment reordered, trailing newline |
-| 270 (Eligibility Inquiry) | ✅ Complete | Identical output | None |
-| 271 (Eligibility Response) | ✅ Complete | Minor diffs | TRN written after NM1/N3/N4/DMG instead of before NM1 |
+| 999 (Acknowledgment) | ✅ Complete | Trailing newline only | None |
+| 270 (Eligibility Inquiry) | ✅ Complete | Trailing newline only | None |
+| 271 (Eligibility Response) | ✅ Complete | Trailing newline only | None |
 | 276 (Claim Status Request) | ✅ Complete | Identical output | None |
 | 277 (Claim Status Response) | ✅ Complete | Identical output | None |
 | 278 (Services Review) | ✅ Complete | Trailing newline only | None |
@@ -29,22 +29,16 @@ Last updated: 2026-04-25
 
 ### Medium Priority
 
-1. **Fix minor segment reordering in 271, 999**
-   - 271: TRN written after NM1/N3/N4/DMG — spec says TRN (pos 0200) before NM1 (pos 0300) in Loop 2000C
-   - 999: AK9 written one position late (after instead of before SE)
-   - Not data loss, but not byte-identical
-   - 270 is now identical (was previously listed here)
-
-2. **Web interface / REST API**
+1. **Web interface / REST API**
    - Spec files in `.kiro/specs/web-ui/`
    - Wrap parser in Actix or Axum for EDI-to-JSON and JSON-to-EDI as a service
 
 ### Low Priority
 
-3. **Performance optimization** for large files
-4. **Schema validation** — verify required elements and code values
-5. **Publish as a crate** — lib.rs already has public exports, ready for crates.io
-6. **Integration tests** — test with real-world EDI files beyond AI-generated demos
+2. **Performance optimization** for large files
+3. **Schema validation** — verify required elements and code values
+4. **Publish as a crate** — lib.rs already has public exports, ready for crates.io
+5. **Integration tests** — test with real-world EDI files beyond AI-generated demos
 
 ## Completed Work
 
@@ -93,6 +87,8 @@ Last updated: 2026-04-25
 - Removed unused generic infrastructure (segment_config.rs, loop_processor.rs, TransactionProcessor)
 - Added custom delimiter support — clean_contents() detects ISA element separator and segment terminator, normalizes to standard * and ~
 - Fixed main.rs clean_contents result being discarded (was stored in unused variable)
+- Fixed: edi271 TRN segment order — now written before NM1 per spec position 0200
+- Fixed: edi999 AK9/SE ordering and loop2000 boundary — AK9 now parsed/written before SE, loop2000 no longer consumes AK9
 
 ## Recommended Next Steps
 
