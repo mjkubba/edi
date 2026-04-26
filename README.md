@@ -15,7 +15,7 @@ This project provides a robust Electronic Data Interchange (EDI) parser and proc
 | EDI837P (Health Care Claim Professional) | ✅ Functional | Functional with differences in output, core functionality working correctly but missing several segments |
 | EDI837I (Health Care Claim Institutional) | ✅ Functional | Functional with specialized handling for CL1 segment, missing several segments in output |
 | EDI837D (Health Care Claim Dental) | ✅ Functional | Functional with specialized handling for TOO segment, core functionality working correctly |
-| EDI820 (Health Insurance Exchange Related Payments) | ⚠️ Partial | Partially functional with many missing segments in output (N1, ENT, NM1, RMR, DTM) |
+| EDI820 (Health Insurance Exchange Related Payments) | ✅ Complete | Fully functional with all segments preserved on round-trip |
 | EDI834 (Benefit Enrollment and Maintenance) | ⚠️ Functional | Parses enrollment data with member-level loops, health coverage, and demographics |
 
 ## Repository Structure

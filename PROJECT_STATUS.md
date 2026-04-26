@@ -22,7 +22,7 @@ Last updated: 2026-04-25
 | 837P (Claim Professional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CR1, CRC, NM1*PW, NM1*45, LX, SV1, QTY, NTE. Dead code: `write_loop2010ba/bb/ca` exist but aren't called |
 | 837I (Claim Institutional) | ⚠️ Functional | Significant gaps | Missing: NM1*41, PER, NM1*40, DMG, NM1*PR, CL1, NM1*71, SBR, OI, LX, SV2, DTP |
 | 837D (Claim Dental) | ✅ Functional | Minor diffs | Core functionality working |
-| 820 (Premium Payment) | ⚠️ Partial | Major gaps | Missing segments: N1, ENT, NM1, RMR, DTM |
+| 820 (Premium Payment) | ✅ Complete | Identical output | None |
 | 834 (Enrollment) | ⚠️ Functional | Partial | Loop1000B boundary fixed; Loop2320/2330 are stubs |
 
 ## What Needs Work
@@ -80,7 +80,7 @@ Last updated: 2026-04-25
 ## Recommended Next Steps
 
 1. ~~Get demo 834 files → debug and verify edi834 parsing~~ ✅ Done
-2. Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)
+2. ~~Fix edi820 segment coverage (N1, ENT, NM1, RMR, DTM)~~ ✅ Done
 3. Implement edi276/277 Loop2000C/D parsing
 4. Wire up edi837 dead code (loop2010ba/bb/ca write functions)
 5. Clean up compiler warnings
