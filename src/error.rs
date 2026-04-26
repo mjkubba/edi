@@ -5,6 +5,7 @@ pub type EdiResult<T> = Result<T, EdiError>;
 
 /// Error types for EDI operations
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum EdiError {
     /// Error parsing EDI content
     ParseError(String),

@@ -47,6 +47,7 @@ impl SegmentRegistry {
     }
 
     /// Check if a segment ID is registered
+    #[allow(dead_code)]
     pub fn has_segment(&self, segment_id: &str) -> bool {
         self.segments.contains_key(segment_id)
     }
