@@ -5,7 +5,7 @@ Last updated: 2026-04-25
 ## Build & Tests
 
 - **237/237 tests passing**, zero failures
-- **52 compiler warnings** (25 unused functions, 16 unused imports, 4 unused mut, misc)
+- **26 compiler warnings** (edi837 dead code, EdiError variants, infrastructure kept for future use)
 - Build toolchain: `cargo.exe` via WSL (project lives on Windows filesystem)
 
 ## Transaction Set Status
