@@ -163,6 +163,20 @@ Before creating tasks, verify prerequisites exist:
 
 If a prerequisite is missing, create it first before proceeding.
 
+## Ongoing Spec Session Handling
+
+When the user sends a follow-up after a phase completes (e.g., "looks good", "continue", "proceed", or feedback on a document):
+
+1. **Recognize this is a continuation** — don't restart the workflow or re-ask feature/bugfix
+2. **Check which files exist** in `.kiro/specs/{feature-name}/`
+3. **Determine the next phase**:
+   - If only `requirements.md` exists → create `design.md` next
+   - If `requirements.md` and `design.md` exist → create `tasks.md` next
+   - If all three exist → ready for task execution
+   - For design-first: if only `design.md` exists → create `requirements.md` next
+4. **If the user gave feedback** on the current document, apply the changes first, then ask for re-review
+5. **Auto-proceed** to the next phase without re-asking workflow type — read `.config.kiro` if needed
+
 ## Updating Existing Specs
 
 When updating an existing spec, read `.kiro/specs/{feature-name}/.config.kiro` to determine the `workflowType` and `specType`, then follow the appropriate workflow.
