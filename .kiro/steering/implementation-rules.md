@@ -76,7 +76,7 @@ The primary remote for pushing is `origin` using HTTPS. Always push to `main`:
 git push origin main
 ```
 
-**NEVER run `git push` from within the AI agent session** — it hangs due to auth prompts. The user will push manually.
+**Use `git.exe push` instead of `git push`** — the WSL `git` hangs on auth prompts, but `git.exe` uses Windows credential manager and works. Use `git.exe` for any git operation that needs authentication (push, pull, fetch from private repos).
 
 ### Commit Messages
 
