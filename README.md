@@ -1,197 +1,133 @@
-# EDI Parser and Processor for Healthcare X12 Formats in Rust
+# EDI Parser — Healthcare X12 to JSON Converter
 
-This project provides a robust Electronic Data Interchange (EDI) parser and processor specifically designed for healthcare X12 formats. It supports multiple transaction sets including 835 (Payment/Remittance Advice), 999 (Implementation Acknowledgment), 270/271 (Eligibility), 276/277 (Claim Status), 278 (Health Care Services Review), 837P/I/D (Claims), and 820 (Health Insurance Exchange Related Payments).
+A fast, single-binary tool for converting healthcare EDI X12 files to JSON and back. Supports all major transaction sets used in US healthcare.
 
-## Project Status
+## Supported Formats
 
-| Transaction Set | Status | Description |
-|----------------|--------|-------------|
-| EDI835 (Payment/Remittance Advice) | ✅ Complete | Fully functional with minor formatting differences in output (missing empty fields in SVC segments) |
-| EDI270 (Health Care Eligibility Benefit Inquiry) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed |
-| EDI271 (Health Care Eligibility Benefit Response) | ✅ Complete | Fully functional with line breaks in generated output, all segments correctly processed including LS/LE |
-| EDI999 (Implementation Acknowledgment) | ✅ Complete | Fully functional with special CTX segment handling for both standard and special formats |
-| EDI276/277 (Health Care Claim Status) | ✅ Complete | Loop2000C/D parsing with TRN, STC, REF, DMG at all HL levels. 277 round-trip identical |
-| EDI278 (Health Care Services Review) | ✅ Complete | Functional with correct handling of AR/HS prefixes in UM segment, trailing newline only |
-| EDI837P (Health Care Claim Professional) | ✅ Complete | Functional with all segments preserved on round-trip, trailing newline only |
-| EDI837I (Health Care Claim Institutional) | ✅ Complete | Functional with all segments preserved on round-trip including CL1 |
-| EDI837D (Health Care Claim Dental) | ✅ Complete | Functional with all segments preserved on round-trip including TOO |
-| EDI820 (Health Insurance Exchange Related Payments) | ✅ Complete | Fully functional with all segments preserved on round-trip |
-| EDI834 (Benefit Enrollment and Maintenance) | ✅ Complete | Parses enrollment data with member-level loops, health coverage, coordination of benefits, and demographics |
+| Transaction Set | Description |
+|----------------|-------------|
+| 835 | Health Care Claim Payment/Remittance Advice |
+| 999 | Implementation Acknowledgment |
+| 270/271 | Health Care Eligibility Benefit Inquiry & Response |
+| 276/277 | Health Care Claim Status Request & Response |
+| 278 | Health Care Services Review |
+| 837P | Health Care Claim — Professional |
+| 837I | Health Care Claim — Institutional |
+| 837D | Health Care Claim — Dental |
+| 820 | Health Insurance Exchange Related Payments |
+| 834 | Benefit Enrollment and Maintenance |
 
-## Repository Structure
-```
-edi/
-├── src/                         # Source code directory
-│   ├── edi835/                  # Healthcare Claim Payment/Advice format implementation
-│   ├── edi999/                  # Functional Acknowledgment format implementation
-│   ├── edi270/                  # Eligibility Benefit Inquiry format implementation
-│   ├── edi271/                  # Eligibility Benefit Response format implementation
-│   ├── edi276/                  # Health Care Claim Status Request implementation
-│   ├── edi277/                  # Health Care Claim Status Response implementation
-│   ├── edi278/                  # Health Care Services Review implementation
-│   ├── edi837/                  # Health Care Claim implementation (Professional, Institutional, Dental)
-│   ├── edi820/                  # Health Insurance Exchange Related Payments implementation
-│   ├── edi834/                  # Benefit Enrollment and Maintenance implementation
-│   ├── helper/                  # Utility functions and shared helpers
-│   ├── segments/                # EDI segment definitions and processors
-│   ├── error.rs                 # Error handling module
-│   ├── transaction_processor.rs # Generic transaction set processor
-│   ├── segment_config.rs        # Configuration-driven segment definitions
-│   ├── loop_processor.rs        # Enhanced loop detection and processing
-│   ├── lib.rs                   # Library exports
-│   └── main.rs                  # Application entry point
-├── Cargo.toml                   # Rust project configuration and dependencies
-└── Cargo.lock                   # Locked dependencies versions
-```
+## Quick Start
 
-## Features
+### Download
 
-- **Multiple Transaction Set Support**: 835, 999, 270/271, 276/277, 278, 837P/I/D, 820, 834
-- **Configuration-Driven Architecture**: Segment and loop definitions are configurable
-- **Robust Error Handling**: Comprehensive error types and validation
-- **Bidirectional Conversion**: EDI to JSON and JSON to EDI
-- **Extensible Design**: Easy to add new transaction sets and segments
-- **Special Format Handling**: Support for complex CTX segments and other special formats
-- **Variant-Specific Components**: Specialized handling for format-specific segments like TOO in 837D and CL1 in 837I
-- **Prefix Support**: Handling for special prefixes like AR/HS in UM segments for 278 transaction sets
-- **Custom Delimiter Support**: Automatic detection and normalization of non-standard element separators and segment terminators from ISA segment
+Grab the latest binary from [Releases](https://github.com/mjkubba/edi/releases).
 
-## Usage Instructions
-### Prerequisites
-- Rust toolchain (1.56.0 or later)
-- Cargo package manager
-- Environment with logging capabilities for debug output
+### Or build from source
 
-### Installation
 ```bash
-# Clone the repository
-git clone [repository-url]
+git clone https://github.com/mjkubba/edi.git
 cd edi
-
-# Build the project
 cargo build --release
-
-# Run tests
-cargo test
+# Binary at target/release/edi (or edi.exe on Windows)
 ```
 
-### Command Line Options
+## Usage
+
+### Convert EDI to JSON
+```bash
+edi -f claim.edi -o claim.json
 ```
--f <file>     Input file path (EDI or JSON)
--o <file>     Output file path
--w            Write mode (convert JSON to EDI)
--j            Specify input is JSON
--h, --help    Show help information
+
+### Convert JSON back to EDI
+```bash
+edi -f claim.json -o claim.edi -w -j
+```
+
+### Options
+```
+-f <file>     Input file (EDI or JSON)
+-o <file>     Output file (defaults to out.json or out.edi)
+-w            Write mode — generate EDI from JSON
+-j            Input is JSON (use with -w)
+-h, --help    Show help
 ```
 
 ### Examples
-```bash
-# Convert EDI to JSON
-cargo run -- -f input.edi -o output.json
 
-# Convert JSON to EDI
-cargo run -- -f input.json -o output.edi -w -j
+```bash
+# Parse an 835 payment file
+edi -f remittance.edi -o remittance.json
+
+# Parse a 270 eligibility inquiry
+edi -f eligibility_request.edi -o eligibility.json
+
+# Generate an 837P claim from JSON
+edi -f professional_claim.json -o claim.edi -w -j
+
+# Round-trip test (parse then regenerate)
+edi -f original.edi -o parsed.json
+edi -f parsed.json -o regenerated.edi -w -j
+diff original.edi regenerated.edi
 ```
 
-## Testing Methodology
-- Parse EDI files to JSON and verify structure
-- Generate EDI files from JSON and verify structure
-- Compare original and generated EDI files
-- Identify unprocessed segments and structural differences
+The parser auto-detects the transaction set type from the content — no need to specify which format you're working with.
 
-Demo files in `demo/` are AI-generated based on public X12 implementation guides and EDI specification documentation, intended for testing and development purposes only.
+## Features
 
+- **Auto-detection** — Identifies transaction set type from ST segments and implementation guide references
+- **Bidirectional** — EDI → JSON and JSON → EDI
+- **Round-trip safe** — Parse and regenerate with identical output for all supported formats
+- **Custom delimiters** — Automatically detects non-standard element separators and segment terminators from the ISA segment
+- **Single binary** — No runtime dependencies, no config files needed
+- **Demo files included** — Sample EDI files for all 12 transaction sets in the `demo/` directory
+
+---
+
+## Development
+
+### Prerequisites
+- Rust toolchain (1.56.0 or later)
+
+### Build & Test
 ```bash
-# Parse EDI to JSON
+cargo build
+cargo test    # 238 tests
+```
+
+### Testing with demo files
+```bash
+# Parse a demo file
 cargo run -- -f ./demo/edi835-demo-005010X221.edi -o ./demo/test835.json
 
-# Generate EDI from JSON
+# Regenerate and compare
 cargo run -- -f ./demo/test835.json -o ./demo/test835.edi -w -j
-
-# Compare files
 diff ./demo/edi835-demo-005010X221.edi ./demo/test835.edi
 ```
 
-## Development Roadmap
+Demo files are AI-generated based on public X12 implementation guides, intended for testing only.
 
-### Completed
-- ✅ Fixed CTX segment implementation in 999 format
-- ✅ Improved error handling for malformed input files
-- ✅ Addressed Table 1 content placement issues
-- ✅ Added comprehensive unit tests
-- ✅ Common Infrastructure Updates
-  - ✅ Generic transaction set processor
-  - ✅ Configuration-driven segment definitions
-  - ✅ Enhanced loop detection and processing
-  - ✅ Standardized error handling
-- ✅ Transaction Set 270/271 (Health Care Eligibility)
-- ✅ Transaction Set 276/277 (Health Care Claim Status)
-  - ✅ Fixed TRN and STC segment handling in 277 format
-- ✅ Transaction Set 278 (Health Care Services Review)
-  - ✅ Implemented all loops and segments
-  - ✅ Added support for AR/HS prefixes in UM segment
-  - ✅ Added facility address handling
-  - ✅ Added service provider details
-- ✅ Transaction Set 837P/I/D (Health Care Claim)
-  - ✅ Implemented variant-specific components
-  - ✅ Added specialized handling for TOO segment in 837D
-  - ✅ Added specialized handling for CL1 segment in 837I
-  - ✅ Rewrote parse_loop2300 with sequential segment processing
-  - ✅ Added NM1*PR (payer), DMG, rendering/attending/operating provider parsing
-  - ✅ Added TOO parsing to Loop2400 for 837D
-  - ✅ Fixed envelope segment double-tilde in write functions
-  - ✅ All segments preserved on round-trip
-- ✅ Transaction Set 820 (Health Insurance Exchange Related Payments)
-  - ✅ Implemented basic structure and segments
-  - ✅ Added parsing and generation functionality
-  - ✅ Fixed off-by-one indexing in all segment parsers — round-trip identical
-- ✅ Transaction Set 834 (Benefit Enrollment and Maintenance)
-  - ✅ Implemented member-level loops and segments (INS, HD, DSB)
-  - ✅ Implemented loop structures for enrollment and maintenance
-  - ✅ Created controller with TransactionSet trait implementation
-  - ✅ Fixed Loop1000B boundary detection and member parsing bugs
-  - ✅ Fixed NM1 offset in all loop2100 files
-  - ✅ Implemented Loop2320/2330 (coordination of benefits)
-- ✅ Transaction Set 276/277 (Claim Status) Enhancements
-  - ✅ Added GS/GE segment handling
-  - ✅ Implemented Loop2000C (Service Provider) and Loop2000D (Subscriber) parsing
-  - ✅ Removed hardcoded segments from 277 write function
-  - ✅ 277 round-trip now identical
-- ✅ Code Cleanup
-  - ✅ Reduced compiler warnings from 52 to 26
-  - ✅ Eliminated all remaining warnings (26 → 0)
-  - ✅ Removed dead code files and unused generic infrastructure
-  - ✅ Created demo files for all 12 transaction sets
-- ✅ Transaction Set 820 (Health Insurance Exchange Related Payments)
-  - ✅ Implemented basic structure and segments
-  - ✅ Added parsing and generation functionality
-  - ✅ Fixed off-by-one indexing in all segment parsers — round-trip identical
-- ✅ Transaction Set 834 (Benefit Enrollment and Maintenance)
-  - ✅ Implemented member-level loops and segments (INS, HD, DSB)
-  - ✅ Implemented loop structures for enrollment and maintenance
-  - ✅ Created controller with TransactionSet trait implementation
-  - ✅ Fixed Loop1000B boundary detection and member parsing bugs
-  - ✅ Fixed NM1 offset in all loop2100 files
-- ✅ Transaction Set 276/277 (Claim Status) Enhancements
-  - ✅ Added GS/GE segment handling
-  - ✅ Implemented Loop2000C (Service Provider) and Loop2000D (Subscriber) parsing
-  - ✅ Removed hardcoded segments from 277 write function
-  - ✅ 277 round-trip now identical
-- ✅ Code Cleanup
-  - ✅ Reduced compiler warnings from 52 to 26
-  - ✅ Created demo files for all 12 transaction sets
+### Project Structure
+```
+src/
+├── edi835/    edi999/    edi270/    edi271/     # Transaction set modules
+├── edi276/    edi277/    edi278/    edi837/     # Each has controller, loops, segments
+├── edi820/    edi834/                           
+├── segments/              # 58 shared segment parsers (NM1, CLM, REF, etc.)
+├── helper/                # CLI args, file I/O, content cleaning
+├── lib.rs                 # Library exports
+└── main.rs                # CLI entry point
+```
 
-### Planned
-- Performance Optimization
-  - Optimize parsing algorithms for better performance with large files
-  - Implement caching for frequently used segments
-  - Reduce memory usage for large files
-- Additional Features
-  - Add schema validation
-  - Create a web interface for EDI processing
+### Roadmap
+- Web UI for browser-based EDI processing
+- Schema validation
+- Performance optimization for large files
 
 ## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
+
 MIT
