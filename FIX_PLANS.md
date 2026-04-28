@@ -222,12 +222,40 @@ slice offsets instead of new Strings. Deferred until after the full fix plan is 
 **Scope:** `edi837/` — controller.rs, loop files
 **Risk:** Maintenance burden, divergent bugs
 
-**Plan:**
-1. Extract shared 837 logic into `edi837/common.rs`: HL parsing, loop2000a/b, loop2010aa/ab/ac, loop2300, loop2400
-2. P/I/D controllers call shared functions, only overriding subtype-specific segments (SV1 vs SV2 vs SV3, CL1, TOO)
-3. Delete duplicate loop files
+**KB findings (verified 2026-04-27):**
+The three 837 subtypes share identical loop structure and required/situational designators
+for everything above Loop 2400. Specific differences:
 
-**Commit sequence:** 2 commits (extract common + delete duplicates)
+Shared (safe to deduplicate):
+- Table 1: ST, BHT (identical)
+- Loop 1000A/B: Submitter/Receiver NM1, PER (identical)
+- Loop 2000A: HL, PRV, CUR — all same usage designators
+- Loop 2010AA: NM1, N3, N4, REF(Tax ID), PER — all Required across P/I/D
+- Loop 2010AB/AC: Pay-to Address/Plan — identical
+- Loop 2000B: HL, SBR — identical
+- Loop 2010BA/BB: Subscriber/Payer Name — identical
+- Loop 2000C: HL, PAT — identical
+- Loop 2010CA: Patient Name — identical
+- Loop 2300: CLM — Required across all three
+- Loop 2320/2330: Other subscriber/COB — identical
+
+Subtype-specific (must remain separate):
+- Loop 2010AA REF (UPIN/License): 837P only — Situational
+- Loop 2300 CL1 (Claim Level Info): 837I only — Required
+- Loop 2300 DTP qualifiers differ: P has Last Seen/Acute Manifestation,
+  I has Admission/Discharge, D has Prior Placement
+- Loop 2400 service line: SV1 (P), SV2 (I), SV3+TOO (D) — completely different
+
+**Plan:**
+1. Create `edi837/common.rs` with shared parsing for loops 1000A/B, 2000A, 2010AA/AB/AC, 2000B, 2010BA/BB, 2000C, 2010CA
+2. Each subtype controller calls shared functions, then handles its own:
+   - 837P: adds UPIN REF parsing, SV1 service lines
+   - 837I: adds CL1 parsing, institutional DTP dates, SV2 service lines
+   - 837D: adds dental DTP dates, SV3+TOO service lines
+3. Shared structs for the common loops, subtype-specific structs for Loop 2400
+4. Delete duplicate loop files after migration
+
+**Commit sequence:** 2-3 commits (extract common → wire P/I/D → delete duplicates)
 
 ---
 
