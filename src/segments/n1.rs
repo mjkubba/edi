@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -29,13 +29,5 @@ pub fn get_n1(n1_content: String) -> N1 {
 }
 
 pub fn write_n1(n1: N1) -> String {
-    let mut n1_content: String = String::new();
-    n1_content.push_str("N1*");
-    n1_content.push_str(&n1.payer_id_code);
-    n1_content.push_str("*");
-    n1_content.push_str(&n1.payee_name);
-    n1_content.push_str(&stiuational_element(n1.payee_identification_code_qualifier));
-    n1_content.push_str(&stiuational_element(n1.payee_identification_code));
-    n1_content.push_str("~");
-    n1_content
+    build_segment(&["N1", &n1.payer_id_code, &n1.payee_name, &n1.payee_identification_code_qualifier, &n1.payee_identification_code])
 }

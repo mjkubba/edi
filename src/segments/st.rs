@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -23,12 +23,5 @@ pub fn get_st(st_content: String) -> ST {
 }
 
 pub fn write_st(st: ST) -> String {
-    let mut st_string = String::new();
-    st_string.push_str("ST*");
-    st_string.push_str(&st.transaction_set_id);
-    st_string.push_str("*");
-    st_string.push_str(&st.transaction_set_control_number);
-    st_string.push_str(&stiuational_element(st.implementation_conven_ref));
-    st_string.push_str("~");
-    st_string
+    build_segment(&["ST", &st.transaction_set_id, &st.transaction_set_control_number, &st.implementation_conven_ref])
 }

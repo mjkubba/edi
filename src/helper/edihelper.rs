@@ -1,16 +1,6 @@
 use log::info;
 
-pub fn stiuational_element(value: String) -> String {
-    if !value.is_empty() {
-        let mut to_return = String::from("*");
-        to_return.push_str(&value);
-        return to_return;
-    } else {
-        return "".to_string();
-    }
-}
-
-/// Build a segment string with proper X12 §3.7 trailing separator suppression.
+/// Build a segment string with proper X12 §B.1.1.3.10 trailing separator suppression.
 /// All elements are joined with `*`, then trailing empty separators are removed
 /// before appending `~`. Middle empty elements are preserved.
 pub fn build_segment(elements: &[&str]) -> String {

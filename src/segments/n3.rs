@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -27,10 +27,5 @@ pub fn write_n3(n3: N3) -> String {
     if n3.payee_address.is_empty() {
         return String::new();
     }
-    let mut n3_content: String = String::new();
-    n3_content.push_str("N3*");
-    n3_content.push_str(&n3.payee_address);
-    n3_content.push_str(&stiuational_element(n3.payee_address2));
-    n3_content.push_str("~");
-    n3_content
+    build_segment(&["N3", &n3.payee_address, &n3.payee_address2])
 }

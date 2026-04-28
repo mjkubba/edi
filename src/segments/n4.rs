@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -43,14 +43,7 @@ pub fn write_n4(n4: N4) -> String {
     if n4.payee_city.is_empty() {
         return String::new();
     }
-    let mut n4_content: String = String::new();
-    n4_content.push_str("N4*");
-    n4_content.push_str(&n4.payee_city);
-    n4_content.push_str(&stiuational_element(n4.payee_state));
-    n4_content.push_str(&stiuational_element(n4.payee_zip));
-    n4_content.push_str(&stiuational_element(n4.payee_country_code));
-    n4_content.push_str("~");
-    n4_content
+    build_segment(&["N4", &n4.payee_city, &n4.payee_state, &n4.payee_zip, &n4.payee_country_code, &n4.payee_country_sub_code])
 }
 
 #[cfg(test)]

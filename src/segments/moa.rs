@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
@@ -72,21 +72,14 @@ pub fn write_moa(moa: MOA) -> String {
     if moa.moa01_reimbursement_rate.is_empty() {
         return String::new();
     }
-    let mut moa_content: String = String::new();
-    moa_content.push_str("MOA");
-    moa_content.push_str(&stiuational_element(moa.moa01_reimbursement_rate));
-    moa_content.push_str(&stiuational_element(moa.moa02_claim_hcpcs_payable_amount));
-    moa_content.push_str(&stiuational_element(moa.moa03_claim_payment_remark_code));
-    moa_content.push_str(&stiuational_element(moa.moa04_claim_payment_remark_code));
-    moa_content.push_str(&stiuational_element(moa.moa05_claim_payment_remark_code));
-    moa_content.push_str(&stiuational_element(moa.moa06_claim_payment_remark_code));
-    moa_content.push_str(&stiuational_element(moa.moa07_claim_payment_remark_code));
-    moa_content.push_str(&stiuational_element(moa.moa08_claim_esrd_payment_amount));
-    moa_content.push_str(&stiuational_element(
-        moa.moa09_nonpayable_professional_component_amount,
-    ));
-    moa_content.push_str("~");
-    moa_content
+    build_segment(&[
+        "MOA",
+        &moa.moa01_reimbursement_rate, &moa.moa02_claim_hcpcs_payable_amount,
+        &moa.moa03_claim_payment_remark_code, &moa.moa04_claim_payment_remark_code,
+        &moa.moa05_claim_payment_remark_code, &moa.moa06_claim_payment_remark_code,
+        &moa.moa07_claim_payment_remark_code, &moa.moa08_claim_esrd_payment_amount,
+        &moa.moa09_nonpayable_professional_component_amount,
+    ])
 }
 
 // unit test

@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -77,29 +77,16 @@ pub fn write_clp(clp: CLP) -> String {
     if clp.clp01_patient_control_number.is_empty() {
         return String::new();
     }
-    let mut clp_content: String = String::new();
-    clp_content.push_str("CLP*");
-    clp_content.push_str(&clp.clp01_patient_control_number);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp02_claim_status_code);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp03_total_claim_charge_amount);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp04_total_claim_payment_amount);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp05_patient_responsibility_amount);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp06_claim_filing_indicator_code);
-    clp_content.push_str("*");
-    clp_content.push_str(&clp.clp07_payer_claim_control_number);
-    clp_content.push_str(&stiuational_element(clp.clp08_facility_type_code));
-    clp_content.push_str(&stiuational_element(clp.clp09_claim_frequency_code));
-    clp_content.push_str(&stiuational_element(clp.clp10_patient_status_code));
-    clp_content.push_str(&stiuational_element(clp.clp11_diagnosis_related_group));
-    clp_content.push_str(&stiuational_element(clp.clp12_drg_weight));
-    clp_content.push_str(&stiuational_element(clp.clp13_percent_discharge_fraction));
-    clp_content.push_str("~");
-    clp_content
+    build_segment(&[
+        "CLP",
+        &clp.clp01_patient_control_number, &clp.clp02_claim_status_code,
+        &clp.clp03_total_claim_charge_amount, &clp.clp04_total_claim_payment_amount,
+        &clp.clp05_patient_responsibility_amount, &clp.clp06_claim_filing_indicator_code,
+        &clp.clp07_payer_claim_control_number, &clp.clp08_facility_type_code,
+        &clp.clp09_claim_frequency_code, &clp.clp10_patient_status_code,
+        &clp.clp11_diagnosis_related_group, &clp.clp12_drg_weight,
+        &clp.clp13_percent_discharge_fraction,
+    ])
 }
 
 // unit test

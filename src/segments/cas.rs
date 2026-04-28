@@ -1,4 +1,4 @@
-use crate::helper::edihelper::stiuational_element;
+use crate::helper::edihelper::build_segment;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -119,31 +119,19 @@ pub fn write_cas(cas: CAS) -> String {
     if cas.cas01_claim_adjustment_group_code.is_empty() {
         return String::new();
     }
-    let mut cas_content = String::new();
-    cas_content.push_str("CAS*");
-    cas_content.push_str(&cas.cas01_claim_adjustment_group_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas02_adjustment_reason_code);
-    cas_content.push_str("*");
-    cas_content.push_str(&cas.cas03_adjustment_amt);
-    cas_content.push_str(&stiuational_element(cas.cas04_adjustment_qty));
-    cas_content.push_str(&stiuational_element(cas.cas05_adjustment_reason_code));
-    cas_content.push_str(&stiuational_element(cas.cas06_adjustment_amt));
-    cas_content.push_str(&stiuational_element(cas.cas07_adjustment_qty));
-    cas_content.push_str(&stiuational_element(cas.cas08_adjustment_reason_code));
-    cas_content.push_str(&stiuational_element(cas.cas09_adjustment_amt));
-    cas_content.push_str(&stiuational_element(cas.cas10_adjustment_qty));
-    cas_content.push_str(&stiuational_element(cas.cas11_adjustment_reason_code));
-    cas_content.push_str(&stiuational_element(cas.cas12_adjustment_amt));
-    cas_content.push_str(&stiuational_element(cas.cas13_adjustment_qty));
-    cas_content.push_str(&stiuational_element(cas.cas14_adjustment_reason_code));
-    cas_content.push_str(&stiuational_element(cas.cas15_adjustment_amt));
-    cas_content.push_str(&stiuational_element(cas.cas16_adjustment_qty));
-    cas_content.push_str(&stiuational_element(cas.cas17_adjustment_reason_code));
-    cas_content.push_str(&stiuational_element(cas.cas18_adjustment_amt));
-    cas_content.push_str(&stiuational_element(cas.cas19_adjustment_qty));
-    cas_content.push_str("~");
-    cas_content
+    build_segment(&[
+        "CAS",
+        &cas.cas01_claim_adjustment_group_code, &cas.cas02_adjustment_reason_code,
+        &cas.cas03_adjustment_amt, &cas.cas04_adjustment_qty,
+        &cas.cas05_adjustment_reason_code, &cas.cas06_adjustment_amt,
+        &cas.cas07_adjustment_qty, &cas.cas08_adjustment_reason_code,
+        &cas.cas09_adjustment_amt, &cas.cas10_adjustment_qty,
+        &cas.cas11_adjustment_reason_code, &cas.cas12_adjustment_amt,
+        &cas.cas13_adjustment_qty, &cas.cas14_adjustment_reason_code,
+        &cas.cas15_adjustment_amt, &cas.cas16_adjustment_qty,
+        &cas.cas17_adjustment_reason_code, &cas.cas18_adjustment_amt,
+        &cas.cas19_adjustment_qty,
+    ])
 }
 
 // unit test
