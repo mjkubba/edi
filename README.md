@@ -92,7 +92,7 @@ The parser auto-detects the transaction set type from the content — no need to
 ### Build & Test
 ```bash
 cargo build
-cargo test    # 238 tests
+cargo test    # 253 tests
 ```
 
 ### Testing with demo files
@@ -120,6 +120,10 @@ src/
 ```
 
 ### Roadmap
+- Deduplicate 837 P/I/D shared loop code into common module
+- 837 HL parent-child tree structure for multi-subscriber batches
+- Consolidate architectural patterns (trait-based routing)
+- `Option<String>` for optional X12 fields
 - Web UI for browser-based EDI processing
 - Schema validation
 - Performance optimization for large files
