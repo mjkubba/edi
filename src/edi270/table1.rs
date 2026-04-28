@@ -17,7 +17,7 @@ pub fn get_table1(contents: &str) -> EdiResult<(Table1, String)> {
     let mut table1 = Table1::default();
 
     // Process ST segment (required)
-    if contents.contains("ST") {
+    if contents.contains("ST*") {
         info!("ST segment found");
         let st_content = get_segment_contents("ST", &contents);
         if st_content.is_empty() {

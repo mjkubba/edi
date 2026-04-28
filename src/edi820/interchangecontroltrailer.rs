@@ -32,7 +32,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
     let mut interchange_trailer = InterchangeTrailer::default();
 
     // Parse SE segment
-    if contents.contains("SE") {
+    if contents.contains("SE*") {
         info!("Warning: Required SE segment not found");
         let se_content = get_segment_contents("SE", &contents);
         info!("segment_content: {}", se_content);
@@ -51,7 +51,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
     }
 
     // Parse GE segment
-    if contents.contains("GE") {
+    if contents.contains("GE*") {
         info!("Warning: Required GE segment not found");
         let ge_content = get_segment_contents("GE", &contents);
         info!("segment_content: {}", ge_content);

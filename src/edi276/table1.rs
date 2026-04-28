@@ -19,7 +19,7 @@ pub fn get_table1s(contents: &str) -> (Table1s, String) {
     let mut remaining_content = contents.clone();
 
     // Process ST segment
-    if let Some(st_segment_start) = remaining_content.find("ST") {
+    if let Some(st_segment_start) = remaining_content.find("ST*") {
         let st_segment_end = remaining_content[st_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - st_segment_start);

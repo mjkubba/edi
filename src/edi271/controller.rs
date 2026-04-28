@@ -65,7 +65,7 @@ pub fn get_271(contents: &str) -> EdiResult<(Edi271, String)> {
 
     // Parse Loop 2000B (Information Receiver) - can be multiple
     let mut loop2000b_vec = Vec::new();
-    while contents.contains("HL") && contents.contains("*21*") {
+    while contents.contains("HL*") && contents.contains("*21*") {
         match get_loop_2000b(&contents) {
             Ok((loop2000b, new_contents)) => {
                 loop2000b_vec.push(loop2000b);
@@ -77,7 +77,7 @@ pub fn get_271(contents: &str) -> EdiResult<(Edi271, String)> {
     edi271.loop2000b = loop2000b_vec;
 
     // Parse SE segment
-    if contents.contains("SE") {
+    if contents.contains("SE*") {
         info!("SE segment found");
         let se_content = get_segment_contents("SE", &contents);
         edi271.se_segments = get_se(se_content);

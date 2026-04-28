@@ -30,7 +30,7 @@ pub fn get_table_3(contents: &str) -> (Vec<PLB>, SE, String) {
         }
     }
 
-    if contents.contains("SE") {
+    if contents.contains("SE*") {
         info!("SE segment found, ");
         se_segments = get_se(get_segment_contents("SE", &contents));
         info!("SE segment parsed");

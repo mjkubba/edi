@@ -53,7 +53,7 @@ pub fn get_first_table_header(contents: &str) -> (ST, BPR, TRN, CUR, REF, REF, D
     let mut ref_version_segments = REF::default();
     let mut dtm_segments = DTM::default();
 
-    if contents.contains("ST") {
+    if contents.contains("ST*") {
         info!("ST segment found, ");
         st_segments = get_st(get_segment_contents("ST", &contents));
         info!("ST segment parsed");

@@ -72,7 +72,7 @@ pub fn get_loop_2000a(contents: &str) -> (Loop2000A, String) {
     let mut remaining_content = contents.clone();
 
     // Process HL segment for Information Source
-    if let Some(hl_segment_start) = contents.find("HL") {
+    if let Some(hl_segment_start) = contents.find("HL*") {
         let hl_segment_end = contents[hl_segment_start..]
             .find('~')
             .unwrap_or(contents.len() - hl_segment_start);
@@ -129,7 +129,7 @@ pub fn get_loop_2000b_vec(contents: &str) -> (Vec<Loop2000B>, String) {
     let mut remaining_content = contents.clone();
 
     // Process multiple Loop 2000B
-    while let Some(hl_segment_start) = remaining_content.find("HL") {
+    while let Some(hl_segment_start) = remaining_content.find("HL*") {
         let hl_segment_end = remaining_content[hl_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - hl_segment_start);
@@ -307,7 +307,7 @@ pub fn get_loop_2100b_vec(contents: &str) -> (Vec<Loop2100B>, String) {
     // Process NM1 segments for Loop 2100B
     while let Some(nm1_segment_start) = remaining_content.find("NM1") {
         // Stop if there's an HL segment before this NM1 (belongs to next loop)
-        if let Some(hl_pos) = remaining_content.find("HL") {
+        if let Some(hl_pos) = remaining_content.find("HL*") {
             if hl_pos < nm1_segment_start {
                 break;
             }
@@ -421,7 +421,7 @@ pub fn get_loop_2000c_vec(contents: &str) -> (Vec<Loop2000C>, String) {
     let mut loop_2000c_vec = Vec::new();
     let mut remaining_content = contents.clone();
 
-    while let Some(hl_segment_start) = remaining_content.find("HL") {
+    while let Some(hl_segment_start) = remaining_content.find("HL*") {
         let hl_segment_end = remaining_content[hl_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - hl_segment_start);
@@ -444,8 +444,8 @@ pub fn get_loop_2000c_vec(contents: &str) -> (Vec<Loop2000C>, String) {
             // Process NM1 segment
             if let Some(nm1_segment_start) = remaining_content.find("NM1") {
                 // Only parse if NM1 comes before next HL or SE
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if nm1_segment_start < next_hl && nm1_segment_start < next_se {
                     let nm1_segment_end = remaining_content[nm1_segment_start..]
                         .find('~')
@@ -467,8 +467,8 @@ pub fn get_loop_2000c_vec(contents: &str) -> (Vec<Loop2000C>, String) {
 
             // Process TRN segment
             if let Some(trn_segment_start) = remaining_content.find("TRN") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if trn_segment_start < next_hl && trn_segment_start < next_se {
                     let trn_segment_end = remaining_content[trn_segment_start..]
                         .find('~')
@@ -489,8 +489,8 @@ pub fn get_loop_2000c_vec(contents: &str) -> (Vec<Loop2000C>, String) {
 
             // Process REF segments
             while let Some(ref_segment_start) = remaining_content.find("REF") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if ref_segment_start < next_hl && ref_segment_start < next_se {
                     let ref_segment_end = remaining_content[ref_segment_start..]
                         .find('~')
@@ -523,7 +523,7 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
     let mut loop_2000d_vec = Vec::new();
     let mut remaining_content = contents.clone();
 
-    while let Some(hl_segment_start) = remaining_content.find("HL") {
+    while let Some(hl_segment_start) = remaining_content.find("HL*") {
         let hl_segment_end = remaining_content[hl_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - hl_segment_start);
@@ -545,8 +545,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process DMG segment (optional, comes before NM1 in 276)
             if let Some(dmg_segment_start) = remaining_content.find("DMG") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 let next_nm1 = remaining_content.find("NM1").unwrap_or(usize::MAX);
                 if dmg_segment_start < next_hl
                     && dmg_segment_start < next_se
@@ -571,8 +571,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process NM1 segment
             if let Some(nm1_segment_start) = remaining_content.find("NM1") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if nm1_segment_start < next_hl && nm1_segment_start < next_se {
                     let nm1_segment_end = remaining_content[nm1_segment_start..]
                         .find('~')
@@ -594,8 +594,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process TRN segment
             if let Some(trn_segment_start) = remaining_content.find("TRN") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if trn_segment_start < next_hl && trn_segment_start < next_se {
                     let trn_segment_end = remaining_content[trn_segment_start..]
                         .find('~')
@@ -616,8 +616,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process REF segments
             while let Some(ref_segment_start) = remaining_content.find("REF") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if ref_segment_start < next_hl && ref_segment_start < next_se {
                     let ref_segment_end = remaining_content[ref_segment_start..]
                         .find('~')
@@ -643,8 +643,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process AMT segments
             while let Some(amt_start) = remaining_content.find("AMT") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if amt_start < next_hl && amt_start < next_se {
                     let amt_end = remaining_content[amt_start..]
                         .find('~')
@@ -669,8 +669,8 @@ pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
 
             // Process DTP segments
             while let Some(dtp_start) = remaining_content.find("DTP") {
-                let next_hl = remaining_content.find("HL").unwrap_or(usize::MAX);
-                let next_se = remaining_content.find("SE").unwrap_or(usize::MAX);
+                let next_hl = remaining_content.find("HL*").unwrap_or(usize::MAX);
+                let next_se = remaining_content.find("SE*").unwrap_or(usize::MAX);
                 if dtp_start < next_hl && dtp_start < next_se {
                     let dtp_end = remaining_content[dtp_start..]
                         .find('~')

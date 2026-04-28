@@ -19,7 +19,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
     let mut ge_segments = GE::default();
     let mut iea_segments = IEA::default();
 
-    if contents.contains("SE") {
+    if contents.contains("SE*") {
         info!("Warning: Required SE segment not found");
         se_segments = get_se(get_segment_contents("SE", &contents));
         info!("SE segment parsed");
@@ -27,7 +27,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
         contents = content_trim("SE", &contents);
     }
 
-    if contents.contains("GE") {
+    if contents.contains("GE*") {
         info!("Warning: Required GE segment not found");
         ge_segments = get_ge(get_segment_contents("GE", &contents));
         info!("GE segment parsed");

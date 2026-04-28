@@ -13,7 +13,7 @@ pub fn get_loop2000b(contents: &str) -> (Loop2000B, String) {
     let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a Requester Level HL segment (HL03=21)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

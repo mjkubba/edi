@@ -14,7 +14,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
     let mut remaining_content = contents.clone();
 
     // Find the GE segment
-    if let Some(ge_segment_start) = remaining_content.find("GE") {
+    if let Some(ge_segment_start) = remaining_content.find("GE*") {
         let ge_segment_end = remaining_content[ge_segment_start..]
             .find('~')
             .unwrap_or(remaining_content.len() - ge_segment_start);

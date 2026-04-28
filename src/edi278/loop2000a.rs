@@ -13,7 +13,7 @@ pub fn get_loop2000a(contents: &str) -> (Loop2000A, String) {
     let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a UMO Level HL segment (HL03=20)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

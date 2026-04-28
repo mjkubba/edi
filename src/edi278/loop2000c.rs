@@ -16,7 +16,7 @@ pub fn get_loop2000c(contents: &str) -> (Loop2000C, String) {
     let mut hl_segments = HL::default();
     let mut trn_segments = Vec::new();
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a Subscriber Level HL segment (HL03=22)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

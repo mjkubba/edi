@@ -20,7 +20,7 @@ pub fn get_interchange_control_trailer(contents: &str) -> (GE, IEA, String) {
     let mut iea_segments = IEA::default();
     let mut ge_segments = GE::default();
 
-    if contents.contains("GE") {
+    if contents.contains("GE*") {
         info!("GE segment found, ");
         ge_segments = get_ge(get_segment_contents("GE", &contents));
         info!("GE segment parsed");

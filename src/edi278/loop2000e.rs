@@ -19,7 +19,7 @@ pub fn get_loop2000e(contents: &str) -> (Loop2000E, String) {
     let mut trn_segments = Vec::new();
     let mut um_segments = None;
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a Service Level HL segment (HL03=EV or HL03=SS)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

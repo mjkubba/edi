@@ -17,7 +17,7 @@ pub fn get_first_table_header(contents: &str) -> (ST, AK1, String) {
     let mut ak1_segments = AK1::default();
 
     // Process ST segment (required)
-    if contents.contains("ST") {
+    if contents.contains("ST*") {
         info!("ST segment found");
         let st_content = get_segment_contents("ST", &contents);
         st_segments = get_st(st_content);

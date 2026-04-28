@@ -73,7 +73,7 @@ pub fn get_277(contents: &str) -> EdiResult<Edi277> {
     contents = new_contents;
 
     // Extract SE segment
-    if let Some(se_segment_start) = contents.find("SE") {
+    if let Some(se_segment_start) = contents.find("SE*") {
         let se_segment_end = contents[se_segment_start..]
             .find('~')
             .unwrap_or(contents.len() - se_segment_start);

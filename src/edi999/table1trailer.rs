@@ -28,7 +28,7 @@ pub fn get_first_table_trailer(contents: &str) -> (SE, AK9, String) {
     }
 
     // Process SE segment (required)
-    if contents.contains("SE") {
+    if contents.contains("SE*") {
         info!("SE segment found");
         let se_content = get_segment_contents("SE", &contents);
         se_segments = get_se(se_content);

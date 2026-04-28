@@ -54,7 +54,7 @@ pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
     let mut interchange_trailer = InterchangeTrailer::default();
 
     // Process GE segment
-    if contents.contains("GE") {
+    if contents.contains("GE*") {
         info!("GE segment found");
         let ge_content = get_segment_contents("GE", &contents);
         interchange_trailer.ge_segments = get_ge(ge_content);

@@ -16,7 +16,7 @@ pub fn get_loop2000d(contents: &str) -> (Loop2000D, String) {
     let mut hl_segments = HL::default();
     let mut trn_segments = Vec::new();
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a Dependent Level HL segment (HL03=23)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

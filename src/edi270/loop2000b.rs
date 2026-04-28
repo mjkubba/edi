@@ -17,7 +17,7 @@ pub fn get_loop_2000b(contents: &str) -> (Loop2000B, String) {
     let mut loop2000b = Loop2000B::default();
 
     // Process HL segment (required)
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         info!("HL segment found");
         let hl_content = get_segment_contents("HL", &contents);
         loop2000b.hl_segments = get_hl(hl_content);
@@ -49,7 +49,7 @@ pub fn get_loop_2000b(contents: &str) -> (Loop2000B, String) {
 
     // Process Loop 2000C segments (can be multiple)
     let mut loop2000c_vec = Vec::new();
-    while contents.contains("HL") && is_loop_2000c(&contents) {
+    while contents.contains("HL*") && is_loop_2000c(&contents) {
         let (loop2000c, new_contents) = get_loop_2000c(&contents);
         loop2000c_vec.push(loop2000c);
         contents = new_contents;

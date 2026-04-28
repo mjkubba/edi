@@ -16,7 +16,7 @@ pub fn get_loop2000f(contents: &str) -> (Loop2000F, String) {
     let mut hl_segments = HL::default();
     let mut um_segments = None;
 
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         // Check if this is a Service Provider Level HL segment (HL03=PT or HL03=SS)
         let hl_content = get_segment_contents("HL", &contents);
         let hl_parts: Vec<&str> = hl_content.split('*').collect();

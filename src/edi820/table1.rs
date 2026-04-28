@@ -68,7 +68,7 @@ pub fn get_table1s(contents: &str) -> (Table1s, String) {
     let mut table1s = Table1s::default();
 
     // Parse ST segment
-    if contents.contains("ST") {
+    if contents.contains("ST*") {
         info!("ST segment found, ");
         let st_content = get_segment_contents("ST", &contents);
         info!("segment_content: {}", st_content);

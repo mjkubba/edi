@@ -49,7 +49,7 @@ pub fn get_loop_2000c(contents: &str) -> EdiResult<(Loop2000C, String)> {
     let mut loop2000c = Loop2000C::default();
 
     // Process HL segment (required)
-    if contents.contains("HL") {
+    if contents.contains("HL*") {
         info!("HL segment found");
         let hl_content = get_segment_contents("HL", &contents);
         if hl_content.is_empty() {
@@ -218,7 +218,7 @@ pub fn get_loop_2000c(contents: &str) -> EdiResult<(Loop2000C, String)> {
     }
 
     // Process Loop 2000D segments (can be multiple)
-    while contents.contains("HL") && is_next_loop_2000d(&contents) {
+    while contents.contains("HL*") && is_next_loop_2000d(&contents) {
         match get_loop_2000d(&contents) {
             Ok((loop2000d, new_contents)) => {
                 loop2000c.loop2000d.push(loop2000d);
