@@ -1,3 +1,4 @@
+use crate::edi837::loop2300::Loop2300;
 use serde::{Deserialize, Serialize};
 
 /// Loop2000C - Patient Hierarchical Level
@@ -19,6 +20,8 @@ pub struct Loop2000c {
     pub ref_patient: Vec<String>,
     /// Patient Date
     pub dtp: Vec<String>,
+    /// Claims for this patient
+    pub loop2300: Vec<Loop2300>,
 }
 
 /// Write Loop2000C to EDI format
