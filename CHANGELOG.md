@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-04-27
+
+### Security & Reliability (Production-Safe Milestone)
+- **C1**: Eliminated 998 panic paths — all segment parsers use safe `get_element()` access, all production `unwrap()` calls replaced with proper error handling
+- **C2**: Fixed `stiuational_element()` output corruption — migrated all segment writers to `build_segment()` per X12 §B.1.1.3.10 (preserves empty middle elements, strips trailing)
+- **C4**: Added 256MB file size limit to prevent OOM on large batch files
+- **C5**: Eliminated 172 unnecessary `contents.clone()` calls by changing function params from `String` to `&str`
+- **C7**: Fixed 837 P/I/D subtype detection in write path — now uses version identifiers (X222/X223/X224) instead of fragile JSON field sniffing
+- **H1+H2**: Fixed 90 bare segment ID matches (`.find("SE")` etc.) that could false-match inside data values — now uses boundary-aware `"SE*"` patterns
+- **H5**: Added X12 envelope validation — checks ST02==SE02, GS06==GE02, ISA13==IEA02 per spec
+- **H6**: Restored CLP10 (patient_status_code) and fixed off-by-one field mapping in CLP segment
+- **H7**: Fixed hardcoded segment ID length of 3 — now uses dynamic `key.len()`
+
+### New Features
+- **H4**: Added numeric/decimal field validation per X12 §B.1.1.3.1 (warns on invalid monetary values in BPR, CLP)
+- **H5**: Envelope validation module (`helper/envelope_validation.rs`)
+- **TA1**: Restored interchange acknowledgment segment parser and writer with tests
+
+### Code Quality
+- **L1**: Fixed typos in public API names (`segement`, `adjustsment`, `numbner`, `scv04`)
+- **L4**: Removed unused `once_cell` dependency
+- **L5**: Removed commented-out dead code, cleaned up segment files
+- **C3**: Audited segment ID handling — confirmed consistent contract, documented
+- **C6**: Documented `clean_contents()` delimiter replacement as correct per X12 §B.1.1.2
+
+### Tests
+- 253 tests (up from 238), all passing
+- All 12 demo files round-trip verified (EDI→JSON→EDI→JSON = identical)
+
 ## [Unreleased]
 
 ### Fixed
