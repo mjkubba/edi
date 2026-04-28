@@ -126,6 +126,9 @@ pub fn find_next_segment_start(key: &str, contents: &str, skip: usize) -> Option
     None
 }
 
+/// Extract the content of a segment, stripping the segment ID and leading separator.
+/// For `get_segment_contents("CLP", "CLP*val1*val2~...")`, returns `"val1*val2"`.
+/// When callers split the result on `*`, index 0 = first data element (e.g., CLP01).
 pub fn get_segment_contents(key: &str, contents: &str) -> String {
     match get_full_segment_contents(key, contents) {
         Some(segment_content) => {
