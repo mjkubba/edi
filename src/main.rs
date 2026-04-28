@@ -59,49 +59,70 @@ fn main() {
             // Check if the content is JSON for 835 format
             if contents.contains("\"transaction_set_id\":\"835\"") {
                 info!("Writing 835 format");
-                let _edi835: Edi835 = serde_json::from_str(&contents).unwrap();
+                let _edi835: Edi835 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_835(contents.clone());
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 999 format
             else if contents.contains("\"transaction_set_id\":\"999\"") {
                 info!("Writing 999 format");
-                let edi999: Edi999 = serde_json::from_str(&contents).unwrap();
+                let edi999: Edi999 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_999(&edi999);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 270 format
             else if contents.contains("\"transaction_set_id\":\"270\"") {
                 info!("Writing 270 format");
-                let edi270: Edi270 = serde_json::from_str(&contents).unwrap();
+                let edi270: Edi270 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_270(&edi270);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 271 format
             else if contents.contains("\"transaction_set_id\":\"271\"") {
                 info!("Writing 271 format");
-                let edi271: Edi271 = serde_json::from_str(&contents).unwrap();
+                let edi271: Edi271 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_271(&edi271);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 276 format
             else if contents.contains("\"st01_transaction_set_identifier_code\":\"276\"") {
                 info!("Writing 276 format");
-                let edi276: Edi276 = serde_json::from_str(&contents).unwrap();
+                let edi276: Edi276 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_276(&edi276);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 277 format
             else if contents.contains("\"st01_transaction_set_identifier_code\":\"277\"") {
                 info!("Writing 277 format");
-                let edi277: Edi277 = serde_json::from_str(&contents).unwrap();
+                let edi277: Edi277 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_277(&edi277);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 837P format
             else if contents.contains("005010X222") {
                 info!("Writing 837P format");
-                let edi837p: Edi837P = serde_json::from_str(&contents).unwrap();
+                let edi837p: Edi837P = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 match write_837p(&edi837p) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
                     Err(e) => warn!("Error writing 837P format: {:?}", e),
@@ -110,7 +131,10 @@ fn main() {
             // Check if the content is JSON for 837I format
             else if contents.contains("005010X223") {
                 info!("Writing 837I format");
-                let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
+                let edi837i: Edi837I = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 match write_837i(&edi837i) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
                     Err(e) => warn!("Error writing 837I format: {:?}", e),
@@ -119,7 +143,10 @@ fn main() {
             // Check if the content is JSON for 837D format
             else if contents.contains("005010X224") {
                 info!("Writing 837D format");
-                let edi837d: Edi837D = serde_json::from_str(&contents).unwrap();
+                let edi837d: Edi837D = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 match write_837d(&edi837d) {
                     Ok(new_edi) => write_to_file(new_edi, args.output_file),
                     Err(e) => warn!("Error writing 837D format: {:?}", e),
@@ -128,21 +155,30 @@ fn main() {
             // Check if the content is JSON for 278 format
             else if contents.contains("\"transaction_set_id\":\"278\"") {
                 info!("Writing 278 format");
-                let edi278: Edi278 = serde_json::from_str(&contents).unwrap();
+                let edi278: Edi278 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_278(&edi278);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 820 format
             else if contents.contains("\"transaction_set_id\":\"820\"") {
                 info!("Writing 820 format");
-                let edi820: Edi820 = serde_json::from_str(&contents).unwrap();
+                let edi820: Edi820 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_820(&edi820);
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 834 format
             else if contents.contains("\"transaction_set_id\":\"834\"") {
                 info!("Writing 834 format");
-                let edi834: Edi834 = serde_json::from_str(&contents).unwrap();
+                let edi834: Edi834 = match serde_json::from_str(&contents) {
+                    Ok(v) => v,
+                    Err(e) => { warn!("Failed to parse JSON: {}", e); return; }
+                };
                 let new_edi = write_834(&edi834);
                 write_to_file(new_edi, args.output_file);
             } else {
@@ -155,7 +191,10 @@ fn main() {
             if contents.contains("ST*835*") {
                 info!("Writing 835 format from raw EDI");
                 let edi835 = get_835(contents.clone());
-                let serialized_edi = serde_json::to_string(&edi835).unwrap();
+                let serialized_edi = match serde_json::to_string(&edi835) {
+                    Ok(s) => s,
+                    Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                };
                 let new_edi = write_835(serialized_edi);
                 write_to_file(new_edi, args.output_file);
             }
@@ -218,18 +257,27 @@ fn main() {
         if contents.contains("~ST*835*") || contents.contains("ST*835*") {
             info!("File is 835");
             let edi835 = get_835(contents.clone());
-            let serialized_edi = serde_json::to_string(&edi835).unwrap();
+            let serialized_edi = match serde_json::to_string(&edi835) {
+                Ok(s) => s,
+                Err(e) => { warn!("Failed to serialize: {}", e); return; }
+            };
             write_to_file(serialized_edi.clone(), args.output_file);
         } else if contents.contains("~ST*999*") || contents.contains("ST*999*") {
             info!("File is 999");
             let edi999 = get_999(contents.clone());
-            let serialized_edi = serde_json::to_string(&edi999.0).unwrap();
+            let serialized_edi = match serde_json::to_string(&edi999.0) {
+                Ok(s) => s,
+                Err(e) => { warn!("Failed to serialize: {}", e); return; }
+            };
             write_to_file(serialized_edi.clone(), args.output_file);
         } else if contents.contains("~ST*270*") || contents.contains("ST*270*") {
             info!("File is 270");
             match get_270(contents.clone()) {
                 Ok((edi270, _)) => {
-                    let serialized_edi = serde_json::to_string(&edi270).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi270) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -240,7 +288,10 @@ fn main() {
             info!("File is 271");
             match get_271(contents.clone()) {
                 Ok((edi271, _)) => {
-                    let serialized_edi = serde_json::to_string(&edi271).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi271) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -251,7 +302,10 @@ fn main() {
             info!("File is 276");
             match get_276(contents.clone()) {
                 Ok(edi276) => {
-                    let serialized_edi = serde_json::to_string(&edi276).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi276) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -262,7 +316,10 @@ fn main() {
             info!("File is 277");
             match get_277(contents.clone()) {
                 Ok(edi277) => {
-                    let serialized_edi = serde_json::to_string(&edi277).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi277) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -276,7 +333,10 @@ fn main() {
                 info!("File is 837P");
                 match get_837p(&contents) {
                     Ok(edi837p) => {
-                        let serialized_edi = serde_json::to_string(&edi837p).unwrap();
+                        let serialized_edi = match serde_json::to_string(&edi837p) {
+                            Ok(s) => s,
+                            Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                        };
                         write_to_file(serialized_edi.clone(), args.output_file);
                     }
                     Err(e) => {
@@ -287,7 +347,10 @@ fn main() {
                 info!("File is 837I");
                 match get_837i(&contents) {
                     Ok(edi837i) => {
-                        let serialized_edi = serde_json::to_string(&edi837i).unwrap();
+                        let serialized_edi = match serde_json::to_string(&edi837i) {
+                            Ok(s) => s,
+                            Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                        };
                         write_to_file(serialized_edi.clone(), args.output_file);
                     }
                     Err(e) => {
@@ -298,7 +361,10 @@ fn main() {
                 info!("File is 837D");
                 match get_837d(&contents) {
                     Ok(edi837d) => {
-                        let serialized_edi = serde_json::to_string(&edi837d).unwrap();
+                        let serialized_edi = match serde_json::to_string(&edi837d) {
+                            Ok(s) => s,
+                            Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                        };
                         write_to_file(serialized_edi.clone(), args.output_file);
                     }
                     Err(e) => {
@@ -312,7 +378,10 @@ fn main() {
             info!("File is 278");
             match Edi278::parse(contents.clone()) {
                 Ok((edi278, _)) => {
-                    let serialized_edi = serde_json::to_string(&edi278).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi278) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -323,7 +392,10 @@ fn main() {
             info!("File is 820");
             match Edi820::parse(contents.clone()) {
                 Ok((edi820, _)) => {
-                    let serialized_edi = serde_json::to_string(&edi820).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi820) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {
@@ -334,7 +406,10 @@ fn main() {
             info!("File is 834");
             match Edi834::parse(contents.clone()) {
                 Ok((edi834, _)) => {
-                    let serialized_edi = serde_json::to_string(&edi834).unwrap();
+                    let serialized_edi = match serde_json::to_string(&edi834) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("Failed to serialize: {}", e); return; }
+                    };
                     write_to_file(serialized_edi.clone(), args.output_file);
                 }
                 Err(e) => {

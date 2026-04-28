@@ -77,7 +77,13 @@ pub fn get_835(mut contents: String) -> Edi835 {
 }
 
 pub fn write_835(contents: String) -> String {
-    let edi_json: Edi835 = serde_json::from_str(&contents.clone()).unwrap();
+    let edi_json: Edi835 = match serde_json::from_str(&contents) {
+        Ok(v) => v,
+        Err(e) => {
+            log::warn!("Failed to parse 835 JSON: {}", e);
+            return String::new();
+        }
+    };
     let mut new_edi = String::new();
 
     // Write interchange control header

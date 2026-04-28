@@ -67,7 +67,7 @@ pub fn get_loop2100a(mut contents: String) -> (Loop2100A, String) {
         .filter_map(|seg| contents.find(seg))
         .min();
 
-        if next_major.is_none() || n3_start < next_major.unwrap() {
+        if next_major.map_or(true, |m| n3_start < m) {
             if let Some(n3_end) = contents[n3_start..].find("~") {
                 let n3_content = &contents[n3_start + 3..n3_start + n3_end];
                 loop2100a.n3 = Some(get_n3(n3_content.to_string()));
@@ -84,7 +84,7 @@ pub fn get_loop2100a(mut contents: String) -> (Loop2100A, String) {
             .filter_map(|seg| contents.find(seg))
             .min();
 
-        if next_major.is_none() || n4_start < next_major.unwrap() {
+        if next_major.map_or(true, |m| n4_start < m) {
             if let Some(n4_end) = contents[n4_start..].find("~") {
                 let n4_content = &contents[n4_start + 3..n4_start + n4_end];
                 loop2100a.n4 = Some(get_n4(n4_content.to_string()));
@@ -101,7 +101,7 @@ pub fn get_loop2100a(mut contents: String) -> (Loop2100A, String) {
             .filter_map(|seg| contents.find(seg))
             .min();
 
-        if next_major.is_none() || dmg_start < next_major.unwrap() {
+        if next_major.map_or(true, |m| dmg_start < m) {
             if let Some(dmg_end) = contents[dmg_start..].find("~") {
                 let dmg_content = &contents[dmg_start + 4..dmg_start + dmg_end];
                 loop2100a.dmg = Some(get_dmg(dmg_content.to_string()));

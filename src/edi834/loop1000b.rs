@@ -36,7 +36,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
             .filter_map(|seg| contents.find(seg))
             .min();
 
-        if next_major.is_none() || n3_start < next_major.unwrap() {
+        if next_major.map_or(true, |m| n3_start < m) {
             if let Some(n3_end) = contents[n3_start..].find("~") {
                 let n3_content = &contents[n3_start + 3..n3_start + n3_end];
                 loop1000b.n3 = Some(get_n3(n3_content.to_string()));
@@ -53,7 +53,7 @@ pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
             .filter_map(|seg| contents.find(seg))
             .min();
 
-        if next_major.is_none() || n4_start < next_major.unwrap() {
+        if next_major.map_or(true, |m| n4_start < m) {
             if let Some(n4_end) = contents[n4_start..].find("~") {
                 let n4_content = &contents[n4_start + 3..n4_start + n4_end];
                 loop1000b.n4 = Some(get_n4(n4_content.to_string()));

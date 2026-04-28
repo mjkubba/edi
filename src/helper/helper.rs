@@ -146,7 +146,10 @@ pub fn get_file_contents(args: Args) -> String {
 
     if file_path.exists() {
         info!("File exists");
-        let metadata = std::fs::metadata(file_path).unwrap();
+        let metadata = match std::fs::metadata(file_path) {
+            Ok(m) => m,
+            Err(e) => { warn!("Failed to read file metadata: {}", e); std::process::exit(1); }
+        };
         if metadata.len() > MAX_FILE_SIZE {
             warn!(
                 "File too large: {} bytes (max {} bytes)",
@@ -155,8 +158,14 @@ pub fn get_file_contents(args: Args) -> String {
             );
             std::process::exit(1);
         }
-        let mut file = File::open(file_path).unwrap();
-        file.read_to_string(&mut contents).unwrap();
+        let mut file = match File::open(file_path) {
+            Ok(f) => f,
+            Err(e) => { warn!("Failed to open file: {}", e); std::process::exit(1); }
+        };
+        match file.read_to_string(&mut contents) {
+            Ok(_) => {},
+            Err(e) => { warn!("Failed to read file: {}", e); std::process::exit(1); }
+        };
     } else {
         warn!("File does not exist: {}", args.file_path);
         std::process::exit(1);

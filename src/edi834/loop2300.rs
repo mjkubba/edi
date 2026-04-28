@@ -104,7 +104,10 @@ pub fn get_loop2300(mut contents: String) -> (Loop2300, String) {
             .filter_map(|s| contents.find(s))
             .min()
             .unwrap_or(contents.len());
-        let cob_pos = contents.find("COB*").unwrap();
+        let cob_pos = match contents.find("COB*") {
+            Some(pos) => pos,
+            None => break,
+        };
         if cob_pos > boundary {
             break;
         }
