@@ -11,31 +11,32 @@ pub struct Loop2100F {
     pub sv2_segments: Option<SV2>,
 }
 
-pub fn get_loop2100f(mut contents: String) -> (Loop2100F, String) {
+pub fn get_loop2100f(contents: &str) -> (Loop2100F, String) {
+    let mut contents = contents.to_string();
     let mut dtp_segments = Vec::new();
     let mut sv2_segments = None;
 
     // Parse DTP segments
     while contents.contains("DTP")
-        && check_if_segment_in_loop("DTP", "SV2", contents.clone())
-        && check_if_segment_in_loop("DTP", "NM1", contents.clone())
+        && check_if_segment_in_loop("DTP", "SV2", &contents)
+        && check_if_segment_in_loop("DTP", "NM1", &contents)
     {
         info!("DTP segment found, ");
         let dtp_segment = get_dtp(get_segment_contents("DTP", &contents));
         info!("DTP segment parsed");
 
         dtp_segments.push(dtp_segment);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Parse SV2 segment
-    if contents.contains("SV2") && check_if_segment_in_loop("SV2", "NM1", contents.clone()) {
+    if contents.contains("SV2") && check_if_segment_in_loop("SV2", "NM1", &contents) {
         info!("SV2 segment found, ");
         let sv2_content = get_segment_contents("SV2", &contents);
         sv2_segments = Some(get_sv2(sv2_content));
         info!("SV2 segment parsed");
 
-        contents = content_trim("SV2", contents);
+        contents = content_trim("SV2", &contents);
     }
 
     info!("Loop 2100F parsed\n");
@@ -98,7 +99,7 @@ mod tests {
     #[test]
     fn test_get_loop2100f() {
         let contents = String::from("DTP*472*D8*20050516~SV2**HC:33510~");
-        let (loop2100f, contents) = get_loop2100f(contents);
+        let (loop2100f, contents) = get_loop2100f(&contents);
 
         assert_eq!(loop2100f.dtp_segments.len(), 1);
         assert_eq!(loop2100f.dtp_segments[0].dtp01_date_time_qualifier, "472");

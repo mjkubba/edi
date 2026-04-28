@@ -13,7 +13,8 @@ pub struct Loop2000E {
     pub um_segments: Option<UM>,
 }
 
-pub fn get_loop2000e(mut contents: String) -> (Loop2000E, String) {
+pub fn get_loop2000e(contents: &str) -> (Loop2000E, String) {
+    let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
     let mut trn_segments = Vec::new();
     let mut um_segments = None;
@@ -28,18 +29,18 @@ pub fn get_loop2000e(mut contents: String) -> (Loop2000E, String) {
             hl_segments = get_hl(hl_content);
             info!("HL segment parsed");
 
-            contents = content_trim("HL", contents);
+            contents = content_trim("HL", &contents);
 
             // Parse TRN segments
             while contents.contains("TRN")
-                && check_if_segment_in_loop("TRN", "UM", contents.clone())
+                && check_if_segment_in_loop("TRN", "UM", &contents)
             {
                 info!("TRN segment found, ");
                 let trn_segment = get_trn(get_segment_contents("TRN", &contents));
                 info!("TRN segment parsed");
 
                 trn_segments.push(trn_segment);
-                contents = content_trim("TRN", contents);
+                contents = content_trim("TRN", &contents);
             }
 
             // Parse UM segment
@@ -49,7 +50,7 @@ pub fn get_loop2000e(mut contents: String) -> (Loop2000E, String) {
                 um_segments = Some(get_um(um_content));
                 info!("Parsed UM segment: {:?}", um_segments);
 
-                contents = content_trim("UM", contents);
+                contents = content_trim("UM", &contents);
             }
         }
     }
@@ -87,7 +88,7 @@ mod tests {
     #[test]
     fn test_get_loop2000e_with_full_um() {
         let contents = String::from("HL*5*4*SS*0~TRN*1*12345*1512345678~UM*AR*I*2*21:B****Y~");
-        let (loop2000e, contents) = get_loop2000e(contents);
+        let (loop2000e, contents) = get_loop2000e(&contents);
         assert_eq!(loop2000e.hl_segments.hl01_hierarchical_id_number, "5");
         assert_eq!(
             loop2000e.hl_segments.hl02_hierarchical_parent_id_number,
@@ -118,7 +119,7 @@ mod tests {
     #[test]
     fn test_get_loop2000e_with_minimal_um() {
         let contents = String::from("HL*5*4*SS*0~TRN*1*12345*1512345678~UM*HS*I*2~");
-        let (loop2000e, contents) = get_loop2000e(contents);
+        let (loop2000e, contents) = get_loop2000e(&contents);
 
         assert!(loop2000e.um_segments.is_some());
         let um = loop2000e.um_segments.unwrap();

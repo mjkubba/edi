@@ -33,19 +33,20 @@ pub struct Edi271 {
     pub unprocessed_msg_segments: Vec<MSG>,
 }
 
-pub fn get_271(mut contents: String) -> EdiResult<(Edi271, String)> {
+pub fn get_271(contents: &str) -> EdiResult<(Edi271, String)> {
+    let mut contents = contents.to_string();
     let mut edi271 = Edi271::default();
 
     // Remove BOM if present
     contents = contents.trim_start_matches("\u{feff}").to_string();
 
     // Parse Interchange Header
-    let (interchange_header, new_contents) = get_interchange_header(contents.clone());
+    let (interchange_header, new_contents) = get_interchange_header(&contents);
     edi271.interchange_header = interchange_header;
     contents = new_contents;
 
     // Parse Table 1
-    match get_table1(contents.clone()) {
+    match get_table1(&contents) {
         Ok((table1, new_contents)) => {
             edi271.table1 = table1;
             contents = new_contents;
@@ -54,7 +55,7 @@ pub fn get_271(mut contents: String) -> EdiResult<(Edi271, String)> {
     }
 
     // Parse Loop 2000A (Information Source)
-    match get_loop_2000a(contents.clone()) {
+    match get_loop_2000a(&contents) {
         Ok((loop2000a, new_contents)) => {
             edi271.loop2000a = loop2000a;
             contents = new_contents;
@@ -65,7 +66,7 @@ pub fn get_271(mut contents: String) -> EdiResult<(Edi271, String)> {
     // Parse Loop 2000B (Information Receiver) - can be multiple
     let mut loop2000b_vec = Vec::new();
     while contents.contains("HL") && contents.contains("*21*") {
-        match get_loop_2000b(contents.clone()) {
+        match get_loop_2000b(&contents) {
             Ok((loop2000b, new_contents)) => {
                 loop2000b_vec.push(loop2000b);
                 contents = new_contents;
@@ -81,13 +82,13 @@ pub fn get_271(mut contents: String) -> EdiResult<(Edi271, String)> {
         let se_content = get_segment_contents("SE", &contents);
         edi271.se_segments = get_se(se_content);
         info!("SE segment parsed");
-        contents = content_trim("SE", contents);
+        contents = content_trim("SE", &contents);
     } else {
         info!("Warning: Required SE segment not found");
     }
 
     // Parse Interchange Trailer
-    let (interchange_trailer, new_contents) = get_interchange_trailer(contents.clone());
+    let (interchange_trailer, new_contents) = get_interchange_trailer(&contents);
     edi271.interchange_trailer = interchange_trailer;
     contents = new_contents;
 

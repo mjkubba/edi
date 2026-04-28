@@ -26,7 +26,8 @@ pub struct Loop2000C {
     pub loop2000d: Vec<Loop2000D>,
 }
 
-pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
+pub fn get_loop_2000c(contents: &str) -> (Loop2000C, String) {
+    let mut contents = contents.to_string();
     let mut loop2000c = Loop2000C::default();
 
     // Process HL segment (required)
@@ -44,7 +45,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         }
 
         info!("HL segment parsed");
-        contents = content_trim("HL", contents);
+        contents = content_trim("HL", &contents);
     } else {
         info!("Warning: Required HL segment not found in Loop 2000C");
     }
@@ -55,7 +56,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let trn_content = get_segment_contents("TRN", &contents);
         loop2000c.trn_segments = Some(get_trn(trn_content));
         info!("TRN segment parsed");
-        contents = content_trim("TRN", contents);
+        contents = content_trim("TRN", &contents);
     }
 
     // Process NM1 segment (required)
@@ -64,7 +65,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let nm1_content = get_segment_contents("NM1", &contents);
         loop2000c.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         info!("Warning: Required NM1 segment not found in Loop 2000C");
     }
@@ -76,7 +77,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed");
         loop2000c.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process N3 segment (situational)
@@ -85,7 +86,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let n3_content = get_segment_contents("N3", &contents);
         loop2000c.n3_segments = Some(get_n3(n3_content));
         info!("N3 segment parsed");
-        contents = content_trim("N3", contents);
+        contents = content_trim("N3", &contents);
     }
 
     // Process N4 segment (situational)
@@ -94,7 +95,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let n4_content = get_segment_contents("N4", &contents);
         loop2000c.n4_segments = Some(get_n4(n4_content));
         info!("N4 segment parsed");
-        contents = content_trim("N4", contents);
+        contents = content_trim("N4", &contents);
     }
 
     // Process DMG segment (situational)
@@ -103,7 +104,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let dmg_content = get_segment_contents("DMG", &contents);
         loop2000c.dmg_segments = Some(get_dmg(dmg_content));
         info!("DMG segment parsed");
-        contents = content_trim("DMG", contents);
+        contents = content_trim("DMG", &contents);
     }
 
     // Process DTP segments (situational, can be multiple)
@@ -113,7 +114,7 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let dtp_segment = get_dtp(dtp_content);
         info!("DTP segment parsed");
         loop2000c.dtp_segments.push(dtp_segment);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Process EQ segments (situational, can be multiple)
@@ -123,13 +124,13 @@ pub fn get_loop_2000c(mut contents: String) -> (Loop2000C, String) {
         let eq_segment = get_eq(eq_content);
         info!("EQ segment parsed");
         loop2000c.eq_segments.push(eq_segment);
-        contents = content_trim("EQ", contents);
+        contents = content_trim("EQ", &contents);
     }
 
     // Process Loop 2000D segments (can be multiple)
     let mut loop2000d_vec = Vec::new();
     while contents.contains("HL") && is_loop_2000d(&contents) {
-        let (loop2000d, new_contents) = get_loop_2000d(contents.clone());
+        let (loop2000d, new_contents) = get_loop_2000d(&contents);
         loop2000d_vec.push(loop2000d);
         contents = new_contents;
     }

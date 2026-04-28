@@ -12,7 +12,8 @@ pub struct Table1 {
     pub bht_segments: BHT,
 }
 
-pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
+pub fn get_table1(contents: &str) -> EdiResult<(Table1, String)> {
+    let mut contents = contents.to_string();
     let mut table1 = Table1::default();
 
     // Process ST segment (required)
@@ -24,7 +25,7 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
         }
         table1.st_segments = get_st(st_content);
         info!("ST segment parsed");
-        contents = content_trim("ST", contents);
+        contents = content_trim("ST", &contents);
     } else {
         return Err(EdiError::MissingSegment("ST".to_string()));
     }
@@ -38,7 +39,7 @@ pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
         }
         table1.bht_segments = get_bht(bht_content);
         info!("BHT segment parsed");
-        contents = content_trim("BHT", contents);
+        contents = content_trim("BHT", &contents);
     } else {
         return Err(EdiError::MissingSegment("BHT".to_string()));
     }
@@ -67,7 +68,7 @@ mod tests {
     fn test_table1() -> EdiResult<()> {
         let contents =
             "ST*270*1234*005010X279A1~BHT*0022*13*10001234*20060501*1319*00~".to_string();
-        let (table1, remaining) = get_table1(contents)?;
+        let (table1, remaining) = get_table1(&contents)?;
 
         assert_eq!(table1.st_segments.transaction_set_id, "270");
         assert_eq!(table1.st_segments.transaction_set_control_number, "1234");

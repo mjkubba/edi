@@ -11,7 +11,8 @@ pub struct Table1s {
     pub ak1_segments: AK1,
 }
 
-pub fn get_first_table_header(mut contents: String) -> (ST, AK1, String) {
+pub fn get_first_table_header(contents: &str) -> (ST, AK1, String) {
+    let mut contents = contents.to_string();
     let mut st_segments = ST::default();
     let mut ak1_segments = AK1::default();
 
@@ -21,7 +22,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, AK1, String) {
         let st_content = get_segment_contents("ST", &contents);
         st_segments = get_st(st_content);
         info!("ST segment parsed");
-        contents = content_trim("ST", contents);
+        contents = content_trim("ST", &contents);
     } else {
         info!("Warning: Required ST segment not found");
     }
@@ -32,7 +33,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, AK1, String) {
         let ak1_content = get_segment_contents("AK1", &contents);
         ak1_segments = get_ak1(ak1_content);
         info!("AK1 segment parsed");
-        contents = content_trim("AK1", contents);
+        contents = content_trim("AK1", &contents);
     } else {
         info!("Warning: Required AK1 segment not found");
     }
@@ -41,8 +42,8 @@ pub fn get_first_table_header(mut contents: String) -> (ST, AK1, String) {
     (st_segments, ak1_segments, contents)
 }
 
-pub fn get_table1s(contents: String) -> (Table1s, String) {
-    let (st_segments, ak1_segments, contents) = get_first_table_header(contents);
+pub fn get_table1s(contents: &str) -> (Table1s, String) {
+    let (st_segments, ak1_segments, contents) = get_first_table_header(&contents);
     let header = Table1s {
         st_segments,
         ak1_segments,

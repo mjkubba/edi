@@ -11,7 +11,8 @@ pub struct Loop2110 {
     pub ctx_segments: Vec<CTX>,
 }
 
-pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
+pub fn get_loop_2110(contents: &str) -> (Loop2110, String) {
+    let mut contents = contents.to_string();
     let mut loop2110 = Loop2110::default();
     let mut ctx_segments = Vec::new();
 
@@ -21,7 +22,7 @@ pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
         let ik4_content = get_segment_contents("IK4", &contents);
         loop2110.ik4_segments = get_ik4(ik4_content);
         info!("IK4 segment parsed");
-        contents = content_trim("IK4", contents);
+        contents = content_trim("IK4", &contents);
     } else {
         info!("Warning: Required IK4 segment not found in Loop 2110");
     }
@@ -33,7 +34,7 @@ pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
         let ctx = get_ctx(ctx_content);
         info!("CTX segment parsed: {:?}", ctx);
         ctx_segments.push(ctx);
-        let trimmed = content_trim("CTX", contents.clone());
+        let trimmed = content_trim("CTX", &contents);
         if trimmed == contents {
             break;
         }
@@ -46,7 +47,8 @@ pub fn get_loop_2110(mut contents: String) -> (Loop2110, String) {
     (loop2110, contents)
 }
 
-pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110>, String) {
+pub fn get_loop_2110s(contents: &str) -> (Vec<Loop2110>, String) {
+    let mut contents = contents.to_string();
     let ik4_count = count_segment_starts("IK4", &contents);
     let mut loop_2110_array = vec![];
     info!("Number of loops in loop 2110: {:?}", ik4_count);
@@ -71,7 +73,7 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110>, String) {
             };
 
             let loop_content = contents[..end_pos].to_string();
-            let (loop2110, _) = get_loop_2110(loop_content);
+            let (loop2110, _) = get_loop_2110(&loop_content);
 
             loop_2110_array.push(loop2110);
 
@@ -108,7 +110,7 @@ mod tests {
     #[test]
     fn test_get_loop_2110() {
         let contents = "IK4*1*66*1*123~CTX*SITUATIONAL TRIGGER*IK3*2*2000*1*1~".to_string();
-        let (loop2110, remaining) = get_loop_2110(contents);
+        let (loop2110, remaining) = get_loop_2110(&contents);
 
         assert_eq!(loop2110.ctx_segments.len(), 1);
         assert_eq!(

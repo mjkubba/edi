@@ -40,7 +40,8 @@ pub struct GS {
     pub version_number: String,
 }
 
-pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let mut contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
 
     // Parse ISA segment
@@ -77,7 +78,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         }
 
         info!("ISA segment parsed");
-        contents = content_trim("ISA", contents);
+        contents = content_trim("ISA", &contents);
     }
 
     // Parse GS segment
@@ -106,7 +107,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         }
 
         info!("GS segment parsed");
-        contents = content_trim("GS", contents);
+        contents = content_trim("GS", &contents);
     }
 
     info!("Interchange Control parsed\n");

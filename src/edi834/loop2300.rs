@@ -16,7 +16,8 @@ pub struct Loop2300 {
     pub loop2320_segments: Vec<Loop2320>,
 }
 
-pub fn get_loop2300(mut contents: String) -> (Loop2300, String) {
+pub fn get_loop2300(contents: &str) -> (Loop2300, String) {
+    let mut contents = contents.to_string();
     let mut loop2300 = Loop2300::default();
 
     // Parse HD segment (required)
@@ -111,7 +112,7 @@ pub fn get_loop2300(mut contents: String) -> (Loop2300, String) {
         if cob_pos > boundary {
             break;
         }
-        let (loop2320, new_contents) = get_loop2320(contents);
+        let (loop2320, new_contents) = get_loop2320(&contents);
         loop2300.loop2320_segments.push(loop2320);
         contents = new_contents;
     }

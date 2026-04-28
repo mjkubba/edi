@@ -28,7 +28,8 @@ pub struct InterchangeHeader {
     pub gs08_version_release_industry_identifier_code: String,
 }
 
-pub fn get_interchange_header(contents: String) -> (InterchangeHeader, String) {
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
     let mut remaining_content = contents.clone();
 

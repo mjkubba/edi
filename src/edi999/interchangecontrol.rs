@@ -11,7 +11,8 @@ pub struct InterchangeHeader {
     pub gs_segments: GS,
 }
 
-pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let mut contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
 
     // Process ISA segment (required)
@@ -20,7 +21,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         let isa_content = get_segment_contents("ISA", &contents);
         interchange_header.isa_segments = get_isa(isa_content);
         info!("ISA segment parsed");
-        contents = content_trim("ISA", contents);
+        contents = content_trim("ISA", &contents);
     } else {
         info!("Warning: Required ISA segment not found");
     }
@@ -31,7 +32,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         let gs_content = get_segment_contents("GS", &contents);
         interchange_header.gs_segments = get_gs(gs_content);
         info!("GS segment parsed");
-        contents = content_trim("GS", contents);
+        contents = content_trim("GS", &contents);
     } else {
         info!("Warning: Required GS segment not found");
     }

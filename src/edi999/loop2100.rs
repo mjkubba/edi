@@ -13,7 +13,8 @@ pub struct Loop2100 {
     pub loop2110s: Vec<Loop2110>,
 }
 
-pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
+pub fn get_loop_2100(contents: &str) -> (Loop2100, String) {
+    let mut contents = contents.to_string();
     let mut loop2100 = Loop2100::default();
     let mut ctx_segments = Vec::new();
 
@@ -23,7 +24,7 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
         let ik3_content = get_segment_contents("IK3", &contents);
         loop2100.ik3_segments = get_ik3(ik3_content);
         info!("IK3 segment parsed");
-        contents = content_trim("IK3", contents);
+        contents = content_trim("IK3", &contents);
     } else {
         info!("Warning: Required IK3 segment not found in Loop 2100");
     }
@@ -35,7 +36,7 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
         let ctx = get_ctx(ctx_content);
         info!("CTX segment parsed: {:?}", ctx);
         ctx_segments.push(ctx);
-        let trimmed = content_trim("CTX", contents.clone());
+        let trimmed = content_trim("CTX", &contents);
         if trimmed == contents {
             break;
         }
@@ -45,7 +46,7 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
     loop2100.ctx_segments = ctx_segments;
 
     // Process Loop 2110 segments
-    let (loop2110s, new_contents) = get_loop_2110s(contents);
+    let (loop2110s, new_contents) = get_loop_2110s(&contents);
     loop2100.loop2110s = loop2110s;
     contents = new_contents;
 
@@ -54,7 +55,8 @@ pub fn get_loop_2100(mut contents: String) -> (Loop2100, String) {
     (loop2100, contents)
 }
 
-pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
+pub fn get_loop_2100s(contents: &str) -> (Vec<Loop2100>, String) {
+    let mut contents = contents.to_string();
     let ik3_count = count_segment_starts("IK3", &contents);
     let mut loop_2100_array = vec![];
     info!("Number of loops in loop 2100: {:?}", ik3_count);
@@ -76,7 +78,7 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
             };
 
             let loop_content = contents[..end_pos].to_string();
-            let (loop2100, _) = get_loop_2100(loop_content);
+            let (loop2100, _) = get_loop_2100(&loop_content);
 
             loop_2100_array.push(loop2100);
 
@@ -119,7 +121,7 @@ mod tests {
     #[test]
     fn test_get_loop_2100() {
         let contents = "IK3*NM1*1*8~CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~IK4*1*66*1*123~CTX*ELEMENT*IK4*1*2110*2~".to_string();
-        let (loop2100, remaining) = get_loop_2100(contents);
+        let (loop2100, remaining) = get_loop_2100(&contents);
 
         assert_eq!(loop2100.ik3_segments.ik301_segment_id_code, "NM1");
         assert_eq!(loop2100.ctx_segments.len(), 1);

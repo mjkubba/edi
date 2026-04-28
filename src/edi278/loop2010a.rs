@@ -11,7 +11,8 @@ pub struct Loop2010A {
     pub per_segments: Vec<PER>,
 }
 
-pub fn get_loop2010a(mut contents: String) -> (Loop2010A, String) {
+pub fn get_loop2010a(contents: &str) -> (Loop2010A, String) {
+    let mut contents = contents.to_string();
     let mut nm1_segments = NM1::default();
     let mut per_segments = Vec::new();
 
@@ -25,7 +26,7 @@ pub fn get_loop2010a(mut contents: String) -> (Loop2010A, String) {
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
 
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Parse PER segments
             while contents.contains("PER") {
@@ -34,7 +35,7 @@ pub fn get_loop2010a(mut contents: String) -> (Loop2010A, String) {
                 info!("PER segment parsed");
 
                 per_segments.push(per_segment);
-                contents = content_trim("PER", contents);
+                contents = content_trim("PER", &contents);
 
                 // Check if the next segment is not a PER segment
                 if !contents.starts_with("PER*") {
@@ -73,7 +74,7 @@ mod tests {
     fn test_get_loop2010a() {
         let contents =
             String::from("NM1*X3*2*UMO NAME*****PI*12345~PER*IC*CONTACT NAME*TE*5551234567~");
-        let (loop2010a, contents) = get_loop2010a(contents);
+        let (loop2010a, contents) = get_loop2010a(&contents);
         assert_eq!(loop2010a.nm1_segments.entity_id, "X3");
         assert_eq!(loop2010a.nm1_segments.entity_type, "2");
         assert_eq!(loop2010a.nm1_segments.lastname, "UMO NAME");

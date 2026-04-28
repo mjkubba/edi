@@ -19,7 +19,8 @@ pub struct InterchangeTrailer {
     pub iea_segments: IEA,
 }
 
-pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let mut contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
 
     // Process ISA segment (required)
@@ -28,7 +29,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         let isa_content = get_segment_contents("ISA", &contents);
         interchange_header.isa_segments = get_isa(isa_content);
         info!("ISA segment parsed");
-        contents = content_trim("ISA", contents);
+        contents = content_trim("ISA", &contents);
     } else {
         info!("Warning: Required ISA segment not found");
     }
@@ -39,7 +40,7 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
         let gs_content = get_segment_contents("GS", &contents);
         interchange_header.gs_segments = get_gs(gs_content);
         info!("GS segment parsed");
-        contents = content_trim("GS", contents);
+        contents = content_trim("GS", &contents);
     } else {
         info!("Warning: Required GS segment not found");
     }
@@ -48,7 +49,8 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     (interchange_header, contents)
 }
 
-pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, String) {
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let mut contents = contents.to_string();
     let mut interchange_trailer = InterchangeTrailer::default();
 
     // Process GE segment (required)
@@ -57,7 +59,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         let ge_content = get_segment_contents("GE", &contents);
         interchange_trailer.ge_segments = get_ge(ge_content);
         info!("GE segment parsed");
-        contents = content_trim("GE", contents);
+        contents = content_trim("GE", &contents);
     } else {
         info!("Warning: Required GE segment not found");
     }
@@ -68,7 +70,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         let iea_content = get_segment_contents("IEA", &contents);
         interchange_trailer.iea_segments = get_iea(iea_content);
         info!("IEA segment parsed");
-        contents = content_trim("IEA", contents);
+        contents = content_trim("IEA", &contents);
     } else {
         info!("Warning: Required IEA segment not found");
     }

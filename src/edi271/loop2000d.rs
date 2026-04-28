@@ -44,7 +44,8 @@ pub struct Loop2100D {
     pub dtp_segments: Vec<DTP>,
 }
 
-pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
+pub fn get_loop_2000d(contents: &str) -> EdiResult<(Loop2000D, String)> {
+    let mut contents = contents.to_string();
     let mut loop2000d = Loop2000D::default();
 
     // Process HL segment (required)
@@ -65,7 +66,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         }
 
         info!("HL segment parsed");
-        contents = content_trim("HL", contents);
+        contents = content_trim("HL", &contents);
     } else {
         return Err(EdiError::MissingSegment("HL".to_string()));
     }
@@ -77,7 +78,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         if !trn_content.is_empty() {
             loop2000d.trn_segments = Some(get_trn(trn_content));
             info!("TRN segment parsed");
-            contents = content_trim("TRN", contents);
+            contents = content_trim("TRN", &contents);
         }
     }
 
@@ -90,7 +91,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         }
         loop2000d.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -105,7 +106,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed");
         loop2000d.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process N3 segment (situational)
@@ -115,7 +116,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         if !n3_content.is_empty() {
             loop2000d.n3_segments = Some(get_n3(n3_content));
             info!("N3 segment parsed");
-            contents = content_trim("N3", contents);
+            contents = content_trim("N3", &contents);
         }
     }
 
@@ -126,7 +127,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         if !n4_content.is_empty() {
             loop2000d.n4_segments = Some(get_n4(n4_content));
             info!("N4 segment parsed");
-            contents = content_trim("N4", contents);
+            contents = content_trim("N4", &contents);
         }
     }
 
@@ -140,7 +141,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed");
         loop2000d.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     // Process DMG segment (situational)
@@ -150,7 +151,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         if !dmg_content.is_empty() {
             loop2000d.dmg_segments = Some(get_dmg(dmg_content));
             info!("DMG segment parsed");
-            contents = content_trim("DMG", contents);
+            contents = content_trim("DMG", &contents);
         }
     }
 
@@ -161,7 +162,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         if !ins_content.is_empty() {
             loop2000d.ins_segments = Some(get_ins(ins_content));
             info!("INS segment parsed");
-            contents = content_trim("INS", contents);
+            contents = content_trim("INS", &contents);
         }
     }
 
@@ -175,12 +176,12 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
         let dtp = get_dtp(dtp_content);
         info!("DTP segment parsed");
         loop2000d.dtp_segments.push(dtp);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Process Loop 2100D segments (can be multiple)
     while contents.contains("NM1") && !is_next_loop_2110d(&contents) {
-        match get_loop_2100d(contents.clone()) {
+        match get_loop_2100d(&contents) {
             Ok((loop2100d, new_contents)) => {
                 loop2000d.loop2100d.push(loop2100d);
                 contents = new_contents;
@@ -191,7 +192,7 @@ pub fn get_loop_2000d(mut contents: String) -> EdiResult<(Loop2000D, String)> {
 
     // Process Loop 2110D segments (can be multiple)
     while contents.contains("EB") {
-        match get_loop_2110d(contents.clone()) {
+        match get_loop_2110d(&contents) {
             Ok((loop2110d, new_contents)) => {
                 loop2000d.loop2110d.push(loop2110d);
                 contents = new_contents;
@@ -209,7 +210,8 @@ fn is_next_loop_2110d(contents: &str) -> bool {
     contents.contains("EB*")
 }
 
-pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
+pub fn get_loop_2100d(contents: &str) -> EdiResult<(Loop2100D, String)> {
+    let mut contents = contents.to_string();
     let mut loop2100d = Loop2100D::default();
 
     // Process NM1 segment (required)
@@ -221,7 +223,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         }
         loop2100d.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed for Loop 2100D");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -236,7 +238,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed for Loop 2100D");
         loop2100d.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process N3 segment (situational)
@@ -246,7 +248,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         if !n3_content.is_empty() {
             loop2100d.n3_segments = Some(get_n3(n3_content));
             info!("N3 segment parsed for Loop 2100D");
-            contents = content_trim("N3", contents);
+            contents = content_trim("N3", &contents);
         }
     }
 
@@ -257,7 +259,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         if !n4_content.is_empty() {
             loop2100d.n4_segments = Some(get_n4(n4_content));
             info!("N4 segment parsed for Loop 2100D");
-            contents = content_trim("N4", contents);
+            contents = content_trim("N4", &contents);
         }
     }
 
@@ -271,7 +273,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed for Loop 2100D");
         loop2100d.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     // Process PRV segment (situational)
@@ -281,7 +283,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         if !prv_content.is_empty() {
             loop2100d.prv_segments = Some(get_prv(prv_content));
             info!("PRV segment parsed for Loop 2100D");
-            contents = content_trim("PRV", contents);
+            contents = content_trim("PRV", &contents);
         }
     }
 
@@ -292,7 +294,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         if !dmg_content.is_empty() {
             loop2100d.dmg_segments = Some(get_dmg(dmg_content));
             info!("DMG segment parsed for Loop 2100D");
-            contents = content_trim("DMG", contents);
+            contents = content_trim("DMG", &contents);
         }
     }
 
@@ -303,7 +305,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         if !ins_content.is_empty() {
             loop2100d.ins_segments = Some(get_ins(ins_content));
             info!("INS segment parsed for Loop 2100D");
-            contents = content_trim("INS", contents);
+            contents = content_trim("INS", &contents);
         }
     }
 
@@ -317,7 +319,7 @@ pub fn get_loop_2100d(mut contents: String) -> EdiResult<(Loop2100D, String)> {
         let dtp = get_dtp(dtp_content);
         info!("DTP segment parsed for Loop 2100D");
         loop2100d.dtp_segments.push(dtp);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     info!("Loop 2100D parsed");

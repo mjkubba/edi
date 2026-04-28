@@ -26,7 +26,7 @@ impl TransactionSet for Edi834 {
     where
         Self: Sized,
     {
-        get_834(contents)
+        get_834(&contents)
     }
 
     fn to_edi(&self) -> String {
@@ -42,19 +42,20 @@ impl TransactionSet for Edi834 {
     }
 }
 
-pub fn get_834(mut contents: String) -> EdiResult<(Edi834, String)> {
+pub fn get_834(contents: &str) -> EdiResult<(Edi834, String)> {
+    let mut contents = contents.to_string();
     let mut edi834 = Edi834::default();
 
     // Remove BOM if present
     contents = contents.trim_start_matches("\u{feff}").to_string();
 
     // Parse Interchange Header
-    let (interchange_header, new_contents) = get_interchange_header(contents.clone());
+    let (interchange_header, new_contents) = get_interchange_header(&contents);
     edi834.interchange_header = interchange_header;
     contents = new_contents;
 
     // Parse Table 1
-    match get_table1(contents.clone()) {
+    match get_table1(&contents) {
         Ok((table1, new_contents)) => {
             edi834.table1 = table1;
             contents = new_contents;
@@ -64,21 +65,21 @@ pub fn get_834(mut contents: String) -> EdiResult<(Edi834, String)> {
 
     // Parse Loop1000A (Sponsor)
     if contents.contains("N1*P5*") || contents.contains("N1*IN*") {
-        let (loop1000a, new_contents) = get_loop1000a(contents);
+        let (loop1000a, new_contents) = get_loop1000a(&contents);
         edi834.loop1000a = Some(loop1000a);
         contents = new_contents;
     }
 
     // Parse Loop1000B (Payer)
     if contents.contains("N1*IN*") && edi834.loop1000a.is_some() {
-        let (loop1000b, new_contents) = get_loop1000b(contents);
+        let (loop1000b, new_contents) = get_loop1000b(&contents);
         edi834.loop1000b = Some(loop1000b);
         contents = new_contents;
     }
 
     // Parse Loop2000 segments (Member Level)
     while contents.contains("INS*") {
-        let (loop2000, new_contents) = get_loop2000(contents);
+        let (loop2000, new_contents) = get_loop2000(&contents);
         edi834.loop2000_segments.push(loop2000);
         contents = new_contents;
     }
@@ -93,7 +94,7 @@ pub fn get_834(mut contents: String) -> EdiResult<(Edi834, String)> {
     }
 
     // Parse Interchange Trailer
-    let (interchange_trailer, new_contents) = get_interchange_trailer(contents.clone());
+    let (interchange_trailer, new_contents) = get_interchange_trailer(&contents);
     edi834.interchange_trailer = interchange_trailer;
     contents = new_contents;
 

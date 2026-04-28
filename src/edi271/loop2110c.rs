@@ -24,7 +24,8 @@ pub struct Loop2110C {
     pub le: Option<LE>,
 }
 
-pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
+pub fn get_loop_2110c(contents: &str) -> EdiResult<(Loop2110C, String)> {
+    let mut contents = contents.to_string();
     let mut loop2110c = Loop2110C::default();
 
     // Process EB segment (required)
@@ -36,7 +37,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         }
         loop2110c.eb_segments = get_eb(eb_content);
         info!("EB segment parsed");
-        contents = content_trim("EB", contents);
+        contents = content_trim("EB", &contents);
     } else {
         return Err(EdiError::MissingSegment("EB".to_string()));
     }
@@ -51,7 +52,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         let hsd = get_hsd(hsd_content);
         info!("HSD segment parsed");
         loop2110c.hsd_segments.push(hsd);
-        contents = content_trim("HSD", contents);
+        contents = content_trim("HSD", &contents);
     }
 
     // Process REF segments (situational, can be multiple)
@@ -64,7 +65,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed");
         loop2110c.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process DTP segments (situational, can be multiple)
@@ -89,7 +90,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
             info!("DTP segment parsed but not added to Loop2110C (will be handled elsewhere)");
         }
 
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Process AAA segments (situational, can be multiple)
@@ -102,7 +103,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed");
         loop2110c.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     // Process MSG segments (situational, can be multiple)
@@ -115,7 +116,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         let msg = get_msg(msg_content);
         info!("MSG segment parsed");
         loop2110c.msg_segments.push(msg);
-        contents = content_trim("MSG", contents);
+        contents = content_trim("MSG", &contents);
     }
 
     // Process LS segment and its content (situational)
@@ -138,7 +139,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
         loop2110c.ls = Some(ls);
 
         // Remove the LS segment from contents
-        contents = content_trim("LS", contents);
+        contents = content_trim("LS", &contents);
 
         // Find the corresponding LE segment
         let le_position = contents.find("LE*");
@@ -158,7 +159,7 @@ pub fn get_loop_2110c(mut contents: String) -> EdiResult<(Loop2110C, String)> {
                     let nm1_segment = &nm1_content[..end_pos + 1];
 
                     // Process this segment as Loop2115C
-                    match get_loop_2115c(nm1_segment.to_string()) {
+                    match get_loop_2115c(&nm1_segment) {
                         Ok((loop2115c, _)) => {
                             loop2110c.loop2115c.push(loop2115c);
                         }

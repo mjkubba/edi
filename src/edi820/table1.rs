@@ -63,7 +63,8 @@ pub struct DTM {
     pub dtm06_date_time_period: String,
 }
 
-pub fn get_table1s(mut contents: String) -> (Table1s, String) {
+pub fn get_table1s(contents: &str) -> (Table1s, String) {
+    let mut contents = contents.to_string();
     let mut table1s = Table1s::default();
 
     // Parse ST segment
@@ -87,7 +88,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         }
 
         info!("ST segment parsed");
-        contents = content_trim("ST", contents);
+        contents = content_trim("ST", &contents);
     }
 
     // Parse BPR segment
@@ -184,7 +185,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         }
 
         info!("BPR segment parsed");
-        contents = content_trim("BPR", contents);
+        contents = content_trim("BPR", &contents);
     }
 
     // Parse TRN segment
@@ -213,13 +214,13 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         }
 
         info!("TRN segment parsed");
-        contents = content_trim("TRN", contents);
+        contents = content_trim("TRN", &contents);
     }
 
     // Parse REF segments
     while contents.contains("REF")
-        && check_if_segment_in_loop("REF", "DTM", contents.clone())
-        && check_if_segment_in_loop("REF", "N1", contents.clone())
+        && check_if_segment_in_loop("REF", "DTM", &contents)
+        && check_if_segment_in_loop("REF", "N1", &contents)
     {
         info!("REF segment found, ");
         let ref_content = get_segment_contents("REF", &contents);
@@ -245,11 +246,11 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         }
 
         info!("REF segment parsed");
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Parse DTM segments
-    while contents.contains("DTM") && check_if_segment_in_loop("DTM", "N1", contents.clone()) {
+    while contents.contains("DTM") && check_if_segment_in_loop("DTM", "N1", &contents) {
         info!("DTM segment found, ");
         let dtm_content = get_segment_contents("DTM", &contents);
 
@@ -289,7 +290,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         }
 
         info!("DTM segment parsed");
-        contents = content_trim("DTM", contents);
+        contents = content_trim("DTM", &contents);
     }
 
     info!("Table 1 parsed\n");

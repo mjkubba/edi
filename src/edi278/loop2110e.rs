@@ -17,7 +17,8 @@ pub struct Loop2110E {
     pub prv_segments: Option<PRV>,
 }
 
-pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
+pub fn get_loop2110e(contents: &str) -> (Loop2110E, String) {
+    let mut contents = contents.to_string();
     let mut nm1_segments = NM1::default();
     let mut ref_segments = Vec::new();
     let mut n3_segments = None;
@@ -41,59 +42,59 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
 
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "N3", contents.clone())
-                && check_if_segment_in_loop("REF", "N4", contents.clone())
-                && check_if_segment_in_loop("REF", "PRV", contents.clone())
-                && check_if_segment_in_loop("REF", "NM1", contents.clone())
+                && check_if_segment_in_loop("REF", "N3", &contents)
+                && check_if_segment_in_loop("REF", "N4", &contents)
+                && check_if_segment_in_loop("REF", "PRV", &contents)
+                && check_if_segment_in_loop("REF", "NM1", &contents)
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
                 info!("REF segment parsed");
 
                 ref_segments.push(ref_segment);
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
 
             // Parse N3 segment (address)
             if contents.contains("N3")
-                && check_if_segment_in_loop("N3", "N4", contents.clone())
-                && check_if_segment_in_loop("N3", "PRV", contents.clone())
-                && check_if_segment_in_loop("N3", "NM1", contents.clone())
+                && check_if_segment_in_loop("N3", "N4", &contents)
+                && check_if_segment_in_loop("N3", "PRV", &contents)
+                && check_if_segment_in_loop("N3", "NM1", &contents)
             {
                 info!("N3 segment found, ");
                 let n3_content = get_segment_contents("N3", &contents);
                 n3_segments = Some(get_n3(n3_content));
                 info!("N3 segment parsed");
 
-                contents = content_trim("N3", contents);
+                contents = content_trim("N3", &contents);
             }
 
             // Parse N4 segment (city, state, zip)
             if contents.contains("N4")
-                && check_if_segment_in_loop("N4", "PRV", contents.clone())
-                && check_if_segment_in_loop("N4", "NM1", contents.clone())
+                && check_if_segment_in_loop("N4", "PRV", &contents)
+                && check_if_segment_in_loop("N4", "NM1", &contents)
             {
                 info!("N4 segment found, ");
                 let n4_content = get_segment_contents("N4", &contents);
                 n4_segments = Some(get_n4(n4_content));
                 info!("N4 segment parsed");
 
-                contents = content_trim("N4", contents);
+                contents = content_trim("N4", &contents);
             }
 
             // Parse PRV segment
-            if contents.contains("PRV") && check_if_segment_in_loop("PRV", "NM1", contents.clone())
+            if contents.contains("PRV") && check_if_segment_in_loop("PRV", "NM1", &contents)
             {
                 info!("PRV segment found, ");
                 let prv_content = get_segment_contents("PRV", &contents);
                 prv_segments = Some(get_prv(&prv_content));
                 info!("PRV segment parsed");
 
-                contents = content_trim("PRV", contents);
+                contents = content_trim("PRV", &contents);
             }
         }
     }
@@ -143,7 +144,7 @@ mod tests {
         let contents = String::from(
             "NM1*71*1*SMITH*JOHN*A***XX*1234567890~REF*1J*12345~PRV*PE*ZZ*207Q00000X~",
         );
-        let (loop2110e, contents) = get_loop2110e(contents);
+        let (loop2110e, contents) = get_loop2110e(&contents);
         assert_eq!(loop2110e.nm1_segments.entity_id, "71");
         assert_eq!(loop2110e.nm1_segments.entity_type, "1");
         assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
@@ -172,7 +173,7 @@ mod tests {
         let contents = String::from(
             "NM1*FA*2*MONTGOMERY HOSPITAL*****24*000012121~N3*475 MAIN STREET~N4*ANYTOWN*PA*19087~",
         );
-        let (loop2110e, contents) = get_loop2110e(contents);
+        let (loop2110e, contents) = get_loop2110e(&contents);
         assert_eq!(loop2110e.nm1_segments.entity_id, "FA");
         assert_eq!(loop2110e.nm1_segments.entity_type, "2");
         assert_eq!(loop2110e.nm1_segments.lastname, "MONTGOMERY HOSPITAL");

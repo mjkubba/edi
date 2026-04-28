@@ -22,7 +22,8 @@ pub struct Edi999 {
     pub interchange_trailer: InterchangeTrailer,
 }
 
-pub fn get_999(mut contents: String) -> (Edi999, String) {
+pub fn get_999(contents: &str) -> (Edi999, String) {
+    let mut contents = contents.to_string();
     let interchange_header;
     let table1s;
     let loop2000s;
@@ -37,19 +38,19 @@ pub fn get_999(mut contents: String) -> (Edi999, String) {
     contents = contents.replace("\r", "").replace("\n", "");
 
     // Control Segments
-    (interchange_header, contents) = get_interchange_header(contents.clone());
+    (interchange_header, contents) = get_interchange_header(&contents);
 
     // Table 1
-    (table1s, contents) = get_table1s(contents.clone());
+    (table1s, contents) = get_table1s(&contents);
 
     // loop 2000
-    (loop2000s, contents) = get_loop_2000s(contents.clone());
+    (loop2000s, contents) = get_loop_2000s(&contents);
 
     // Table 1 trailer
-    (table1trailer, contents) = get_table1trailer(contents.clone());
+    (table1trailer, contents) = get_table1trailer(&contents);
 
     // Control Trailer
-    (interchange_trailer, contents) = get_interchange_trailer(contents.clone());
+    (interchange_trailer, contents) = get_interchange_trailer(&contents);
 
     // Combined Table 1 and Loop 2000
     table1_combined = Table1Combined {

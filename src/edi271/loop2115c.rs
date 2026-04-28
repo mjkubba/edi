@@ -16,7 +16,8 @@ pub struct Loop2115C {
     pub per_segments: Vec<PER>,
 }
 
-pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
+pub fn get_loop_2115c(contents: &str) -> EdiResult<(Loop2115C, String)> {
+    let mut contents = contents.to_string();
     let mut loop2115c = Loop2115C::default();
 
     // Process NM1 segment (required)
@@ -32,7 +33,7 @@ pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
         if nm1.entity_id == "P3" {
             loop2115c.nm1_segments = nm1;
             info!("NM1*P3 segment parsed for Loop 2115C");
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
         } else {
             // If not a P3 entity, this is not a 2115C loop
             return Err(EdiError::MissingSegment("NM1*P3".to_string()));
@@ -48,7 +49,7 @@ pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
         if !n3_content.is_empty() {
             loop2115c.n3_segments = Some(get_n3(n3_content));
             info!("N3 segment parsed for Loop 2115C");
-            contents = content_trim("N3", contents);
+            contents = content_trim("N3", &contents);
         }
     }
 
@@ -59,7 +60,7 @@ pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
         if !n4_content.is_empty() {
             loop2115c.n4_segments = Some(get_n4(n4_content));
             info!("N4 segment parsed for Loop 2115C");
-            contents = content_trim("N4", contents);
+            contents = content_trim("N4", &contents);
         }
     }
 
@@ -73,7 +74,7 @@ pub fn get_loop_2115c(mut contents: String) -> EdiResult<(Loop2115C, String)> {
         let per = get_per(per_content);
         info!("PER segment parsed for Loop 2115C");
         loop2115c.per_segments.push(per);
-        contents = content_trim("PER", contents);
+        contents = content_trim("PER", &contents);
     }
 
     info!("Loop 2115C parsed");
@@ -111,7 +112,7 @@ mod tests {
     #[test]
     fn test_get_loop_2115c() {
         let contents = "NM1*P3*1*JONES*MARCUS****SV*0202034~N3*123 MAIN ST~N4*ANYTOWN*NY*12345~PER*IC*OFFICE*TE*5551234567~".to_string();
-        let result = get_loop_2115c(contents);
+        let result = get_loop_2115c(&contents);
 
         assert!(result.is_ok());
         let (loop2115c, _) = result.unwrap();

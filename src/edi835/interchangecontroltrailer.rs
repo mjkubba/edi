@@ -11,7 +11,8 @@ pub struct InterchangeTrailer {
     pub iea_segments: IEA,
 }
 
-pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String) {
+pub fn get_interchange_control_trailer(contents: &str) -> (GE, IEA, String) {
+    let mut contents = contents.to_string();
     // Interchange Control Trailer
     // IEA Interchange Control Trailer R 1
     // GE FUNCTIONAL GROUP TRAILER R 1
@@ -23,14 +24,14 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
         info!("GE segment found, ");
         ge_segments = get_ge(get_segment_contents("GE", &contents));
         info!("GE segment parsed");
-        contents = content_trim("GE", contents);
+        contents = content_trim("GE", &contents);
     }
 
     if contents.contains("IEA") {
         info!("IEA segment found, ");
         iea_segments = get_iea(get_segment_contents("IEA", &contents));
         info!("IEA segment parsed");
-        contents = content_trim("IEA", contents);
+        contents = content_trim("IEA", &contents);
     }
 
     info!("Interchange Control Trailer parsed\n");
@@ -38,8 +39,8 @@ pub fn get_interchange_control_trailer(mut contents: String) -> (GE, IEA, String
     return (ge_segments, iea_segments, contents);
 }
 
-pub fn get_interchange_trailer(contents: String) -> (InterchangeTrailer, String) {
-    let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(contents);
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(&contents);
     let header = InterchangeTrailer {
         ge_segments,
         iea_segments,
@@ -63,7 +64,7 @@ mod tests {
     #[test]
     fn test_get_interchange_control_trailer() {
         let contents = String::from("GE*1*1~IEA*1*000000905~");
-        let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(contents);
+        let (ge_segments, iea_segments, contents) = get_interchange_control_trailer(&contents);
         assert_eq!(ge_segments.group_control_number, "1");
         assert_eq!(iea_segments.interchange_control_number, "000000905");
         assert_eq!(contents, "");

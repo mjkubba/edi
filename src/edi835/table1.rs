@@ -20,7 +20,8 @@ pub struct Table1s {
     pub dtm_segments: DTM,
 }
 
-pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, REF, DTM, String) {
+pub fn get_first_table_header(contents: &str) -> (ST, BPR, TRN, CUR, REF, REF, DTM, String) {
+    let mut contents = contents.to_string();
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats
     // R: required
@@ -56,54 +57,54 @@ pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, 
         info!("ST segment found, ");
         st_segments = get_st(get_segment_contents("ST", &contents));
         info!("ST segment parsed");
-        contents = content_trim("ST", contents);
+        contents = content_trim("ST", &contents);
     }
 
     if contents.contains("BPR") {
         info!("BPR segment found, ");
         bpr_segments = get_bpr(get_segment_contents("BPR", &contents));
         info!("BPR segment parsed");
-        contents = content_trim("BPR", contents);
+        contents = content_trim("BPR", &contents);
     }
 
     if contents.contains("TRN") {
         info!("TRN segment found, ");
         trn_segments = get_trn(get_segment_contents("TRN", &contents));
         info!("TRN segment parsed");
-        contents = content_trim("TRN", contents);
+        contents = content_trim("TRN", &contents);
     }
 
     if contents.contains("CUR") {
         info!("CUR segment found, ");
         cur_segments = get_cur(get_segment_contents("CUR", &contents));
         info!("CUR segment parsed");
-        contents = content_trim("CUR", contents);
+        contents = content_trim("CUR", &contents);
     }
 
     if contents.contains("REF") {
-        if check_if_segment_in_loop("REF", "N1", contents.clone()) {
+        if check_if_segment_in_loop("REF", "N1", &contents) {
             info!("REF segment found, ");
             ref_receiver_segments = get_ref(get_segment_contents("REF", &contents));
             info!("REF segment parsed");
-            contents = content_trim("REF", contents);
+            contents = content_trim("REF", &contents);
         }
     }
 
     if contents.contains("REF") {
-        if check_if_segment_in_loop("REF", "N1", contents.clone()) {
+        if check_if_segment_in_loop("REF", "N1", &contents) {
             info!("REF segment found, ");
             ref_version_segments = get_ref(get_segment_contents("REF", &contents));
             info!("REF segment parsed");
-            contents = content_trim("REF", contents);
+            contents = content_trim("REF", &contents);
         }
     }
 
     if contents.contains("DTM") {
-        if check_if_segment_in_loop("DTM", "N1", contents.clone()) {
+        if check_if_segment_in_loop("DTM", "N1", &contents) {
             info!("DTM segment found, ");
             dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
             info!("DTM segment parsed");
-            contents = content_trim("DTM", contents);
+            contents = content_trim("DTM", &contents);
         }
     }
 
@@ -120,7 +121,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, 
     );
 }
 
-pub fn get_table1s(contents: String) -> (Table1s, String) {
+pub fn get_table1s(contents: &str) -> (Table1s, String) {
     let (
         st_segments,
         bpr_segments,
@@ -130,7 +131,7 @@ pub fn get_table1s(contents: String) -> (Table1s, String) {
         ref_version_segments,
         dtm_segments,
         contents,
-    ) = get_first_table_header(contents);
+    ) = get_first_table_header(&contents);
     let header = Table1s {
         st_segments,
         bpr_segments,
@@ -189,7 +190,7 @@ mod tests {
             ref_version_segments,
             dtm_segments,
             contents,
-        ) = get_first_table_header(contents);
+        ) = get_first_table_header(&contents);
         assert_eq!(st_segments.transaction_set_id, "835");
         assert_eq!(trn_segments.reference_id, "12345");
         assert_eq!(bpr_segments.bpr01_transaction_handling_code, "I");

@@ -11,7 +11,8 @@ pub struct Loop2000F {
     pub um_segments: Option<UM>,
 }
 
-pub fn get_loop2000f(mut contents: String) -> (Loop2000F, String) {
+pub fn get_loop2000f(contents: &str) -> (Loop2000F, String) {
+    let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
     let mut um_segments = None;
 
@@ -25,7 +26,7 @@ pub fn get_loop2000f(mut contents: String) -> (Loop2000F, String) {
             hl_segments = get_hl(hl_content);
             info!("HL segment parsed");
 
-            contents = content_trim("HL", contents);
+            contents = content_trim("HL", &contents);
 
             // Parse UM segment
             if contents.contains("UM") {
@@ -34,7 +35,7 @@ pub fn get_loop2000f(mut contents: String) -> (Loop2000F, String) {
                 um_segments = Some(get_um(um_content));
                 info!("Parsed UM segment: {:?}", um_segments);
 
-                contents = content_trim("UM", contents);
+                contents = content_trim("UM", &contents);
             }
         }
     }
@@ -67,7 +68,7 @@ mod tests {
     #[test]
     fn test_get_loop2000f_with_hl_pt() {
         let contents = String::from("HL*6*5*PT*0~");
-        let (loop2000f, contents) = get_loop2000f(contents);
+        let (loop2000f, contents) = get_loop2000f(&contents);
         assert_eq!(loop2000f.hl_segments.hl01_hierarchical_id_number, "6");
         assert_eq!(
             loop2000f.hl_segments.hl02_hierarchical_parent_id_number,
@@ -81,7 +82,7 @@ mod tests {
     #[test]
     fn test_get_loop2000f_with_hl_ss() {
         let contents = String::from("HL*5*4*SS*0~UM*HS*I*2~");
-        let (loop2000f, contents) = get_loop2000f(contents);
+        let (loop2000f, contents) = get_loop2000f(&contents);
         assert_eq!(loop2000f.hl_segments.hl01_hierarchical_id_number, "5");
         assert_eq!(
             loop2000f.hl_segments.hl02_hierarchical_parent_id_number,

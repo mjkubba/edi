@@ -7,7 +7,8 @@ pub struct Loop2100H {
     pub nm1: NM1,
 }
 
-pub fn get_loop2100h(mut contents: String) -> (Loop2100H, String) {
+pub fn get_loop2100h(contents: &str) -> (Loop2100H, String) {
+    let mut contents = contents.to_string();
     let mut loop2100h = Loop2100H::default();
 
     if let Some(nm1_start) = contents.find("NM1*9K*") {

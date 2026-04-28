@@ -38,7 +38,8 @@ fn in_current_member(contents: &str, segment: &str) -> bool {
     contents[..boundary].contains(segment)
 }
 
-pub fn get_loop2000(mut contents: String) -> (Loop2000, String) {
+pub fn get_loop2000(contents: &str) -> (Loop2000, String) {
+    let mut contents = contents.to_string();
     let mut loop2000 = Loop2000::default();
 
     // Parse INS segment (required)
@@ -98,63 +99,63 @@ pub fn get_loop2000(mut contents: String) -> (Loop2000, String) {
 
     // Parse Loop2100A (Member Name)
     if in_current_member(&contents, "NM1*IL*") {
-        let (loop2100a, new_contents) = get_loop2100a(contents);
+        let (loop2100a, new_contents) = get_loop2100a(&contents);
         loop2000.loop2100a = Some(loop2100a);
         contents = new_contents;
     }
 
     // Parse Loop2100B (Incorrect Member Name)
     if in_current_member(&contents, "NM1*70*") {
-        let (loop2100b, new_contents) = get_loop2100b(contents);
+        let (loop2100b, new_contents) = get_loop2100b(&contents);
         loop2000.loop2100b = Some(loop2100b);
         contents = new_contents;
     }
 
     // Parse Loop2100C (Member Mailing Address)
     if in_current_member(&contents, "NM1*31*") {
-        let (loop2100c, new_contents) = get_loop2100c(contents);
+        let (loop2100c, new_contents) = get_loop2100c(&contents);
         loop2000.loop2100c = Some(loop2100c);
         contents = new_contents;
     }
 
     // Parse Loop2100D (Member Employer)
     if in_current_member(&contents, "NM1*36*") {
-        let (loop2100d, new_contents) = get_loop2100d(contents);
+        let (loop2100d, new_contents) = get_loop2100d(&contents);
         loop2000.loop2100d = Some(loop2100d);
         contents = new_contents;
     }
 
     // Parse Loop2100E (Member School)
     if in_current_member(&contents, "NM1*M8*") {
-        let (loop2100e, new_contents) = get_loop2100e(contents);
+        let (loop2100e, new_contents) = get_loop2100e(&contents);
         loop2000.loop2100e = Some(loop2100e);
         contents = new_contents;
     }
 
     // Parse Loop2100F (Custodial Parent)
     if in_current_member(&contents, "NM1*S1*") {
-        let (loop2100f, new_contents) = get_loop2100f(contents);
+        let (loop2100f, new_contents) = get_loop2100f(&contents);
         loop2000.loop2100f = Some(loop2100f);
         contents = new_contents;
     }
 
     // Parse Loop2100G (Responsible Person)
     if in_current_member(&contents, "NM1*6Y*") {
-        let (loop2100g, new_contents) = get_loop2100g(contents);
+        let (loop2100g, new_contents) = get_loop2100g(&contents);
         loop2000.loop2100g = Some(loop2100g);
         contents = new_contents;
     }
 
     // Parse Loop2100H (Drop Off Location)
     if in_current_member(&contents, "NM1*9K*") {
-        let (loop2100h, new_contents) = get_loop2100h(contents);
+        let (loop2100h, new_contents) = get_loop2100h(&contents);
         loop2000.loop2100h = Some(loop2100h);
         contents = new_contents;
     }
 
     // Parse Loop2300 segments (Health Coverage — contains nested Loop2320/2330)
     while in_current_member(&contents, "HD*") {
-        let (loop2300, new_contents) = get_loop2300(contents);
+        let (loop2300, new_contents) = get_loop2300(&contents);
         loop2000.loop2300_segments.push(loop2300);
         contents = new_contents;
     }

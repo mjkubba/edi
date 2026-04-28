@@ -67,13 +67,20 @@
 **Scope:** 201 `contents.clone()` calls across 49 files
 **Risk:** Quadratic memory usage — each segment parse clones the entire remaining content
 
-**Plan:**
+**Plan (Option A — implemented):**
 1. Change all controller/loop functions from `fn parse(contents: String)` to `fn parse(contents: &str)`
-2. Replace `contents.clone()` with `&str` slicing — pass `&contents[pos..]` instead of cloning
-3. Change `content_trim()` to return a slice offset rather than a new String
-4. Benchmark before/after on the largest demo file
+2. Remove `contents.clone()` at call sites — pass `&contents` instead
+3. Internal `content_trim()` still returns `String` (allocates), but callers no longer clone just to pass in
 
-**Commit sequence:** 1 commit per transaction type (10 commits), or batch
+**Future optimization (Option B — zero-copy with offsets):**
+Instead of `content_trim()` creating new Strings, track a byte offset into the original:
+```rust
+pub fn get_loop_2000(contents: &str) -> (Loop2000, usize) {
+    // returns bytes consumed; caller does: contents = &contents[consumed..];
+}
+```
+This eliminates ALL allocations during parsing but requires rethinking `content_trim()` to return
+slice offsets instead of new Strings. Deferred until after the full fix plan is complete.
 
 ---
 

@@ -13,7 +13,8 @@ pub struct Loop2010F {
     pub prv_segments: Option<PRV>,
 }
 
-pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
+pub fn get_loop2010f(contents: &str) -> (Loop2010F, String) {
+    let mut contents = contents.to_string();
     let mut nm1_segments = NM1::default();
     let mut ref_segments = Vec::new();
     let mut prv_segments = None;
@@ -28,33 +29,33 @@ pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
 
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "PRV", contents.clone())
-                && check_if_segment_in_loop("REF", "HL", contents.clone())
-                && check_if_segment_in_loop("REF", "SE", contents.clone())
+                && check_if_segment_in_loop("REF", "PRV", &contents)
+                && check_if_segment_in_loop("REF", "HL", &contents)
+                && check_if_segment_in_loop("REF", "SE", &contents)
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
                 info!("REF segment parsed");
 
                 ref_segments.push(ref_segment);
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
 
             // Parse PRV segment
             if contents.contains("PRV")
-                && check_if_segment_in_loop("PRV", "HL", contents.clone())
-                && check_if_segment_in_loop("PRV", "SE", contents.clone())
+                && check_if_segment_in_loop("PRV", "HL", &contents)
+                && check_if_segment_in_loop("PRV", "SE", &contents)
             {
                 info!("PRV segment found, ");
                 let prv_content = get_segment_contents("PRV", &contents);
                 prv_segments = Some(get_prv(&prv_content));
                 info!("PRV segment parsed");
 
-                contents = content_trim("PRV", contents);
+                contents = content_trim("PRV", &contents);
             }
         }
     }
@@ -109,7 +110,7 @@ mod tests {
     #[test]
     fn test_get_loop2010f() {
         let contents = String::from("NM1*SJ*1*WATSON*SUSAN****34*987654321~");
-        let (loop2010f, contents) = get_loop2010f(contents);
+        let (loop2010f, contents) = get_loop2010f(&contents);
         assert_eq!(loop2010f.nm1_segments.entity_id, "SJ");
         assert_eq!(loop2010f.nm1_segments.entity_type, "1");
         assert_eq!(loop2010f.nm1_segments.lastname, "WATSON");
@@ -122,7 +123,7 @@ mod tests {
     #[test]
     fn test_get_loop2010f_with_prv() {
         let contents = String::from("NM1*SJ*1*WATSON*SUSAN****34*987654321~PRV*PE*PXC*203BS0133X~");
-        let (loop2010f, contents) = get_loop2010f(contents);
+        let (loop2010f, contents) = get_loop2010f(&contents);
         assert_eq!(loop2010f.nm1_segments.entity_id, "SJ");
         assert_eq!(loop2010f.nm1_segments.entity_type, "1");
 

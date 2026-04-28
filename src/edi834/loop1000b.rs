@@ -16,7 +16,8 @@ pub struct Loop1000B {
     pub ref_segments: Vec<REF>,
 }
 
-pub fn get_loop1000b(mut contents: String) -> (Loop1000B, String) {
+pub fn get_loop1000b(contents: &str) -> (Loop1000B, String) {
+    let mut contents = contents.to_string();
     let mut loop1000b = Loop1000B::default();
 
     // Parse N1 segment (required)

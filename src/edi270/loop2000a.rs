@@ -14,7 +14,8 @@ pub struct Loop2000A {
     pub per_segments: Vec<PER>,
 }
 
-pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
+pub fn get_loop_2000a(contents: &str) -> EdiResult<(Loop2000A, String)> {
+    let mut contents = contents.to_string();
     let mut loop2000a = Loop2000A::default();
 
     // Process HL segment (required)
@@ -35,7 +36,7 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
         }
 
         info!("HL segment parsed");
-        contents = content_trim("HL", contents);
+        contents = content_trim("HL", &contents);
     } else {
         return Err(EdiError::MissingSegment("HL".to_string()));
     }
@@ -49,7 +50,7 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
         }
         loop2000a.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -64,7 +65,7 @@ pub fn get_loop_2000a(mut contents: String) -> EdiResult<(Loop2000A, String)> {
         let per = get_per(per_content);
         info!("PER segment parsed");
         loop2000a.per_segments.push(per);
-        contents = content_trim("PER", contents);
+        contents = content_trim("PER", &contents);
     }
 
     info!("Loop 2000A parsed");
@@ -97,7 +98,7 @@ mod tests {
         let contents =
             "HL*1**20*1~NM1*PR*2*ABC INSURANCE*****PI*12345~PER*IC*JANE DOE*TE*1234567890~"
                 .to_string();
-        let (loop2000a, remaining) = get_loop_2000a(contents)?;
+        let (loop2000a, remaining) = get_loop_2000a(&contents)?;
 
         assert_eq!(loop2000a.hl_segments.hl01_hierarchical_id_number, "1");
         assert_eq!(loop2000a.hl_segments.hl02_hierarchical_parent_id_number, "");

@@ -60,25 +60,25 @@ impl TransactionSet for Edi278 {
         contents = contents.replace("\r", "").replace("\n", "");
 
         // Parse interchange control header
-        let (interchange_header, new_contents) = get_interchange_header(contents);
+        let (interchange_header, new_contents) = get_interchange_header(&contents);
         edi278.interchange_header = interchange_header;
         contents = new_contents;
 
         // Parse table 1
-        let (table1s, new_contents) = get_table1s(contents);
+        let (table1s, new_contents) = get_table1s(&contents);
         contents = new_contents;
 
         // Combine Table 1
         edi278.table1_combined = Table1Combined { table1: table1s };
 
         // Parse Loop 2000A (UMO Level)
-        let (loop2000a, new_contents) = get_loop2000a(contents.clone());
+        let (loop2000a, new_contents) = get_loop2000a(&contents);
         if loop2000a.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000a = Some(loop2000a);
             contents = new_contents;
 
             // Parse Loop 2010A (UMO Name)
-            let (loop2010a, new_contents) = get_loop2010a(contents.clone());
+            let (loop2010a, new_contents) = get_loop2010a(&contents);
             if loop2010a.nm1_segments.entity_id != "" {
                 edi278.loop2010a = Some(loop2010a);
                 contents = new_contents;
@@ -86,13 +86,13 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse Loop 2000B (Requester Level)
-        let (loop2000b, new_contents) = get_loop2000b(contents.clone());
+        let (loop2000b, new_contents) = get_loop2000b(&contents);
         if loop2000b.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000b = Some(loop2000b);
             contents = new_contents;
 
             // Parse Loop 2010B (Requester Name)
-            let (loop2010b, new_contents) = get_loop2010b(contents.clone());
+            let (loop2010b, new_contents) = get_loop2010b(&contents);
             if loop2010b.nm1_segments.entity_id != "" {
                 edi278.loop2010b = Some(loop2010b);
                 contents = new_contents;
@@ -100,13 +100,13 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse Loop 2000C (Subscriber Level)
-        let (loop2000c, new_contents) = get_loop2000c(contents.clone());
+        let (loop2000c, new_contents) = get_loop2000c(&contents);
         if loop2000c.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000c = Some(loop2000c);
             contents = new_contents;
 
             // Parse Loop 2010C (Subscriber Name)
-            let (loop2010c, new_contents) = get_loop2010c(contents.clone());
+            let (loop2010c, new_contents) = get_loop2010c(&contents);
             if loop2010c.nm1_segments.entity_id != "" {
                 edi278.loop2010c = Some(loop2010c);
                 contents = new_contents;
@@ -114,13 +114,13 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse Loop 2000D (Dependent Level)
-        let (loop2000d, new_contents) = get_loop2000d(contents.clone());
+        let (loop2000d, new_contents) = get_loop2000d(&contents);
         if loop2000d.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000d = Some(loop2000d);
             contents = new_contents;
 
             // Parse Loop 2010D (Dependent Name)
-            let (loop2010d, new_contents) = get_loop2010d(contents.clone());
+            let (loop2010d, new_contents) = get_loop2010d(&contents);
             if loop2010d.nm1_segments.entity_id != "" {
                 edi278.loop2010d = Some(loop2010d);
                 contents = new_contents;
@@ -128,13 +128,13 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse Loop 2000E (Service Level)
-        let (loop2000e, new_contents) = get_loop2000e(contents.clone());
+        let (loop2000e, new_contents) = get_loop2000e(&contents);
         if loop2000e.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000e = Some(loop2000e);
             contents = new_contents;
 
             // Parse Loop 2100E (Service Level Detail)
-            let (loop2100e, new_contents) = get_loop2100e(contents.clone());
+            let (loop2100e, new_contents) = get_loop2100e(&contents);
             if !loop2100e.dtp_segments.is_empty()
                 || loop2100e.hi_segments.is_some()
                 || loop2100e.hsd_segments.is_some()
@@ -145,7 +145,7 @@ impl TransactionSet for Edi278 {
             }
 
             // Parse Loop 2110E (Service Provider)
-            let (loop2110e, new_contents) = get_loop2110e(contents.clone());
+            let (loop2110e, new_contents) = get_loop2110e(&contents);
             if loop2110e.nm1_segments.entity_id != "" {
                 edi278.loop2110e = Some(loop2110e);
                 contents = new_contents;
@@ -153,20 +153,20 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse Loop 2000F (Service Provider Level)
-        let (loop2000f, new_contents) = get_loop2000f(contents.clone());
+        let (loop2000f, new_contents) = get_loop2000f(&contents);
         if loop2000f.hl_segments.hl01_hierarchical_id_number != "" {
             edi278.loop2000f = Some(loop2000f);
             contents = new_contents;
 
             // Parse Loop 2010F (Service Provider Name)
-            let (loop2010f, new_contents) = get_loop2010f(contents.clone());
+            let (loop2010f, new_contents) = get_loop2010f(&contents);
             if loop2010f.nm1_segments.entity_id != "" {
                 edi278.loop2010f = Some(loop2010f);
                 contents = new_contents;
             }
 
             // Parse Loop 2100F (Service Provider Detail)
-            let (loop2100f, new_contents) = get_loop2100f(contents.clone());
+            let (loop2100f, new_contents) = get_loop2100f(&contents);
             if !loop2100f.dtp_segments.is_empty() || loop2100f.sv2_segments.is_some() {
                 edi278.loop2100f = Some(loop2100f);
                 contents = new_contents;
@@ -174,7 +174,7 @@ impl TransactionSet for Edi278 {
         }
 
         // Parse interchange control trailer
-        let (interchange_trailer, remaining) = get_interchange_trailer(contents);
+        let (interchange_trailer, remaining) = get_interchange_trailer(&contents);
         edi278.interchange_trailer = interchange_trailer;
 
         Ok((edi278, remaining))
@@ -279,8 +279,8 @@ impl TransactionSet for Edi278 {
 }
 
 #[allow(dead_code)]
-pub fn get_278(contents: String) -> EdiResult<Edi278> {
-    match Edi278::parse(contents) {
+pub fn get_278(contents: &str) -> EdiResult<Edi278> {
+    match Edi278::parse(contents.to_string()) {
         Ok((edi278, _)) => Ok(edi278),
         Err(e) => Err(e),
     }
@@ -571,7 +571,7 @@ GE*1*1~
 IEA*1*000000001~";
 
         // Parse the content
-        let result = get_278(content.to_string());
+        let result = get_278(content);
         assert!(result.is_ok());
 
         let edi278 = result.unwrap();

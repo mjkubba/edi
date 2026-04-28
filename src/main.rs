@@ -190,7 +190,7 @@ fn main() {
             // Check if the content is raw EDI for 835 format
             if contents.contains("ST*835*") {
                 info!("Writing 835 format from raw EDI");
-                let edi835 = get_835(contents.clone());
+                let edi835 = get_835(&contents);
                 let serialized_edi = match serde_json::to_string(&edi835) {
                     Ok(s) => s,
                     Err(e) => { warn!("Failed to serialize: {}", e); return; }
@@ -201,7 +201,7 @@ fn main() {
             // Check if the content is raw EDI for 999 format
             else if contents.contains("ST*999*") {
                 info!("Writing 999 format from raw EDI");
-                let edi999 = get_999(contents.clone());
+                let edi999 = get_999(&contents);
                 let new_edi = write_999(&edi999.0);
                 write_to_file(new_edi, args.output_file);
             }
@@ -210,7 +210,7 @@ fn main() {
                 || (contents.contains("HL*") && contents.contains("*20*"))
             {
                 info!("Writing 270 format from raw EDI");
-                match get_270(contents.clone()) {
+                match get_270(&contents) {
                     Ok((edi270, _)) => {
                         let new_edi = write_270(&edi270);
                         write_to_file(new_edi, args.output_file);
@@ -225,7 +225,7 @@ fn main() {
                 || (contents.contains("EB*") && contents.contains("HL*"))
             {
                 info!("Writing 271 format from raw EDI");
-                match get_271(contents.clone()) {
+                match get_271(&contents) {
                     Ok((edi271, _)) => {
                         let new_edi = write_271(&edi271);
                         write_to_file(new_edi, args.output_file);
@@ -256,7 +256,7 @@ fn main() {
 
         if contents.contains("~ST*835*") || contents.contains("ST*835*") {
             info!("File is 835");
-            let edi835 = get_835(contents.clone());
+            let edi835 = get_835(&contents);
             let serialized_edi = match serde_json::to_string(&edi835) {
                 Ok(s) => s,
                 Err(e) => { warn!("Failed to serialize: {}", e); return; }
@@ -264,7 +264,7 @@ fn main() {
             write_to_file(serialized_edi.clone(), args.output_file);
         } else if contents.contains("~ST*999*") || contents.contains("ST*999*") {
             info!("File is 999");
-            let edi999 = get_999(contents.clone());
+            let edi999 = get_999(&contents);
             let serialized_edi = match serde_json::to_string(&edi999.0) {
                 Ok(s) => s,
                 Err(e) => { warn!("Failed to serialize: {}", e); return; }
@@ -272,7 +272,7 @@ fn main() {
             write_to_file(serialized_edi.clone(), args.output_file);
         } else if contents.contains("~ST*270*") || contents.contains("ST*270*") {
             info!("File is 270");
-            match get_270(contents.clone()) {
+            match get_270(&contents) {
                 Ok((edi270, _)) => {
                     let serialized_edi = match serde_json::to_string(&edi270) {
                         Ok(s) => s,
@@ -286,7 +286,7 @@ fn main() {
             }
         } else if contents.contains("~ST*271*") || contents.contains("ST*271*") {
             info!("File is 271");
-            match get_271(contents.clone()) {
+            match get_271(&contents) {
                 Ok((edi271, _)) => {
                     let serialized_edi = match serde_json::to_string(&edi271) {
                         Ok(s) => s,
@@ -300,7 +300,7 @@ fn main() {
             }
         } else if contents.contains("~ST*276*") || contents.contains("ST*276*") {
             info!("File is 276");
-            match get_276(contents.clone()) {
+            match get_276(&contents) {
                 Ok(edi276) => {
                     let serialized_edi = match serde_json::to_string(&edi276) {
                         Ok(s) => s,
@@ -314,7 +314,7 @@ fn main() {
             }
         } else if contents.contains("~ST*277*") || contents.contains("ST*277*") {
             info!("File is 277");
-            match get_277(contents.clone()) {
+            match get_277(&contents) {
                 Ok(edi277) => {
                     let serialized_edi = match serde_json::to_string(&edi277) {
                         Ok(s) => s,

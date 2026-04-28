@@ -61,7 +61,8 @@ pub struct Loop2000E {
     pub loop2200e: Vec<Loop2200E>,
 }
 
-pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
+pub fn get_loop_2000a(contents: &str) -> (Loop2000A, String) {
+    let contents = contents.to_string();
     let mut loop_2000a = Loop2000A::default();
     let mut remaining_content = contents.clone();
 
@@ -106,7 +107,7 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
                     remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
 
                 // Process Loop 2100A
-                let (loop_2100a_vec, new_remaining) = get_loop_2100a_vec(remaining_content.clone());
+                let (loop_2100a_vec, new_remaining) = get_loop_2100a_vec(&remaining_content);
                 loop_2000a.loop2100a = loop_2100a_vec;
                 remaining_content = new_remaining;
             }
@@ -116,7 +117,8 @@ pub fn get_loop_2000a(contents: String) -> (Loop2000A, String) {
     (loop_2000a, remaining_content)
 }
 
-pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
+pub fn get_loop_2000b_vec(contents: &str) -> (Vec<Loop2000B>, String) {
+    let contents = contents.to_string();
     let mut loop_2000b_vec = Vec::new();
     let mut remaining_content = contents.clone();
 
@@ -163,7 +165,7 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
                     remaining_content[nm1_segment_start + nm1_segment_end + 1..].to_string();
 
                 // Process Loop 2100B
-                let (loop_2100b_vec, new_remaining) = get_loop_2100b_vec(remaining_content.clone());
+                let (loop_2100b_vec, new_remaining) = get_loop_2100b_vec(&remaining_content);
                 loop_2000b.loop2100b = loop_2100b_vec;
                 remaining_content = new_remaining;
             }
@@ -179,12 +181,13 @@ pub fn get_loop_2000b_vec(contents: String) -> (Vec<Loop2000B>, String) {
 }
 
 // Placeholder functions for loop processing
-pub fn get_loop_2100a_vec(contents: String) -> (Vec<Loop2100A>, String) {
+pub fn get_loop_2100a_vec(contents: &str) -> (Vec<Loop2100A>, String) {
     // Implementation will be added later
-    (Vec::new(), contents)
+    (Vec::new(), contents.to_string())
 }
 
-pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
+pub fn get_loop_2100b_vec(contents: &str) -> (Vec<Loop2100B>, String) {
+    let contents = contents.to_string();
     // Implementation will be added later
     let remaining_content = contents.clone();
 
@@ -202,7 +205,8 @@ pub fn get_loop_2100b_vec(contents: String) -> (Vec<Loop2100B>, String) {
     (Vec::new(), remaining_content)
 }
 
-pub fn get_loop_2000c_vec(contents: String) -> (Vec<Loop2000C>, String) {
+pub fn get_loop_2000c_vec(contents: &str) -> (Vec<Loop2000C>, String) {
+    let contents = contents.to_string();
     let mut loop_2000c_vec = Vec::new();
     let mut remaining_content = contents.clone();
 
@@ -302,7 +306,8 @@ pub fn get_loop_2000c_vec(contents: String) -> (Vec<Loop2000C>, String) {
     (loop_2000c_vec, remaining_content)
 }
 
-pub fn get_loop_2000d_vec(contents: String) -> (Vec<Loop2000D>, String) {
+pub fn get_loop_2000d_vec(contents: &str) -> (Vec<Loop2000D>, String) {
+    let contents = contents.to_string();
     let mut loop_2000d_vec = Vec::new();
     let mut remaining_content = contents.clone();
 

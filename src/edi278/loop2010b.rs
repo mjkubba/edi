@@ -13,7 +13,8 @@ pub struct Loop2010B {
     pub ref_segments: Vec<REF>,
 }
 
-pub fn get_loop2010b(mut contents: String) -> (Loop2010B, String) {
+pub fn get_loop2010b(contents: &str) -> (Loop2010B, String) {
+    let mut contents = contents.to_string();
     let mut nm1_segments = NM1::default();
     let mut per_segments = Vec::new();
     let mut ref_segments = Vec::new();
@@ -28,30 +29,30 @@ pub fn get_loop2010b(mut contents: String) -> (Loop2010B, String) {
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
 
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Parse PER segments
             while contents.contains("PER")
-                && check_if_segment_in_loop("PER", "HL", contents.clone())
+                && check_if_segment_in_loop("PER", "HL", &contents)
             {
                 info!("PER segment found, ");
                 let per_segment = get_per(get_segment_contents("PER", &contents));
                 info!("PER segment parsed");
 
                 per_segments.push(per_segment);
-                contents = content_trim("PER", contents);
+                contents = content_trim("PER", &contents);
             }
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "HL", contents.clone())
+                && check_if_segment_in_loop("REF", "HL", &contents)
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
                 info!("REF segment parsed");
 
                 ref_segments.push(ref_segment);
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
         }
     }
@@ -90,7 +91,7 @@ mod tests {
     fn test_get_loop2010b() {
         let contents =
             String::from("NM1*1P*2*BONE AND JOINT CLINIC*****SV*2000035~REF*XZ*7654321~");
-        let (loop2010b, contents) = get_loop2010b(contents);
+        let (loop2010b, contents) = get_loop2010b(&contents);
         assert_eq!(loop2010b.nm1_segments.entity_id, "1P");
         assert_eq!(loop2010b.nm1_segments.entity_type, "2");
         assert_eq!(loop2010b.nm1_segments.lastname, "BONE AND JOINT CLINIC");

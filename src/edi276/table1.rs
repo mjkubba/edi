@@ -13,7 +13,8 @@ pub struct Table1s {
     pub bht06_transaction_type_code: String,
 }
 
-pub fn get_table1s(contents: String) -> (Table1s, String) {
+pub fn get_table1s(contents: &str) -> (Table1s, String) {
+    let contents = contents.to_string();
     let mut table1s = Table1s::default();
     let mut remaining_content = contents.clone();
 

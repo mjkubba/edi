@@ -26,7 +26,8 @@ pub struct Edi835 {
     pub interchange_trailer: InterchangeTrailer,
 }
 
-pub fn get_835(mut contents: String) -> Edi835 {
+pub fn get_835(contents: &str) -> Edi835 {
+    let mut contents = contents.to_string();
     let interchange_header;
     let table1s;
     let loop1000as;
@@ -37,16 +38,16 @@ pub fn get_835(mut contents: String) -> Edi835 {
     let table1;
 
     // Control Segments
-    (interchange_header, contents) = get_interchange_header(contents.clone());
+    (interchange_header, contents) = get_interchange_header(&contents);
 
     // Table 1
-    (table1s, contents) = get_table1s(contents.clone());
+    (table1s, contents) = get_table1s(&contents);
 
     // Loop 1000A Payer Identification
-    (loop1000as, contents) = get_1000as(contents.clone());
+    (loop1000as, contents) = get_1000as(&contents);
 
     // Loop 1000B Payee Identification
-    (loop1000bs, contents) = get_1000bs(contents.clone());
+    (loop1000bs, contents) = get_1000bs(&contents);
 
     // table 1 combined
     table1 = Table1 {
@@ -56,13 +57,13 @@ pub fn get_835(mut contents: String) -> Edi835 {
     };
 
     // loop 2000
-    (table2s, contents) = get_loop_2000s(contents.clone());
+    (table2s, contents) = get_loop_2000s(&contents);
 
     // Table 3
-    (table3s, contents) = get_table3s(contents.clone());
+    (table3s, contents) = get_table3s(&contents);
 
     // Control Trailer
-    (interchange_trailer, contents) = get_interchange_trailer(contents.clone());
+    (interchange_trailer, contents) = get_interchange_trailer(&contents);
 
     let edi835 = Edi835 {
         interchange_header,

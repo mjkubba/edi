@@ -11,7 +11,8 @@ pub struct Table1s {
     pub bht_segments: BHT,
 }
 
-pub fn get_table1s(mut contents: String) -> (Table1s, String) {
+pub fn get_table1s(contents: &str) -> (Table1s, String) {
+    let mut contents = contents.to_string();
     let mut st_segments = ST::default();
     let mut bht_segments = BHT::default();
 
@@ -20,7 +21,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         st_segments = get_st(get_segment_contents("ST", &contents));
         info!("ST segment parsed");
 
-        contents = content_trim("ST", contents);
+        contents = content_trim("ST", &contents);
     }
 
     if contents.contains("BHT") {
@@ -28,7 +29,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
         bht_segments = get_bht(get_segment_contents("BHT", &contents));
         info!("BHT segment parsed");
 
-        contents = content_trim("BHT", contents);
+        contents = content_trim("BHT", &contents);
     }
 
     info!("Table 1 parsed\n");
@@ -55,7 +56,7 @@ mod tests {
     #[test]
     fn test_get_table1s() {
         let contents = String::from("ST*278*0001*005010X217~BHT*0007*11*123456*20200101*1200~");
-        let (table1s, contents) = get_table1s(contents);
+        let (table1s, contents) = get_table1s(&contents);
         assert_eq!(table1s.st_segments.transaction_set_id, "278");
         assert_eq!(table1s.st_segments.transaction_set_control_number, "0001");
         assert_eq!(table1s.st_segments.implementation_conven_ref, "005010X217");

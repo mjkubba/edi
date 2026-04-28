@@ -50,7 +50,8 @@ pub struct Loop2320 {
     pub loop2330_segments: Vec<Loop2330>,
 }
 
-pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
+pub fn get_loop2320(contents: &str) -> (Loop2320, String) {
+    let mut contents = contents.to_string();
     let mut loop2320 = Loop2320::default();
 
     // Parse COB segment
@@ -106,7 +107,7 @@ pub fn get_loop2320(mut contents: String) -> (Loop2320, String) {
         if !trimmed.starts_with("NM1*") {
             break;
         }
-        let (loop2330, new_contents) = get_loop2330(contents);
+        let (loop2330, new_contents) = get_loop2330(&contents);
         if loop2330.nm1.entity_id.is_empty() {
             contents = new_contents;
             break;
@@ -171,7 +172,7 @@ mod tests {
     #[test]
     fn test_parse_loop2320_with_loop2330() {
         let content = "COB*P*XYZ123*1~REF*60*GROUP123~DTP*344*D8*20230101~NM1*IN*2*OTHER INSURANCE CO*****PI*99999~HD*021~~";
-        let (loop2320, remaining) = get_loop2320(content.to_string());
+        let (loop2320, remaining) = get_loop2320(content);
         assert_eq!(
             loop2320.cob.cob01_payer_responsibility_sequence_number_code,
             "P"

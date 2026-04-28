@@ -18,7 +18,8 @@ pub struct Loop2100A {
     pub ref_segments: Vec<REF>,
 }
 
-pub fn get_loop2100a(mut contents: String) -> (Loop2100A, String) {
+pub fn get_loop2100a(contents: &str) -> (Loop2100A, String) {
+    let mut contents = contents.to_string();
     let mut loop2100a = Loop2100A::default();
 
     // Parse NM1 segment (required) - looking for IL (Insured or Subscriber)

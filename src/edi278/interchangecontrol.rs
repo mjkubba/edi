@@ -11,7 +11,8 @@ pub struct InterchangeHeader {
     pub gs_segments: GS,
 }
 
-pub fn get_interchange_control(mut contents: String) -> (ISA, GS, String) {
+pub fn get_interchange_control(contents: &str) -> (ISA, GS, String) {
+    let mut contents = contents.to_string();
     let mut isa_segments = ISA::default();
     let mut gs_segments = GS::default();
 
@@ -20,7 +21,7 @@ pub fn get_interchange_control(mut contents: String) -> (ISA, GS, String) {
         isa_segments = get_isa(get_segment_contents("ISA", &contents));
         info!("ISA segment parsed");
 
-        contents = content_trim("ISA", contents);
+        contents = content_trim("ISA", &contents);
     }
 
     if contents.contains("GS") {
@@ -28,15 +29,15 @@ pub fn get_interchange_control(mut contents: String) -> (ISA, GS, String) {
         gs_segments = get_gs(get_segment_contents("GS", &contents));
         info!("GS segment parsed");
 
-        contents = content_trim("GS", contents);
+        contents = content_trim("GS", &contents);
     }
 
     info!("Interchange Control parsed\n");
     return (isa_segments, gs_segments, contents);
 }
 
-pub fn get_interchange_header(contents: String) -> (InterchangeHeader, String) {
-    let (isa_segments, gs_segments, contents) = get_interchange_control(contents);
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let (isa_segments, gs_segments, contents) = get_interchange_control(&contents);
     let header = InterchangeHeader {
         isa_segments,
         gs_segments,
@@ -58,7 +59,7 @@ mod tests {
     #[test]
     fn test_get_interchange_control() {
         let contents = String::from("ISA*00*          *00*          *ZZ*SUBMITTERS ID  *ZZ*RECEIVERS ID   *200101*1253*^*00501*000000905*0*T*|~GS*HI*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X217~");
-        let (isa_segments, gs_segments, contents) = get_interchange_control(contents);
+        let (isa_segments, gs_segments, contents) = get_interchange_control(&contents);
         assert_eq!(isa_segments.sender_id, "SUBMITTERS ID  ");
         assert_eq!(isa_segments.receiver_id, "RECEIVERS ID   ");
         assert_eq!(gs_segments.app_sender_id, "SENDER CODE");
@@ -69,7 +70,7 @@ mod tests {
     #[test]
     fn test_get_interchange_header() {
         let contents = String::from("ISA*00*          *00*          *ZZ*SUBMITTERS ID  *ZZ*RECEIVERS ID   *200101*1253*^*00501*000000905*0*T*|~GS*HI*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X217~");
-        let (header, contents) = get_interchange_header(contents);
+        let (header, contents) = get_interchange_header(&contents);
         assert_eq!(header.isa_segments.sender_id, "SUBMITTERS ID  ");
         assert_eq!(header.isa_segments.receiver_id, "RECEIVERS ID   ");
         assert_eq!(header.gs_segments.app_sender_id, "SENDER CODE");

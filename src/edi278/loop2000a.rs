@@ -9,7 +9,8 @@ pub struct Loop2000A {
     pub hl_segments: HL,
 }
 
-pub fn get_loop2000a(mut contents: String) -> (Loop2000A, String) {
+pub fn get_loop2000a(contents: &str) -> (Loop2000A, String) {
+    let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
 
     if contents.contains("HL") {
@@ -22,7 +23,7 @@ pub fn get_loop2000a(mut contents: String) -> (Loop2000A, String) {
             hl_segments = get_hl(hl_content);
             info!("HL segment parsed");
 
-            contents = content_trim("HL", contents);
+            contents = content_trim("HL", &contents);
         }
     }
 
@@ -46,7 +47,7 @@ mod tests {
     #[test]
     fn test_get_loop2000a() {
         let contents = String::from("HL*1**20*1~");
-        let (loop2000a, contents) = get_loop2000a(contents);
+        let (loop2000a, contents) = get_loop2000a(&contents);
         assert_eq!(loop2000a.hl_segments.hl01_hierarchical_id_number, "1");
         assert_eq!(loop2000a.hl_segments.hl02_hierarchical_parent_id_number, "");
         assert_eq!(loop2000a.hl_segments.hl03_hierarchical_level_code, "20");

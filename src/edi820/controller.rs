@@ -38,20 +38,20 @@ impl TransactionSet for Edi820 {
         contents = contents.replace("\r", "").replace("\n", "");
 
         // Parse interchange control header
-        let (interchange_header, new_contents) = get_interchange_header(contents);
+        let (interchange_header, new_contents) = get_interchange_header(&contents);
         edi820.interchange_header = interchange_header;
         contents = new_contents;
 
         // Parse table 1
-        let (table1s, new_contents) = get_table1s(contents);
+        let (table1s, new_contents) = get_table1s(&contents);
         contents = new_contents;
 
         // Parse loop 1000A (payer identification)
-        let (loop1000as, new_contents) = get_1000as(contents);
+        let (loop1000as, new_contents) = get_1000as(&contents);
         contents = new_contents;
 
         // Parse loop 1000B (payee identification)
-        let (loop1000bs, new_contents) = get_1000bs(contents);
+        let (loop1000bs, new_contents) = get_1000bs(&contents);
         contents = new_contents;
 
         // Combine Table 1
@@ -62,12 +62,12 @@ impl TransactionSet for Edi820 {
         };
 
         // Parse loop 2000 (entity)
-        let (table2s, new_contents) = get_loop_2000s(contents);
+        let (table2s, new_contents) = get_loop_2000s(&contents);
         edi820.table2s = table2s;
         contents = new_contents;
 
         // Parse interchange control trailer
-        let (interchange_trailer, remaining) = get_interchange_trailer(contents);
+        let (interchange_trailer, remaining) = get_interchange_trailer(&contents);
         edi820.interchange_trailer = interchange_trailer;
 
         Ok((edi820, remaining))
@@ -108,8 +108,8 @@ impl TransactionSet for Edi820 {
 }
 
 #[allow(dead_code)]
-pub fn get_820(contents: String) -> EdiResult<Edi820> {
-    match Edi820::parse(contents) {
+pub fn get_820(contents: &str) -> EdiResult<Edi820> {
+    match Edi820::parse(contents.to_string()) {
         Ok((edi820, _)) => Ok(edi820),
         Err(e) => Err(e),
     }

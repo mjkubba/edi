@@ -15,7 +15,8 @@ pub struct Table2 {
     pub loop2100s: Vec<Loop2100s>,
 }
 
-pub fn get_loop_2000(mut contents: String) -> (LX, TS3, TS2, String) {
+pub fn get_loop_2000(contents: &str) -> (LX, TS3, TS2, String) {
+    let mut contents = contents.to_string();
     // Table 2
     // Loop 2000 Header Number (>1)
     // LX Header Number S 1
@@ -31,34 +32,35 @@ pub fn get_loop_2000(mut contents: String) -> (LX, TS3, TS2, String) {
         info!("LX segment found, ");
         lx_segments = get_lx(get_segment_contents("LX", &contents));
         info!("LX segment parsed");
-        contents = content_trim("LX", contents);
+        contents = content_trim("LX", &contents);
     }
     if contents.contains("TS3") {
         info!("TS3 segment found, ");
         ts3_segments = get_ts3(get_segment_contents("TS3", &contents));
         info!("TS3 segment parsed");
-        contents = content_trim("TS3", contents);
+        contents = content_trim("TS3", &contents);
     }
     if contents.contains("TS2") {
         info!("TS2 segment found, ");
         ts2_segments = get_ts2(get_segment_contents("TS2", &contents));
         info!("TS2 segment parsed");
-        contents = content_trim("TS2", contents);
+        contents = content_trim("TS2", &contents);
     }
 
     info!("Loop 2000 parsed\n");
     return (lx_segments, ts3_segments, ts2_segments, contents);
 }
 
-pub fn get_loop_2000s(mut contents: String) -> (Vec<Table2>, String) {
+pub fn get_loop_2000s(contents: &str) -> (Vec<Table2>, String) {
+    let mut contents = contents.to_string();
     let lx_count = contents.matches("LX").count();
     let mut loop_2000_array = vec![];
     info!("Number of loops in loop 2000: {:?}", lx_count);
 
     for _ in 0..lx_count {
         let (lx, ts3, ts2, loop2100s);
-        (lx, ts3, ts2, contents) = get_loop_2000(contents.clone());
-        (loop2100s, contents) = get_loop_2100s(contents.clone());
+        (lx, ts3, ts2, contents) = get_loop_2000(&contents);
+        (loop2100s, contents) = get_loop_2100s(&contents);
 
         let loop2000s = Table2 {
             lx_segments: lx,
@@ -94,7 +96,7 @@ mod tests {
     #[test]
     fn test_get_loop_2000() {
         let contents = String::from("LX*1~TS3*6543210903*11*20021231*1*211366.97********138018.4**73348.57~TS2*2178.45*1919.71**56.82*197.69*4.23~CLP*EXAMPLE3*2*500*100**12*05090256390*11*1~CAS*OA*23*600**94*-200~");
-        let (lx_segments, ts3_segments, ts2_segments, contents) = get_loop_2000(contents);
+        let (lx_segments, ts3_segments, ts2_segments, contents) = get_loop_2000(&contents);
         assert_eq!(lx_segments.lx01_claim_sequence_number, "1");
         assert_eq!(
             contents,

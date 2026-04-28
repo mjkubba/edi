@@ -13,7 +13,8 @@ pub struct Loop2010D {
     pub dmg_segments: Option<DMG>,
 }
 
-pub fn get_loop2010d(mut contents: String) -> (Loop2010D, String) {
+pub fn get_loop2010d(contents: &str) -> (Loop2010D, String) {
+    let mut contents = contents.to_string();
     let mut nm1_segments = NM1::default();
     let mut ref_segments = Vec::new();
     let mut dmg_segments = None;
@@ -28,29 +29,29 @@ pub fn get_loop2010d(mut contents: String) -> (Loop2010D, String) {
             nm1_segments = get_nm1(nm1_content);
             info!("NM1 segment parsed");
 
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "DMG", contents.clone())
-                && check_if_segment_in_loop("REF", "HL", contents.clone())
+                && check_if_segment_in_loop("REF", "DMG", &contents)
+                && check_if_segment_in_loop("REF", "HL", &contents)
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
                 info!("REF segment parsed");
 
                 ref_segments.push(ref_segment);
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
 
             // Parse DMG segment
-            if contents.contains("DMG") && check_if_segment_in_loop("DMG", "HL", contents.clone())
+            if contents.contains("DMG") && check_if_segment_in_loop("DMG", "HL", &contents)
             {
                 info!("DMG segment found, ");
                 dmg_segments = Some(get_dmg(get_segment_contents("DMG", &contents)));
                 info!("DMG segment parsed");
 
-                contents = content_trim("DMG", contents);
+                contents = content_trim("DMG", &contents);
             }
         }
     }
@@ -89,7 +90,7 @@ mod tests {
     fn test_get_loop2010d() {
         let contents =
             String::from("NM1*QC*1*DOE*JANE****MI*123456789B~REF*SY*987654321~DMG*D8*20100519*F~");
-        let (loop2010d, contents) = get_loop2010d(contents);
+        let (loop2010d, contents) = get_loop2010d(&contents);
         assert_eq!(loop2010d.nm1_segments.entity_id, "QC");
         assert_eq!(loop2010d.nm1_segments.entity_type, "1");
         assert_eq!(loop2010d.nm1_segments.lastname, "DOE");

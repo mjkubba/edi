@@ -11,7 +11,8 @@ pub struct Table1trailer {
     pub ak9_segments: AK9,
 }
 
-pub fn get_first_table_trailer(mut contents: String) -> (SE, AK9, String) {
+pub fn get_first_table_trailer(contents: &str) -> (SE, AK9, String) {
+    let mut contents = contents.to_string();
     let mut se_segments = SE::default();
     let mut ak9_segments = AK9::default();
 
@@ -21,7 +22,7 @@ pub fn get_first_table_trailer(mut contents: String) -> (SE, AK9, String) {
         let ak9_content = get_segment_contents("AK9", &contents);
         ak9_segments = get_ak9(ak9_content);
         info!("AK9 segment parsed");
-        contents = content_trim("AK9", contents);
+        contents = content_trim("AK9", &contents);
     } else {
         info!("Warning: Required AK9 segment not found");
     }
@@ -32,7 +33,7 @@ pub fn get_first_table_trailer(mut contents: String) -> (SE, AK9, String) {
         let se_content = get_segment_contents("SE", &contents);
         se_segments = get_se(se_content);
         info!("SE segment parsed");
-        contents = content_trim("SE", contents);
+        contents = content_trim("SE", &contents);
     } else {
         info!("Warning: Required SE segment not found");
     }
@@ -41,8 +42,8 @@ pub fn get_first_table_trailer(mut contents: String) -> (SE, AK9, String) {
     (se_segments, ak9_segments, contents)
 }
 
-pub fn get_table1trailer(contents: String) -> (Table1trailer, String) {
-    let (se_segments, ak9_segments, contents) = get_first_table_trailer(contents);
+pub fn get_table1trailer(contents: &str) -> (Table1trailer, String) {
+    let (se_segments, ak9_segments, contents) = get_first_table_trailer(&contents);
     let trailer = Table1trailer {
         se_segments,
         ak9_segments,

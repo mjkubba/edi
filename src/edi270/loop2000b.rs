@@ -12,7 +12,8 @@ pub struct Loop2000B {
     pub loop2000c: Vec<Loop2000C>,
 }
 
-pub fn get_loop_2000b(mut contents: String) -> (Loop2000B, String) {
+pub fn get_loop_2000b(contents: &str) -> (Loop2000B, String) {
+    let mut contents = contents.to_string();
     let mut loop2000b = Loop2000B::default();
 
     // Process HL segment (required)
@@ -30,7 +31,7 @@ pub fn get_loop_2000b(mut contents: String) -> (Loop2000B, String) {
         }
 
         info!("HL segment parsed");
-        contents = content_trim("HL", contents);
+        contents = content_trim("HL", &contents);
     } else {
         info!("Warning: Required HL segment not found in Loop 2000B");
     }
@@ -41,7 +42,7 @@ pub fn get_loop_2000b(mut contents: String) -> (Loop2000B, String) {
         let nm1_content = get_segment_contents("NM1", &contents);
         loop2000b.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         info!("Warning: Required NM1 segment not found in Loop 2000B");
     }
@@ -49,7 +50,7 @@ pub fn get_loop_2000b(mut contents: String) -> (Loop2000B, String) {
     // Process Loop 2000C segments (can be multiple)
     let mut loop2000c_vec = Vec::new();
     while contents.contains("HL") && is_loop_2000c(&contents) {
-        let (loop2000c, new_contents) = get_loop_2000c(contents.clone());
+        let (loop2000c, new_contents) = get_loop_2000c(&contents);
         loop2000c_vec.push(loop2000c);
         contents = new_contents;
     }

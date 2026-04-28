@@ -8,7 +8,8 @@ pub struct InterchangeTrailer {
     pub iea02_interchange_control_number: String,
 }
 
-pub fn get_interchange_trailer(contents: String) -> (InterchangeTrailer, String) {
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let contents = contents.to_string();
     let mut interchange_trailer = InterchangeTrailer::default();
     let mut remaining_content = contents.clone();
 

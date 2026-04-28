@@ -19,7 +19,8 @@ pub struct Table1 {
     pub n1_segments: Vec<N1>,
 }
 
-pub fn get_table1(mut contents: String) -> EdiResult<(Table1, String)> {
+pub fn get_table1(contents: &str) -> EdiResult<(Table1, String)> {
+    let mut contents = contents.to_string();
     let mut table1 = Table1::default();
 
     // Parse ST segment

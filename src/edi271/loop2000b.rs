@@ -28,7 +28,8 @@ pub struct Loop2100B {
     pub aaa_segments: Vec<AAA>,
 }
 
-pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
+pub fn get_loop_2000b(contents: &str) -> EdiResult<(Loop2000B, String)> {
+    let mut contents = contents.to_string();
     let mut loop2000b = Loop2000B::default();
 
     // Process HL segment (required)
@@ -49,7 +50,7 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         }
 
         info!("HL segment parsed");
-        contents = content_trim("HL", contents);
+        contents = content_trim("HL", &contents);
     } else {
         return Err(EdiError::MissingSegment("HL".to_string()));
     }
@@ -63,7 +64,7 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         }
         loop2000b.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -78,7 +79,7 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         let per = get_per(per_content);
         info!("PER segment parsed");
         loop2000b.per_segments.push(per);
-        contents = content_trim("PER", contents);
+        contents = content_trim("PER", &contents);
     }
 
     // Process REF segments (situational, can be multiple)
@@ -91,7 +92,7 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed");
         loop2000b.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process AAA segments (situational, can be multiple)
@@ -104,12 +105,12 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed");
         loop2000b.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     // Process Loop 2100B segments (can be multiple)
     while contents.contains("NM1") && !is_next_loop_2000c(&contents) {
-        match get_loop_2100b(contents.clone()) {
+        match get_loop_2100b(&contents) {
             Ok((loop2100b, new_contents)) => {
                 loop2000b.loop2100b.push(loop2100b);
                 contents = new_contents;
@@ -120,7 +121,7 @@ pub fn get_loop_2000b(mut contents: String) -> EdiResult<(Loop2000B, String)> {
 
     // Process Loop 2000C segments (can be multiple)
     while contents.contains("HL") && is_next_loop_2000c(&contents) {
-        match get_loop_2000c(contents.clone()) {
+        match get_loop_2000c(&contents) {
             Ok((loop2000c, new_contents)) => {
                 loop2000b.loop2000c.push(loop2000c);
                 contents = new_contents;
@@ -144,7 +145,8 @@ fn is_next_loop_2000c(contents: &str) -> bool {
     false
 }
 
-pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
+pub fn get_loop_2100b(contents: &str) -> EdiResult<(Loop2100B, String)> {
+    let mut contents = contents.to_string();
     let mut loop2100b = Loop2100B::default();
 
     // Process NM1 segment (required)
@@ -156,7 +158,7 @@ pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
         }
         loop2100b.nm1_segments = get_nm1(nm1_content);
         info!("NM1 segment parsed for Loop 2100B");
-        contents = content_trim("NM1", contents);
+        contents = content_trim("NM1", &contents);
     } else {
         return Err(EdiError::MissingSegment("NM1".to_string()));
     }
@@ -171,7 +173,7 @@ pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
         let per = get_per(per_content);
         info!("PER segment parsed for Loop 2100B");
         loop2100b.per_segments.push(per);
-        contents = content_trim("PER", contents);
+        contents = content_trim("PER", &contents);
     }
 
     // Process REF segments (situational, can be multiple)
@@ -184,7 +186,7 @@ pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed for Loop 2100B");
         loop2100b.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process AAA segments (situational, can be multiple)
@@ -197,7 +199,7 @@ pub fn get_loop_2100b(mut contents: String) -> EdiResult<(Loop2100B, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed for Loop 2100B");
         loop2100b.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     info!("Loop 2100B parsed");

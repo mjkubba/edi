@@ -25,7 +25,7 @@ pub struct Loop2110s {
 }
 
 pub fn get_loop_2110(
-    mut contents: String,
+    contents: &str,
 ) -> (
     SVC,
     Vec<DTM>,
@@ -51,6 +51,7 @@ pub fn get_loop_2110(
     // QTY Service Supplemental Quantity S 6
     // LQ Health Care Remark Codes S 99
 
+    let mut contents = contents.to_string();
     let mut svc_segments = SVC::default();
     let mut dtm_segments = vec![];
     let mut cas_segments = vec![];
@@ -66,7 +67,7 @@ pub fn get_loop_2110(
         info!("SVC segment found, ");
         svc_segments = get_svc(get_segment_contents("SVC", &contents));
         info!("SVC segment parsed");
-        contents = content_trim("SVC", contents);
+        contents = content_trim("SVC", &contents);
     }
 
     if contents.contains("DTM") {
@@ -74,11 +75,11 @@ pub fn get_loop_2110(
         let dtm_count = contents.matches("DTM").count();
         for _ in 0..dtm_count {
             let dtm_tmp = get_dtm(get_segment_contents("DTM", &contents));
-            if check_for_expected_codes("150,151,472", dtm_tmp.date_time_qualifier.clone()) {
+            if check_for_expected_codes("150,151,472", &dtm_tmp.date_time_qualifier) {
                 info!("DTM segment found, in the correct loop");
                 dtm_segments.push(dtm_tmp);
                 info!("DTM segment parsed");
-                contents = content_trim("DTM", contents);
+                contents = content_trim("DTM", &contents);
             }
         }
     }
@@ -89,12 +90,12 @@ pub fn get_loop_2110(
             let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
             if check_for_expected_codes(
                 "CO,OA,PI,PR",
-                cas_tmp.cas01_claim_adjustment_group_code.clone(),
+                &cas_tmp.cas01_claim_adjustment_group_code,
             ) {
                 info!("CAS segment found, ");
                 cas_segments.push(cas_tmp);
                 info!("CAS segment parsed");
-                contents = content_trim("CAS", contents);
+                contents = content_trim("CAS", &contents);
             }
         }
     }
@@ -106,22 +107,22 @@ pub fn get_loop_2110(
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
             if check_for_expected_codes(
                 "1S,APC,BB,E9,G1,G3,LU,RB",
-                ref_tmp.reference_id_number_qualifier.clone(),
+                &ref_tmp.reference_id_number_qualifier,
             ) {
                 info!("REF segment found, in the right loop");
                 ref_service_identification.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
         }
     }
     if contents.contains("REF") {
         info!("REF segment found, ");
         let ref_tmp = get_ref(get_segment_contents("REF", &contents));
-        if check_for_expected_codes("6R", ref_tmp.reference_id_number_qualifier.clone()) {
+        if check_for_expected_codes("6R", &ref_tmp.reference_id_number_qualifier) {
             ref_line_item_control_number = ref_tmp;
             info!("REF segment parsed");
-            contents = content_trim("REF", contents);
+            contents = content_trim("REF", &contents);
         }
     }
 
@@ -132,13 +133,13 @@ pub fn get_loop_2110(
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
             if check_for_expected_codes(
                 "0B,1A,1B,1C,1D,1G,1H,1J,D3,G2,HPI,SY,TJ",
-                ref_tmp.reference_id_number_qualifier.clone(),
+                &ref_tmp.reference_id_number_qualifier,
             ) {
                 info!("REF segment found, in the right loop");
                 ref_rendering_provider_information
                     .push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
         }
     }
@@ -147,12 +148,12 @@ pub fn get_loop_2110(
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
             let ref_tmp = get_ref(get_segment_contents("REF", &contents));
-            if check_for_expected_codes("0K", ref_tmp.reference_id_number_qualifier.clone()) {
+            if check_for_expected_codes("0K", &ref_tmp.reference_id_number_qualifier) {
                 info!("REF segment found, in the right loop");
                 ref_healthcare_policy_identification
                     .push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
         }
     }
@@ -163,7 +164,7 @@ pub fn get_loop_2110(
             info!("AMT segment found, ");
             amt_segments.push(get_amt(get_segment_contents("AMT", &contents)));
             info!("AMT segment parsed");
-            contents = content_trim("AMT", contents);
+            contents = content_trim("AMT", &contents);
         }
     }
 
@@ -173,7 +174,7 @@ pub fn get_loop_2110(
             info!("QTY segment found, ");
             qty_segments.push(get_qty(get_segment_contents("QTY", &contents)));
             info!("QTY segment parsed");
-            contents = content_trim("QTY", contents);
+            contents = content_trim("QTY", &contents);
         }
     }
     if contents.contains("LQ") {
@@ -182,7 +183,7 @@ pub fn get_loop_2110(
             info!("LQ segment found, ");
             lq_segments.push(get_lq(get_segment_contents("LQ", &contents)));
             info!("LQ segment parsed");
-            contents = content_trim("LQ", contents);
+            contents = content_trim("LQ", &contents);
         }
     }
 
@@ -203,12 +204,13 @@ pub fn get_loop_2110(
     );
 }
 
-pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
+pub fn get_loop_2110s(contents: &str) -> (Vec<Loop2110s>, String) {
+    let mut contents = contents.to_string();
     let svc_count = contents.matches("SVC").count();
     let mut loop_2110_array = vec![];
     info!("Number of loops in loop 2110: {:?}", svc_count);
     for _ in 0..svc_count {
-        let tmp_contents = get_loop_contents("SVC", "SVC", contents.clone());
+        let tmp_contents = get_loop_contents("SVC", "SVC", &contents);
 
         let (
             svc_segments,
@@ -235,7 +237,7 @@ pub fn get_loop_2110s(mut contents: String) -> (Vec<Loop2110s>, String) {
             qty_segments,
             lq_segments,
             rem_contents,
-        ) = get_loop_2110(tmp_contents.clone());
+        ) = get_loop_2110(&tmp_contents);
 
         let loop2110 = Loop2110s {
             svc_segments,
@@ -316,7 +318,7 @@ mod tests {
             qty,
             lq,
             contents,
-        ) = get_loop_2110(contents);
+        ) = get_loop_2110(&contents);
         assert_eq!(contents, "SE*22*35681~GE*1*1~IEA*1*000000905~");
         assert_eq!(svc.svc01_1_product_or_service_is_qualifier, "HC|99213");
         assert_eq!(dtm[0].date_time_qualifier, "472");

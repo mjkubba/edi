@@ -36,7 +36,8 @@ pub struct Edi277 {
 ///
 /// # Returns
 /// * `EdiResult<Edi277>` - The parsed EDI 277 structure or an error
-pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
+pub fn get_277(contents: &str) -> EdiResult<Edi277> {
+    let mut contents = contents.to_string();
     let interchange_header;
     let table1s;
     let loop2000a;
@@ -52,23 +53,23 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     contents = contents.replace("\r", "").replace("\n", "");
 
     // Control Segments
-    (interchange_header, contents) = get_interchange_header(contents.clone());
+    (interchange_header, contents) = get_interchange_header(&contents);
 
     // Table 1
-    (table1s, contents) = get_table1s(contents.clone());
+    (table1s, contents) = get_table1s(&contents);
 
     // Loop 2000A - Information Source
-    (loop2000a, contents) = get_loop_2000a(contents.clone());
+    (loop2000a, contents) = get_loop_2000a(&contents);
 
     // Loop 2000B - Information Receiver
-    (loop2000b_vec, contents) = get_loop_2000b_vec(contents.clone());
+    (loop2000b_vec, contents) = get_loop_2000b_vec(&contents);
 
     // Loop 2000C - Service Provider
-    let (loop2000c_vec, new_contents) = get_loop_2000c_vec(contents.clone());
+    let (loop2000c_vec, new_contents) = get_loop_2000c_vec(&contents);
     contents = new_contents;
 
     // Loop 2000D - Subscriber
-    let (loop2000d_vec, new_contents) = get_loop_2000d_vec(contents.clone());
+    let (loop2000d_vec, new_contents) = get_loop_2000d_vec(&contents);
     contents = new_contents;
 
     // Extract SE segment
@@ -83,7 +84,7 @@ pub fn get_277(mut contents: String) -> EdiResult<Edi277> {
     }
 
     // Control Trailer
-    (interchange_trailer, contents) = get_interchange_trailer(contents.clone());
+    (interchange_trailer, contents) = get_interchange_trailer(&contents);
 
     // Combined Table 1
     table1_combined = Table1Combined {
@@ -260,7 +261,7 @@ mod tests {
                           GE*1*1~\
                           IEA*1*000000001~";
 
-        let edi277_result = get_277(sample_edi.to_string());
+        let edi277_result = get_277(sample_edi);
         assert!(edi277_result.is_ok(), "Failed to parse EDI 277 file");
 
         let edi277 = edi277_result.unwrap();

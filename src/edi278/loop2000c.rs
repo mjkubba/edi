@@ -11,7 +11,8 @@ pub struct Loop2000C {
     pub trn_segments: Vec<TRN>,
 }
 
-pub fn get_loop2000c(mut contents: String) -> (Loop2000C, String) {
+pub fn get_loop2000c(contents: &str) -> (Loop2000C, String) {
+    let mut contents = contents.to_string();
     let mut hl_segments = HL::default();
     let mut trn_segments = Vec::new();
 
@@ -25,18 +26,18 @@ pub fn get_loop2000c(mut contents: String) -> (Loop2000C, String) {
             hl_segments = get_hl(hl_content);
             info!("HL segment parsed");
 
-            contents = content_trim("HL", contents);
+            contents = content_trim("HL", &contents);
 
             // Parse TRN segments
             while contents.contains("TRN")
-                && check_if_segment_in_loop("TRN", "NM1", contents.clone())
+                && check_if_segment_in_loop("TRN", "NM1", &contents)
             {
                 info!("TRN segment found, ");
                 let trn_segment = get_trn(get_segment_contents("TRN", &contents));
                 info!("TRN segment parsed");
 
                 trn_segments.push(trn_segment);
-                contents = content_trim("TRN", contents);
+                contents = content_trim("TRN", &contents);
             }
         }
     }
@@ -69,7 +70,7 @@ mod tests {
     #[test]
     fn test_get_loop2000c() {
         let contents = String::from("HL*3*2*22*1~TRN*1*12345*1512345678~");
-        let (loop2000c, contents) = get_loop2000c(contents);
+        let (loop2000c, contents) = get_loop2000c(&contents);
         assert_eq!(loop2000c.hl_segments.hl01_hierarchical_id_number, "3");
         assert_eq!(
             loop2000c.hl_segments.hl02_hierarchical_parent_id_number,

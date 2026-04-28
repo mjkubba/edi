@@ -19,7 +19,8 @@ pub struct ENT {
     pub ent06_entity_type: String,
 }
 
-pub fn get_loop_2000s(mut contents: String) -> (Vec<Table2>, String) {
+pub fn get_loop_2000s(contents: &str) -> (Vec<Table2>, String) {
+    let mut contents = contents.to_string();
     let mut table2s = Vec::new();
     let original_length = contents.len();
     let mut safety_counter = 0;
@@ -77,7 +78,7 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Table2>, String) {
 
         info!("ENT segment parsed");
         let old_contents = contents.clone();
-        contents = content_trim("ENT", contents);
+        contents = content_trim("ENT", &contents);
 
         // Safety check - ensure content is actually being trimmed
         if contents == old_contents {
@@ -86,7 +87,7 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Table2>, String) {
         }
 
         // Parse Loop2100s associated with this ENT
-        let (loop2100s, new_contents) = get_loop_2100s(contents.clone());
+        let (loop2100s, new_contents) = get_loop_2100s(&contents);
 
         // Safety check - ensure we're making progress
         if new_contents == contents {

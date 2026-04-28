@@ -11,7 +11,8 @@ pub struct Table3s {
     pub se_segments: SE,
 }
 
-pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
+pub fn get_table_3(contents: &str) -> (Vec<PLB>, SE, String) {
+    let mut contents = contents.to_string();
     // Table 3
     // PLB Provider Adjustment S >1
     // SE Transaction Set Trailer R 1
@@ -25,7 +26,7 @@ pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
             info!("PLB segment found, ");
             plb_segments.push(get_plb(get_segment_contents("PLB", &contents)));
             info!("PLB segment parsed");
-            contents = content_trim("PLB", contents);
+            contents = content_trim("PLB", &contents);
         }
     }
 
@@ -33,7 +34,7 @@ pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
         info!("SE segment found, ");
         se_segments = get_se(get_segment_contents("SE", &contents));
         info!("SE segment parsed");
-        contents = content_trim("SE", contents);
+        contents = content_trim("SE", &contents);
     }
 
     info!("Table 3 parsed\n");
@@ -41,8 +42,8 @@ pub fn get_table_3(mut contents: String) -> (Vec<PLB>, SE, String) {
     return (plb_segments, se_segments, contents);
 }
 
-pub fn get_table3s(contents: String) -> (Table3s, String) {
-    let (plb_segments, se_segments, contents) = get_table_3(contents);
+pub fn get_table3s(contents: &str) -> (Table3s, String) {
+    let (plb_segments, se_segments, contents) = get_table_3(&contents);
     let header = Table3s {
         plb_segments,
         se_segments,
@@ -67,7 +68,7 @@ mod tests {
     #[test]
     fn test_table3() {
         let contents = String::from("~SE*22*35681~GE*1*1~IEA*1*000000905~");
-        let (plb_segments, se_segments, contents) = get_table_3(contents);
+        let (plb_segments, se_segments, contents) = get_table_3(&contents);
         assert_eq!(contents, "GE*1*1~IEA*1*000000905~");
         assert_eq!(plb_segments, vec![]);
         assert_eq!(se_segments.number_of_segment, "22");

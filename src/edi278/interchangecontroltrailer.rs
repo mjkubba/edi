@@ -13,7 +13,8 @@ pub struct InterchangeTrailer {
     pub iea_segments: IEA,
 }
 
-pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, String) {
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let mut contents = contents.to_string();
     let mut se_segments = SE::default();
     let mut ge_segments = GE::default();
     let mut iea_segments = IEA::default();
@@ -23,7 +24,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         se_segments = get_se(get_segment_contents("SE", &contents));
         info!("SE segment parsed");
 
-        contents = content_trim("SE", contents);
+        contents = content_trim("SE", &contents);
     }
 
     if contents.contains("GE") {
@@ -31,7 +32,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         ge_segments = get_ge(get_segment_contents("GE", &contents));
         info!("GE segment parsed");
 
-        contents = content_trim("GE", contents);
+        contents = content_trim("GE", &contents);
     }
 
     if contents.contains("IEA") {
@@ -39,7 +40,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         iea_segments = get_iea(get_segment_contents("IEA", &contents));
         info!("IEA segment parsed");
 
-        contents = content_trim("IEA", contents);
+        contents = content_trim("IEA", &contents);
     }
 
     info!("Interchange Control Trailer parsed\n");
@@ -70,7 +71,7 @@ mod tests {
     #[test]
     fn test_get_interchange_trailer() {
         let contents = String::from("SE*10*0001~GE*1*1~IEA*1*000000001~");
-        let (trailer, contents) = get_interchange_trailer(contents);
+        let (trailer, contents) = get_interchange_trailer(&contents);
         assert_eq!(trailer.se_segments.number_of_segment, "10");
         assert_eq!(trailer.se_segments.transaction_set_control_number, "0001");
         assert_eq!(trailer.ge_segments.number_of_transitions, "1");

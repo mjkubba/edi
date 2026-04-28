@@ -15,7 +15,7 @@ pub fn build_segment(elements: &[&str]) -> String {
     format!("{}~", trimmed)
 }
 
-pub fn check_if_segment_in_loop(segment: &str, anchor: &str, contents: String) -> bool {
+pub fn check_if_segment_in_loop(segment: &str, anchor: &str, contents: &str) -> bool {
     if let (Some(segment_pos), Some(anchor_pos)) = (contents.find(segment), contents.find(anchor)) {
         return segment_pos < anchor_pos;
     }
@@ -27,12 +27,12 @@ pub fn check_if_segment_in_loop(segment: &str, anchor: &str, contents: String) -
     false
 }
 
-pub fn check_for_expected_codes(codes: &str, content: String) -> bool {
+pub fn check_for_expected_codes(codes: &str, content: &str) -> bool {
     codes.contains(&content)
 }
 
-pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: String) -> String {
-    let mut tmp_contents = contents.clone();
+pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: &str) -> String {
+    let mut tmp_contents = contents.to_string();
     let remaining_loop_count = contents.matches(segment_start).count();
 
     if remaining_loop_count > 1 {
@@ -47,8 +47,8 @@ pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: String) ->
     tmp_contents
 }
 
-pub fn get_table2(contents: String) -> String {
-    let mut tmp_contents = contents.clone();
+pub fn get_table2(contents: &str) -> String {
+    let mut tmp_contents = contents.to_string();
     let key = "CLP";
     let remaining_clp_count = contents.matches(key).count();
 
@@ -65,8 +65,8 @@ pub fn get_table2(contents: String) -> String {
 }
 
 #[allow(dead_code)]
-pub fn get_999_2000(contents: String) -> String {
-    let mut tmp_contents = contents.clone();
+pub fn get_999_2000(contents: &str) -> String {
+    let mut tmp_contents = contents.to_string();
     let remaining_ak2_count = contents.matches("AK2").count();
 
     if remaining_ak2_count > 1 {
@@ -209,8 +209,8 @@ pub fn get_full_segment_contents(key: &str, contents: &str) -> Option<String> {
     None
 }
 
-pub fn content_trim(key: &str, contents: String) -> String {
-    if let Some(to_remove) = get_full_segment_contents(key, &contents) {
+pub fn content_trim(key: &str, contents: &str) -> String {
+    if let Some(to_remove) = get_full_segment_contents(key, contents) {
         let to_remove_with_tilde = to_remove.clone() + "~";
 
         // Check if the segment exists in the content
@@ -223,7 +223,7 @@ pub fn content_trim(key: &str, contents: String) -> String {
     // If we couldn't find or remove the segment, return the original content
     // This helps prevent infinite loops
     info!("Warning: Failed to trim segment {} from content", key);
-    contents
+    contents.to_string()
 }
 
 #[cfg(test)]
@@ -262,7 +262,7 @@ mod tests {
     fn test_content_trim() {
         let key = "ST";
         let contents = "~GS*HP*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X221A1~ST*835*35681~BPR*I*132*C*CHK************20190331";
-        let result = content_trim(key, contents.to_string());
+        let result = content_trim(key, contents);
         assert_eq!(result, "GS*HP*SENDER CODE*RECEIVER CODE*20200101*0802*1*X*005010X221A1~BPR*I*132*C*CHK************20190331");
     }
 
@@ -274,35 +274,35 @@ mod tests {
         assert!(check_if_segment_in_loop(
             "NM1",
             "ENT",
-            contents.to_string()
+            contents
         ));
 
         // REF comes before ENT
         assert!(check_if_segment_in_loop(
             "REF",
             "ENT",
-            contents.to_string()
+            contents
         ));
 
         // RMR comes before ENT
         assert!(check_if_segment_in_loop(
             "RMR",
             "ENT",
-            contents.to_string()
+            contents
         ));
 
         // DTM comes before ENT
         assert!(check_if_segment_in_loop(
             "DTM",
             "ENT",
-            contents.to_string()
+            contents
         ));
 
         // ENT doesn't come before ENT
         assert!(!check_if_segment_in_loop(
             "ENT",
             "ENT",
-            contents.to_string()
+            contents
         ));
 
         // Test with segment at the end (no anchor after it)
@@ -310,7 +310,7 @@ mod tests {
         assert!(check_if_segment_in_loop(
             "RMR",
             "XYZ",
-            contents_end.to_string()
+            contents_end
         ));
     }
 }

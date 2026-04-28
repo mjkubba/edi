@@ -15,7 +15,8 @@ pub struct Loop2100E {
     pub cl1_segments: Option<CL1>,
 }
 
-pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
+pub fn get_loop2100e(contents: &str) -> (Loop2100E, String) {
+    let mut contents = contents.to_string();
     let mut dtp_segments = Vec::new();
     let mut hi_segments = None;
     let mut hsd_segments = None;
@@ -23,51 +24,51 @@ pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
 
     // Parse DTP segments
     while contents.contains("DTP")
-        && check_if_segment_in_loop("DTP", "HI", contents.clone())
-        && check_if_segment_in_loop("DTP", "HSD", contents.clone())
-        && check_if_segment_in_loop("DTP", "CL1", contents.clone())
-        && check_if_segment_in_loop("DTP", "NM1", contents.clone())
+        && check_if_segment_in_loop("DTP", "HI", &contents)
+        && check_if_segment_in_loop("DTP", "HSD", &contents)
+        && check_if_segment_in_loop("DTP", "CL1", &contents)
+        && check_if_segment_in_loop("DTP", "NM1", &contents)
     {
         info!("DTP segment found, ");
         let dtp_segment = get_dtp(get_segment_contents("DTP", &contents));
         info!("DTP segment parsed");
 
         dtp_segments.push(dtp_segment);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Parse HI segment
     if contents.contains("HI")
-        && check_if_segment_in_loop("HI", "HSD", contents.clone())
-        && check_if_segment_in_loop("HI", "CL1", contents.clone())
-        && check_if_segment_in_loop("HI", "NM1", contents.clone())
+        && check_if_segment_in_loop("HI", "HSD", &contents)
+        && check_if_segment_in_loop("HI", "CL1", &contents)
+        && check_if_segment_in_loop("HI", "NM1", &contents)
     {
         info!("HI segment found, ");
         hi_segments = Some(get_hi(get_segment_contents("HI", &contents)));
         info!("HI segment parsed");
 
-        contents = content_trim("HI", contents);
+        contents = content_trim("HI", &contents);
     }
 
     // Parse HSD segment
     if contents.contains("HSD")
-        && check_if_segment_in_loop("HSD", "CL1", contents.clone())
-        && check_if_segment_in_loop("HSD", "NM1", contents.clone())
+        && check_if_segment_in_loop("HSD", "CL1", &contents)
+        && check_if_segment_in_loop("HSD", "NM1", &contents)
     {
         info!("HSD segment found, ");
         hsd_segments = Some(get_hsd(get_segment_contents("HSD", &contents)));
         info!("HSD segment parsed");
 
-        contents = content_trim("HSD", contents);
+        contents = content_trim("HSD", &contents);
     }
 
     // Parse CL1 segment
-    if contents.contains("CL1") && check_if_segment_in_loop("CL1", "NM1", contents.clone()) {
+    if contents.contains("CL1") && check_if_segment_in_loop("CL1", "NM1", &contents) {
         info!("CL1 segment found, ");
         cl1_segments = Some(get_cl1(get_segment_contents("CL1", &contents)));
         info!("CL1 segment parsed");
 
-        contents = content_trim("CL1", contents);
+        contents = content_trim("CL1", &contents);
     }
 
     info!("Loop 2100E parsed\n");
@@ -111,7 +112,7 @@ mod tests {
     #[test]
     fn test_get_loop2100e() {
         let contents = String::from("DTP*435*D8*20050516~HI*BF:41090:D8:20050125~HSD*DY*7~CL1*2~");
-        let (loop2100e, contents) = get_loop2100e(contents);
+        let (loop2100e, contents) = get_loop2100e(&contents);
 
         assert_eq!(loop2100e.dtp_segments.len(), 1);
         assert_eq!(loop2100e.dtp_segments[0].dtp01_date_time_qualifier, "435");

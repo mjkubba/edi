@@ -13,7 +13,8 @@ pub struct Loop2000 {
     pub ik5_segments: IK5,
 }
 
-pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
+pub fn get_loop_2000(contents: &str) -> (Loop2000, String) {
+    let mut contents = contents.to_string();
     let mut loop2000 = Loop2000::default();
 
     // Process AK2 segment (required)
@@ -22,13 +23,13 @@ pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
         let ak2_content = get_segment_contents("AK2", &contents);
         loop2000.ak2_segments = get_ak2(ak2_content);
         info!("AK2 segment parsed");
-        contents = content_trim("AK2", contents);
+        contents = content_trim("AK2", &contents);
     } else {
         info!("Warning: Required AK2 segment not found in Loop 2000");
     }
 
     // Process Loop 2100 segments
-    let (loop2100s, new_contents) = get_loop_2100s(contents);
+    let (loop2100s, new_contents) = get_loop_2100s(&contents);
     loop2000.loop2100s = loop2100s;
     contents = new_contents;
 
@@ -38,7 +39,7 @@ pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
         let ik5_content = get_segment_contents("IK5", &contents);
         loop2000.ik5_segments = get_ik5(ik5_content);
         info!("IK5 segment parsed");
-        contents = content_trim("IK5", contents);
+        contents = content_trim("IK5", &contents);
     } else {
         info!("Warning: Required IK5 segment not found in Loop 2000");
     }
@@ -48,7 +49,8 @@ pub fn get_loop_2000(mut contents: String) -> (Loop2000, String) {
     (loop2000, contents)
 }
 
-pub fn get_loop_2000s(mut contents: String) -> (Vec<Loop2000>, String) {
+pub fn get_loop_2000s(contents: &str) -> (Vec<Loop2000>, String) {
+    let mut contents = contents.to_string();
     let ak2_count = count_segment_starts("AK2", &contents);
     let mut loop_2000_array = vec![];
     info!("Number of loops in loop 2000: {:?}", ak2_count);
@@ -67,7 +69,7 @@ pub fn get_loop_2000s(mut contents: String) -> (Vec<Loop2000>, String) {
             };
 
             let loop_content = contents[..end_pos].to_string();
-            let (loop2000, _) = get_loop_2000(loop_content);
+            let (loop2000, _) = get_loop_2000(&loop_content);
 
             loop_2000_array.push(loop2000);
 
@@ -109,7 +111,7 @@ mod tests {
     #[test]
     fn test_get_loop_2000() {
         let contents = "AK2*837*000000001~IK3*NM1*1*8~CTX*SITUATIONAL TRIGGER*IK3*1*2100*1~IK4*1*66*1*123~CTX*ELEMENT*IK4*1*2110*2~IK5*A~".to_string();
-        let (loop2000, remaining) = get_loop_2000(contents);
+        let (loop2000, remaining) = get_loop_2000(&contents);
 
         assert_eq!(
             loop2000.ak2_segments.ak201_transaction_set_identifier_code,

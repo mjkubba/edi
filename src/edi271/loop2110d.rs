@@ -27,7 +27,8 @@ pub struct Loop2115D {
     pub iii_segments: III,
 }
 
-pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
+pub fn get_loop_2110d(contents: &str) -> EdiResult<(Loop2110D, String)> {
+    let mut contents = contents.to_string();
     let mut loop2110d = Loop2110D::default();
 
     // Process EB segment (required)
@@ -39,7 +40,7 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         }
         loop2110d.eb_segments = get_eb(eb_content);
         info!("EB segment parsed");
-        contents = content_trim("EB", contents);
+        contents = content_trim("EB", &contents);
     } else {
         return Err(EdiError::MissingSegment("EB".to_string()));
     }
@@ -54,7 +55,7 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         let hsd = get_hsd(hsd_content);
         info!("HSD segment parsed");
         loop2110d.hsd_segments.push(hsd);
-        contents = content_trim("HSD", contents);
+        contents = content_trim("HSD", &contents);
     }
 
     // Process REF segments (situational, can be multiple)
@@ -67,7 +68,7 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         let ref_segment = get_ref(ref_content);
         info!("REF segment parsed");
         loop2110d.ref_segments.push(ref_segment);
-        contents = content_trim("REF", contents);
+        contents = content_trim("REF", &contents);
     }
 
     // Process DTP segments (situational, can be multiple)
@@ -80,7 +81,7 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         let dtp = get_dtp(dtp_content);
         info!("DTP segment parsed");
         loop2110d.dtp_segments.push(dtp);
-        contents = content_trim("DTP", contents);
+        contents = content_trim("DTP", &contents);
     }
 
     // Process AAA segments (situational, can be multiple)
@@ -93,7 +94,7 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         let aaa = get_aaa(aaa_content);
         info!("AAA segment parsed");
         loop2110d.aaa_segments.push(aaa);
-        contents = content_trim("AAA", contents);
+        contents = content_trim("AAA", &contents);
     }
 
     // Process MSG segments (situational, can be multiple)
@@ -106,12 +107,12 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
         let msg = get_msg(msg_content);
         info!("MSG segment parsed");
         loop2110d.msg_segments.push(msg);
-        contents = content_trim("MSG", contents);
+        contents = content_trim("MSG", &contents);
     }
 
     // Process Loop 2115D segments (can be multiple)
     while contents.contains("III") {
-        match get_loop_2115d(contents.clone()) {
+        match get_loop_2115d(&contents) {
             Ok((loop2115d_item, new_contents)) => {
                 loop2110d.loop2115d.push(loop2115d_item);
                 contents = new_contents;
@@ -124,7 +125,8 @@ pub fn get_loop_2110d(mut contents: String) -> EdiResult<(Loop2110D, String)> {
     Ok((loop2110d, contents))
 }
 
-pub fn get_loop_2115d(mut contents: String) -> EdiResult<(Loop2115D, String)> {
+pub fn get_loop_2115d(contents: &str) -> EdiResult<(Loop2115D, String)> {
+    let mut contents = contents.to_string();
     let mut loop2115d = Loop2115D::default();
 
     // Process III segment (required)
@@ -136,7 +138,7 @@ pub fn get_loop_2115d(mut contents: String) -> EdiResult<(Loop2115D, String)> {
         }
         loop2115d.iii_segments = get_iii(iii_content);
         info!("III segment parsed");
-        contents = content_trim("III", contents);
+        contents = content_trim("III", &contents);
     } else {
         return Err(EdiError::MissingSegment("III".to_string()));
     }
@@ -200,7 +202,7 @@ mod tests {
     #[test]
     fn test_get_loop_2115d() {
         let contents = "III*ZZ*ELIGIBILITY*Y*ADDITIONAL INFORMATION~".to_string();
-        let result = get_loop_2115d(contents);
+        let result = get_loop_2115d(&contents);
 
         assert!(result.is_ok());
         let (loop2115d, _) = result.unwrap();

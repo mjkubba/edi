@@ -49,7 +49,8 @@ pub struct DTM {
     pub dtm06_date_time_period: String,
 }
 
-pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
+pub fn get_loop_2100s(contents: &str) -> (Vec<Loop2100>, String) {
+    let mut contents = contents.to_string();
     let mut loop2100s = Vec::new();
     let original_length = contents.len();
     let mut safety_counter = 0;
@@ -70,8 +71,8 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
         );
 
         // Check if this NM1 is part of the current loop or a new section
-        if !check_if_segment_in_loop("NM1", "ENT", contents.clone())
-            && !check_if_segment_in_loop("NM1", "SE", contents.clone())
+        if !check_if_segment_in_loop("NM1", "ENT", &contents)
+            && !check_if_segment_in_loop("NM1", "SE", &contents)
         {
             info!("NM1 segment is not part of the current loop, breaking");
             break;
@@ -130,7 +131,7 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
 
             info!("NM1 segment parsed");
             let old_contents = contents.clone();
-            contents = content_trim("NM1", contents);
+            contents = content_trim("NM1", &contents);
 
             // Safety check - ensure content is actually being trimmed
             if contents == old_contents {
@@ -146,11 +147,11 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
             // Parse REF segments
             while contents.contains("REF") && 
                   ref_safety_counter < 20 && // Safety limit for REF segments
-                  check_if_segment_in_loop("REF", "RMR", contents.clone()) && 
-                  check_if_segment_in_loop("REF", "DTM", contents.clone()) && 
-                  check_if_segment_in_loop("REF", "NM1", contents.clone()) && 
-                  check_if_segment_in_loop("REF", "ENT", contents.clone()) && 
-                  check_if_segment_in_loop("REF", "SE", contents.clone())
+                  check_if_segment_in_loop("REF", "RMR", &contents) && 
+                  check_if_segment_in_loop("REF", "DTM", &contents) && 
+                  check_if_segment_in_loop("REF", "NM1", &contents) && 
+                  check_if_segment_in_loop("REF", "ENT", &contents) && 
+                  check_if_segment_in_loop("REF", "SE", &contents)
             {
                 ref_safety_counter += 1;
                 info!("REF segment found, iteration {}", ref_safety_counter);
@@ -179,7 +180,7 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
 
                 info!("REF segment parsed");
                 let old_contents = contents.clone();
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
 
                 // Safety check - ensure content is actually being trimmed
                 if contents == old_contents {
@@ -193,10 +194,10 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
             // Parse RMR segments
             while contents.contains("RMR") && 
                   rmr_safety_counter < 20 && // Safety limit for RMR segments
-                  check_if_segment_in_loop("RMR", "DTM", contents.clone()) && 
-                  check_if_segment_in_loop("RMR", "NM1", contents.clone()) && 
-                  check_if_segment_in_loop("RMR", "ENT", contents.clone()) && 
-                  check_if_segment_in_loop("RMR", "SE", contents.clone())
+                  check_if_segment_in_loop("RMR", "DTM", &contents) && 
+                  check_if_segment_in_loop("RMR", "NM1", &contents) && 
+                  check_if_segment_in_loop("RMR", "ENT", &contents) && 
+                  check_if_segment_in_loop("RMR", "SE", &contents)
             {
                 rmr_safety_counter += 1;
                 info!("RMR segment found, iteration {}", rmr_safety_counter);
@@ -235,7 +236,7 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
 
                 info!("RMR segment parsed");
                 let old_contents = contents.clone();
-                contents = content_trim("RMR", contents);
+                contents = content_trim("RMR", &contents);
 
                 // Safety check - ensure content is actually being trimmed
                 if contents == old_contents {
@@ -248,10 +249,10 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
                 // Parse DTM segments associated with this RMR
                 while contents.contains("DTM") && 
                       dtm_safety_counter < 20 && // Safety limit for DTM segments
-                      check_if_segment_in_loop("DTM", "RMR", contents.clone()) && 
-                      check_if_segment_in_loop("DTM", "NM1", contents.clone()) && 
-                      check_if_segment_in_loop("DTM", "ENT", contents.clone()) && 
-                      check_if_segment_in_loop("DTM", "SE", contents.clone())
+                      check_if_segment_in_loop("DTM", "RMR", &contents) && 
+                      check_if_segment_in_loop("DTM", "NM1", &contents) && 
+                      check_if_segment_in_loop("DTM", "ENT", &contents) && 
+                      check_if_segment_in_loop("DTM", "SE", &contents)
                 {
                     dtm_safety_counter += 1;
                     info!("DTM segment found, iteration {}", dtm_safety_counter);
@@ -295,7 +296,7 @@ pub fn get_loop_2100s(mut contents: String) -> (Vec<Loop2100>, String) {
 
                     info!("DTM segment parsed");
                     let old_contents = contents.clone();
-                    contents = content_trim("DTM", contents);
+                    contents = content_trim("DTM", &contents);
 
                     // Safety check - ensure content is actually being trimmed
                     if contents == old_contents {

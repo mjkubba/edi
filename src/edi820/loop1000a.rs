@@ -54,7 +54,8 @@ pub struct PER {
     pub communication_number3: String,
 }
 
-pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
+pub fn get_1000as(contents: &str) -> (Loop1000as, String) {
+    let mut contents = contents.to_string();
     let mut loop1000as = Loop1000as::default();
 
     // Parse N1 segment for payer identification
@@ -86,14 +87,14 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
             };
 
             info!("N1 segment parsed");
-            contents = content_trim("N1", contents);
+            contents = content_trim("N1", &contents);
 
             // Parse N3 segment (address)
             if contents.contains("N3")
-                && check_if_segment_in_loop("N3", "N4", contents.clone())
-                && check_if_segment_in_loop("N3", "REF", contents.clone())
-                && check_if_segment_in_loop("N3", "PER", contents.clone())
-                && check_if_segment_in_loop("N3", "N1", contents.clone())
+                && check_if_segment_in_loop("N3", "N4", &contents)
+                && check_if_segment_in_loop("N3", "REF", &contents)
+                && check_if_segment_in_loop("N3", "PER", &contents)
+                && check_if_segment_in_loop("N3", "N1", &contents)
             {
                 info!("N3 segment found, ");
                 let n3_content = get_segment_contents("N3", &contents);
@@ -113,14 +114,14 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 });
 
                 info!("N3 segment parsed");
-                contents = content_trim("N3", contents);
+                contents = content_trim("N3", &contents);
             }
 
             // Parse N4 segment (city, state, zip)
             if contents.contains("N4")
-                && check_if_segment_in_loop("N4", "REF", contents.clone())
-                && check_if_segment_in_loop("N4", "PER", contents.clone())
-                && check_if_segment_in_loop("N4", "N1", contents.clone())
+                && check_if_segment_in_loop("N4", "REF", &contents)
+                && check_if_segment_in_loop("N4", "PER", &contents)
+                && check_if_segment_in_loop("N4", "N1", &contents)
             {
                 info!("N4 segment found, ");
                 let n4_content = get_segment_contents("N4", &contents);
@@ -160,13 +161,13 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 });
 
                 info!("N4 segment parsed");
-                contents = content_trim("N4", contents);
+                contents = content_trim("N4", &contents);
             }
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "PER", contents.clone())
-                && check_if_segment_in_loop("REF", "N1", contents.clone())
+                && check_if_segment_in_loop("REF", "PER", &contents)
+                && check_if_segment_in_loop("REF", "N1", &contents)
             {
                 info!("REF segment found, ");
                 let ref_content = get_segment_contents("REF", &contents);
@@ -193,12 +194,12 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 loop1000as.ref_segments.push(ref_segment);
 
                 info!("REF segment parsed");
-                contents = content_trim("REF", contents);
+                contents = content_trim("REF", &contents);
             }
 
             // Parse PER segments
             while contents.contains("PER")
-                && check_if_segment_in_loop("PER", "N1", contents.clone())
+                && check_if_segment_in_loop("PER", "N1", &contents)
             {
                 info!("PER segment found, ");
                 let per_content = get_segment_contents("PER", &contents);
@@ -250,7 +251,7 @@ pub fn get_1000as(mut contents: String) -> (Loop1000as, String) {
                 loop1000as.per_segments.push(per_segment);
 
                 info!("PER segment parsed");
-                contents = content_trim("PER", contents);
+                contents = content_trim("PER", &contents);
             }
         }
     }

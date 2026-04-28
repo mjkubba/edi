@@ -18,7 +18,8 @@ pub struct InterchangeTrailer {
     pub iea: IEA,
 }
 
-pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, String) {
+pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
+    let mut contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
 
     // Parse ISA segment
@@ -43,7 +44,8 @@ pub fn get_interchange_header(mut contents: String) -> (InterchangeHeader, Strin
     (interchange_header, contents)
 }
 
-pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, String) {
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let mut contents = contents.to_string();
     let mut interchange_trailer = InterchangeTrailer::default();
 
     // Parse GE segment

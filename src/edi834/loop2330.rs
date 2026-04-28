@@ -11,7 +11,8 @@ pub struct Loop2330 {
     pub n4: Option<N4>,
 }
 
-pub fn get_loop2330(mut contents: String) -> (Loop2330, String) {
+pub fn get_loop2330(contents: &str) -> (Loop2330, String) {
+    let mut contents = contents.to_string();
     let mut loop2330 = Loop2330::default();
 
     // Parse NM1 segment

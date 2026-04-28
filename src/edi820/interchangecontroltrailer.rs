@@ -27,7 +27,8 @@ pub struct IEA {
     pub interchange_control_number: String,
 }
 
-pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, String) {
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let mut contents = contents.to_string();
     let mut interchange_trailer = InterchangeTrailer::default();
 
     // Parse SE segment
@@ -46,7 +47,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         }
 
         info!("SE segment parsed");
-        contents = content_trim("SE", contents);
+        contents = content_trim("SE", &contents);
     }
 
     // Parse GE segment
@@ -65,7 +66,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         }
 
         info!("GE segment parsed");
-        contents = content_trim("GE", contents);
+        contents = content_trim("GE", &contents);
     }
 
     // Parse IEA segment
@@ -84,7 +85,7 @@ pub fn get_interchange_trailer(mut contents: String) -> (InterchangeTrailer, Str
         }
 
         info!("IEA segment parsed");
-        contents = content_trim("IEA", contents);
+        contents = content_trim("IEA", &contents);
     }
 
     info!("Interchange Control Trailer parsed\n");
