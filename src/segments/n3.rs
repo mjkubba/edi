@@ -31,9 +31,6 @@ pub fn write_n3(n3: N3) -> String {
     n3_content.push_str("N3*");
     n3_content.push_str(&n3.payee_address);
     n3_content.push_str(&stiuational_element(n3.payee_address2));
-
-    // n3_content.push_str("*");
-    // n3_content.push_str(&n3.payee_address2);
     n3_content.push_str("~");
     n3_content
 }

@@ -57,13 +57,3 @@ pub fn write_ak9(ak9: AK9) -> String {
 
 // unit test
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     #[test]
-//     fn test_ak1() {
-//         let ak9_content = "A*1*2~".to_string();
-//         let ak9 = get_ak9(ak9_content);
-
-//     }
-// }

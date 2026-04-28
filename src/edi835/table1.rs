@@ -20,14 +20,6 @@ pub struct Table1s {
     pub dtm_segments: DTM,
 }
 
-// fn check_if_segment_in_loop(segment: &str, anchor: &str, contents:String) -> bool {
-//     let segment_pos = contents.find(&segment);
-//     let anchor_pos = contents.find(&anchor);
-//     if segment_pos < anchor_pos {
-//         return true;
-//     }
-//     return false;
-// }
 pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, REF, DTM, String) {
     // Table 1
     // Notes format: Code(x) Code is the segment name and x is the number if repeats

@@ -49,12 +49,6 @@ pub fn write_n4(n4: N4) -> String {
     n4_content.push_str(&stiuational_element(n4.payee_state));
     n4_content.push_str(&stiuational_element(n4.payee_zip));
     n4_content.push_str(&stiuational_element(n4.payee_country_code));
-    // n4_content.push_str("*");
-    // n4_content.push_str(&n4.payee_state);
-    // n4_content.push_str("*");
-    // n4_content.push_str(&n4.payee_zip);
-    // n4_content.push_str("*");
-    // n4_content.push_str(&n4.payee_country_code);
     n4_content.push_str("~");
     n4_content
 }
