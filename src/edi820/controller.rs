@@ -77,7 +77,7 @@ impl TransactionSet for Edi820 {
         let mut new_edi = String::new();
 
         // Write interchange header
-        new_edi.push_str(&write_interchange_control(self.interchange_header.clone()));
+        new_edi.push_str(&write_interchange_control(&self.interchange_header));
 
         // Write table 1 segments
         new_edi.push_str(&write_table1(self.table1_combined.table1.clone()));
@@ -92,7 +92,7 @@ impl TransactionSet for Edi820 {
         new_edi.push_str(&write_loop2000(self.table2s.clone()));
 
         // Write interchange control trailer
-        new_edi.push_str(&write_interchange_trailer(self.interchange_trailer.clone()));
+        new_edi.push_str(&write_interchange_trailer(&self.interchange_trailer));
 
         info!("Generated EDI 820: {}", new_edi);
         new_edi

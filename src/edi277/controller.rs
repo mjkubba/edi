@@ -3,7 +3,6 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::edi277::interchangecontrol::*;
-use crate::edi277::interchangecontroltrailer::*;
 use crate::edi277::loop2000::*;
 use crate::edi277::table1::*;
 use crate::error::EdiResult;
@@ -268,11 +267,11 @@ mod tests {
 
         // Verify interchange header with GS
         assert_eq!(
-            edi277.interchange_header.isa01_authorization_qualifier,
+            edi277.interchange_header.isa_segments.information_qualifier,
             "00"
         );
         assert_eq!(
-            edi277.interchange_header.gs01_functional_identifier_code,
+            edi277.interchange_header.gs_segments.functional_id_code,
             "HN"
         );
 
@@ -303,7 +302,7 @@ mod tests {
 
         // Verify trailer with GE
         assert_eq!(
-            edi277.interchange_trailer.ge01_number_of_transaction_sets,
+            edi277.interchange_trailer.ge_segments.number_of_transitions,
             "1"
         );
 

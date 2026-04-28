@@ -1,125 +1,90 @@
+use log::info;
 use serde::{Deserialize, Serialize};
+
+use crate::helper::edihelper::*;
+use crate::segments::ge::*;
+use crate::segments::gs::*;
+use crate::segments::iea::*;
+use crate::segments::isa::*;
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 pub struct InterchangeHeader {
-    pub isa01_authorization_qualifier: String,
-    pub isa02_authorization_information: String,
-    pub isa03_security_qualifier: String,
-    pub isa04_security_information: String,
-    pub isa05_interchange_id_qualifier: String,
-    pub isa06_interchange_sender_id: String,
-    pub isa07_interchange_id_qualifier: String,
-    pub isa08_interchange_receiver_id: String,
-    pub isa09_interchange_date: String,
-    pub isa10_interchange_time: String,
-    pub isa11_repetition_separator: String,
-    pub isa12_interchange_control_version_number: String,
-    pub isa13_interchange_control_number: String,
-    pub isa14_acknowledgment_requested: String,
-    pub isa15_usage_indicator: String,
-    pub isa16_component_element_separator: String,
-    pub gs01_functional_identifier_code: String,
-    pub gs02_application_sender_code: String,
-    pub gs03_application_receiver_code: String,
-    pub gs04_date: String,
-    pub gs05_time: String,
-    pub gs06_group_control_number: String,
-    pub gs07_responsible_agency_code: String,
-    pub gs08_version_release_industry_identifier_code: String,
+    pub isa_segments: ISA,
+    pub gs_segments: GS,
+}
+
+#[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
+pub struct InterchangeTrailer {
+    pub ge_segments: GE,
+    pub iea_segments: IEA,
 }
 
 pub fn get_interchange_header(contents: &str) -> (InterchangeHeader, String) {
-    let contents = contents.to_string();
+    let mut contents = contents.to_string();
     let mut interchange_header = InterchangeHeader::default();
-    let mut remaining_content = contents.clone();
 
-    if contents.starts_with("ISA") {
-        let isa_segment = contents.split('~').next().unwrap_or("");
-        let isa_elements: Vec<&str> = isa_segment.split('*').collect();
-
-        if isa_elements.len() >= 17 {
-            interchange_header.isa01_authorization_qualifier = isa_elements[1].to_string();
-            interchange_header.isa02_authorization_information = isa_elements[2].to_string();
-            interchange_header.isa03_security_qualifier = isa_elements[3].to_string();
-            interchange_header.isa04_security_information = isa_elements[4].to_string();
-            interchange_header.isa05_interchange_id_qualifier = isa_elements[5].to_string();
-            interchange_header.isa06_interchange_sender_id = isa_elements[6].to_string();
-            interchange_header.isa07_interchange_id_qualifier = isa_elements[7].to_string();
-            interchange_header.isa08_interchange_receiver_id = isa_elements[8].to_string();
-            interchange_header.isa09_interchange_date = isa_elements[9].to_string();
-            interchange_header.isa10_interchange_time = isa_elements[10].to_string();
-            interchange_header.isa11_repetition_separator = isa_elements[11].to_string();
-            interchange_header.isa12_interchange_control_version_number =
-                isa_elements[12].to_string();
-            interchange_header.isa13_interchange_control_number = isa_elements[13].to_string();
-            interchange_header.isa14_acknowledgment_requested = isa_elements[14].to_string();
-            interchange_header.isa15_usage_indicator = isa_elements[15].to_string();
-            interchange_header.isa16_component_element_separator = isa_elements[16].to_string();
-        }
-
-        // Remove the ISA segment from the remaining content
-        remaining_content = contents.replacen(isa_segment, "", 1);
-        if remaining_content.starts_with("~") {
-            remaining_content = remaining_content[1..].to_string();
-        }
+    if contents.contains("ISA") {
+        info!("ISA segment found");
+        let isa_content = get_segment_contents("ISA", &contents);
+        interchange_header.isa_segments = get_isa(isa_content);
+        info!("ISA segment parsed");
+        contents = content_trim("ISA", &contents);
+    } else {
+        info!("Warning: Required ISA segment not found");
     }
 
-    // Parse GS segment
-    if let Some(gs_start) = remaining_content.find("GS") {
-        let gs_segment = remaining_content[gs_start..]
-            .split('~')
-            .next()
-            .unwrap_or("");
-        let gs_elements: Vec<&str> = gs_segment.split('*').collect();
-
-        if gs_elements.len() >= 9 {
-            interchange_header.gs01_functional_identifier_code = gs_elements[1].to_string();
-            interchange_header.gs02_application_sender_code = gs_elements[2].to_string();
-            interchange_header.gs03_application_receiver_code = gs_elements[3].to_string();
-            interchange_header.gs04_date = gs_elements[4].to_string();
-            interchange_header.gs05_time = gs_elements[5].to_string();
-            interchange_header.gs06_group_control_number = gs_elements[6].to_string();
-            interchange_header.gs07_responsible_agency_code = gs_elements[7].to_string();
-            interchange_header.gs08_version_release_industry_identifier_code =
-                gs_elements[8].to_string();
-        }
-
-        let gs_end = gs_start + gs_segment.len();
-        remaining_content = remaining_content[gs_end..].to_string();
-        if remaining_content.starts_with("~") {
-            remaining_content = remaining_content[1..].to_string();
-        }
+    if contents.contains("GS") {
+        info!("GS segment found");
+        let gs_content = get_segment_contents("GS", &contents);
+        interchange_header.gs_segments = get_gs(gs_content);
+        info!("GS segment parsed");
+        contents = content_trim("GS", &contents);
+    } else {
+        info!("Warning: Required GS segment not found");
     }
 
-    (interchange_header, remaining_content)
+    info!("Interchange Control parsed\n");
+    (interchange_header, contents)
+}
+
+pub fn get_interchange_trailer(contents: &str) -> (InterchangeTrailer, String) {
+    let mut contents = contents.to_string();
+    let mut interchange_trailer = InterchangeTrailer::default();
+
+    if contents.contains("GE*") {
+        info!("GE segment found");
+        let ge_content = get_segment_contents("GE", &contents);
+        interchange_trailer.ge_segments = get_ge(ge_content);
+        info!("GE segment parsed");
+        contents = content_trim("GE", &contents);
+    } else {
+        info!("Warning: Required GE segment not found");
+    }
+
+    if contents.contains("IEA") {
+        info!("IEA segment found");
+        let iea_content = get_segment_contents("IEA", &contents);
+        interchange_trailer.iea_segments = get_iea(iea_content);
+        info!("IEA segment parsed");
+        contents = content_trim("IEA", &contents);
+    } else {
+        info!("Warning: Required IEA segment not found");
+    }
+
+    info!("Interchange Control Trailer parsed\n");
+    (interchange_trailer, contents)
 }
 
 pub fn write_interchange_control(interchange_header: &InterchangeHeader) -> String {
-    format!(
-        "ISA*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}*{}~\nGS*{}*{}*{}*{}*{}*{}*{}*{}~\n",
-        interchange_header.isa01_authorization_qualifier,
-        interchange_header.isa02_authorization_information,
-        interchange_header.isa03_security_qualifier,
-        interchange_header.isa04_security_information,
-        interchange_header.isa05_interchange_id_qualifier,
-        interchange_header.isa06_interchange_sender_id,
-        interchange_header.isa07_interchange_id_qualifier,
-        interchange_header.isa08_interchange_receiver_id,
-        interchange_header.isa09_interchange_date,
-        interchange_header.isa10_interchange_time,
-        interchange_header.isa11_repetition_separator,
-        interchange_header.isa12_interchange_control_version_number,
-        interchange_header.isa13_interchange_control_number,
-        interchange_header.isa14_acknowledgment_requested,
-        interchange_header.isa15_usage_indicator,
-        interchange_header.isa16_component_element_separator,
-        interchange_header.gs01_functional_identifier_code,
-        interchange_header.gs02_application_sender_code,
-        interchange_header.gs03_application_receiver_code,
-        interchange_header.gs04_date,
-        interchange_header.gs05_time,
-        interchange_header.gs06_group_control_number,
-        interchange_header.gs07_responsible_agency_code,
-        interchange_header.gs08_version_release_industry_identifier_code
-    )
+    let mut contents = String::new();
+    contents.push_str(&write_isa(interchange_header.isa_segments.clone()));
+    contents.push_str(&write_gs(interchange_header.gs_segments.clone()));
+    contents
+}
+
+pub fn write_interchange_trailer(interchange_trailer: &InterchangeTrailer) -> String {
+    let mut contents = String::new();
+    contents.push_str(&write_ge(interchange_trailer.ge_segments.clone()));
+    contents.push_str(&write_iea(interchange_trailer.iea_segments.clone()));
+    contents
 }

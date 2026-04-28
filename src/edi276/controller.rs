@@ -3,7 +3,6 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::edi276::interchangecontrol::*;
-use crate::edi276::interchangecontroltrailer::*;
 use crate::edi276::loop2000::*;
 use crate::edi276::table1::*;
 use crate::error::EdiResult;
@@ -263,7 +262,7 @@ mod tests {
 
         // Verify key components
         assert_eq!(
-            edi276.interchange_header.isa01_authorization_qualifier,
+            edi276.interchange_header.isa_segments.information_qualifier,
             "00"
         );
         assert_eq!(
