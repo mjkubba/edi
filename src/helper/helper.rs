@@ -137,12 +137,24 @@ pub fn process_args() -> Args {
  * Returns:
  * - String containing the file contents
  */
+/// Maximum file size: 256 MB
+const MAX_FILE_SIZE: u64 = 256 * 1024 * 1024;
+
 pub fn get_file_contents(args: Args) -> String {
     let mut contents = String::new();
     let file_path = Path::new(&args.file_path);
 
     if file_path.exists() {
         info!("File exists");
+        let metadata = std::fs::metadata(file_path).unwrap();
+        if metadata.len() > MAX_FILE_SIZE {
+            warn!(
+                "File too large: {} bytes (max {} bytes)",
+                metadata.len(),
+                MAX_FILE_SIZE
+            );
+            std::process::exit(1);
+        }
         let mut file = File::open(file_path).unwrap();
         file.read_to_string(&mut contents).unwrap();
     } else {
