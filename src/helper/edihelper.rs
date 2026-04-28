@@ -40,9 +40,10 @@ pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: String) ->
     let remaining_loop_count = contents.matches(segment_start).count();
 
     if remaining_loop_count > 1 {
-        if let Some(skipped_content) = contents.get(3..) {
+        let skip = segment_start.len();
+        if let Some(skipped_content) = contents.get(skip..) {
             if let Some(foundanchor) = skipped_content.find(anchor) {
-                tmp_contents = contents[..foundanchor + 3].to_string();
+                tmp_contents = contents[..foundanchor + skip].to_string();
             }
         }
     }
@@ -52,12 +53,14 @@ pub fn get_loop_contents(segment_start: &str, anchor: &str, contents: String) ->
 
 pub fn get_table2(contents: String) -> String {
     let mut tmp_contents = contents.clone();
-    let remaining_clp_count = contents.matches("CLP").count();
+    let key = "CLP";
+    let remaining_clp_count = contents.matches(key).count();
 
     if remaining_clp_count > 1 {
-        if let Some(skipped_content) = contents.get(3..) {
-            if let Some(foundclp) = skipped_content.find("CLP") {
-                tmp_contents = contents[..foundclp + 3].to_string();
+        let skip = key.len();
+        if let Some(skipped_content) = contents.get(skip..) {
+            if let Some(foundclp) = skipped_content.find(key) {
+                tmp_contents = contents[..foundclp + skip].to_string();
             }
         }
     }
