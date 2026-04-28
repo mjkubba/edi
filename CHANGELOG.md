@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] — refactor/v0.3.0-architecture
+## [0.3.0] - 2026-04-28
 
 ### Refactored
 - Migrated 276, 277, 820 to shared ISA/GS/GE/IEA structs (unified interchange envelope)
@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.
 - Nested claims under subscriber/patient per HL parent-child tree (multi-subscriber batches now preserve claim associations)
 - Consolidated main.rs routing from 440-line if/else chain into three dispatch functions (261 lines)
 - Replaced glob imports with explicit imports in main.rs
+
+### Tests
+- 257 tests (up from 253), all passing
+- All 12 demo files round-trip verified
 
 ## [0.2.0] - 2026-04-27
 

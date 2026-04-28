@@ -56,6 +56,10 @@ These guides contain segment element definitions, loop hierarchies, situational 
 
 15. **837 P/I/D share structure above Loop 2400.** Loops 1000A/B, 2000A/B/C, 2010AA/AB/AC/BA/BB/CA, 2300, 2320, 2330 are structurally identical across Professional, Institutional, and Dental. Differences: 837P has UPIN REF in 2010AA; 837I has CL1 in 2300; DTP qualifiers vary per subtype; Loop 2400 service lines are completely different (SV1 vs SV2 vs SV3+TOO).
 
+16. **837 uses a single `Edi837` struct with a `subtype` enum.** The old `Edi837P`/`Edi837I`/`Edi837D` types are aliases to `Edi837`. Subtype is auto-detected from the version identifier (X222/X223/X224). Do not create separate structs for subtypes.
+
+17. **837 claims are nested under their subscriber/patient via the HL tree.** `Loop2000b` (subscriber) contains `loop2000c: Vec<Loop2000c>` (patients) and `loop2300: Vec<Loop2300>` (claims when subscriber=patient). `Loop2000c` (patient) contains `loop2300: Vec<Loop2300>` (claims for that patient). Claims are NOT stored as flat vectors on the top-level `Edi837` struct.
+
 ## File Operations
 
 When working with file operations in Rust:
