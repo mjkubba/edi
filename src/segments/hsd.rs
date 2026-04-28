@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -20,42 +21,42 @@ pub fn get_hsd(hsd_content: String) -> HSD {
 
     // HSD01 - Quantity Qualifier
     if !hsd_parts.is_empty() && !hsd_parts[0].is_empty() {
-        hsd.hsd01_quantity_qualifier = hsd_parts[0].to_string();
+        hsd.hsd01_quantity_qualifier = get_element(&hsd_parts, 0);
     }
 
     // HSD02 - Quantity
     if hsd_parts.len() > 1 && !hsd_parts[1].is_empty() {
-        hsd.hsd02_quantity = hsd_parts[1].to_string();
+        hsd.hsd02_quantity = get_element(&hsd_parts, 1);
     }
 
     // HSD03 - Unit of Measure Code
     if hsd_parts.len() > 2 && !hsd_parts[2].is_empty() {
-        hsd.hsd03_unit_of_measure_code = hsd_parts[2].to_string();
+        hsd.hsd03_unit_of_measure_code = get_element(&hsd_parts, 2);
     }
 
     // HSD04 - Sample Selection Modulus
     if hsd_parts.len() > 3 && !hsd_parts[3].is_empty() {
-        hsd.hsd04_sample_selection_modulus = hsd_parts[3].to_string();
+        hsd.hsd04_sample_selection_modulus = get_element(&hsd_parts, 3);
     }
 
     // HSD05 - Time Period Qualifier
     if hsd_parts.len() > 4 && !hsd_parts[4].is_empty() {
-        hsd.hsd05_time_period_qualifier = hsd_parts[4].to_string();
+        hsd.hsd05_time_period_qualifier = get_element(&hsd_parts, 4);
     }
 
     // HSD06 - Period Count
     if hsd_parts.len() > 5 && !hsd_parts[5].is_empty() {
-        hsd.hsd06_period_count = hsd_parts[5].to_string();
+        hsd.hsd06_period_count = get_element(&hsd_parts, 5);
     }
 
     // HSD07 - Delivery Frequency Code
     if hsd_parts.len() > 6 && !hsd_parts[6].is_empty() {
-        hsd.hsd07_delivery_frequency_code = hsd_parts[6].to_string();
+        hsd.hsd07_delivery_frequency_code = get_element(&hsd_parts, 6);
     }
 
     // HSD08 - Delivery Pattern Time Code
     if hsd_parts.len() > 7 && !hsd_parts[7].is_empty() {
-        hsd.hsd08_delivery_pattern_time_code = hsd_parts[7].to_string();
+        hsd.hsd08_delivery_pattern_time_code = get_element(&hsd_parts, 7);
     }
 
     info!("Parsed HSD segment: {:?}", hsd);

@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -21,43 +22,43 @@ pub fn get_sv2(sv2_content: String) -> SV2 {
     let mut sv2 = SV2::default();
 
     if sv2_parts.len() > 0 && !sv2_parts[0].is_empty() {
-        sv2.sv201_service_line_revenue_code = sv2_parts[0].to_string();
+        sv2.sv201_service_line_revenue_code = get_element(&sv2_parts, 0);
     }
 
     if sv2_parts.len() > 1 && !sv2_parts[1].is_empty() {
-        sv2.sv202_procedure_code = sv2_parts[1].to_string();
+        sv2.sv202_procedure_code = get_element(&sv2_parts, 1);
     }
 
     if sv2_parts.len() > 2 && !sv2_parts[2].is_empty() {
-        sv2.sv203_line_item_charge_amount = sv2_parts[2].to_string();
+        sv2.sv203_line_item_charge_amount = get_element(&sv2_parts, 2);
     }
 
     if sv2_parts.len() > 3 && !sv2_parts[3].is_empty() {
-        sv2.sv204_unit_or_basis_for_measurement_code = sv2_parts[3].to_string();
+        sv2.sv204_unit_or_basis_for_measurement_code = get_element(&sv2_parts, 3);
     }
 
     if sv2_parts.len() > 4 && !sv2_parts[4].is_empty() {
-        sv2.sv205_service_unit_count = sv2_parts[4].to_string();
+        sv2.sv205_service_unit_count = get_element(&sv2_parts, 4);
     }
 
     if sv2_parts.len() > 5 && !sv2_parts[5].is_empty() {
-        sv2.sv206_unit_rate = sv2_parts[5].to_string();
+        sv2.sv206_unit_rate = get_element(&sv2_parts, 5);
     }
 
     if sv2_parts.len() > 6 && !sv2_parts[6].is_empty() {
-        sv2.sv207_amount = sv2_parts[6].to_string();
+        sv2.sv207_amount = get_element(&sv2_parts, 6);
     }
 
     if sv2_parts.len() > 7 && !sv2_parts[7].is_empty() {
-        sv2.sv208_yes_no_condition_or_response_code = sv2_parts[7].to_string();
+        sv2.sv208_yes_no_condition_or_response_code = get_element(&sv2_parts, 7);
     }
 
     if sv2_parts.len() > 8 && !sv2_parts[8].is_empty() {
-        sv2.sv209_nursing_home_residential_status_code = sv2_parts[8].to_string();
+        sv2.sv209_nursing_home_residential_status_code = get_element(&sv2_parts, 8);
     }
 
     if sv2_parts.len() > 9 && !sv2_parts[9].is_empty() {
-        sv2.sv210_level_of_care_code = sv2_parts[9].to_string();
+        sv2.sv210_level_of_care_code = get_element(&sv2_parts, 9);
     }
 
     sv2

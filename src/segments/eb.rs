@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -24,62 +25,62 @@ pub fn get_eb(eb_content: String) -> EB {
 
     // EB01 - Eligibility or Benefit Information
     if !eb_parts.is_empty() && !eb_parts[0].is_empty() {
-        eb.eb01_eligibility_indicator = eb_parts[0].to_string();
+        eb.eb01_eligibility_indicator = get_element(&eb_parts, 0);
     }
 
     // EB02 - Benefit Type
     if eb_parts.len() > 1 && !eb_parts[1].is_empty() {
-        eb.eb02_benefit_type = eb_parts[1].to_string();
+        eb.eb02_benefit_type = get_element(&eb_parts, 1);
     }
 
     // EB03 - Service Type Code
     if eb_parts.len() > 2 && !eb_parts[2].is_empty() {
-        eb.eb03_service_type_code = eb_parts[2].to_string();
+        eb.eb03_service_type_code = get_element(&eb_parts, 2);
     }
 
     // EB04 - Insurance Type Code
     if eb_parts.len() > 3 && !eb_parts[3].is_empty() {
-        eb.eb04_insurance_type_code = eb_parts[3].to_string();
+        eb.eb04_insurance_type_code = get_element(&eb_parts, 3);
     }
 
     // EB05 - Plan Coverage Description
     if eb_parts.len() > 4 && !eb_parts[4].is_empty() {
-        eb.eb05_plan_coverage_description = eb_parts[4].to_string();
+        eb.eb05_plan_coverage_description = get_element(&eb_parts, 4);
     }
 
     // EB06 - Time Period Qualifier
     if eb_parts.len() > 5 && !eb_parts[5].is_empty() {
-        eb.eb06_time_period_qualifier = eb_parts[5].to_string();
+        eb.eb06_time_period_qualifier = get_element(&eb_parts, 5);
     }
 
     // EB07 - Monetary Amount
     if eb_parts.len() > 6 && !eb_parts[6].is_empty() {
-        eb.eb07_monetary_amount = eb_parts[6].to_string();
+        eb.eb07_monetary_amount = get_element(&eb_parts, 6);
     }
 
     // EB08 - Percent
     if eb_parts.len() > 7 && !eb_parts[7].is_empty() {
-        eb.eb08_percent = eb_parts[7].to_string();
+        eb.eb08_percent = get_element(&eb_parts, 7);
     }
 
     // EB09 - Quantity Qualifier
     if eb_parts.len() > 8 && !eb_parts[8].is_empty() {
-        eb.eb09_quantity_qualifier = eb_parts[8].to_string();
+        eb.eb09_quantity_qualifier = get_element(&eb_parts, 8);
     }
 
     // EB10 - Quantity
     if eb_parts.len() > 9 && !eb_parts[9].is_empty() {
-        eb.eb10_quantity = eb_parts[9].to_string();
+        eb.eb10_quantity = get_element(&eb_parts, 9);
     }
 
     // EB11 - Yes/No Condition or Response Code
     if eb_parts.len() > 10 && !eb_parts[10].is_empty() {
-        eb.eb11_yes_no_condition_response_code = eb_parts[10].to_string();
+        eb.eb11_yes_no_condition_response_code = get_element(&eb_parts, 10);
     }
 
     // EB12 - Yes/No Condition or Response Code
     if eb_parts.len() > 11 && !eb_parts[11].is_empty() {
-        eb.eb12_yes_no_condition_response_code = eb_parts[11].to_string();
+        eb.eb12_yes_no_condition_response_code = get_element(&eb_parts, 11);
     }
 
     info!("Parsed EB segment: {:?}", eb);

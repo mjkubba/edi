@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -18,13 +19,13 @@ pub fn get_rdm(rdm_content: String) -> RDM {
     let mut rdm03_communication_number: String = "".to_string();
 
     if rdm_parts.get(1).is_some() {
-        rdm02_name = rdm_parts[1].to_string();
+        rdm02_name = get_element(&rdm_parts, 1);
     }
     if rdm_parts.get(2).is_some() {
-        rdm03_communication_number = rdm_parts[2].to_string();
+        rdm03_communication_number = get_element(&rdm_parts, 2);
     }
     RDM {
-        rdm01_report_transmission_code: rdm_parts[0].to_string(),
+        rdm01_report_transmission_code: get_element(&rdm_parts, 0),
         rdm02_name,
         rdm03_communication_number,
     }

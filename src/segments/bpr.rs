@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 // EDI 835 BPR segment
@@ -41,44 +42,44 @@ pub fn get_bpr(bpr_content: String) -> BPR {
     let mut bpr15_account_number: String = "".to_string();
 
     if bpr_parts.get(4).is_some() {
-        bpr05_payment_format_code = bpr_parts[4].to_string();
+        bpr05_payment_format_code = get_element(&bpr_parts, 4);
     }
     if bpr_parts.get(5).is_some() {
-        bpr06_id_number_qualifier = bpr_parts[5].to_string();
+        bpr06_id_number_qualifier = get_element(&bpr_parts, 5);
     }
     if bpr_parts.get(6).is_some() {
-        bpr07_id_number = bpr_parts[6].to_string();
+        bpr07_id_number = get_element(&bpr_parts, 6);
     }
     if bpr_parts.get(7).is_some() {
-        bpr08_account_number_qualifier = bpr_parts[7].to_string();
+        bpr08_account_number_qualifier = get_element(&bpr_parts, 7);
     }
     if bpr_parts.get(8).is_some() {
-        bpr09_account_number = bpr_parts[8].to_string();
+        bpr09_account_number = get_element(&bpr_parts, 8);
     }
     if bpr_parts.get(9).is_some() {
-        bpr10_originating_company_identifier = bpr_parts[9].to_string();
+        bpr10_originating_company_identifier = get_element(&bpr_parts, 9);
     }
     if bpr_parts.get(10).is_some() {
-        bpr11_originating_company_supplemental_code = bpr_parts[10].to_string();
+        bpr11_originating_company_supplemental_code = get_element(&bpr_parts, 10);
     }
     if bpr_parts.get(11).is_some() {
-        bpr12_dfi_identification_number_qualifier = bpr_parts[11].to_string();
+        bpr12_dfi_identification_number_qualifier = get_element(&bpr_parts, 11);
     }
     if bpr_parts.get(12).is_some() {
-        bpr13_dfi_identification_number = bpr_parts[12].to_string();
+        bpr13_dfi_identification_number = get_element(&bpr_parts, 12);
     }
     if bpr_parts.get(13).is_some() {
-        bpr14_account_number_qualifier = bpr_parts[13].to_string();
+        bpr14_account_number_qualifier = get_element(&bpr_parts, 13);
     }
     if bpr_parts.get(14).is_some() {
-        bpr15_account_number = bpr_parts[14].to_string();
+        bpr15_account_number = get_element(&bpr_parts, 14);
     }
 
     BPR {
-        bpr01_transaction_handling_code: bpr_parts[0].to_string(),
-        bpr02_monetary_amount: bpr_parts[1].to_string(),
-        bpr03_credit_debit_flag: bpr_parts[2].to_string(),
-        bpr04_payment_method_code: bpr_parts[3].to_string(),
+        bpr01_transaction_handling_code: get_element(&bpr_parts, 0),
+        bpr02_monetary_amount: get_element(&bpr_parts, 1),
+        bpr03_credit_debit_flag: get_element(&bpr_parts, 2),
+        bpr04_payment_method_code: get_element(&bpr_parts, 3),
         bpr05_payment_format_code,
         bpr06_id_number_qualifier,
         bpr07_id_number,
@@ -90,7 +91,7 @@ pub fn get_bpr(bpr_content: String) -> BPR {
         bpr13_dfi_identification_number,
         bpr14_account_number_qualifier,
         bpr15_account_number,
-        bpr16_date: bpr_parts[15].to_string(),
+        bpr16_date: get_element(&bpr_parts, 15),
     }
 }
 

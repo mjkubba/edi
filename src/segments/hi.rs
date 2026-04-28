@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -23,51 +24,51 @@ pub fn get_hi(hi_content: String) -> HI {
     let mut hi = HI::default();
 
     if hi_parts.len() > 0 && !hi_parts[0].is_empty() {
-        hi.hi01_health_care_code_information = hi_parts[0].to_string();
+        hi.hi01_health_care_code_information = get_element(&hi_parts, 0);
     }
 
     if hi_parts.len() > 1 && !hi_parts[1].is_empty() {
-        hi.hi02_health_care_code_information = hi_parts[1].to_string();
+        hi.hi02_health_care_code_information = get_element(&hi_parts, 1);
     }
 
     if hi_parts.len() > 2 && !hi_parts[2].is_empty() {
-        hi.hi03_health_care_code_information = hi_parts[2].to_string();
+        hi.hi03_health_care_code_information = get_element(&hi_parts, 2);
     }
 
     if hi_parts.len() > 3 && !hi_parts[3].is_empty() {
-        hi.hi04_health_care_code_information = hi_parts[3].to_string();
+        hi.hi04_health_care_code_information = get_element(&hi_parts, 3);
     }
 
     if hi_parts.len() > 4 && !hi_parts[4].is_empty() {
-        hi.hi05_health_care_code_information = hi_parts[4].to_string();
+        hi.hi05_health_care_code_information = get_element(&hi_parts, 4);
     }
 
     if hi_parts.len() > 5 && !hi_parts[5].is_empty() {
-        hi.hi06_health_care_code_information = hi_parts[5].to_string();
+        hi.hi06_health_care_code_information = get_element(&hi_parts, 5);
     }
 
     if hi_parts.len() > 6 && !hi_parts[6].is_empty() {
-        hi.hi07_health_care_code_information = hi_parts[6].to_string();
+        hi.hi07_health_care_code_information = get_element(&hi_parts, 6);
     }
 
     if hi_parts.len() > 7 && !hi_parts[7].is_empty() {
-        hi.hi08_health_care_code_information = hi_parts[7].to_string();
+        hi.hi08_health_care_code_information = get_element(&hi_parts, 7);
     }
 
     if hi_parts.len() > 8 && !hi_parts[8].is_empty() {
-        hi.hi09_health_care_code_information = hi_parts[8].to_string();
+        hi.hi09_health_care_code_information = get_element(&hi_parts, 8);
     }
 
     if hi_parts.len() > 9 && !hi_parts[9].is_empty() {
-        hi.hi10_health_care_code_information = hi_parts[9].to_string();
+        hi.hi10_health_care_code_information = get_element(&hi_parts, 9);
     }
 
     if hi_parts.len() > 10 && !hi_parts[10].is_empty() {
-        hi.hi11_health_care_code_information = hi_parts[10].to_string();
+        hi.hi11_health_care_code_information = get_element(&hi_parts, 10);
     }
 
     if hi_parts.len() > 11 && !hi_parts[11].is_empty() {
-        hi.hi12_health_care_code_information = hi_parts[11].to_string();
+        hi.hi12_health_care_code_information = get_element(&hi_parts, 11);
     }
 
     hi

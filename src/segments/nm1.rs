@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -18,26 +19,17 @@ pub struct NM1 {
 pub fn get_nm1(nm1_content: String) -> NM1 {
     let nm1_parts: Vec<&str> = nm1_content.split("*").collect();
 
-    // Safely access elements with bounds checking
-    let get_element = |index: usize| -> String {
-        if index < nm1_parts.len() {
-            nm1_parts[index].to_string()
-        } else {
-            String::new()
-        }
-    };
-
     NM1 {
-        entity_id: get_element(0),
-        entity_type: get_element(1),
-        lastname: get_element(2),
-        firstname: get_element(3),
-        middle_initial: get_element(4),
-        suffix: get_element(5),
-        title: get_element(6),
-        id_code_qualifier: get_element(7),
-        id_code: get_element(8),
-        member_number: get_element(9),
+        entity_id: get_element(&nm1_parts, 0),
+        entity_type: get_element(&nm1_parts, 1),
+        lastname: get_element(&nm1_parts, 2),
+        firstname: get_element(&nm1_parts, 3),
+        middle_initial: get_element(&nm1_parts, 4),
+        suffix: get_element(&nm1_parts, 5),
+        title: get_element(&nm1_parts, 6),
+        id_code_qualifier: get_element(&nm1_parts, 7),
+        id_code: get_element(&nm1_parts, 8),
+        member_number: get_element(&nm1_parts, 9),
     }
 }
 

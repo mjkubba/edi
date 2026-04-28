@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -21,47 +22,47 @@ pub fn get_dmg(dmg_content: String) -> DMG {
 
     // DMG01 - Date Time Qualifier
     if !dmg_parts.is_empty() && !dmg_parts[0].is_empty() {
-        dmg.dmg01_date_time_qualifier = dmg_parts[0].to_string();
+        dmg.dmg01_date_time_qualifier = get_element(&dmg_parts, 0);
     }
 
     // DMG02 - Date Time Period
     if dmg_parts.len() > 1 && !dmg_parts[1].is_empty() {
-        dmg.dmg02_date_time_period = dmg_parts[1].to_string();
+        dmg.dmg02_date_time_period = get_element(&dmg_parts, 1);
     }
 
     // DMG03 - Gender Code
     if dmg_parts.len() > 2 && !dmg_parts[2].is_empty() {
-        dmg.dmg03_gender_code = dmg_parts[2].to_string();
+        dmg.dmg03_gender_code = get_element(&dmg_parts, 2);
     }
 
     // DMG04 - Marital Status Code
     if dmg_parts.len() > 3 && !dmg_parts[3].is_empty() {
-        dmg.dmg04_marital_status_code = dmg_parts[3].to_string();
+        dmg.dmg04_marital_status_code = get_element(&dmg_parts, 3);
     }
 
     // DMG05 - Race or Ethnicity Code
     if dmg_parts.len() > 4 && !dmg_parts[4].is_empty() {
-        dmg.dmg05_race_or_ethnicity_code = dmg_parts[4].to_string();
+        dmg.dmg05_race_or_ethnicity_code = get_element(&dmg_parts, 4);
     }
 
     // DMG06 - Citizenship Status Code
     if dmg_parts.len() > 5 && !dmg_parts[5].is_empty() {
-        dmg.dmg06_citizenship_status_code = dmg_parts[5].to_string();
+        dmg.dmg06_citizenship_status_code = get_element(&dmg_parts, 5);
     }
 
     // DMG07 - Country Code
     if dmg_parts.len() > 6 && !dmg_parts[6].is_empty() {
-        dmg.dmg07_country_code = dmg_parts[6].to_string();
+        dmg.dmg07_country_code = get_element(&dmg_parts, 6);
     }
 
     // DMG08 - Basis of Verification Code
     if dmg_parts.len() > 7 && !dmg_parts[7].is_empty() {
-        dmg.dmg08_basis_of_verification_code = dmg_parts[7].to_string();
+        dmg.dmg08_basis_of_verification_code = get_element(&dmg_parts, 7);
     }
 
     // DMG09 - Quantity
     if dmg_parts.len() > 8 && !dmg_parts[8].is_empty() {
-        dmg.dmg09_quantity = dmg_parts[8].to_string();
+        dmg.dmg09_quantity = get_element(&dmg_parts, 8);
     }
 
     info!("Parsed DMG segment: {:?}", dmg);

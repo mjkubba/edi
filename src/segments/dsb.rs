@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -21,42 +22,42 @@ pub fn get_dsb(dsb_content: String) -> DSB {
 
     // DSB01 - Disability Type Code
     if !dsb_parts.is_empty() && !dsb_parts[0].is_empty() {
-        dsb.dsb01_disability_type_code = dsb_parts[0].to_string();
+        dsb.dsb01_disability_type_code = get_element(&dsb_parts, 0);
     }
 
     // DSB02 - Quantity
     if dsb_parts.len() > 1 && !dsb_parts[1].is_empty() {
-        dsb.dsb02_quantity = dsb_parts[1].to_string();
+        dsb.dsb02_quantity = get_element(&dsb_parts, 1);
     }
 
     // DSB03 - Occupation Code
     if dsb_parts.len() > 2 && !dsb_parts[2].is_empty() {
-        dsb.dsb03_occupation_code = dsb_parts[2].to_string();
+        dsb.dsb03_occupation_code = get_element(&dsb_parts, 2);
     }
 
     // DSB04 - Work Intensity Code
     if dsb_parts.len() > 3 && !dsb_parts[3].is_empty() {
-        dsb.dsb04_work_intensity_code = dsb_parts[3].to_string();
+        dsb.dsb04_work_intensity_code = get_element(&dsb_parts, 3);
     }
 
     // DSB05 - Product Option Code
     if dsb_parts.len() > 4 && !dsb_parts[4].is_empty() {
-        dsb.dsb05_product_option_code = dsb_parts[4].to_string();
+        dsb.dsb05_product_option_code = get_element(&dsb_parts, 4);
     }
 
     // DSB06 - Monetary Amount
     if dsb_parts.len() > 5 && !dsb_parts[5].is_empty() {
-        dsb.dsb06_monetary_amount = dsb_parts[5].to_string();
+        dsb.dsb06_monetary_amount = get_element(&dsb_parts, 5);
     }
 
     // DSB07 - Product Option Code 2
     if dsb_parts.len() > 6 && !dsb_parts[6].is_empty() {
-        dsb.dsb07_product_option_code_2 = dsb_parts[6].to_string();
+        dsb.dsb07_product_option_code_2 = get_element(&dsb_parts, 6);
     }
 
     // DSB08 - Monetary Amount 2
     if dsb_parts.len() > 7 && !dsb_parts[7].is_empty() {
-        dsb.dsb08_monetary_amount_2 = dsb_parts[7].to_string();
+        dsb.dsb08_monetary_amount_2 = get_element(&dsb_parts, 7);
     }
 
     info!("Parsed DSB segment: {:?}", dsb);

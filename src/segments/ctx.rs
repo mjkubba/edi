@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -36,34 +37,34 @@ pub fn get_ctx(ctx_content: String) -> CTX {
 
     // CTX01 - Context Name (Required)
     if !ctx_parts.is_empty() {
-        ctx.ctx01_context_name = ctx_parts[0].to_string();
+        ctx.ctx01_context_name = get_element(&ctx_parts, 0);
     }
 
     // CTX02 - Segment ID Code (Situational)
     if ctx_parts.len() > 1 && !ctx_parts[1].is_empty() {
-        ctx.ctx02_segment_id_code = ctx_parts[1].to_string();
+        ctx.ctx02_segment_id_code = get_element(&ctx_parts, 1);
     }
 
     // CTX03 - Segment Position in Transaction Set (Situational)
     if ctx_parts.len() > 2 && !ctx_parts[2].is_empty() {
-        ctx.ctx03_segment_position_in_transaction = ctx_parts[2].to_string();
+        ctx.ctx03_segment_position_in_transaction = get_element(&ctx_parts, 2);
     }
 
     // CTX04 - Loop Identifier Code (Situational)
     if ctx_parts.len() > 3 && !ctx_parts[3].is_empty() {
-        ctx.ctx04_loop_id_code = ctx_parts[3].to_string();
+        ctx.ctx04_loop_id_code = get_element(&ctx_parts, 3);
     }
 
     // CTX05 - Position in Segment (Situational)
     if ctx_parts.len() > 4 && !ctx_parts[4].is_empty() {
         // Handle special format like "5:3"
-        ctx.ctx05_position_in_segment = ctx_parts[4].to_string();
+        ctx.ctx05_position_in_segment = get_element(&ctx_parts, 4);
     }
 
     // CTX06 - Reference in Segment (Situational)
     if ctx_parts.len() > 5 && !ctx_parts[5].is_empty() {
         // Handle special format like "C023:1325"
-        ctx.ctx06_reference_in_segment = ctx_parts[5].to_string();
+        ctx.ctx06_reference_in_segment = get_element(&ctx_parts, 5);
     }
 
     info!("Parsed CTX segment: {:?}", ctx);

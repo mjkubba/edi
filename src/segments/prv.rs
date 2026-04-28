@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 /// PRV - Provider Information
@@ -26,32 +27,32 @@ pub fn get_prv(segment: &str) -> PRV {
 
     // Process PRV01 - Provider Code
     if !elements.is_empty() && !elements[0].is_empty() {
-        prv.prv01_provider_code = elements[0].to_string();
+        prv.prv01_provider_code = get_element(&elements, 0);
     }
 
     // Process PRV02 - Reference Identification Qualifier
     if elements.len() > 1 && !elements[1].is_empty() {
-        prv.prv02_reference_identification_qualifier = elements[1].to_string();
+        prv.prv02_reference_identification_qualifier = get_element(&elements, 1);
     }
 
     // Process PRV03 - Reference Identification
     if elements.len() > 2 && !elements[2].is_empty() {
-        prv.prv03_reference_identification = elements[2].to_string();
+        prv.prv03_reference_identification = get_element(&elements, 2);
     }
 
     // Process PRV04 - State or Province Code
     if elements.len() > 3 && !elements[3].is_empty() {
-        prv.prv04_state_or_province_code = Some(elements[3].to_string());
+        prv.prv04_state_or_province_code = Some(get_element(&elements, 3));
     }
 
     // Process PRV05 - Provider Specialty Information
     if elements.len() > 4 && !elements[4].is_empty() {
-        prv.prv05_provider_specialty_information = Some(elements[4].to_string());
+        prv.prv05_provider_specialty_information = Some(get_element(&elements, 4));
     }
 
     // Process PRV06 - Provider Organization Code
     if elements.len() > 5 && !elements[5].is_empty() {
-        prv.prv06_provider_organization_code = Some(elements[5].to_string());
+        prv.prv06_provider_organization_code = Some(get_element(&elements, 5));
     }
 
     prv

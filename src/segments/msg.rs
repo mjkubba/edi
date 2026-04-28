@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -18,17 +19,17 @@ pub fn get_msg(msg_content: String) -> MSG {
 
     // Extract fields with bounds checking, skipping the segment ID
     let msg01_free_form_message_text = if msg_parts.len() > 1 {
-        msg_parts[1].to_string()
+        get_element(&msg_parts, 1)
     } else {
         String::new()
     };
     let msg02_printer_carriage_control_code = if msg_parts.len() > 2 {
-        msg_parts[2].to_string()
+        get_element(&msg_parts, 2)
     } else {
         String::new()
     };
     let msg03_number = if msg_parts.len() > 3 {
-        msg_parts[3].to_string()
+        get_element(&msg_parts, 3)
     } else {
         String::new()
     };

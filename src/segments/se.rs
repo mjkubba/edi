@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -14,12 +15,12 @@ pub fn get_se(se_content: String) -> SE {
 
     // SE01 - Number of Included Segments
     if se_parts.len() > 0 && !se_parts[0].is_empty() {
-        se.number_of_segment = se_parts[0].to_string();
+        se.number_of_segment = get_element(&se_parts, 0);
     }
 
     // SE02 - Transaction Set Control Number
     if se_parts.len() > 1 && !se_parts[1].is_empty() {
-        se.transaction_set_control_number = se_parts[1].to_string();
+        se.transaction_set_control_number = get_element(&se_parts, 1);
     }
 
     info!("Parsed SE segment: {:?}", se);

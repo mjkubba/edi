@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -58,52 +59,52 @@ impl UM {
 
         // Check if the first part contains a prefix like "AR" or "HS"
         if !parts.is_empty() && !parts[0].is_empty() {
-            um.um01_request_category_code = parts[0].to_string();
+            um.um01_request_category_code = get_element(&parts, 0);
         }
 
         // UM02 - Certification Type Code
         if parts.len() > 1 && !parts[1].is_empty() {
-            um.um02_certification_type_code = parts[1].to_string();
+            um.um02_certification_type_code = get_element(&parts, 1);
         }
 
         // UM03 - Service Type Code
         if parts.len() > 2 && !parts[2].is_empty() {
-            um.um03_service_type_code = parts[2].to_string();
+            um.um03_service_type_code = get_element(&parts, 2);
         }
 
         // UM04 - Health Care Service Location Information
         if parts.len() > 3 && !parts[3].is_empty() {
-            um.um04_health_care_service_location_information = parts[3].to_string();
+            um.um04_health_care_service_location_information = get_element(&parts, 3);
         }
 
         // UM05 - Related Causes Information
         if parts.len() > 4 && !parts[4].is_empty() {
-            um.um05_related_causes_information = parts[4].to_string();
+            um.um05_related_causes_information = get_element(&parts, 4);
         }
 
         // UM06 - Level of Service Code
         if parts.len() > 5 && !parts[5].is_empty() {
-            um.um06_level_of_service_code = parts[5].to_string();
+            um.um06_level_of_service_code = get_element(&parts, 5);
         }
 
         // UM07 - Current Health Condition Code
         if parts.len() > 6 && !parts[6].is_empty() {
-            um.um07_current_health_condition_code = parts[6].to_string();
+            um.um07_current_health_condition_code = get_element(&parts, 6);
         }
 
         // UM08 - Prognosis Code
         if parts.len() > 7 && !parts[7].is_empty() {
-            um.um08_prognosis_code = parts[7].to_string();
+            um.um08_prognosis_code = get_element(&parts, 7);
         }
 
         // UM09 - Release of Information Code
         if parts.len() > 8 && !parts[8].is_empty() {
-            um.um09_release_of_information_code = parts[8].to_string();
+            um.um09_release_of_information_code = get_element(&parts, 8);
         }
 
         // UM10 - Delay Reason Code
         if parts.len() > 9 && !parts[9].is_empty() {
-            um.um10_delay_reason_code = parts[9].to_string();
+            um.um10_delay_reason_code = get_element(&parts, 9);
         }
 
         info!("Parsed UM segment: {:?}", um);

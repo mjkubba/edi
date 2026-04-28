@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -24,10 +24,10 @@ pub fn get_ak9(ak9_content: String) -> AK9 {
     let ak909_fn_group_err_code = String::new();
 
     AK9 {
-        ak901_functional_ack_code: ak9_parts[0].to_string(),
-        ak902_num_of_ts_incl: ak9_parts[1].to_string(),
-        ak903_num_of_recv_ts: ak9_parts[2].to_string(),
-        ak904_num_of_accepted_ts: ak9_parts[3].to_string(),
+        ak901_functional_ack_code: get_element(&ak9_parts, 0),
+        ak902_num_of_ts_incl: get_element(&ak9_parts, 1),
+        ak903_num_of_recv_ts: get_element(&ak9_parts, 2),
+        ak904_num_of_accepted_ts: get_element(&ak9_parts, 3),
         ak905_fn_group_err_code,
         ak906_fn_group_err_code,
         ak907_fn_group_err_code,

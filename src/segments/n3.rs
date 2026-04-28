@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -12,13 +12,13 @@ pub fn get_n3(n3_content: String) -> N3 {
     let n3_parts: Vec<&str> = n3_content.split("*").collect();
     if n3_parts.len() == 1 {
         N3 {
-            payee_address: n3_parts[0].to_string(),
+            payee_address: get_element(&n3_parts, 0),
             payee_address2: "".to_string(),
         }
     } else {
         N3 {
-            payee_address: n3_parts[0].to_string(),
-            payee_address2: n3_parts[1].to_string(),
+            payee_address: get_element(&n3_parts, 0),
+            payee_address2: get_element(&n3_parts, 1),
         }
     }
 }

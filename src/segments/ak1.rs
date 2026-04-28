@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -11,9 +12,9 @@ pub struct AK1 {
 pub fn get_ak1(ak1_content: String) -> AK1 {
     let ak1_parts: Vec<&str> = ak1_content.split("*").collect();
     AK1 {
-        ak01_functional_id_group: ak1_parts[0].to_string(),
-        ak02_group_control_number: ak1_parts[1].to_string(),
-        ak03_ver_release_id_code: ak1_parts[2].to_string(),
+        ak01_functional_id_group: get_element(&ak1_parts, 0),
+        ak02_group_control_number: get_element(&ak1_parts, 1),
+        ak03_ver_release_id_code: get_element(&ak1_parts, 2),
     }
 }
 

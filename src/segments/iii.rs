@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -16,22 +17,22 @@ pub fn get_iii(iii_content: String) -> III {
 
     // Code List Qualifier Code
     if !iii_parts.is_empty() && !iii_parts[0].is_empty() {
-        iii.code_list_qualifier_code = iii_parts[0].to_string();
+        iii.code_list_qualifier_code = get_element(&iii_parts, 0);
     }
 
     // Industry Code
     if iii_parts.len() > 1 && !iii_parts[1].is_empty() {
-        iii.industry_code = iii_parts[1].to_string();
+        iii.industry_code = get_element(&iii_parts, 1);
     }
 
     // Code Category
     if iii_parts.len() > 2 && !iii_parts[2].is_empty() {
-        iii.code_category = iii_parts[2].to_string();
+        iii.code_category = get_element(&iii_parts, 2);
     }
 
     // Free Form Message Text
     if iii_parts.len() > 3 && !iii_parts[3].is_empty() {
-        iii.free_form_message_text = iii_parts[3].to_string();
+        iii.free_form_message_text = get_element(&iii_parts, 3);
     }
 
     info!("Parsed III segment: {:?}", iii);

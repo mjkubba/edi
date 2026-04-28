@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -19,32 +20,32 @@ pub fn get_ik5(ik5_content: String) -> IK5 {
 
     // IK501 - Transaction Set Acknowledgment Code (Required)
     if !ik5_parts.is_empty() && !ik5_parts[0].is_empty() {
-        ik5.ik501_transaction_set_acknowledgment_code = ik5_parts[0].to_string();
+        ik5.ik501_transaction_set_acknowledgment_code = get_element(&ik5_parts, 0);
     }
 
     // IK502 - Implementation Transaction Set Syntax Error Code (Situational)
     if ik5_parts.len() > 1 && !ik5_parts[1].is_empty() {
-        ik5.ik502_implementation_transaction_set_syntax_error_code = ik5_parts[1].to_string();
+        ik5.ik502_implementation_transaction_set_syntax_error_code = get_element(&ik5_parts, 1);
     }
 
     // IK503 - Implementation Transaction Set Syntax Error Code (Situational)
     if ik5_parts.len() > 2 && !ik5_parts[2].is_empty() {
-        ik5.ik503_implementation_transaction_set_syntax_error_code = ik5_parts[2].to_string();
+        ik5.ik503_implementation_transaction_set_syntax_error_code = get_element(&ik5_parts, 2);
     }
 
     // IK504 - Implementation Transaction Set Syntax Error Code (Situational)
     if ik5_parts.len() > 3 && !ik5_parts[3].is_empty() {
-        ik5.ik504_implementation_transaction_set_syntax_error_code = ik5_parts[3].to_string();
+        ik5.ik504_implementation_transaction_set_syntax_error_code = get_element(&ik5_parts, 3);
     }
 
     // IK505 - Implementation Transaction Set Syntax Error Code (Situational)
     if ik5_parts.len() > 4 && !ik5_parts[4].is_empty() {
-        ik5.ik505_implementation_transaction_set_syntax_error_code = ik5_parts[4].to_string();
+        ik5.ik505_implementation_transaction_set_syntax_error_code = get_element(&ik5_parts, 4);
     }
 
     // IK506 - Implementation Transaction Set Syntax Error Code (Situational)
     if ik5_parts.len() > 5 && !ik5_parts[5].is_empty() {
-        ik5.ik506_implementation_transaction_set_syntax_error_code = ik5_parts[5].to_string();
+        ik5.ik506_implementation_transaction_set_syntax_error_code = get_element(&ik5_parts, 5);
     }
 
     info!("Parsed IK5 segment: {:?}", ik5);

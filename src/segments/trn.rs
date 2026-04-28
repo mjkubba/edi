@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -16,22 +17,22 @@ pub fn get_trn(trn_content: String) -> TRN {
 
     // TRN01 - Trace Type Code
     if !trn_parts.is_empty() && !trn_parts[0].is_empty() {
-        trn.trace_type_code = trn_parts[0].to_string();
+        trn.trace_type_code = get_element(&trn_parts, 0);
     }
 
     // TRN02 - Reference Identification
     if trn_parts.len() > 1 && !trn_parts[1].is_empty() {
-        trn.reference_id = trn_parts[1].to_string();
+        trn.reference_id = get_element(&trn_parts, 1);
     }
 
     // TRN03 - Originating Company Identifier
     if trn_parts.len() > 2 && !trn_parts[2].is_empty() {
-        trn.originating_company_id = trn_parts[2].to_string();
+        trn.originating_company_id = get_element(&trn_parts, 2);
     }
 
     // TRN04 - Reference Identification
     if trn_parts.len() > 3 && !trn_parts[3].is_empty() {
-        trn.trn04_reference_id = trn_parts[3].to_string();
+        trn.trn04_reference_id = get_element(&trn_parts, 3);
     }
 
     info!("Parsed TRN segment: {:?}", trn);

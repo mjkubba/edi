@@ -1,5 +1,11 @@
 use log::info;
 
+/// Safely get element at index, returning empty string if absent.
+/// Per X12 §B.1.1.3.10, trailing optional elements may be omitted.
+pub fn get_element(parts: &[&str], index: usize) -> String {
+    parts.get(index).unwrap_or(&"").to_string()
+}
+
 /// Build a segment string with proper X12 §B.1.1.3.10 trailing separator suppression.
 /// All elements are joined with `*`, then trailing empty separators are removed
 /// before appending `~`. Middle empty elements are preserved.

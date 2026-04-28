@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -18,32 +19,32 @@ pub fn get_bht(bht_content: String) -> BHT {
 
     // BHT01 - Hierarchical Structure Code
     if !bht_parts.is_empty() && !bht_parts[0].is_empty() {
-        bht.bht01_hierarchical_structure_code = bht_parts[0].to_string();
+        bht.bht01_hierarchical_structure_code = get_element(&bht_parts, 0);
     }
 
     // BHT02 - Transaction Set Purpose Code
     if bht_parts.len() > 1 && !bht_parts[1].is_empty() {
-        bht.bht02_transaction_set_purpose_code = bht_parts[1].to_string();
+        bht.bht02_transaction_set_purpose_code = get_element(&bht_parts, 1);
     }
 
     // BHT03 - Reference Identification
     if bht_parts.len() > 2 && !bht_parts[2].is_empty() {
-        bht.bht03_reference_identification = bht_parts[2].to_string();
+        bht.bht03_reference_identification = get_element(&bht_parts, 2);
     }
 
     // BHT04 - Date
     if bht_parts.len() > 3 && !bht_parts[3].is_empty() {
-        bht.bht04_date = bht_parts[3].to_string();
+        bht.bht04_date = get_element(&bht_parts, 3);
     }
 
     // BHT05 - Time
     if bht_parts.len() > 4 && !bht_parts[4].is_empty() {
-        bht.bht05_time = bht_parts[4].to_string();
+        bht.bht05_time = get_element(&bht_parts, 4);
     }
 
     // BHT06 - Transaction Type Code
     if bht_parts.len() > 5 && !bht_parts[5].is_empty() {
-        bht.bht06_transaction_type_code = bht_parts[5].to_string();
+        bht.bht06_transaction_type_code = get_element(&bht_parts, 5);
     }
 
     info!("Parsed BHT segment: {:?}", bht);

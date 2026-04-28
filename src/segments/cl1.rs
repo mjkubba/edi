@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -14,15 +15,15 @@ pub fn get_cl1(cl1_content: String) -> CL1 {
     let mut cl1 = CL1::default();
 
     if cl1_parts.len() > 0 && !cl1_parts[0].is_empty() {
-        cl1.cl101_admission_type_code = cl1_parts[0].to_string();
+        cl1.cl101_admission_type_code = get_element(&cl1_parts, 0);
     }
 
     if cl1_parts.len() > 1 && !cl1_parts[1].is_empty() {
-        cl1.cl102_admission_source_code = cl1_parts[1].to_string();
+        cl1.cl102_admission_source_code = get_element(&cl1_parts, 1);
     }
 
     if cl1_parts.len() > 2 && !cl1_parts[2].is_empty() {
-        cl1.cl103_patient_status_code = cl1_parts[2].to_string();
+        cl1.cl103_patient_status_code = get_element(&cl1_parts, 2);
     }
 
     cl1

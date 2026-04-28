@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -9,7 +10,7 @@ pub struct LX {
 pub fn get_lx(lx_content: String) -> LX {
     let lx_parts: Vec<&str> = lx_content.split("*").collect();
     LX {
-        lx01_claim_sequence_number: lx_parts[0].to_string(),
+        lx01_claim_sequence_number: get_element(&lx_parts, 0),
     }
 }
 

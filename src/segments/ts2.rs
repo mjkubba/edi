@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 // EDI 835 TS2 - PROVIDER SUMMARY INFORMATION
@@ -49,61 +49,61 @@ pub fn get_ts2(ts2_content: String) -> TS2 {
     let mut ts219_total_pps_dsh_drg_amount: String = "".to_string();
 
     if ts2_parts.get(0).is_some() {
-        ts201_total_drg_amount = ts2_parts[0].to_string();
+        ts201_total_drg_amount = get_element(&ts2_parts, 0);
     }
     if ts2_parts.get(1).is_some() {
-        ts202_total_fed_spec_amount = ts2_parts[1].to_string();
+        ts202_total_fed_spec_amount = get_element(&ts2_parts, 1);
     }
     if ts2_parts.get(2).is_some() {
-        ts203_total_hosp_spec_amount = ts2_parts[2].to_string();
+        ts203_total_hosp_spec_amount = get_element(&ts2_parts, 2);
     }
     if ts2_parts.get(3).is_some() {
-        ts204_total_disproportionate_share_amount = ts2_parts[3].to_string();
+        ts204_total_disproportionate_share_amount = get_element(&ts2_parts, 3);
     }
     if ts2_parts.get(4).is_some() {
-        ts205_total_capital_amount = ts2_parts[4].to_string();
+        ts205_total_capital_amount = get_element(&ts2_parts, 4);
     }
     if ts2_parts.get(5).is_some() {
-        ts206_total_indirect_medical_education_amount = ts2_parts[5].to_string();
+        ts206_total_indirect_medical_education_amount = get_element(&ts2_parts, 5);
     }
     if ts2_parts.get(6).is_some() {
-        ts207_total_outlier_day_count = ts2_parts[6].to_string();
+        ts207_total_outlier_day_count = get_element(&ts2_parts, 6);
     }
     if ts2_parts.get(7).is_some() {
-        ts208_total_day_outlier_amount = ts2_parts[7].to_string();
+        ts208_total_day_outlier_amount = get_element(&ts2_parts, 7);
     }
     if ts2_parts.get(8).is_some() {
-        ts209_total_cost_outlier_amount = ts2_parts[8].to_string();
+        ts209_total_cost_outlier_amount = get_element(&ts2_parts, 8);
     }
     if ts2_parts.get(9).is_some() {
-        ts210_average_drg_length_of_stay = ts2_parts[9].to_string();
+        ts210_average_drg_length_of_stay = get_element(&ts2_parts, 9);
     }
     if ts2_parts.get(10).is_some() {
-        ts211_total_discharge_count = ts2_parts[10].to_string();
+        ts211_total_discharge_count = get_element(&ts2_parts, 10);
     }
     if ts2_parts.get(11).is_some() {
-        ts212_total_cost_report_day_count = ts2_parts[11].to_string();
+        ts212_total_cost_report_day_count = get_element(&ts2_parts, 11);
     }
     if ts2_parts.get(12).is_some() {
-        ts213_total_covered_day_count = ts2_parts[12].to_string();
+        ts213_total_covered_day_count = get_element(&ts2_parts, 12);
     }
     if ts2_parts.get(13).is_some() {
-        ts214_total_noncovered_day_count = ts2_parts[13].to_string();
+        ts214_total_noncovered_day_count = get_element(&ts2_parts, 13);
     }
     if ts2_parts.get(14).is_some() {
-        ts215_total_msp_pass_through_amount = ts2_parts[14].to_string();
+        ts215_total_msp_pass_through_amount = get_element(&ts2_parts, 14);
     }
     if ts2_parts.get(15).is_some() {
-        ts216_average_drg_weight = ts2_parts[15].to_string();
+        ts216_average_drg_weight = get_element(&ts2_parts, 15);
     }
     if ts2_parts.get(16).is_some() {
-        ts217_total_pps_capital_fs_drg_amount = ts2_parts[16].to_string();
+        ts217_total_pps_capital_fs_drg_amount = get_element(&ts2_parts, 16);
     }
     if ts2_parts.get(17).is_some() {
-        ts218_total_pps_capital_hs_drg_amount = ts2_parts[17].to_string();
+        ts218_total_pps_capital_hs_drg_amount = get_element(&ts2_parts, 17);
     }
     if ts2_parts.get(18).is_some() {
-        ts219_total_pps_dsh_drg_amount = ts2_parts[18].to_string();
+        ts219_total_pps_dsh_drg_amount = get_element(&ts2_parts, 18);
     }
     TS2 {
         ts201_total_drg_amount,

@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -20,42 +21,42 @@ pub fn get_bgn(bgn_content: String) -> BGN {
 
     // BGN01 - Transaction Set Purpose Code
     if !bgn_parts.is_empty() && !bgn_parts[0].is_empty() {
-        bgn.bgn01_transaction_set_purpose_code = bgn_parts[0].to_string();
+        bgn.bgn01_transaction_set_purpose_code = get_element(&bgn_parts, 0);
     }
 
     // BGN02 - Reference Identification
     if bgn_parts.len() > 1 && !bgn_parts[1].is_empty() {
-        bgn.bgn02_reference_identification = bgn_parts[1].to_string();
+        bgn.bgn02_reference_identification = get_element(&bgn_parts, 1);
     }
 
     // BGN03 - Date
     if bgn_parts.len() > 2 && !bgn_parts[2].is_empty() {
-        bgn.bgn03_date = bgn_parts[2].to_string();
+        bgn.bgn03_date = get_element(&bgn_parts, 2);
     }
 
     // BGN04 - Time
     if bgn_parts.len() > 3 && !bgn_parts[3].is_empty() {
-        bgn.bgn04_time = bgn_parts[3].to_string();
+        bgn.bgn04_time = get_element(&bgn_parts, 3);
     }
 
     // BGN05 - Time Code
     if bgn_parts.len() > 4 && !bgn_parts[4].is_empty() {
-        bgn.bgn05_time_code = bgn_parts[4].to_string();
+        bgn.bgn05_time_code = get_element(&bgn_parts, 4);
     }
 
     // BGN06 - Reference Identification 2
     if bgn_parts.len() > 5 && !bgn_parts[5].is_empty() {
-        bgn.bgn06_reference_identification_2 = bgn_parts[5].to_string();
+        bgn.bgn06_reference_identification_2 = get_element(&bgn_parts, 5);
     }
 
     // BGN07 - Transaction Type Code
     if bgn_parts.len() > 6 && !bgn_parts[6].is_empty() {
-        bgn.bgn07_transaction_type_code = bgn_parts[6].to_string();
+        bgn.bgn07_transaction_type_code = get_element(&bgn_parts, 6);
     }
 
     // BGN08 - Action Code
     if bgn_parts.len() > 7 && !bgn_parts[7].is_empty() {
-        bgn.bgn08_action_code = bgn_parts[7].to_string();
+        bgn.bgn08_action_code = get_element(&bgn_parts, 7);
     }
 
     info!("Parsed BGN segment: {:?}", bgn);

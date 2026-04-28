@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -45,57 +45,57 @@ pub fn get_cas(cas_content: String) -> CAS {
     let mut cas19_adjustment_qty: String = "".to_string();
 
     if cas_parts.get(3).is_some() {
-        cas04_adjustment_qty = cas_parts[3].to_string();
+        cas04_adjustment_qty = get_element(&cas_parts, 3);
     }
     if cas_parts.get(4).is_some() {
-        cas05_adjustment_reason_code = cas_parts[4].to_string();
+        cas05_adjustment_reason_code = get_element(&cas_parts, 4);
     }
     if cas_parts.get(5).is_some() {
-        cas06_adjustment_amt = cas_parts[5].to_string();
+        cas06_adjustment_amt = get_element(&cas_parts, 5);
     }
     if cas_parts.get(6).is_some() {
-        cas07_adjustment_qty = cas_parts[6].to_string();
+        cas07_adjustment_qty = get_element(&cas_parts, 6);
     }
     if cas_parts.get(7).is_some() {
-        cas08_adjustment_reason_code = cas_parts[7].to_string();
+        cas08_adjustment_reason_code = get_element(&cas_parts, 7);
     }
     if cas_parts.get(8).is_some() {
-        cas09_adjustment_amt = cas_parts[8].to_string();
+        cas09_adjustment_amt = get_element(&cas_parts, 8);
     }
     if cas_parts.get(9).is_some() {
-        cas10_adjustment_qty = cas_parts[9].to_string();
+        cas10_adjustment_qty = get_element(&cas_parts, 9);
     }
     if cas_parts.get(10).is_some() {
-        cas11_adjustment_reason_code = cas_parts[10].to_string();
+        cas11_adjustment_reason_code = get_element(&cas_parts, 10);
     }
     if cas_parts.get(11).is_some() {
-        cas12_adjustment_amt = cas_parts[11].to_string();
+        cas12_adjustment_amt = get_element(&cas_parts, 11);
     }
     if cas_parts.get(12).is_some() {
-        cas13_adjustment_qty = cas_parts[12].to_string();
+        cas13_adjustment_qty = get_element(&cas_parts, 12);
     }
     if cas_parts.get(13).is_some() {
-        cas14_adjustment_reason_code = cas_parts[13].to_string();
+        cas14_adjustment_reason_code = get_element(&cas_parts, 13);
     }
     if cas_parts.get(14).is_some() {
-        cas15_adjustment_amt = cas_parts[14].to_string();
+        cas15_adjustment_amt = get_element(&cas_parts, 14);
     }
     if cas_parts.get(15).is_some() {
-        cas16_adjustment_qty = cas_parts[15].to_string();
+        cas16_adjustment_qty = get_element(&cas_parts, 15);
     }
     if cas_parts.get(16).is_some() {
-        cas17_adjustment_reason_code = cas_parts[16].to_string();
+        cas17_adjustment_reason_code = get_element(&cas_parts, 16);
     }
     if cas_parts.get(17).is_some() {
-        cas18_adjustment_amt = cas_parts[17].to_string();
+        cas18_adjustment_amt = get_element(&cas_parts, 17);
     }
     if cas_parts.get(18).is_some() {
-        cas19_adjustment_qty = cas_parts[18].to_string();
+        cas19_adjustment_qty = get_element(&cas_parts, 18);
     }
     CAS {
-        cas01_claim_adjustment_group_code: cas_parts[0].to_string(),
-        cas02_adjustment_reason_code: cas_parts[1].to_string(),
-        cas03_adjustment_amt: cas_parts[2].to_string(),
+        cas01_claim_adjustment_group_code: get_element(&cas_parts, 0),
+        cas02_adjustment_reason_code: get_element(&cas_parts, 1),
+        cas03_adjustment_amt: get_element(&cas_parts, 2),
         cas04_adjustment_qty,
         cas05_adjustment_reason_code,
         cas06_adjustment_amt,

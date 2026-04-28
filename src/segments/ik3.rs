@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -17,22 +18,22 @@ pub fn get_ik3(ik3_content: String) -> IK3 {
 
     // IK301 - Segment ID Code (Required)
     if !ik3_parts.is_empty() && !ik3_parts[0].is_empty() {
-        ik3.ik301_segment_id_code = ik3_parts[0].to_string();
+        ik3.ik301_segment_id_code = get_element(&ik3_parts, 0);
     }
 
     // IK302 - Segment Position in Transaction Set (Required)
     if ik3_parts.len() > 1 && !ik3_parts[1].is_empty() {
-        ik3.ik302_segment_position_in_transaction_set = ik3_parts[1].to_string();
+        ik3.ik302_segment_position_in_transaction_set = get_element(&ik3_parts, 1);
     }
 
     // IK303 - Loop Identifier Code (Situational)
     if ik3_parts.len() > 2 && !ik3_parts[2].is_empty() {
-        ik3.ik303_loop_identifier_code = ik3_parts[2].to_string();
+        ik3.ik303_loop_identifier_code = get_element(&ik3_parts, 2);
     }
 
     // IK304 - Implementation Segment Syntax Error Code (Situational)
     if ik3_parts.len() > 3 && !ik3_parts[3].is_empty() {
-        ik3.ik304_implementation_segment_syntax_error_code = ik3_parts[3].to_string();
+        ik3.ik304_implementation_segment_syntax_error_code = get_element(&ik3_parts, 3);
     }
 
     info!("Parsed IK3 segment: {:?}", ik3);

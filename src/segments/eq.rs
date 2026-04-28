@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -15,31 +16,23 @@ pub fn get_eq(eq_content: String) -> EQ {
     let mut eq = EQ::default();
 
     // Check if the first part is the segment ID "EQ"
-    let start_index = if !eq_parts.is_empty() && eq_parts[0] == "EQ" {
+    let start_index = if !eq_parts.is_empty() && get_element(&eq_parts, 0) == "EQ" {
         1
     } else {
         0
     };
 
     // EQ01 - Service Type Code
-    if eq_parts.len() > start_index && !eq_parts[start_index].is_empty() {
-        eq.eq01_service_type_code = eq_parts[start_index].to_string();
-    }
+    eq.eq01_service_type_code = get_element(&eq_parts, start_index);
 
     // EQ02 - Composite Medical Procedure Identifier
-    if eq_parts.len() > start_index + 1 && !eq_parts[start_index + 1].is_empty() {
-        eq.eq02_composite_medical_procedure_identifier = eq_parts[start_index + 1].to_string();
-    }
+    eq.eq02_composite_medical_procedure_identifier = get_element(&eq_parts, start_index + 1);
 
     // EQ03 - Coverage Level Code
-    if eq_parts.len() > start_index + 2 && !eq_parts[start_index + 2].is_empty() {
-        eq.eq03_coverage_level_code = eq_parts[start_index + 2].to_string();
-    }
+    eq.eq03_coverage_level_code = get_element(&eq_parts, start_index + 2);
 
     // EQ04 - Insurance Type Code
-    if eq_parts.len() > start_index + 3 && !eq_parts[start_index + 3].is_empty() {
-        eq.eq04_insurance_type_code = eq_parts[start_index + 3].to_string();
-    }
+    eq.eq04_insurance_type_code = get_element(&eq_parts, start_index + 3);
 
     info!("Parsed EQ segment: {:?}", eq);
     eq

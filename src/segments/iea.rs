@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -10,8 +11,8 @@ pub struct IEA {
 pub fn get_iea(iea_content: String) -> IEA {
     let iea_parts: Vec<&str> = iea_content.split("*").collect();
     IEA {
-        number_of_included_group: iea_parts[0].to_string(),
-        interchange_control_number: iea_parts[1].to_string(),
+        number_of_included_group: get_element(&iea_parts, 0),
+        interchange_control_number: get_element(&iea_parts, 1),
     }
 }
 

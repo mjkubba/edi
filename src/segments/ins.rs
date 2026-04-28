@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -29,87 +30,87 @@ pub fn get_ins(ins_content: String) -> INS {
 
     // INS01 - Insured Indicator
     if !ins_parts.is_empty() && !ins_parts[0].is_empty() {
-        ins.ins01_insured_indicator = ins_parts[0].to_string();
+        ins.ins01_insured_indicator = get_element(&ins_parts, 0);
     }
 
     // INS02 - Individual Relationship Code
     if ins_parts.len() > 1 && !ins_parts[1].is_empty() {
-        ins.ins02_individual_relationship_code = ins_parts[1].to_string();
+        ins.ins02_individual_relationship_code = get_element(&ins_parts, 1);
     }
 
     // INS03 - Maintenance Type Code
     if ins_parts.len() > 2 && !ins_parts[2].is_empty() {
-        ins.ins03_maintenance_type_code = ins_parts[2].to_string();
+        ins.ins03_maintenance_type_code = get_element(&ins_parts, 2);
     }
 
     // INS04 - Maintenance Reason Code
     if ins_parts.len() > 3 && !ins_parts[3].is_empty() {
-        ins.ins04_maintenance_reason_code = ins_parts[3].to_string();
+        ins.ins04_maintenance_reason_code = get_element(&ins_parts, 3);
     }
 
     // INS05 - Benefit Status Code
     if ins_parts.len() > 4 && !ins_parts[4].is_empty() {
-        ins.ins05_benefit_status_code = ins_parts[4].to_string();
+        ins.ins05_benefit_status_code = get_element(&ins_parts, 4);
     }
 
     // INS06 - Medicare Plan Code
     if ins_parts.len() > 5 && !ins_parts[5].is_empty() {
-        ins.ins06_medicare_plan_code = ins_parts[5].to_string();
+        ins.ins06_medicare_plan_code = get_element(&ins_parts, 5);
     }
 
     // INS07 - COBRA Qualifying Event Code
     if ins_parts.len() > 6 && !ins_parts[6].is_empty() {
-        ins.ins07_cobra_qualifying_event_code = ins_parts[6].to_string();
+        ins.ins07_cobra_qualifying_event_code = get_element(&ins_parts, 6);
     }
 
     // INS08 - Employment Status Code
     if ins_parts.len() > 7 && !ins_parts[7].is_empty() {
-        ins.ins08_employment_status_code = ins_parts[7].to_string();
+        ins.ins08_employment_status_code = get_element(&ins_parts, 7);
     }
 
     // INS09 - Student Status Code
     if ins_parts.len() > 8 && !ins_parts[8].is_empty() {
-        ins.ins09_student_status_code = ins_parts[8].to_string();
+        ins.ins09_student_status_code = get_element(&ins_parts, 8);
     }
 
     // INS10 - Handicap Indicator
     if ins_parts.len() > 9 && !ins_parts[9].is_empty() {
-        ins.ins10_handicap_indicator = ins_parts[9].to_string();
+        ins.ins10_handicap_indicator = get_element(&ins_parts, 9);
     }
 
     // INS11 - Date Time Qualifier
     if ins_parts.len() > 10 && !ins_parts[10].is_empty() {
-        ins.ins11_date_time_qualifier = ins_parts[10].to_string();
+        ins.ins11_date_time_qualifier = get_element(&ins_parts, 10);
     }
 
     // INS12 - Date Time Period Format Qualifier
     if ins_parts.len() > 11 && !ins_parts[11].is_empty() {
-        ins.ins12_date_time_period_format_qualifier = ins_parts[11].to_string();
+        ins.ins12_date_time_period_format_qualifier = get_element(&ins_parts, 11);
     }
 
     // INS13 - Date Time Period
     if ins_parts.len() > 12 && !ins_parts[12].is_empty() {
-        ins.ins13_date_time_period = ins_parts[12].to_string();
+        ins.ins13_date_time_period = get_element(&ins_parts, 12);
     }
 
     // INS14 - Confidentiality Code
     if ins_parts.len() > 13 && !ins_parts[13].is_empty() {
-        ins.ins14_confidentiality_code = ins_parts[13].to_string();
+        ins.ins14_confidentiality_code = get_element(&ins_parts, 13);
     }
 
     // INS15 - City Name
     if ins_parts.len() > 14 && !ins_parts[14].is_empty() {
-        ins.ins15_city_name = ins_parts[14].to_string();
+        ins.ins15_city_name = get_element(&ins_parts, 14);
     }
 
     // INS16 - State or Province Code
     if ins_parts.len() > 15 && !ins_parts[15].is_empty() {
-        ins.ins16_state_or_province_code = ins_parts[15].to_string();
+        ins.ins16_state_or_province_code = get_element(&ins_parts, 15);
     }
 
     // INS17 - Country Code
     if ins_parts.len() > 16 && !ins_parts[16].is_empty() {
-        ins.ins17_country_code = ins_parts[16].to_string();
+        ins.ins17_country_code = get_element(&ins_parts, 16);
     }
 
     info!("Parsed INS segment: {:?}", ins);

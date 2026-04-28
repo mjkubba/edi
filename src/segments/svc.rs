@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -21,22 +21,22 @@ pub fn get_svc(svc_content: String) -> SVC {
     let mut svc07_original_units_of_service_count: String = "".to_string();
 
     if svc_parts.get(3).is_some() {
-        svc04_product_service_id = svc_parts[3].to_string();
+        svc04_product_service_id = get_element(&svc_parts, 3);
     }
     if svc_parts.get(4).is_some() {
-        svc05_unit_of_service_paid_count = svc_parts[4].to_string();
+        svc05_unit_of_service_paid_count = get_element(&svc_parts, 4);
     }
     if svc_parts.get(5).is_some() {
-        svc06_composite_medical_procedure_id = svc_parts[5].to_string();
+        svc06_composite_medical_procedure_id = get_element(&svc_parts, 5);
     }
     if svc_parts.get(6).is_some() {
-        svc07_original_units_of_service_count = svc_parts[6].to_string();
+        svc07_original_units_of_service_count = get_element(&svc_parts, 6);
     }
 
     SVC {
-        svc01_1_product_or_service_is_qualifier: svc_parts[0].to_string(),
-        svc02_line_item_charge_amount: svc_parts[1].to_string(),
-        svc03_line_item_provider_payment_amount: svc_parts[2].to_string(),
+        svc01_1_product_or_service_is_qualifier: get_element(&svc_parts, 0),
+        svc02_line_item_charge_amount: get_element(&svc_parts, 1),
+        svc03_line_item_provider_payment_amount: get_element(&svc_parts, 2),
         svc04_product_service_id,
         svc05_unit_of_service_paid_count,
         svc06_composite_medical_procedure_id,

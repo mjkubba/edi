@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -16,22 +17,22 @@ pub fn get_hl(hl_content: String) -> HL {
 
     // HL01 - Hierarchical ID Number
     if !hl_parts.is_empty() && !hl_parts[0].is_empty() {
-        hl.hl01_hierarchical_id_number = hl_parts[0].to_string();
+        hl.hl01_hierarchical_id_number = get_element(&hl_parts, 0);
     }
 
     // HL02 - Hierarchical Parent ID Number
     if hl_parts.len() > 1 && !hl_parts[1].is_empty() {
-        hl.hl02_hierarchical_parent_id_number = hl_parts[1].to_string();
+        hl.hl02_hierarchical_parent_id_number = get_element(&hl_parts, 1);
     }
 
     // HL03 - Hierarchical Level Code
     if hl_parts.len() > 2 && !hl_parts[2].is_empty() {
-        hl.hl03_hierarchical_level_code = hl_parts[2].to_string();
+        hl.hl03_hierarchical_level_code = get_element(&hl_parts, 2);
     }
 
     // HL04 - Hierarchical Child Code
     if hl_parts.len() > 3 && !hl_parts[3].is_empty() {
-        hl.hl04_hierarchical_child_code = hl_parts[3].to_string();
+        hl.hl04_hierarchical_child_code = get_element(&hl_parts, 3);
     }
 
     info!("Parsed HL segment: {:?}", hl);

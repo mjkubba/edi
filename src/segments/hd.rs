@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -23,57 +24,57 @@ pub fn get_hd(hd_content: String) -> HD {
 
     // HD01 - Maintenance Type Code
     if !hd_parts.is_empty() && !hd_parts[0].is_empty() {
-        hd.hd01_maintenance_type_code = hd_parts[0].to_string();
+        hd.hd01_maintenance_type_code = get_element(&hd_parts, 0);
     }
 
     // HD02 - Maintenance Reason Code
     if hd_parts.len() > 1 && !hd_parts[1].is_empty() {
-        hd.hd02_maintenance_reason_code = hd_parts[1].to_string();
+        hd.hd02_maintenance_reason_code = get_element(&hd_parts, 1);
     }
 
     // HD03 - Insurance Line Code
     if hd_parts.len() > 2 && !hd_parts[2].is_empty() {
-        hd.hd03_insurance_line_code = hd_parts[2].to_string();
+        hd.hd03_insurance_line_code = get_element(&hd_parts, 2);
     }
 
     // HD04 - Plan Coverage Description
     if hd_parts.len() > 3 && !hd_parts[3].is_empty() {
-        hd.hd04_plan_coverage_description = hd_parts[3].to_string();
+        hd.hd04_plan_coverage_description = get_element(&hd_parts, 3);
     }
 
     // HD05 - Coverage Level Code
     if hd_parts.len() > 4 && !hd_parts[4].is_empty() {
-        hd.hd05_coverage_level_code = hd_parts[4].to_string();
+        hd.hd05_coverage_level_code = get_element(&hd_parts, 4);
     }
 
     // HD06 - Count
     if hd_parts.len() > 5 && !hd_parts[5].is_empty() {
-        hd.hd06_count = hd_parts[5].to_string();
+        hd.hd06_count = get_element(&hd_parts, 5);
     }
 
     // HD07 - Count 2
     if hd_parts.len() > 6 && !hd_parts[6].is_empty() {
-        hd.hd07_count_2 = hd_parts[6].to_string();
+        hd.hd07_count_2 = get_element(&hd_parts, 6);
     }
 
     // HD08 - Underwriting Decision Code
     if hd_parts.len() > 7 && !hd_parts[7].is_empty() {
-        hd.hd08_underwriting_decision_code = hd_parts[7].to_string();
+        hd.hd08_underwriting_decision_code = get_element(&hd_parts, 7);
     }
 
     // HD09 - Yes/No Condition or Response Code
     if hd_parts.len() > 8 && !hd_parts[8].is_empty() {
-        hd.hd09_yes_no_condition_or_response_code = hd_parts[8].to_string();
+        hd.hd09_yes_no_condition_or_response_code = get_element(&hd_parts, 8);
     }
 
     // HD10 - Drug House Code
     if hd_parts.len() > 9 && !hd_parts[9].is_empty() {
-        hd.hd10_drug_house_code = hd_parts[9].to_string();
+        hd.hd10_drug_house_code = get_element(&hd_parts, 9);
     }
 
     // HD11 - Yes/No Condition or Response Code 2
     if hd_parts.len() > 10 && !hd_parts[10].is_empty() {
-        hd.hd11_yes_no_condition_or_response_code_2 = hd_parts[10].to_string();
+        hd.hd11_yes_no_condition_or_response_code_2 = get_element(&hd_parts, 10);
     }
 
     info!("Parsed HD segment: {:?}", hd);

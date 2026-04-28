@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -10,8 +11,8 @@ pub struct QTY {
 pub fn get_qty(qty_content: String) -> QTY {
     let qty_parts: Vec<&str> = qty_content.split("*").collect();
     QTY {
-        qty01_quantity_qualifier: qty_parts[0].to_string(),
-        qty02_claim_supplement_information_quantity: qty_parts[1].to_string(),
+        qty01_quantity_qualifier: get_element(&qty_parts, 0),
+        qty02_claim_supplement_information_quantity: get_element(&qty_parts, 1),
     }
 }
 

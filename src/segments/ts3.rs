@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 // EDI 835 TS3 - PROVIDER SUMMARY INFORMATION
@@ -25,27 +25,26 @@ pub struct TS3 {
 
 pub fn get_ts3(ts3_content: String) -> TS3 {
     let ts3_parts: Vec<&str> = ts3_content.split("*").collect();
-    let get = |i: usize| ts3_parts.get(i).unwrap_or(&"").to_string();
 
     TS3 {
-        ts301_provider_identifier: get(0),
-        ts302_facility_type_code: get(1),
-        ts303_fiscal_period_date: get(2),
-        ts304_total_claim_count: get(3),
-        ts305_total_claim_charge_amount: get(4),
+        ts301_provider_identifier: get_element(&ts3_parts, 0),
+        ts302_facility_type_code: get_element(&ts3_parts, 1),
+        ts303_fiscal_period_date: get_element(&ts3_parts, 2),
+        ts304_total_claim_count: get_element(&ts3_parts, 3),
+        ts305_total_claim_charge_amount: get_element(&ts3_parts, 4),
         // TS306-TS312 are NOT USED (positions 5-11)
-        ts313_total_msp_payer_amount: get(12),
+        ts313_total_msp_payer_amount: get_element(&ts3_parts, 12),
         // TS314 NOT USED (position 13)
-        ts315_total_non_lab_charge_amount: get(14),
+        ts315_total_non_lab_charge_amount: get_element(&ts3_parts, 14),
         // TS316 NOT USED (position 15)
-        ts317_total_hcpcs_reported_charge_amount: get(16),
-        ts318_total_hcpcs_payable_amount: get(17),
+        ts317_total_hcpcs_reported_charge_amount: get_element(&ts3_parts, 16),
+        ts318_total_hcpcs_payable_amount: get_element(&ts3_parts, 17),
         // TS319 NOT USED (position 18)
-        ts320_total_professional_component_amount: get(19),
-        ts321_total_msp_patient_liability_met_amount: get(20),
-        ts322_total_patient_reimbursement_amount: get(21),
-        ts323_total_pip_claim_count: get(22),
-        ts324_total_pip_adjustment_amount: get(23),
+        ts320_total_professional_component_amount: get_element(&ts3_parts, 19),
+        ts321_total_msp_patient_liability_met_amount: get_element(&ts3_parts, 20),
+        ts322_total_patient_reimbursement_amount: get_element(&ts3_parts, 21),
+        ts323_total_pip_claim_count: get_element(&ts3_parts, 22),
+        ts324_total_pip_adjustment_amount: get_element(&ts3_parts, 23),
     }
 }
 

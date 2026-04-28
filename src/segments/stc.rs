@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 /// STC - Claim Status Information
@@ -39,7 +40,7 @@ pub fn get_stc(segment: &str) -> STC {
     let elements: Vec<&str> = segment.split('*').collect();
 
     let mut stc = STC {
-        segment_id: elements[0].to_string(),
+        segment_id: get_element(&elements, 0),
         ..Default::default()
     };
 
@@ -47,102 +48,102 @@ pub fn get_stc(segment: &str) -> STC {
     if elements.len() > 1 && !elements[1].is_empty() {
         let stc01_parts: Vec<&str> = elements[1].split(':').collect();
         if stc01_parts.len() > 0 {
-            stc.stc01_1_claim_status_category_code = stc01_parts[0].to_string();
+            stc.stc01_1_claim_status_category_code = get_element(&stc01_parts, 0);
         }
         if stc01_parts.len() > 1 {
-            stc.stc01_2_claim_status_code = stc01_parts[1].to_string();
+            stc.stc01_2_claim_status_code = get_element(&stc01_parts, 1);
         }
         if stc01_parts.len() > 2 {
-            stc.stc01_3_entity_identifier_code = Some(stc01_parts[2].to_string());
+            stc.stc01_3_entity_identifier_code = Some(get_element(&stc01_parts, 2));
         }
         if stc01_parts.len() > 3 {
-            stc.stc01_4_code_list_qualifier_code = Some(stc01_parts[3].to_string());
+            stc.stc01_4_code_list_qualifier_code = Some(get_element(&stc01_parts, 3));
         }
 
-        stc.stc01_health_care_claim_status = elements[1].to_string();
+        stc.stc01_health_care_claim_status = get_element(&elements, 1);
     }
 
     // Process STC02 - Status Information Effective Date
     if elements.len() > 2 && !elements[2].is_empty() {
-        stc.stc02_status_information_effective_date = elements[2].to_string();
+        stc.stc02_status_information_effective_date = get_element(&elements, 2);
     }
 
     // Process STC03 - Action Code
     if elements.len() > 3 && !elements[3].is_empty() {
-        stc.stc03_action_code = Some(elements[3].to_string());
+        stc.stc03_action_code = Some(get_element(&elements, 3));
     }
 
     // Process STC04 - Monetary Amount
     if elements.len() > 4 && !elements[4].is_empty() {
-        stc.stc04_monetary_amount = Some(elements[4].to_string());
+        stc.stc04_monetary_amount = Some(get_element(&elements, 4));
     }
 
     // Process STC05 - Monetary Amount
     if elements.len() > 5 && !elements[5].is_empty() {
-        stc.stc05_monetary_amount = Some(elements[5].to_string());
+        stc.stc05_monetary_amount = Some(get_element(&elements, 5));
     }
 
     // Process STC06 - Date
     if elements.len() > 6 && !elements[6].is_empty() {
-        stc.stc06_date = Some(elements[6].to_string());
+        stc.stc06_date = Some(get_element(&elements, 6));
     }
 
     // Process STC07 - Payment Method Code
     if elements.len() > 7 && !elements[7].is_empty() {
-        stc.stc07_payment_method_code = Some(elements[7].to_string());
+        stc.stc07_payment_method_code = Some(get_element(&elements, 7));
     }
 
     // Process STC08 - Date
     if elements.len() > 8 && !elements[8].is_empty() {
-        stc.stc08_date = Some(elements[8].to_string());
+        stc.stc08_date = Some(get_element(&elements, 8));
     }
 
     // Process STC09 - Check Number
     if elements.len() > 9 && !elements[9].is_empty() {
-        stc.stc09_check_number = Some(elements[9].to_string());
+        stc.stc09_check_number = Some(get_element(&elements, 9));
     }
 
     // Process STC10 - Health Care Claim Status
     if elements.len() > 10 && !elements[10].is_empty() {
         let stc10_parts: Vec<&str> = elements[10].split(':').collect();
         if stc10_parts.len() > 0 {
-            stc.stc10_1_claim_status_category_code = Some(stc10_parts[0].to_string());
+            stc.stc10_1_claim_status_category_code = Some(get_element(&stc10_parts, 0));
         }
         if stc10_parts.len() > 1 {
-            stc.stc10_2_claim_status_code = Some(stc10_parts[1].to_string());
+            stc.stc10_2_claim_status_code = Some(get_element(&stc10_parts, 1));
         }
         if stc10_parts.len() > 2 {
-            stc.stc10_3_entity_identifier_code = Some(stc10_parts[2].to_string());
+            stc.stc10_3_entity_identifier_code = Some(get_element(&stc10_parts, 2));
         }
         if stc10_parts.len() > 3 {
-            stc.stc10_4_code_list_qualifier_code = Some(stc10_parts[3].to_string());
+            stc.stc10_4_code_list_qualifier_code = Some(get_element(&stc10_parts, 3));
         }
 
-        stc.stc10_health_care_claim_status = Some(elements[10].to_string());
+        stc.stc10_health_care_claim_status = Some(get_element(&elements, 10));
     }
 
     // Process STC11 - Health Care Claim Status
     if elements.len() > 11 && !elements[11].is_empty() {
         let stc11_parts: Vec<&str> = elements[11].split(':').collect();
         if stc11_parts.len() > 0 {
-            stc.stc11_1_claim_status_category_code = Some(stc11_parts[0].to_string());
+            stc.stc11_1_claim_status_category_code = Some(get_element(&stc11_parts, 0));
         }
         if stc11_parts.len() > 1 {
-            stc.stc11_2_claim_status_code = Some(stc11_parts[1].to_string());
+            stc.stc11_2_claim_status_code = Some(get_element(&stc11_parts, 1));
         }
         if stc11_parts.len() > 2 {
-            stc.stc11_3_entity_identifier_code = Some(stc11_parts[2].to_string());
+            stc.stc11_3_entity_identifier_code = Some(get_element(&stc11_parts, 2));
         }
         if stc11_parts.len() > 3 {
-            stc.stc11_4_code_list_qualifier_code = Some(stc11_parts[3].to_string());
+            stc.stc11_4_code_list_qualifier_code = Some(get_element(&stc11_parts, 3));
         }
 
-        stc.stc11_health_care_claim_status = Some(elements[11].to_string());
+        stc.stc11_health_care_claim_status = Some(get_element(&elements, 11));
     }
 
     // Process STC12 - Free Form Message Text
     if elements.len() > 12 && !elements[12].is_empty() {
-        stc.stc12_free_form_message_text = Some(elements[12].to_string());
+        stc.stc12_free_form_message_text = Some(get_element(&elements, 12));
     }
 
     stc

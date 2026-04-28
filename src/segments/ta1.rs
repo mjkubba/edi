@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -12,13 +13,13 @@ pub struct TA1 {
 
 pub fn get_ta1(ta1_content: String) -> TA1 {
     let ta1_parts: Vec<&str> = ta1_content.split("*").collect();
-    let mut ta1 = TA1::default();
-    if let Some(v) = ta1_parts.get(0) { ta1.ta01_interchange_control_number = v.to_string(); }
-    if let Some(v) = ta1_parts.get(1) { ta1.ta02_interchange_date = v.to_string(); }
-    if let Some(v) = ta1_parts.get(2) { ta1.ta03_interchange_time = v.to_string(); }
-    if let Some(v) = ta1_parts.get(3) { ta1.ta04_interchange_ack_code = v.to_string(); }
-    if let Some(v) = ta1_parts.get(4) { ta1.ta05_interchange_note_code = v.to_string(); }
-    ta1
+    TA1 {
+        ta01_interchange_control_number: get_element(&ta1_parts, 0),
+        ta02_interchange_date: get_element(&ta1_parts, 1),
+        ta03_interchange_time: get_element(&ta1_parts, 2),
+        ta04_interchange_ack_code: get_element(&ta1_parts, 3),
+        ta05_interchange_note_code: get_element(&ta1_parts, 4),
+    }
 }
 
 pub fn write_ta1(ta1: &TA1) -> String {

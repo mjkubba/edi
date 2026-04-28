@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 // EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount
@@ -11,8 +12,8 @@ pub struct AMT {
 pub fn get_amt(amt_content: String) -> AMT {
     let amt_parts: Vec<&str> = amt_content.split("*").collect();
     AMT {
-        amt01_amount_qualifier_code: amt_parts[0].to_string(),
-        amt02_service_line_allowed_amount: amt_parts[1].to_string(),
+        amt01_amount_qualifier_code: get_element(&amt_parts, 0),
+        amt02_service_line_allowed_amount: get_element(&amt_parts, 1),
     }
 }
 

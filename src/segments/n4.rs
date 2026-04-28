@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
@@ -18,20 +18,20 @@ pub fn get_n4(n4_content: String) -> N4 {
     let mut payee_country_code: String = "".to_string();
     let mut payee_country_sub_code: String = "".to_string();
     if n4_parts.get(1).is_some() {
-        payee_state = n4_parts[1].to_string();
+        payee_state = get_element(&n4_parts, 1);
     }
     if n4_parts.get(2).is_some() {
-        payee_zip = n4_parts[2].to_string();
+        payee_zip = get_element(&n4_parts, 2);
     }
     if n4_parts.get(3).is_some() {
-        payee_country_code = n4_parts[3].to_string();
+        payee_country_code = get_element(&n4_parts, 3);
     }
     if n4_parts.get(4).is_some() {
-        payee_country_sub_code = n4_parts[4].to_string();
+        payee_country_sub_code = get_element(&n4_parts, 4);
     }
 
     N4 {
-        payee_city: n4_parts[0].to_string(),
+        payee_city: get_element(&n4_parts, 0),
         payee_state,
         payee_zip,
         payee_country_code,

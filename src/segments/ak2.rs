@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -16,17 +17,17 @@ pub fn get_ak2(ak2_content: String) -> AK2 {
 
     // AK201 - Transaction Set Identifier Code (Required)
     if !ak2_parts.is_empty() && !ak2_parts[0].is_empty() {
-        ak2.ak201_transaction_set_identifier_code = ak2_parts[0].to_string();
+        ak2.ak201_transaction_set_identifier_code = get_element(&ak2_parts, 0);
     }
 
     // AK202 - Transaction Set Control Number (Required)
     if ak2_parts.len() > 1 && !ak2_parts[1].is_empty() {
-        ak2.ak202_transaction_set_control_number = ak2_parts[1].to_string();
+        ak2.ak202_transaction_set_control_number = get_element(&ak2_parts, 1);
     }
 
     // AK203 - Implementation Convention Reference (Situational)
     if ak2_parts.len() > 2 && !ak2_parts[2].is_empty() {
-        ak2.ak203_implementation_convention_reference = ak2_parts[2].to_string();
+        ak2.ak203_implementation_convention_reference = get_element(&ak2_parts, 2);
     }
 
     info!("Parsed AK2 segment: {:?}", ak2);

@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 /**
  * PER (Administrative Communications Contact) Segment
  *
@@ -51,44 +52,44 @@ pub fn get_per(per_content: String) -> PER {
 
     // Extract the actual function code (skip the segment ID)
     let per01_contact_function_code = if per_parts.len() > 0 {
-        per_parts[0].to_string()
+        get_element(&per_parts, 0)
     } else {
         String::new()
     };
 
     // Extract remaining fields with bounds checking
     let per02_contact_name = if per_parts.len() > 1 {
-        per_parts[1].to_string()
+        get_element(&per_parts, 1)
     } else {
         String::new()
     };
     let per03_contact_number_qualifier = if per_parts.len() > 2 {
-        per_parts[2].to_string()
+        get_element(&per_parts, 2)
     } else {
         String::new()
     };
     let per04_contact_number = if per_parts.len() > 3 {
-        per_parts[3].to_string()
+        get_element(&per_parts, 3)
     } else {
         String::new()
     };
     let per05_contact_number_qualifier = if per_parts.len() > 4 {
-        per_parts[4].to_string()
+        get_element(&per_parts, 4)
     } else {
         String::new()
     };
     let per06_contact_number = if per_parts.len() > 5 {
-        per_parts[5].to_string()
+        get_element(&per_parts, 5)
     } else {
         String::new()
     };
     let per07_contact_number_qualifier = if per_parts.len() > 6 {
-        per_parts[6].to_string()
+        get_element(&per_parts, 6)
     } else {
         String::new()
     };
     let per08_contact_number = if per_parts.len() > 7 {
-        per_parts[7].to_string()
+        get_element(&per_parts, 7)
     } else {
         String::new()
     };

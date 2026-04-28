@@ -1,3 +1,4 @@
+use crate::helper::edihelper::get_element;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ pub fn get_ik4(ik4_content: String) -> IK4 {
 
     // IK401 - Position in Segment (Required)
     if !ik4_parts.is_empty() && !ik4_parts[0].is_empty() {
-        ik4.ik401_position_in_segment = ik4_parts[0].to_string();
+        ik4.ik401_position_in_segment = get_element(&ik4_parts, 0);
     } else {
         // Default value for required field
         ik4.ik401_position_in_segment = "1".to_string();
@@ -25,7 +26,7 @@ pub fn get_ik4(ik4_content: String) -> IK4 {
 
     // IK402 - Data Element Reference Number (Required)
     if ik4_parts.len() > 1 && !ik4_parts[1].is_empty() {
-        ik4.ik402_data_element_reference_number = ik4_parts[1].to_string();
+        ik4.ik402_data_element_reference_number = get_element(&ik4_parts, 1);
     } else {
         // Default value for required field
         ik4.ik402_data_element_reference_number = "0".to_string();
@@ -33,7 +34,7 @@ pub fn get_ik4(ik4_content: String) -> IK4 {
 
     // IK403 - Implementation Data Element Syntax Error Code (Required)
     if ik4_parts.len() > 2 && !ik4_parts[2].is_empty() {
-        ik4.ik403_implementation_data_element_syntax_error_code = ik4_parts[2].to_string();
+        ik4.ik403_implementation_data_element_syntax_error_code = get_element(&ik4_parts, 2);
     } else {
         // Default value for required field
         ik4.ik403_implementation_data_element_syntax_error_code = "1".to_string();
@@ -41,7 +42,7 @@ pub fn get_ik4(ik4_content: String) -> IK4 {
 
     // IK404 - Copy of Bad Data Element (Situational)
     if ik4_parts.len() > 3 && !ik4_parts[3].is_empty() {
-        ik4.ik404_copy_of_bad_data_element = ik4_parts[3].to_string();
+        ik4.ik404_copy_of_bad_data_element = get_element(&ik4_parts, 3);
     }
 
     info!("Parsed IK4 segment: {:?}", ik4_parts);

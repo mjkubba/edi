@@ -1,4 +1,4 @@
-use crate::helper::edihelper::build_segment;
+use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
@@ -29,31 +29,31 @@ pub fn get_moa(moa_content: String) -> MOA {
     let mut moa09_nonpayable_professional_component_amount: String = "".to_string();
 
     if moa_parts.get(0).is_some() {
-        moa01_reimbursement_rate = moa_parts[0].to_string();
+        moa01_reimbursement_rate = get_element(&moa_parts, 0);
     }
     if moa_parts.get(1).is_some() {
-        moa02_claim_hcpcs_payable_amount = moa_parts[1].to_string();
+        moa02_claim_hcpcs_payable_amount = get_element(&moa_parts, 1);
     }
     if moa_parts.get(2).is_some() {
-        moa03_claim_payment_remark_code = moa_parts[2].to_string();
+        moa03_claim_payment_remark_code = get_element(&moa_parts, 2);
     }
     if moa_parts.get(3).is_some() {
-        moa04_claim_payment_remark_code = moa_parts[3].to_string();
+        moa04_claim_payment_remark_code = get_element(&moa_parts, 3);
     }
     if moa_parts.get(4).is_some() {
-        moa05_claim_payment_remark_code = moa_parts[4].to_string();
+        moa05_claim_payment_remark_code = get_element(&moa_parts, 4);
     }
     if moa_parts.get(5).is_some() {
-        moa06_claim_payment_remark_code = moa_parts[5].to_string();
+        moa06_claim_payment_remark_code = get_element(&moa_parts, 5);
     }
     if moa_parts.get(6).is_some() {
-        moa07_claim_payment_remark_code = moa_parts[6].to_string();
+        moa07_claim_payment_remark_code = get_element(&moa_parts, 6);
     }
     if moa_parts.get(7).is_some() {
-        moa08_claim_esrd_payment_amount = moa_parts[7].to_string();
+        moa08_claim_esrd_payment_amount = get_element(&moa_parts, 7);
     }
     if moa_parts.get(8).is_some() {
-        moa09_nonpayable_professional_component_amount = moa_parts[8].to_string();
+        moa09_nonpayable_professional_component_amount = get_element(&moa_parts, 8);
     }
     MOA {
         moa01_reimbursement_rate,
