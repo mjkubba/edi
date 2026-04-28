@@ -1,3 +1,6 @@
+// Library crate: all public items are part of the API even if not used by the binary.
+#![allow(dead_code)]
+
 pub mod edi270;
 pub mod edi271;
 pub mod edi276;

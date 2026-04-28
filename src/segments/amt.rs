@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 // EDI 835 segment with Amount Qualifier Code and Service Line Allowed Amount
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct AMT {
     pub amt01_amount_qualifier_code: String,
     pub amt02_service_line_allowed_amount: String,

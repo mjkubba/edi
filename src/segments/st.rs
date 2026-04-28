@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct ST {
     pub transaction_set_id: String,
     pub transaction_set_control_number: String,

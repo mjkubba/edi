@@ -3,7 +3,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct IK3 {
     pub ik301_segment_id_code: String,
     pub ik302_segment_position_in_transaction_set: String,

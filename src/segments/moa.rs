@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct MOA {
     pub moa01_reimbursement_rate: String,
     pub moa02_claim_hcpcs_payable_amount: String,

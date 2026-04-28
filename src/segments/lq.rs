@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct LQ {
     pub lq01_code_list_qualifier: String,
     pub lq02_remark_code: String,

@@ -3,7 +3,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct IK4 {
     pub ik401_position_in_segment: String,
     pub ik402_data_element_reference_number: String,

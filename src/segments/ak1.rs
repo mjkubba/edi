@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct AK1 {
     pub ak01_functional_id_group: String,
     pub ak02_group_control_number: String,

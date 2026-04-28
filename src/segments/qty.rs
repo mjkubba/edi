@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct QTY {
     pub qty01_quantity_qualifier: String,
     pub qty02_claim_supplement_information_quantity: String,

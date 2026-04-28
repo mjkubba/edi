@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct PLB {
     pub plb01_provider_identifier: String,
     pub plb02_fiscal_period_date: String,

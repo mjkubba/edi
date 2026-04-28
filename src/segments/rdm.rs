@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct RDM {
     pub rdm01_report_transmission_code: String,
     pub rdm02_name: String,

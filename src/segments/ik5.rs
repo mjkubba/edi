@@ -3,7 +3,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct IK5 {
     pub ik501_transaction_set_acknowledgment_code: String,
     pub ik502_implementation_transaction_set_syntax_error_code: String,

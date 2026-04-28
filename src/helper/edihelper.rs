@@ -64,7 +64,7 @@ pub fn get_table2(contents: &str) -> String {
     tmp_contents
 }
 
-#[allow(dead_code)]
+
 pub fn get_999_2000(contents: &str) -> String {
     let mut tmp_contents = contents.to_string();
     let remaining_ak2_count = contents.matches("AK2").count();
@@ -143,7 +143,7 @@ pub fn get_segment_contents(key: &str, contents: &str) -> String {
     }
 }
 
-#[allow(dead_code)]
+
 pub fn get_segment_contents_opt(key: &str, contents: &str) -> Option<String> {
     match get_full_segment_contents(key, contents) {
         Some(segment_content) => {
@@ -159,7 +159,7 @@ pub fn get_segment_contents_opt(key: &str, contents: &str) -> Option<String> {
 }
 
 // Helper function to extract content between LS and LE segments
-#[allow(dead_code)]
+
 pub fn extract_between_ls_le(contents: &str) -> Option<String> {
     if let Some(ls_pos) = contents.find("LS*") {
         // Find the end of the LS segment
@@ -179,7 +179,7 @@ pub fn extract_between_ls_le(contents: &str) -> Option<String> {
 }
 
 // Helper function to get the loop identifier code from LS or LE segment
-#[allow(dead_code)]
+
 pub fn get_loop_identifier_code(segment_content: &str) -> String {
     let parts: Vec<&str> = segment_content.split('*').collect();
     if parts.len() > 1 {

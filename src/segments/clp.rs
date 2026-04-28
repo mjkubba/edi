@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct CLP {
     pub clp01_patient_control_number: String,
     pub clp02_claim_status_code: String,

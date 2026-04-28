@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct N1 {
     pub payer_id_code: String,
     pub payee_name: String,

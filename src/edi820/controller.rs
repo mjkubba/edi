@@ -107,7 +107,7 @@ impl TransactionSet for Edi820 {
     }
 }
 
-#[allow(dead_code)]
+
 pub fn get_820(contents: &str) -> EdiResult<Edi820> {
     match Edi820::parse(contents.to_string()) {
         Ok((edi820, _)) => Ok(edi820),
@@ -135,7 +135,7 @@ pub fn is_820(contents: &str) -> bool {
 }
 
 // Function to detect if content is EDI 820 JSON
-#[allow(dead_code)]
+
 pub fn is_820_json(contents: &str) -> bool {
     contents.contains("\"transaction_set_id\":\"820\"")
 }

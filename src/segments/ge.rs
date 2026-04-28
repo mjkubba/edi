@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct GE {
     pub number_of_transitions: String,
     pub group_control_number: String,

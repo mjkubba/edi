@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct AK9 {
     pub ak901_functional_ack_code: String,
     pub ak902_num_of_ts_incl: String,

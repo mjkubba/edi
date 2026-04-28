@@ -138,7 +138,7 @@ fn fix_ref_277(r: &mut crate::segments::r#ref::REF) {
 }
 
 /// Helper function to fix STC segment for 277 format
-#[allow(dead_code)]
+
 fn fix_stc_277(stc: &mut crate::segments::stc::STC) {
     // If the segment_id is in the health_care_claim_status field, fix it
     if stc.segment_id == "STC" && stc.stc01_health_care_claim_status == "STC" {
@@ -228,7 +228,7 @@ pub fn write_277(edi277: &Edi277) -> String {
 ///
 /// # Returns
 /// * `bool` - True if the JSON contains 277 format data, false otherwise
-#[allow(dead_code)]
+
 pub fn is_277_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 277 format
     contents.contains("\"st01_transaction_set_identifier_code\":\"277\"")

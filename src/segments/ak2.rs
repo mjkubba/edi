@@ -3,7 +3,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct AK2 {
     pub ak201_transaction_set_identifier_code: String,
     pub ak202_transaction_set_control_number: String,

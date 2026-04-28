@@ -278,7 +278,7 @@ impl TransactionSet for Edi278 {
     }
 }
 
-#[allow(dead_code)]
+
 pub fn get_278(contents: &str) -> EdiResult<Edi278> {
     match Edi278::parse(contents.to_string()) {
         Ok((edi278, _)) => Ok(edi278),
@@ -306,7 +306,7 @@ pub fn is_278(contents: &str) -> bool {
 }
 
 // Function to detect if JSON contains 278 format data
-#[allow(dead_code)]
+
 pub fn is_278_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 278 format
     contents.contains("\"transaction_set_id\":\"278\"")

@@ -1,3 +1,6 @@
+// Many public functions/structs exist for API completeness but aren't called from the CLI binary.
+#![allow(dead_code)]
+
 /**
  * EDI Parser and Processor for Healthcare X12 Formats
  *
