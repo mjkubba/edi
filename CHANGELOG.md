@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Nested claims under subscriber/patient per HL parent-child tree (multi-subscriber batches now preserve claim associations)
 - Consolidated main.rs routing from 440-line if/else chain into three dispatch functions (261 lines)
 - Replaced glob imports with explicit imports in main.rs
+- NM1 segment: optional fields (NM104-NM110) now use `Option<String>` per X12 spec; JSON omits absent fields
 
 ## [0.2.0] - 2026-04-27
 

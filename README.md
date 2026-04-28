@@ -120,7 +120,7 @@ src/
 ```
 
 ### Roadmap
-- `Option<String>` for optional X12 fields
+- `Option<String>` for remaining segment optional fields (NM1 done, 57 segments remaining)
 - Web UI for browser-based EDI processing
 - Schema validation
 - Performance optimization for large files
