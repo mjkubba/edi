@@ -147,9 +147,15 @@ mod tests {
         assert_eq!(loop2110e.nm1_segments.entity_id, "71");
         assert_eq!(loop2110e.nm1_segments.entity_type, "1");
         assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
-        assert_eq!(loop2110e.nm1_segments.firstname, "JOHN");
-        assert_eq!(loop2110e.nm1_segments.id_code_qualifier, "XX");
-        assert_eq!(loop2110e.nm1_segments.id_code, "1234567890");
+        assert_eq!(loop2110e.nm1_segments.firstname, Some("JOHN".to_string()));
+        assert_eq!(
+            loop2110e.nm1_segments.id_code_qualifier,
+            Some("XX".to_string())
+        );
+        assert_eq!(
+            loop2110e.nm1_segments.id_code,
+            Some("1234567890".to_string())
+        );
 
         assert_eq!(loop2110e.ref_segments.len(), 1);
         assert_eq!(
@@ -176,8 +182,14 @@ mod tests {
         assert_eq!(loop2110e.nm1_segments.entity_id, "FA");
         assert_eq!(loop2110e.nm1_segments.entity_type, "2");
         assert_eq!(loop2110e.nm1_segments.lastname, "MONTGOMERY HOSPITAL");
-        assert_eq!(loop2110e.nm1_segments.id_code_qualifier, "24");
-        assert_eq!(loop2110e.nm1_segments.id_code, "000012121");
+        assert_eq!(
+            loop2110e.nm1_segments.id_code_qualifier,
+            Some("24".to_string())
+        );
+        assert_eq!(
+            loop2110e.nm1_segments.id_code,
+            Some("000012121".to_string())
+        );
 
         assert!(loop2110e.n3_segments.is_some());
         let n3 = loop2110e.n3_segments.unwrap();
@@ -199,13 +211,13 @@ mod tests {
                 entity_id: "71".to_string(),
                 entity_type: "1".to_string(),
                 lastname: "SMITH".to_string(),
-                firstname: "JOHN".to_string(),
-                middle_initial: "A".to_string(),
-                suffix: "".to_string(),
-                title: "".to_string(),
-                id_code_qualifier: "XX".to_string(),
-                id_code: "1234567890".to_string(),
-                member_number: "".to_string(),
+                firstname: Some("JOHN".to_string()),
+                middle_initial: Some("A".to_string()),
+                suffix: None,
+                title: None,
+                id_code_qualifier: Some("XX".to_string()),
+                id_code: Some("1234567890".to_string()),
+                member_number: None,
             },
             ref_segments: vec![REF {
                 reference_id_number_qualifier: "1J".to_string(),
@@ -237,13 +249,13 @@ mod tests {
                 entity_id: "FA".to_string(),
                 entity_type: "2".to_string(),
                 lastname: "MONTGOMERY HOSPITAL".to_string(),
-                firstname: "".to_string(),
-                middle_initial: "".to_string(),
-                suffix: "".to_string(),
-                title: "".to_string(),
-                id_code_qualifier: "24".to_string(),
-                id_code: "000012121".to_string(),
-                member_number: "".to_string(),
+                firstname: None,
+                middle_initial: None,
+                suffix: None,
+                title: None,
+                id_code_qualifier: Some("24".to_string()),
+                id_code: Some("000012121".to_string()),
+                member_number: None,
             },
             ref_segments: vec![],
             n3_segments: Some(N3 {

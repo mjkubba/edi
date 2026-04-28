@@ -64,7 +64,7 @@ mod tests {
                 assert!(!edi820.table2s[0].loop2100s.is_empty());
                 assert_eq!(edi820.table2s[0].loop2100s[0].nm1_segments.entity_id, "IL");
                 assert_eq!(edi820.table2s[0].loop2100s[0].nm1_segments.lastname, "DOE");
-                assert_eq!(edi820.table2s[0].loop2100s[0].nm1_segments.firstname, "JOHN");
+                assert_eq!(edi820.table2s[0].loop2100s[0].nm1_segments.firstname, Some("JOHN".to_string()));
                 
                 // Check REF segments
                 assert!(!edi820.table2s[0].loop2100s[0].ref_segments.is_empty());

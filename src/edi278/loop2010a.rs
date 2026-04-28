@@ -78,8 +78,11 @@ mod tests {
         assert_eq!(loop2010a.nm1_segments.entity_id, "X3");
         assert_eq!(loop2010a.nm1_segments.entity_type, "2");
         assert_eq!(loop2010a.nm1_segments.lastname, "UMO NAME");
-        assert_eq!(loop2010a.nm1_segments.id_code_qualifier, "PI");
-        assert_eq!(loop2010a.nm1_segments.id_code, "12345");
+        assert_eq!(
+            loop2010a.nm1_segments.id_code_qualifier,
+            Some("PI".to_string())
+        );
+        assert_eq!(loop2010a.nm1_segments.id_code, Some("12345".to_string()));
 
         assert_eq!(loop2010a.per_segments.len(), 1);
         assert_eq!(loop2010a.per_segments[0].per01_contact_function_code, "IC");

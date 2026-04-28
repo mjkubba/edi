@@ -91,8 +91,11 @@ mod tests {
         assert_eq!(loop2010b.nm1_segments.entity_id, "1P");
         assert_eq!(loop2010b.nm1_segments.entity_type, "2");
         assert_eq!(loop2010b.nm1_segments.lastname, "BONE AND JOINT CLINIC");
-        assert_eq!(loop2010b.nm1_segments.id_code_qualifier, "SV");
-        assert_eq!(loop2010b.nm1_segments.id_code, "2000035");
+        assert_eq!(
+            loop2010b.nm1_segments.id_code_qualifier,
+            Some("SV".to_string())
+        );
+        assert_eq!(loop2010b.nm1_segments.id_code, Some("2000035".to_string()));
 
         assert_eq!(loop2010b.ref_segments.len(), 1);
         assert_eq!(
@@ -111,13 +114,13 @@ mod tests {
                 entity_id: "1P".to_string(),
                 entity_type: "2".to_string(),
                 lastname: "BONE AND JOINT CLINIC".to_string(),
-                firstname: "".to_string(),
-                middle_initial: "".to_string(),
-                suffix: "".to_string(),
-                title: "".to_string(),
-                id_code_qualifier: "SV".to_string(),
-                id_code: "2000035".to_string(),
-                member_number: "".to_string(),
+                firstname: None,
+                middle_initial: None,
+                suffix: None,
+                title: None,
+                id_code_qualifier: Some("SV".to_string()),
+                id_code: Some("2000035".to_string()),
+                member_number: None,
             },
             per_segments: Vec::new(),
             ref_segments: vec![REF {

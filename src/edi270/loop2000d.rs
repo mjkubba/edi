@@ -165,7 +165,7 @@ mod tests {
         assert_eq!(loop2000d.nm1_segments.entity_id, "IL");
         assert_eq!(loop2000d.nm1_segments.entity_type, "1");
         assert_eq!(loop2000d.nm1_segments.lastname, "DOE");
-        assert_eq!(loop2000d.nm1_segments.firstname, "JANE");
+        assert_eq!(loop2000d.nm1_segments.firstname, Some("JANE".to_string()));
 
         assert_eq!(loop2000d.ref_segments.len(), 1);
         assert_eq!(
