@@ -99,9 +99,7 @@ fn main() {
                 write_to_file(new_edi, args.output_file);
             }
             // Check if the content is JSON for 837P format
-            else if contents.contains("\"st\":\"ST*837*")
-                || contents.contains("\"table1\":{\"table1\":{\"bht\":\"BHT*0019*00*")
-            {
+            else if contents.contains("005010X222") {
                 info!("Writing 837P format");
                 let edi837p: Edi837P = serde_json::from_str(&contents).unwrap();
                 match write_837p(&edi837p) {
@@ -110,7 +108,7 @@ fn main() {
                 }
             }
             // Check if the content is JSON for 837I format
-            else if contents.contains("\"st\":\"ST*837*") || contents.contains("\"cl1\":") {
+            else if contents.contains("005010X223") {
                 info!("Writing 837I format");
                 let edi837i: Edi837I = serde_json::from_str(&contents).unwrap();
                 match write_837i(&edi837i) {
@@ -119,9 +117,7 @@ fn main() {
                 }
             }
             // Check if the content is JSON for 837D format
-            else if contents.contains("\"st\":\"ST*837*")
-                || contents.contains("\"too_segments\":")
-            {
+            else if contents.contains("005010X224") {
                 info!("Writing 837D format");
                 let edi837d: Edi837D = serde_json::from_str(&contents).unwrap();
                 match write_837d(&edi837d) {
