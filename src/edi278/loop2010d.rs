@@ -93,15 +93,9 @@ mod tests {
         assert_eq!(loop2010d.nm1_segments.entity_id, "QC");
         assert_eq!(loop2010d.nm1_segments.entity_type, "1");
         assert_eq!(loop2010d.nm1_segments.lastname, "DOE");
-        assert_eq!(loop2010d.nm1_segments.firstname, Some("JANE".to_string()));
-        assert_eq!(
-            loop2010d.nm1_segments.id_code_qualifier,
-            Some("MI".to_string())
-        );
-        assert_eq!(
-            loop2010d.nm1_segments.id_code,
-            Some("123456789B".to_string())
-        );
+        assert_eq!(loop2010d.nm1_segments.firstname, "JANE");
+        assert_eq!(loop2010d.nm1_segments.id_code_qualifier, "MI");
+        assert_eq!(loop2010d.nm1_segments.id_code, "123456789B");
 
         assert_eq!(loop2010d.ref_segments.len(), 1);
         assert_eq!(
@@ -126,13 +120,13 @@ mod tests {
                 entity_id: "QC".to_string(),
                 entity_type: "1".to_string(),
                 lastname: "DOE".to_string(),
-                firstname: Some("JANE".to_string()),
-                middle_initial: None,
-                suffix: None,
-                title: None,
-                id_code_qualifier: Some("MI".to_string()),
-                id_code: Some("123456789B".to_string()),
-                member_number: None,
+                firstname: "JANE".to_string(),
+                middle_initial: "".to_string(),
+                suffix: "".to_string(),
+                title: "".to_string(),
+                id_code_qualifier: "MI".to_string(),
+                id_code: "123456789B".to_string(),
+                member_number: "".to_string(),
             },
             ref_segments: vec![REF {
                 reference_id_number_qualifier: "SY".to_string(),

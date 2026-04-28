@@ -463,7 +463,7 @@ IEA*1*000000001~";
         assert!(edi278.loop2010c.is_some());
         let loop2010c = edi278.loop2010c.unwrap();
         assert_eq!(loop2010c.nm1_segments.lastname, "DOE");
-        assert_eq!(loop2010c.nm1_segments.firstname, Some("JOHN".to_string()));
+        assert_eq!(loop2010c.nm1_segments.firstname, "JOHN");
         assert!(loop2010c.dmg_segments.is_some());
         assert_eq!(
             loop2010c.dmg_segments.as_ref().unwrap().dmg03_gender_code,
@@ -479,7 +479,7 @@ IEA*1*000000001~";
         assert!(edi278.loop2010d.is_some());
         let loop2010d = edi278.loop2010d.unwrap();
         assert_eq!(loop2010d.nm1_segments.lastname, "DOE");
-        assert_eq!(loop2010d.nm1_segments.firstname, Some("JANE".to_string()));
+        assert_eq!(loop2010d.nm1_segments.firstname, "JANE");
         assert!(loop2010d.dmg_segments.is_some());
         assert_eq!(
             loop2010d.dmg_segments.as_ref().unwrap().dmg03_gender_code,
@@ -514,7 +514,7 @@ IEA*1*000000001~";
         let loop2110e = edi278.loop2110e.unwrap();
         assert_eq!(loop2110e.nm1_segments.entity_id, "71");
         assert_eq!(loop2110e.nm1_segments.lastname, "SMITH");
-        assert_eq!(loop2110e.nm1_segments.firstname, Some("JOHN".to_string()));
+        assert_eq!(loop2110e.nm1_segments.firstname, "JOHN");
         assert!(loop2110e.prv_segments.is_some());
         assert_eq!(
             loop2110e.prv_segments.as_ref().unwrap().prv01_provider_code,

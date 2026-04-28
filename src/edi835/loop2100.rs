@@ -493,12 +493,9 @@ mod tests {
         assert_eq!(cas, vec![]);
         assert_eq!(nm1_patient.lastname, "TOWNSEND");
         assert_eq!(nm1_insured.entity_id, "82");
-        assert_eq!(
-            nm1_corrected_patient.id_code,
-            Some("98765432111".to_string())
-        );
+        assert_eq!(nm1_corrected_patient.id_code, "98765432111");
         assert_eq!(nm1_service_provider.entity_type, "3");
-        assert_eq!(nm1_crossover_carrier.firstname, Some("John".to_string()));
+        assert_eq!(nm1_crossover_carrier.firstname, "John");
         assert_eq!(nm1_corrected_priority_payer, NM1::default());
         assert_eq!(nm1_other_subscriber, NM1::default());
         assert_eq!(mia, MIA::default());

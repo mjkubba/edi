@@ -120,12 +120,9 @@ mod tests {
         assert_eq!(loop2115c.nm1_segments.entity_id, "P3");
         assert_eq!(loop2115c.nm1_segments.entity_type, "1");
         assert_eq!(loop2115c.nm1_segments.lastname, "JONES");
-        assert_eq!(loop2115c.nm1_segments.firstname, Some("MARCUS".to_string()));
-        assert_eq!(
-            loop2115c.nm1_segments.id_code_qualifier,
-            Some("SV".to_string())
-        );
-        assert_eq!(loop2115c.nm1_segments.id_code, Some("0202034".to_string()));
+        assert_eq!(loop2115c.nm1_segments.firstname, "MARCUS");
+        assert_eq!(loop2115c.nm1_segments.id_code_qualifier, "SV");
+        assert_eq!(loop2115c.nm1_segments.id_code, "0202034");
 
         assert!(loop2115c.n3_segments.is_some());
         assert_eq!(loop2115c.n3_segments.unwrap().payee_address, "123 MAIN ST");
@@ -151,13 +148,13 @@ mod tests {
                 entity_id: "P3".to_string(),
                 entity_type: "1".to_string(),
                 lastname: "JONES".to_string(),
-                firstname: Some("MARCUS".to_string()),
-                middle_initial: None,
-                suffix: None,
-                title: None,
-                id_code_qualifier: Some("SV".to_string()),
-                id_code: Some("0202034".to_string()),
-                member_number: None,
+                firstname: "MARCUS".to_string(),
+                middle_initial: "".to_string(),
+                suffix: "".to_string(),
+                title: "".to_string(),
+                id_code_qualifier: "SV".to_string(),
+                id_code: "0202034".to_string(),
+                member_number: "".to_string(),
             },
             n3_segments: Some(N3 {
                 payee_address: "123 MAIN ST".to_string(),

@@ -114,11 +114,8 @@ mod tests {
         assert_eq!(loop2010f.nm1_segments.entity_id, "SJ");
         assert_eq!(loop2010f.nm1_segments.entity_type, "1");
         assert_eq!(loop2010f.nm1_segments.lastname, "WATSON");
-        assert_eq!(loop2010f.nm1_segments.firstname, Some("SUSAN".to_string()));
-        assert_eq!(
-            loop2010f.nm1_segments.id_code,
-            Some("987654321".to_string())
-        );
+        assert_eq!(loop2010f.nm1_segments.firstname, "SUSAN");
+        assert_eq!(loop2010f.nm1_segments.id_code, "987654321");
 
         assert_eq!(contents, "");
     }
@@ -146,13 +143,13 @@ mod tests {
                 entity_id: "SJ".to_string(),
                 entity_type: "1".to_string(),
                 lastname: "WATSON".to_string(),
-                firstname: Some("SUSAN".to_string()),
-                middle_initial: None,
-                suffix: None,
-                title: None,
-                id_code_qualifier: Some("34".to_string()),
-                id_code: Some("987654321".to_string()),
-                member_number: None,
+                firstname: "SUSAN".to_string(),
+                middle_initial: "".to_string(),
+                suffix: "".to_string(),
+                title: "".to_string(),
+                id_code_qualifier: "34".to_string(),
+                id_code: "987654321".to_string(),
+                member_number: "".to_string(),
             },
             ref_segments: vec![],
             prv_segments: None,
@@ -170,13 +167,13 @@ mod tests {
                 entity_id: "SJ".to_string(),
                 entity_type: "1".to_string(),
                 lastname: "WATSON".to_string(),
-                firstname: Some("SUSAN".to_string()),
-                middle_initial: None,
-                suffix: None,
-                title: None,
-                id_code_qualifier: Some("34".to_string()),
-                id_code: Some("987654321".to_string()),
-                member_number: None,
+                firstname: "SUSAN".to_string(),
+                middle_initial: "".to_string(),
+                suffix: "".to_string(),
+                title: "".to_string(),
+                id_code_qualifier: "34".to_string(),
+                id_code: "987654321".to_string(),
+                member_number: "".to_string(),
             },
             ref_segments: vec![],
             prv_segments: Some(PRV {
