@@ -13,7 +13,7 @@ pub struct CLP {
     pub clp07_payer_claim_control_number: String,
     pub clp08_facility_type_code: String,
     pub clp09_claim_frequency_code: String,
-    // patient_status_code: String,
+    pub clp10_patient_status_code: String,
     pub clp11_diagnosis_related_group: String,
     pub clp12_drg_weight: String,
     pub clp13_percent_discharge_fraction: String,
@@ -30,6 +30,7 @@ pub fn get_clp(bpr_content: String) -> CLP {
     let mut clp05_patient_responsibility_amount: String = "".to_string();
     let mut clp08_facility_type_code: String = "".to_string();
     let mut clp09_claim_frequency_code: String = "".to_string();
+    let mut clp10_patient_status_code: String = "".to_string();
     let mut clp11_diagnosis_related_group: String = "".to_string();
     let mut clp12_drg_weight: String = "".to_string();
     let mut clp13_percent_discharge_fraction: String = "".to_string();
@@ -43,13 +44,16 @@ pub fn get_clp(bpr_content: String) -> CLP {
         clp09_claim_frequency_code = clp_parts[8].to_string();
     }
     if clp_parts.get(9).is_some() {
-        clp11_diagnosis_related_group = clp_parts[9].to_string();
+        clp10_patient_status_code = clp_parts[9].to_string();
     }
     if clp_parts.get(10).is_some() {
-        clp12_drg_weight = clp_parts[10].to_string();
+        clp11_diagnosis_related_group = clp_parts[10].to_string();
     }
-    if clp_parts.get(13).is_some() {
-        clp13_percent_discharge_fraction = clp_parts[13].to_string();
+    if clp_parts.get(11).is_some() {
+        clp12_drg_weight = clp_parts[11].to_string();
+    }
+    if clp_parts.get(12).is_some() {
+        clp13_percent_discharge_fraction = clp_parts[12].to_string();
     }
 
     CLP {
@@ -62,7 +66,7 @@ pub fn get_clp(bpr_content: String) -> CLP {
         clp07_payer_claim_control_number: clp_parts[6].to_string(),
         clp08_facility_type_code,
         clp09_claim_frequency_code,
-        // patient_status_code: clp_parts[10].to_string(),
+        clp10_patient_status_code,
         clp11_diagnosis_related_group,
         clp12_drg_weight,
         clp13_percent_discharge_fraction,
@@ -90,6 +94,7 @@ pub fn write_clp(clp: CLP) -> String {
     clp_content.push_str(&clp.clp07_payer_claim_control_number);
     clp_content.push_str(&stiuational_element(clp.clp08_facility_type_code));
     clp_content.push_str(&stiuational_element(clp.clp09_claim_frequency_code));
+    clp_content.push_str(&stiuational_element(clp.clp10_patient_status_code));
     clp_content.push_str(&stiuational_element(clp.clp11_diagnosis_related_group));
     clp_content.push_str(&stiuational_element(clp.clp12_drg_weight));
     clp_content.push_str(&stiuational_element(clp.clp13_percent_discharge_fraction));
@@ -105,7 +110,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_clp() {
-        let bpr_content = "EXAMPLE9*3*500*100**12*05090256390*11*1".to_string();
+        let bpr_content = "EXAMPLE9*3*500*100**12*05090256390*11*1*20*DRG1*1.5*0.8".to_string();
         let clp = get_clp(bpr_content);
         assert_eq!(clp.clp01_patient_control_number, "EXAMPLE9");
         assert_eq!(clp.clp02_claim_status_code, "3");
@@ -116,8 +121,9 @@ mod tests {
         assert_eq!(clp.clp07_payer_claim_control_number, "05090256390");
         assert_eq!(clp.clp08_facility_type_code, "11");
         assert_eq!(clp.clp09_claim_frequency_code, "1");
-        assert_eq!(clp.clp11_diagnosis_related_group, "");
-        assert_eq!(clp.clp12_drg_weight, "");
-        assert_eq!(clp.clp13_percent_discharge_fraction, "");
+        assert_eq!(clp.clp10_patient_status_code, "20");
+        assert_eq!(clp.clp11_diagnosis_related_group, "DRG1");
+        assert_eq!(clp.clp12_drg_weight, "1.5");
+        assert_eq!(clp.clp13_percent_discharge_fraction, "0.8");
     }
 }
