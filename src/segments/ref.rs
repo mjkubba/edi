@@ -2,7 +2,7 @@ use crate::helper::edihelper::get_element;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct REF {
     pub reference_id_number_qualifier: String,
     pub reference_id_number: String,
@@ -17,7 +17,11 @@ pub fn get_ref(ref_content: String) -> REF {
     }
 
     // Check if the first part is the segment ID "REF"
-    let start_index = if get_element(&ref_parts, 0) == "REF" { 1 } else { 0 };
+    let start_index = if get_element(&ref_parts, 0) == "REF" {
+        1
+    } else {
+        0
+    };
 
     // Extract the qualifier and reference number, skipping the segment ID if present
     let reference_id_number_qualifier = get_element(&ref_parts, start_index);

@@ -77,11 +77,19 @@ pub fn get_835(contents: &str) -> Edi835 {
 
     // Validate monetary fields per X12 §B.1.1.3.1.2
     use crate::helper::numeric_validation::warn_if_invalid_monetary;
-    warn_if_invalid_monetary("BPR", "02", &edi835.table1.table1.bpr_segments.bpr02_monetary_amount);
+    warn_if_invalid_monetary(
+        "BPR",
+        "02",
+        &edi835.table1.table1.bpr_segments.bpr02_monetary_amount,
+    );
     for t2 in &edi835.table2s {
         for l in &t2.loop2100s {
             warn_if_invalid_monetary("CLP", "03", &l.clp_segments.clp03_total_claim_charge_amount);
-            warn_if_invalid_monetary("CLP", "04", &l.clp_segments.clp04_total_claim_payment_amount);
+            warn_if_invalid_monetary(
+                "CLP",
+                "04",
+                &l.clp_segments.clp04_total_claim_payment_amount,
+            );
         }
     }
 

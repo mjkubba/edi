@@ -16,7 +16,7 @@ pub struct PRV {
 }
 
 /// Parse a PRV segment string into a PRV struct
-#[allow(dead_code)]
+
 pub fn get_prv(segment: &str) -> PRV {
     let elements: Vec<&str> = segment.split('*').collect();
 
@@ -59,7 +59,7 @@ pub fn get_prv(segment: &str) -> PRV {
 }
 
 /// Convert a PRV struct to an EDI segment string
-#[allow(dead_code)]
+
 pub fn write_prv(prv: &PRV) -> String {
     let mut result = String::new();
 

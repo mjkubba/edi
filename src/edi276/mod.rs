@@ -1,6 +1,5 @@
 pub mod controller;
 pub mod interchangecontrol;
-pub mod interchangecontroltrailer;
 pub mod loop2000;
 pub mod loop2100;
 pub mod loop2200;

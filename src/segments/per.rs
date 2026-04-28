@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
  * - per08_contact_number: Third communication number
  */
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct PER {
     pub per01_contact_function_code: String,
     pub per02_contact_name: String,

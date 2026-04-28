@@ -88,10 +88,7 @@ pub fn get_loop_2110(
         let cas_count = contents.matches("CAS").count();
         for _ in 0..cas_count {
             let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
-            if check_for_expected_codes(
-                "CO,OA,PI,PR",
-                &cas_tmp.cas01_claim_adjustment_group_code,
-            ) {
+            if check_for_expected_codes("CO,OA,PI,PR", &cas_tmp.cas01_claim_adjustment_group_code) {
                 info!("CAS segment found, ");
                 cas_segments.push(cas_tmp);
                 info!("CAS segment parsed");

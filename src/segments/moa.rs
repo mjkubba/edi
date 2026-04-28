@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 // EDI 835 MOA - PROVIDER SUMMARY INFORMATION
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct MOA {
     pub moa01_reimbursement_rate: String,
     pub moa02_claim_hcpcs_payable_amount: String,
@@ -74,10 +74,14 @@ pub fn write_moa(moa: MOA) -> String {
     }
     build_segment(&[
         "MOA",
-        &moa.moa01_reimbursement_rate, &moa.moa02_claim_hcpcs_payable_amount,
-        &moa.moa03_claim_payment_remark_code, &moa.moa04_claim_payment_remark_code,
-        &moa.moa05_claim_payment_remark_code, &moa.moa06_claim_payment_remark_code,
-        &moa.moa07_claim_payment_remark_code, &moa.moa08_claim_esrd_payment_amount,
+        &moa.moa01_reimbursement_rate,
+        &moa.moa02_claim_hcpcs_payable_amount,
+        &moa.moa03_claim_payment_remark_code,
+        &moa.moa04_claim_payment_remark_code,
+        &moa.moa05_claim_payment_remark_code,
+        &moa.moa06_claim_payment_remark_code,
+        &moa.moa07_claim_payment_remark_code,
+        &moa.moa08_claim_esrd_payment_amount,
         &moa.moa09_nonpayable_professional_component_amount,
     ])
 }

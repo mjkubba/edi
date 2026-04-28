@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 // EDI 835 BPR segment
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct BPR {
     pub bpr01_transaction_handling_code: String,
     pub bpr02_monetary_amount: String,

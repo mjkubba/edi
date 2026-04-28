@@ -1,8 +1,8 @@
 use crate::helper::edihelper::get_element;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct TA1 {
     pub ta01_interchange_control_number: String,
     pub ta02_interchange_date: String,

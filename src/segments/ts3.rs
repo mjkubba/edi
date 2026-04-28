@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 // X12 spec defines 24 elements (TS301-TS324)
 // 835 TR3 marks TS306-TS312, TS314, TS316, TS319 as NOT USED
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct TS3 {
     pub ts301_provider_identifier: String,
     pub ts302_facility_type_code: String,

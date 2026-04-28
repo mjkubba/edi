@@ -198,9 +198,7 @@ pub fn get_1000bs(contents: &str) -> (Loop1000bs, String) {
             }
 
             // Parse PER segments
-            while contents.contains("PER")
-                && check_if_segment_in_loop("PER", "ENT", &contents)
-            {
+            while contents.contains("PER") && check_if_segment_in_loop("PER", "ENT", &contents) {
                 info!("PER segment found, ");
                 let per_content = get_segment_contents("PER", &contents);
                 let per_parts: Vec<&str> = per_content.split('*').collect();

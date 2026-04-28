@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct N1 {
     pub payer_id_code: String,
     pub payee_name: String,
@@ -29,5 +29,11 @@ pub fn get_n1(n1_content: String) -> N1 {
 }
 
 pub fn write_n1(n1: N1) -> String {
-    build_segment(&["N1", &n1.payer_id_code, &n1.payee_name, &n1.payee_identification_code_qualifier, &n1.payee_identification_code])
+    build_segment(&[
+        "N1",
+        &n1.payer_id_code,
+        &n1.payee_name,
+        &n1.payee_identification_code_qualifier,
+        &n1.payee_identification_code,
+    ])
 }

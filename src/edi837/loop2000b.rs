@@ -1,3 +1,6 @@
+use crate::edi837::loop2000c::{write_loop2000c, Loop2000c};
+use crate::edi837::loop2300::{write_loop2300, Loop2300};
+use crate::edi837::loop2400::write_loop2400;
 use serde::{Deserialize, Serialize};
 
 /// Loop2000B - Subscriber Hierarchical Level
@@ -31,6 +34,10 @@ pub struct Loop2000b {
     pub per: Option<String>,
     /// Payer Additional Identification
     pub ref_payer: Vec<String>,
+    /// Patient hierarchical levels (children of this subscriber)
+    pub loop2000c: Vec<Loop2000c>,
+    /// Claims when subscriber IS the patient (HL04=0, no Loop2000C children)
+    pub loop2300: Vec<Loop2300>,
 }
 
 /// Write Loop2000B to EDI format
@@ -115,6 +122,26 @@ pub fn write_loop2000b(loop2000b: &Loop2000b) -> String {
     for ref_segment in &loop2000b.ref_payer {
         result.push_str(ref_segment);
         result.push_str("\n");
+    }
+
+    // Write nested Loop2000C (Patient) children
+    for loop2000c in &loop2000b.loop2000c {
+        result.push_str(&write_loop2000c(loop2000c));
+        // Write claims nested under patient
+        for loop2300 in &loop2000c.loop2300 {
+            result.push_str(&write_loop2300(loop2300));
+            for loop2400 in &loop2300.loop2400 {
+                result.push_str(&write_loop2400(loop2400));
+            }
+        }
+    }
+
+    // Write claims directly under subscriber (when subscriber=patient)
+    for loop2300 in &loop2000b.loop2300 {
+        result.push_str(&write_loop2300(loop2300));
+        for loop2400 in &loop2300.loop2400 {
+            result.push_str(&write_loop2400(loop2400));
+        }
     }
 
     result

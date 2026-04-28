@@ -3,7 +3,7 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct CTX {
     pub ctx01_context_name: String,
     pub ctx02_segment_id_code: String,

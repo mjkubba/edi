@@ -3,7 +3,6 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::edi276::interchangecontrol::*;
-use crate::edi276::interchangecontroltrailer::*;
 use crate::edi276::loop2000::*;
 use crate::edi276::table1::*;
 use crate::error::EdiResult;
@@ -217,7 +216,7 @@ pub fn write_276(edi276: &Edi276) -> String {
 ///
 /// # Returns
 /// * `bool` - True if the JSON contains 276 format data, false otherwise
-#[allow(dead_code)]
+
 pub fn is_276_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 276 format
     contents.contains("\"st01_transaction_set_identifier_code\":\"276\"")
@@ -263,7 +262,7 @@ mod tests {
 
         // Verify key components
         assert_eq!(
-            edi276.interchange_header.isa01_authorization_qualifier,
+            edi276.interchange_header.isa_segments.information_qualifier,
             "00"
         );
         assert_eq!(

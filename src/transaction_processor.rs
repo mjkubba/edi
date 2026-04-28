@@ -2,7 +2,7 @@ use crate::error::EdiResult;
 use serde::{de::DeserializeOwned, Serialize};
 
 /// Trait defining common behavior for all transaction sets
-#[allow(dead_code)]
+
 pub trait TransactionSet: Serialize + DeserializeOwned + Default {
     /// Parse EDI content into this transaction set
     fn parse(contents: String) -> EdiResult<(Self, String)>

@@ -32,9 +32,7 @@ pub fn get_loop2000e(contents: &str) -> (Loop2000E, String) {
             contents = content_trim("HL", &contents);
 
             // Parse TRN segments
-            while contents.contains("TRN")
-                && check_if_segment_in_loop("TRN", "UM", &contents)
-            {
+            while contents.contains("TRN") && check_if_segment_in_loop("TRN", "UM", &contents) {
                 info!("TRN segment found, ");
                 let trn_segment = get_trn(get_segment_contents("TRN", &contents));
                 info!("TRN segment parsed");

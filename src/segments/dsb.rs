@@ -14,7 +14,6 @@ pub struct DSB {
     pub dsb08_monetary_amount_2: String,
 }
 
-#[allow(dead_code)]
 pub fn get_dsb(dsb_content: String) -> DSB {
     let dsb_parts: Vec<&str> = dsb_content.split("*").collect();
 
@@ -64,7 +63,6 @@ pub fn get_dsb(dsb_content: String) -> DSB {
     dsb
 }
 
-#[allow(dead_code)]
 pub fn write_dsb(dsb: DSB) -> String {
     let mut dsb_content = String::new();
 

@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct CLP {
     pub clp01_patient_control_number: String,
     pub clp02_claim_status_code: String,
@@ -79,12 +79,18 @@ pub fn write_clp(clp: CLP) -> String {
     }
     build_segment(&[
         "CLP",
-        &clp.clp01_patient_control_number, &clp.clp02_claim_status_code,
-        &clp.clp03_total_claim_charge_amount, &clp.clp04_total_claim_payment_amount,
-        &clp.clp05_patient_responsibility_amount, &clp.clp06_claim_filing_indicator_code,
-        &clp.clp07_payer_claim_control_number, &clp.clp08_facility_type_code,
-        &clp.clp09_claim_frequency_code, &clp.clp10_patient_status_code,
-        &clp.clp11_diagnosis_related_group, &clp.clp12_drg_weight,
+        &clp.clp01_patient_control_number,
+        &clp.clp02_claim_status_code,
+        &clp.clp03_total_claim_charge_amount,
+        &clp.clp04_total_claim_payment_amount,
+        &clp.clp05_patient_responsibility_amount,
+        &clp.clp06_claim_filing_indicator_code,
+        &clp.clp07_payer_claim_control_number,
+        &clp.clp08_facility_type_code,
+        &clp.clp09_claim_frequency_code,
+        &clp.clp10_patient_status_code,
+        &clp.clp11_diagnosis_related_group,
+        &clp.clp12_drg_weight,
         &clp.clp13_percent_discharge_fraction,
     ])
 }

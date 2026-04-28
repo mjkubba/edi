@@ -92,7 +92,7 @@ The parser auto-detects the transaction set type from the content — no need to
 ### Build & Test
 ```bash
 cargo build
-cargo test    # 238 tests
+cargo test    # 257 tests
 ```
 
 ### Testing with demo files

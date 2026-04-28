@@ -1,3 +1,6 @@
+// Library crate: all public items are part of the API even if not used by the binary.
+#![allow(dead_code)]
+
 pub mod edi270;
 pub mod edi271;
 pub mod edi276;
@@ -25,7 +28,7 @@ pub use edi277::controller::Edi277;
 pub use edi278::controller::Edi278;
 pub use edi834::controller::Edi834;
 pub use edi835::controller::Edi835;
-pub use edi837::controller::{Edi837D, Edi837I, Edi837P};
+pub use edi837::controller::{Edi837, Edi837D, Edi837I, Edi837P, Edi837Subtype};
 pub use edi999::controller::Edi999;
 
 // Re-export transaction set functions
@@ -36,5 +39,7 @@ pub use edi277::controller::{get_277, write_277};
 pub use edi278::controller::{get_278, write_278};
 pub use edi834::controller::{get_834, write_834};
 pub use edi835::controller::{get_835, write_835};
-pub use edi837::controller::{get_837d, get_837i, get_837p, write_837d, write_837i, write_837p};
+pub use edi837::controller::{
+    get_837, get_837d, get_837i, get_837p, write_837, write_837d, write_837i, write_837p,
+};
 pub use edi999::controller::{get_999, write_999};

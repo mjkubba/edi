@@ -3,7 +3,6 @@ use log::info;
 use serde::{Deserialize, Serialize};
 
 use crate::edi277::interchangecontrol::*;
-use crate::edi277::interchangecontroltrailer::*;
 use crate::edi277::loop2000::*;
 use crate::edi277::table1::*;
 use crate::error::EdiResult;
@@ -138,7 +137,7 @@ fn fix_ref_277(r: &mut crate::segments::r#ref::REF) {
 }
 
 /// Helper function to fix STC segment for 277 format
-#[allow(dead_code)]
+
 fn fix_stc_277(stc: &mut crate::segments::stc::STC) {
     // If the segment_id is in the health_care_claim_status field, fix it
     if stc.segment_id == "STC" && stc.stc01_health_care_claim_status == "STC" {
@@ -228,7 +227,7 @@ pub fn write_277(edi277: &Edi277) -> String {
 ///
 /// # Returns
 /// * `bool` - True if the JSON contains 277 format data, false otherwise
-#[allow(dead_code)]
+
 pub fn is_277_json(contents: &str) -> bool {
     // Check if the JSON contains key indicators of 277 format
     contents.contains("\"st01_transaction_set_identifier_code\":\"277\"")
@@ -268,11 +267,11 @@ mod tests {
 
         // Verify interchange header with GS
         assert_eq!(
-            edi277.interchange_header.isa01_authorization_qualifier,
+            edi277.interchange_header.isa_segments.information_qualifier,
             "00"
         );
         assert_eq!(
-            edi277.interchange_header.gs01_functional_identifier_code,
+            edi277.interchange_header.gs_segments.functional_id_code,
             "HN"
         );
 
@@ -303,7 +302,7 @@ mod tests {
 
         // Verify trailer with GE
         assert_eq!(
-            edi277.interchange_trailer.ge01_number_of_transaction_sets,
+            edi277.interchange_trailer.ge_segments.number_of_transitions,
             "1"
         );
 

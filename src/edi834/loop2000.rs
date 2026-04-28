@@ -1,14 +1,8 @@
 use log::info;
 use serde::{Deserialize, Serialize};
 
+use crate::edi834::loop2100_generic::*;
 use crate::edi834::loop2100a::*;
-use crate::edi834::loop2100b::*;
-use crate::edi834::loop2100c::*;
-use crate::edi834::loop2100d::*;
-use crate::edi834::loop2100e::*;
-use crate::edi834::loop2100f::*;
-use crate::edi834::loop2100g::*;
-use crate::edi834::loop2100h::*;
 use crate::edi834::loop2300::*;
 use crate::segments::dtp::*;
 use crate::segments::ins::*;

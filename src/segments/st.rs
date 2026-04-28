@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct ST {
     pub transaction_set_id: String,
     pub transaction_set_control_number: String,
@@ -23,5 +23,10 @@ pub fn get_st(st_content: String) -> ST {
 }
 
 pub fn write_st(st: ST) -> String {
-    build_segment(&["ST", &st.transaction_set_id, &st.transaction_set_control_number, &st.implementation_conven_ref])
+    build_segment(&[
+        "ST",
+        &st.transaction_set_id,
+        &st.transaction_set_control_number,
+        &st.implementation_conven_ref,
+    ])
 }

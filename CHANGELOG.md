@@ -2,64 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-04-28
+
+### Refactored
+- Migrated 276, 277, 820 to shared ISA/GS/GE/IEA structs (unified interchange envelope)
+- Removed scattered `#[allow(dead_code)]` — uses crate-level allow instead
+- Deduplicated 834 loop2100b-h into generic parameterized module
+- Unified Edi837P/I/D into single `Edi837` struct with subtype enum — eliminated 600 lines of copy-paste
+- Nested claims under subscriber/patient per HL parent-child tree (multi-subscriber batches now preserve claim associations)
+- Consolidated main.rs routing from 440-line if/else chain into three dispatch functions (261 lines)
+- Replaced glob imports with explicit imports in main.rs
+
+### Tests
+- 257 tests (up from 253), all passing
+- All 12 demo files round-trip verified
+
 ## [0.2.0] - 2026-04-27
 
 ### Security & Reliability (Production-Safe Milestone)
-- **C1**: Eliminated 998 panic paths — all segment parsers use safe `get_element()` access, all production `unwrap()` calls replaced with proper error handling
-- **C2**: Fixed `stiuational_element()` output corruption — migrated all segment writers to `build_segment()` per X12 §B.1.1.3.10 (preserves empty middle elements, strips trailing)
-- **C4**: Added 256MB file size limit to prevent OOM on large batch files
-- **C5**: Eliminated 172 unnecessary `contents.clone()` calls by changing function params from `String` to `&str`
-- **C7**: Fixed 837 P/I/D subtype detection in write path — now uses version identifiers (X222/X223/X224) instead of fragile JSON field sniffing
-- **H1+H2**: Fixed 90 bare segment ID matches (`.find("SE")` etc.) that could false-match inside data values — now uses boundary-aware `"SE*"` patterns
-- **H5**: Added X12 envelope validation — checks ST02==SE02, GS06==GE02, ISA13==IEA02 per spec
-- **H6**: Restored CLP10 (patient_status_code) and fixed off-by-one field mapping in CLP segment
-- **H7**: Fixed hardcoded segment ID length of 3 — now uses dynamic `key.len()`
+- Eliminated 998 panic paths — all segment parsers use safe `get_element()` access, all production `unwrap()` calls replaced with proper error handling
+- Fixed `stiuational_element()` output corruption — migrated all segment writers to `build_segment()` per X12 §B.1.1.3.10 (preserves empty middle elements, strips trailing)
+- Added 256MB file size limit to prevent OOM on large batch files
+- Eliminated 172 unnecessary `contents.clone()` calls by changing function params from `String` to `&str`
+- Fixed 837 P/I/D subtype detection in write path — now uses version identifiers (X222/X223/X224) instead of fragile JSON field sniffing
+- Fixed 90 bare segment ID matches (`.find("SE")` etc.) that could false-match inside data values — now uses boundary-aware `"SE*"` patterns
+- Added X12 envelope validation — checks ST02==SE02, GS06==GE02, ISA13==IEA02 per spec
+- Restored CLP10 (patient_status_code) and fixed off-by-one field mapping in CLP segment
+- Fixed hardcoded segment ID length of 3 — now uses dynamic `key.len()`
 
 ### New Features
-- **H4**: Added numeric/decimal field validation per X12 §B.1.1.3.1 (warns on invalid monetary values in BPR, CLP)
-- **H5**: Envelope validation module (`helper/envelope_validation.rs`)
-- **TA1**: Restored interchange acknowledgment segment parser and writer with tests
+- Added numeric/decimal field validation per X12 §B.1.1.3.1 (warns on invalid monetary values in BPR, CLP)
+- Envelope validation module (`helper/envelope_validation.rs`)
+- Restored interchange acknowledgment (TA1) segment parser and writer with tests
 
 ### Code Quality
-- **L1**: Fixed typos in public API names (`segement`, `adjustsment`, `numbner`, `scv04`)
-- **L4**: Removed unused `once_cell` dependency
-- **L5**: Removed commented-out dead code, cleaned up segment files
-- **C3**: Audited segment ID handling — confirmed consistent contract, documented
-- **C6**: Documented `clean_contents()` delimiter replacement as correct per X12 §B.1.1.2
+- Fixed typos in public API names (`segement`, `adjustsment`, `numbner`, `scv04`)
+- Removed unused `once_cell` dependency
+- Removed commented-out dead code, cleaned up segment files
+- Audited segment ID handling — confirmed consistent contract, documented
+- Documented `clean_contents()` delimiter replacement as correct per X12 §B.1.1.2
 
 ### Tests
 - 253 tests (up from 238), all passing
 - All 12 demo files round-trip verified (EDI→JSON→EDI→JSON = identical)
-
-## [Unreleased]
-
-### Fixed
-- **edi837P/I/D**: Rewrote `parse_loop2300` with sequential segment processing — eliminates `find()` ordering bugs that caused segments to be skipped when they appeared in non-standard order
-- **edi837**: Fixed `parse_loop2000a` PRV boundary — was consuming claim-level PRV*PE from far ahead in content
-- **edi837**: Fixed envelope segment double-tilde in `write_837p`/`write_837i`/`write_837d` — raw segments already contain `~`, write functions no longer add another
-- **edi837**: Removed redundant CL1/TOO parsing from 837I/D controllers — now handled by sequential `parse_loop2300`
-- **edi835**: Fixed output formatting — segments now written one-per-line instead of all on single line
-- **edi835**: Fixed TS3 parser element position mapping — TS306-TS312 are NOT USED per TR3, TS313 now correctly at position 12
-- **edi835**: Added `build_segment()` helper for X12 §3.7 compliant trailing separator suppression — preserves empty middle fields, trims trailing empties
-- **edi835**: Converted TS3, TS2, MIA, SVC, PLB writers to use `build_segment()`
-- **edi834**: Fixed Loop2320/2330 — moved from Loop2000 level to inside Loop2300 per spec; Loop2330 corrected from DSB (disability) to NM1 (COB insurer)
-- **edi276**: AMT/DTP segments at subscriber level now captured on round-trip
-- **main.rs**: Fixed `clean_contents` result being discarded (was stored in unused `_clean_contents` variable)
-
-### Added
-- **edi837 Loop2000B**: NM1*PR (payer name), DMG after NM1*IL, payer N3/N4/PER/REF
-- **edi837 Loop2000C**: DMG parsing after NM1*QC (handles both before-NM1 and after-NM1 orderings)
-- **edi837 Loop2300**: NM1*82/71/72 (rendering/attending/operating provider) and associated PRV*PE
-- **edi837 Loop2400**: TOO segment parsing for 837D dental claims
-- **edi834 Loop2320**: COB segment + REF + DTP with nested Loop2330 (NM1 + N3 + N4)
-- **Custom delimiter support**: `clean_contents()` detects ISA element separator (position 3) and segment terminator (position 105), normalizes to standard `*` and `~`
-
-### Changed
-- 238 tests passing, 0 compiler warnings (was 237 tests, 26 warnings)
-- Removed dead code: `loop2010ba.rs`, `loop2010bb.rs`, `loop2010ca.rs`, unused parse/write functions from `table1.rs`, `interchangecontrol.rs`, `interchangecontroltrailer.rs`
-- Removed unused generic infrastructure: `segment_config.rs`, `loop_processor.rs`, `TransactionProcessor`
-- Suppressed warnings on public API (`get_278`, `get_820`) and infrastructure kept for future use (`EdiError` variants, `has_segment`)
-- All 12 transaction sets now round-trip identical or trailing-newline-only
 
 ## [0.1.0] - 2026-04-25
 

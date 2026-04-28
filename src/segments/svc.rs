@@ -2,7 +2,7 @@ use crate::helper::edihelper::{build_segment, get_element};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
-#[allow(dead_code)]
+
 pub struct SVC {
     pub svc01_1_product_or_service_is_qualifier: String,
     pub svc02_line_item_charge_amount: String,
