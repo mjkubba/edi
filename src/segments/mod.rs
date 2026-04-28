@@ -50,6 +50,7 @@ pub mod st;
 pub mod stc;
 pub mod sv2;
 pub mod svc;
+pub mod ta1;
 pub mod trn;
 pub mod ts2;
 pub mod ts3;
