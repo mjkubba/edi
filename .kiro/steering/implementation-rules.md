@@ -26,7 +26,7 @@ These guides contain segment element definitions, loop hierarchies, situational 
 
 ## EDI Segment Parsing Rules
 
-1. **`get_segment_contents(key, contents)` strips the segment ID prefix** (e.g., `get_segment_contents("NM1", ...)` returns content AFTER `NM1*`). Parsers like `get_nm1`, `get_hl`, `get_prv` expect content WITHOUT the segment ID at index 0. If you extract a segment manually with `find("HL")`, you must strip the prefix (e.g., `&segment[3..]` for `HL*`) before passing to the parser.
+1. **`get_segment_contents(key, contents)` strips the segment ID prefix** (e.g., `get_segment_contents("NM1", ...)` returns content AFTER `NM1*`). When callers split the result on `*`, index 0 = first data element (e.g., NM101). This contract is consistent across the entire codebase (audited 2026-04-27).
 
 2. **The edi837 module stores raw segment strings WITH the `~` terminator** (e.g., `"HL*2*1*22*0~"`). This is by design — the write functions output the stored value directly followed by `\n`. All other modules use parsed structs (NM1, HL, etc.) and the write functions add `~`. Do not mix these patterns.
 
@@ -38,13 +38,23 @@ These guides contain segment element definitions, loop hierarchies, situational 
 
 6. **Prefer sequential segment processing over `find()` for loops with many segment types.** The `parse_loop2300` rewrite proved that iterating segment-by-segment (split on `~`, match prefix) is more reliable than calling `find()` for each segment type. `find()` skips over unrecognized segments between the cursor and the match, silently losing data.
 
-7. **NOT USED elements still occupy their position in the segment.** Per X12 §3.7 and RFI #1500, only **trailing** empty element separators may be suppressed. Middle empty elements must keep their `*` separators to preserve positional meaning. Use `build_segment()` from edihelper which handles this correctly — it joins all elements with `*` then trims trailing empties.
+7. **NOT USED elements still occupy their position in the segment.** Per X12 §B.1.1.3.10, only **trailing** empty element separators may be suppressed. Middle empty elements must keep their `*` separators to preserve positional meaning. Use `build_segment()` from edihelper which handles this correctly — it joins all elements with `*` then trims trailing empties.
 
 8. **NOT USED elements in the spec do NOT remove the position from the segment.** If TS306 is NOT USED and TS313 is SITUATIONAL, TS313 is still at position 12 (not position 5). The parser must read from the correct X12 position index, not skip NOT USED positions.
 
 9. **Demo files are AI-generated and may contain errors.** Always verify segment content against the X12 spec in the knowledge base before assuming the demo file is correct. If a round-trip diff occurs, check whether the demo or the code is wrong.
 
 10. **Write functions must output segments in spec-defined position order.** The X12 implementation guide defines a position number for each segment within a loop (e.g., TRN at pos 0200, NM1 at pos 0300). Writers must follow this order even if the parser stored them differently.
+
+11. **Use boundary-aware segment matching.** Never use bare `.find("SE")` or `.contains("HL")` — these match inside data values (e.g., "SERVICES" contains "SE"). Always append the element separator: `.find("SE*")`, `.contains("HL*")`. For robust matching, use `find_next_segment_start()` from edihelper which checks for `~` or start-of-content before the segment ID.
+
+12. **All segment parsers must use safe element access.** Use `get_element(&parts, index)` from edihelper instead of direct `parts[index]`. EDI segments may have fewer elements than the maximum (trailing optionals omitted per §B.1.1.3.10). Direct indexing panics on short segments.
+
+13. **ISA/GS/GE/IEA envelope segments are identical across all transaction types.** The control segments use the same struct definitions, same element names, same required/situational designators. Use the shared structs from `segments/isa.rs`, `segments/gs.rs`, `segments/se.rs`, `segments/ge.rs`, `segments/iea.rs`. Do not create local copies.
+
+14. **X12 delimiter replacement in `clean_contents()` is correct per spec.** Per X12 §B.1.1.2, delimiter characters must not appear inside data element values within the interchange. Global `replace()` of custom delimiters to standard `*` and `~` is safe.
+
+15. **837 P/I/D share structure above Loop 2400.** Loops 1000A/B, 2000A/B/C, 2010AA/AB/AC/BA/BB/CA, 2300, 2320, 2330 are structurally identical across Professional, Institutional, and Dental. Differences: 837P has UPIN REF in 2010AA; 837I has CL1 in 2300; DTP qualifiers vary per subtype; Loop 2400 service lines are completely different (SV1 vs SV2 vs SV3+TOO).
 
 ## File Operations
 

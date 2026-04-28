@@ -368,31 +368,32 @@ Subtype-specific (must remain separate):
 
 Issues are ordered by dependency and impact. Each row can start after its prerequisites are done.
 
-| Priority | Issue | Depends On | Est. Files | Est. Effort |
-|----------|-------|------------|------------|-------------|
-| 1        | C4: File size limits | — | 1 | Small |
-| 2        | C6: Fix clean_contents | — | 1 | Small |
-| 3        | H6: Fix CLP off-by-one | — | 1 | Small |
-| 4        | H7: Fix segment ID length | — | 1 | Small |
-| 5        | C7: Fix 837 detection | — | 2 | Small |
-| 6        | L1: Fix typos | — | ~10 | Small |
-| 7        | L4: Remove once_cell | — | 1 | Trivial |
-| 8        | L5: Remove commented code | — | ~20 | Small |
-| 9        | C3: Standardize segment ID | — | ~50 | Medium |
-| 10       | C2: Fix stiuational_element | C3 | 9 | Medium |
-| 11       | C1: Eliminate panics | C3 | ~60 | Large |
-| 12       | C5: Eliminate clones | C1 | ~50 | Large |
-| 13       | H1+H2: Fix segment finding | — | 4 | Small |
-| 14       | H5: Envelope validation | C1 | 2 | Medium |
-| 15       | H4: Numeric validation | C1 | ~45 | Medium |
-| 16       | M2: Unify InterchangeHeader | C1 | ~12 | Medium |
-| 17       | M7: Dedup 834 stubs | — | 8 | Small |
-| 18       | M6: Remove dead_code attrs | C1 | ~54 | Small |
-| 19       | M1: Dedup 837 P/I/D | M2 | ~15 | Large |
-| 20       | H3: 837 HL tree structure | M1 | ~5 | Large |
-| 21       | M3+M4: Consolidate arch | M1, M2 | ~15 | Large |
-| 22       | L3: Remove glob imports | M3 | 1 | Trivial |
-| 23       | L2: Option<String> fields | C1, C2 | ~50 | Large |
+| Priority | Issue | Depends On | Status |
+|----------|-------|------------|--------|
+| 1        | C4: File size limits | — | ✅ v0.2.0 |
+| 2        | C6: Fix clean_contents | — | ✅ v0.2.0 (correct per spec, documented) |
+| 3        | H6: Fix CLP off-by-one | — | ✅ v0.2.0 |
+| 4        | H7: Fix segment ID length | — | ✅ v0.2.0 |
+| 5        | C7: Fix 837 detection | — | ✅ v0.2.0 |
+| 6        | L1: Fix typos | — | ✅ v0.2.0 |
+| 7        | L4: Remove once_cell | — | ✅ v0.2.0 |
+| 8        | L5: Remove commented code | — | ✅ v0.2.0 (TA1 restored as active) |
+| 9        | C3: Standardize segment ID | — | ✅ v0.2.0 (audited, already consistent) |
+| 10       | C2: Fix stiuational_element | C3 | ✅ v0.2.0 |
+| 11       | C1: Eliminate panics | C3 | ✅ v0.2.0 (998 panic paths, 2 commits) |
+| 12       | C5: Eliminate clones | C1 | ✅ v0.2.0 (172/201 removed) |
+| 13       | H1+H2: Fix segment finding | — | ✅ v0.2.0 (90 bare finds fixed) |
+| 14       | H5: Envelope validation | C1 | ✅ v0.2.0 |
+| 15       | H4: Numeric validation | C1 | ✅ v0.2.0 |
+| 16       | M2: Unify InterchangeHeader | C1 | ✅ refactor branch |
+| 17       | M7: Dedup 834 stubs | — | ✅ refactor branch |
+| 18       | M6: Remove dead_code attrs | C1 | ✅ refactor branch |
+| 19       | M1: Dedup 837 P/I/D | M2 | 🔲 Next — plan updated with KB analysis |
+| 20       | H3: 837 HL tree structure | M1 | 🔲 |
+| 21       | M3+M4: Consolidate arch | M1, M2 | 🔲 |
+| 22       | L3: Remove glob imports | M3 | 🔲 |
+| 23       | L2: Option<String> fields | C1, C2 | 🔲 |
 
-**Total estimated commits:** ~35-40
-**Suggested milestone:** After items 1-14, the parser is safe for production input. Items 15+ are quality-of-life.
+**v0.2.0 released** — items 1-15 (production-safe milestone)
+**refactor/v0.3.0-architecture branch** — items 16-18 done, pushed
+**Next session** — start with M1 (837 dedup), then H3, M3+M4
