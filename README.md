@@ -120,7 +120,6 @@ src/
 ```
 
 ### Roadmap
-- `Option<String>` for optional X12 fields
 - Web UI for browser-based EDI processing
 - Schema validation
 - Performance optimization for large files
