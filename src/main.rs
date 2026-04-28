@@ -50,6 +50,11 @@ fn main() {
     let contents = get_file_contents(args.clone());
     let contents = clean_contents(contents);
 
+    // Validate X12 envelope if this is raw EDI (not JSON)
+    if !args.is_json && !contents.starts_with('{') {
+        crate::helper::envelope_validation::validate_raw_envelope(&contents);
+    }
+
     if args.operation == "write" {
         info!("Write EDI Operation");
 
