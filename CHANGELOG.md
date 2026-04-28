@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 - Migrated 276, 277, 820 to shared ISA/GS/GE/IEA structs (unified interchange envelope)
 - Removed scattered `#[allow(dead_code)]` — uses crate-level allow instead
 - Deduplicated 834 loop2100b-h into generic parameterized module
+- Unified Edi837P/I/D into single `Edi837` struct with subtype enum — eliminated 600 lines of copy-paste
+- Nested claims under subscriber/patient per HL parent-child tree (multi-subscriber batches now preserve claim associations)
+- Consolidated main.rs routing from 440-line if/else chain into three dispatch functions (261 lines)
+- Replaced glob imports with explicit imports in main.rs
 
 ## [0.2.0] - 2026-04-27
 

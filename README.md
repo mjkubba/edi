@@ -120,9 +120,6 @@ src/
 ```
 
 ### Roadmap
-- Deduplicate 837 P/I/D shared loop code into common module
-- 837 HL parent-child tree structure for multi-subscriber batches
-- Consolidate architectural patterns (trait-based routing)
 - `Option<String>` for optional X12 fields
 - Web UI for browser-based EDI processing
 - Schema validation
