@@ -64,7 +64,6 @@ pub fn get_table2(contents: &str) -> String {
     tmp_contents
 }
 
-
 pub fn get_999_2000(contents: &str) -> String {
     let mut tmp_contents = contents.to_string();
     let remaining_ak2_count = contents.matches("AK2").count();
@@ -142,7 +141,6 @@ pub fn get_segment_contents(key: &str, contents: &str) -> String {
         }
     }
 }
-
 
 pub fn get_segment_contents_opt(key: &str, contents: &str) -> Option<String> {
     match get_full_segment_contents(key, contents) {
@@ -271,47 +269,23 @@ mod tests {
         let contents = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~DTM*582****RD8*20120501-20140531~ENT*2~";
 
         // NM1 comes before ENT
-        assert!(check_if_segment_in_loop(
-            "NM1",
-            "ENT",
-            contents
-        ));
+        assert!(check_if_segment_in_loop("NM1", "ENT", contents));
 
         // REF comes before ENT
-        assert!(check_if_segment_in_loop(
-            "REF",
-            "ENT",
-            contents
-        ));
+        assert!(check_if_segment_in_loop("REF", "ENT", contents));
 
         // RMR comes before ENT
-        assert!(check_if_segment_in_loop(
-            "RMR",
-            "ENT",
-            contents
-        ));
+        assert!(check_if_segment_in_loop("RMR", "ENT", contents));
 
         // DTM comes before ENT
-        assert!(check_if_segment_in_loop(
-            "DTM",
-            "ENT",
-            contents
-        ));
+        assert!(check_if_segment_in_loop("DTM", "ENT", contents));
 
         // ENT doesn't come before ENT
-        assert!(!check_if_segment_in_loop(
-            "ENT",
-            "ENT",
-            contents
-        ));
+        assert!(!check_if_segment_in_loop("ENT", "ENT", contents));
 
         // Test with segment at the end (no anchor after it)
         let contents_end = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~";
-        assert!(check_if_segment_in_loop(
-            "RMR",
-            "XYZ",
-            contents_end
-        ));
+        assert!(check_if_segment_in_loop("RMR", "XYZ", contents_end));
     }
 }
 #[test]

@@ -73,7 +73,6 @@ pub struct Loop2100E {
 // Placeholder functions for loop processing
 // These will be implemented in detail later
 
-
 pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
     let mut result = String::new();
 
@@ -102,7 +101,6 @@ pub fn write_loop_2100a(loop_2100a: &Loop2100A) -> String {
 
     result
 }
-
 
 pub fn write_loop_2100b(loop_2100b: &Loop2100B) -> String {
     let mut result = String::new();

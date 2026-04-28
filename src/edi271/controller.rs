@@ -383,7 +383,6 @@ fn remove_duplicate_dtp_segments(edi_content: &str) -> String {
     result
 }
 
-
 pub fn is_271_json(contents: &str) -> bool {
     // Check if the content is likely to be a 271 JSON
     contents.contains("\"interchange_header\"")

@@ -278,7 +278,6 @@ impl TransactionSet for Edi278 {
     }
 }
 
-
 pub fn get_278(contents: &str) -> EdiResult<Edi278> {
     match Edi278::parse(contents.to_string()) {
         Ok((edi278, _)) => Ok(edi278),

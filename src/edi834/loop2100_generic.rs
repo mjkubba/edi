@@ -41,18 +41,46 @@ pub type Loop2100G = Loop2100Generic;
 pub type Loop2100H = Loop2100Generic;
 
 // Convenience functions to preserve existing call signatures
-pub fn get_loop2100b(contents: &str) -> (Loop2100B, String) { get_loop2100_generic(contents, "70") }
-pub fn get_loop2100c(contents: &str) -> (Loop2100C, String) { get_loop2100_generic(contents, "31") }
-pub fn get_loop2100d(contents: &str) -> (Loop2100D, String) { get_loop2100_generic(contents, "36") }
-pub fn get_loop2100e(contents: &str) -> (Loop2100E, String) { get_loop2100_generic(contents, "M8") }
-pub fn get_loop2100f(contents: &str) -> (Loop2100F, String) { get_loop2100_generic(contents, "S1") }
-pub fn get_loop2100g(contents: &str) -> (Loop2100G, String) { get_loop2100_generic(contents, "6Y") }
-pub fn get_loop2100h(contents: &str) -> (Loop2100H, String) { get_loop2100_generic(contents, "9K") }
+pub fn get_loop2100b(contents: &str) -> (Loop2100B, String) {
+    get_loop2100_generic(contents, "70")
+}
+pub fn get_loop2100c(contents: &str) -> (Loop2100C, String) {
+    get_loop2100_generic(contents, "31")
+}
+pub fn get_loop2100d(contents: &str) -> (Loop2100D, String) {
+    get_loop2100_generic(contents, "36")
+}
+pub fn get_loop2100e(contents: &str) -> (Loop2100E, String) {
+    get_loop2100_generic(contents, "M8")
+}
+pub fn get_loop2100f(contents: &str) -> (Loop2100F, String) {
+    get_loop2100_generic(contents, "S1")
+}
+pub fn get_loop2100g(contents: &str) -> (Loop2100G, String) {
+    get_loop2100_generic(contents, "6Y")
+}
+pub fn get_loop2100h(contents: &str) -> (Loop2100H, String) {
+    get_loop2100_generic(contents, "9K")
+}
 
-pub fn write_loop2100b(l: Loop2100B) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100c(l: Loop2100C) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100d(l: Loop2100D) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100e(l: Loop2100E) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100f(l: Loop2100F) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100g(l: Loop2100G) -> String { write_loop2100_generic(&l) }
-pub fn write_loop2100h(l: Loop2100H) -> String { write_loop2100_generic(&l) }
+pub fn write_loop2100b(l: Loop2100B) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100c(l: Loop2100C) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100d(l: Loop2100D) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100e(l: Loop2100E) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100f(l: Loop2100F) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100g(l: Loop2100G) -> String {
+    write_loop2100_generic(&l)
+}
+pub fn write_loop2100h(l: Loop2100H) -> String {
+    write_loop2100_generic(&l)
+}

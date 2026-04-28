@@ -32,9 +32,7 @@ pub fn get_loop2010b(contents: &str) -> (Loop2010B, String) {
             contents = content_trim("NM1", &contents);
 
             // Parse PER segments
-            while contents.contains("PER")
-                && check_if_segment_in_loop("PER", "HL", &contents)
-            {
+            while contents.contains("PER") && check_if_segment_in_loop("PER", "HL", &contents) {
                 info!("PER segment found, ");
                 let per_segment = get_per(get_segment_contents("PER", &contents));
                 info!("PER segment parsed");
@@ -44,9 +42,7 @@ pub fn get_loop2010b(contents: &str) -> (Loop2010B, String) {
             }
 
             // Parse REF segments
-            while contents.contains("REF")
-                && check_if_segment_in_loop("REF", "HL", &contents)
-            {
+            while contents.contains("REF") && check_if_segment_in_loop("REF", "HL", &contents) {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
                 info!("REF segment parsed");

@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 // EDI 835 CUR segment
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 
-
 pub struct CUR {
     pub identity_identifier_code: String,
     pub currency_code: String,

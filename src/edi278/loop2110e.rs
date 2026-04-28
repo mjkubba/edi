@@ -87,8 +87,7 @@ pub fn get_loop2110e(contents: &str) -> (Loop2110E, String) {
             }
 
             // Parse PRV segment
-            if contents.contains("PRV") && check_if_segment_in_loop("PRV", "NM1", &contents)
-            {
+            if contents.contains("PRV") && check_if_segment_in_loop("PRV", "NM1", &contents) {
                 info!("PRV segment found, ");
                 let prv_content = get_segment_contents("PRV", &contents);
                 prv_segments = Some(get_prv(&prv_content));

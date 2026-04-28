@@ -45,8 +45,7 @@ pub fn get_loop2010d(contents: &str) -> (Loop2010D, String) {
             }
 
             // Parse DMG segment
-            if contents.contains("DMG") && check_if_segment_in_loop("DMG", "HL", &contents)
-            {
+            if contents.contains("DMG") && check_if_segment_in_loop("DMG", "HL", &contents) {
                 info!("DMG segment found, ");
                 dmg_segments = Some(get_dmg(get_segment_contents("DMG", &contents)));
                 info!("DMG segment parsed");

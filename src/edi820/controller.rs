@@ -107,7 +107,6 @@ impl TransactionSet for Edi820 {
     }
 }
 
-
 pub fn get_820(contents: &str) -> EdiResult<Edi820> {
     match Edi820::parse(contents.to_string()) {
         Ok((edi820, _)) => Ok(edi820),

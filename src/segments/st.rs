@@ -23,5 +23,10 @@ pub fn get_st(st_content: String) -> ST {
 }
 
 pub fn write_st(st: ST) -> String {
-    build_segment(&["ST", &st.transaction_set_id, &st.transaction_set_control_number, &st.implementation_conven_ref])
+    build_segment(&[
+        "ST",
+        &st.transaction_set_id,
+        &st.transaction_set_control_number,
+        &st.implementation_conven_ref,
+    ])
 }

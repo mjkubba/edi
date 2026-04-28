@@ -43,7 +43,14 @@ pub fn write_n4(n4: N4) -> String {
     if n4.payee_city.is_empty() {
         return String::new();
     }
-    build_segment(&["N4", &n4.payee_city, &n4.payee_state, &n4.payee_zip, &n4.payee_country_code, &n4.payee_country_sub_code])
+    build_segment(&[
+        "N4",
+        &n4.payee_city,
+        &n4.payee_state,
+        &n4.payee_zip,
+        &n4.payee_country_code,
+        &n4.payee_country_sub_code,
+    ])
 }
 
 #[cfg(test)]

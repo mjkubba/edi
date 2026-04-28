@@ -18,7 +18,11 @@ pub fn get_dtp(dtp_content: String) -> DTP {
     }
 
     // Check if the first part is the segment ID "DTP"
-    let start_index = if get_element(&dtp_parts, 0) == "DTP" { 1 } else { 0 };
+    let start_index = if get_element(&dtp_parts, 0) == "DTP" {
+        1
+    } else {
+        0
+    };
 
     // Extract fields with bounds checking, skipping the segment ID if present
     let dtp01_date_time_qualifier = get_element(&dtp_parts, start_index);
