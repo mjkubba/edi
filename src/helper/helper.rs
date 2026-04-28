@@ -189,6 +189,8 @@ pub fn clean_contents(contents: String) -> String {
                 "Custom delimiters detected: element='{}' segment='{}'",
                 element_sep, segment_term
             );
+            // Per X12 §B.1.1.2: delimiter characters must not appear inside data
+            // element values within the interchange, so global replace is safe.
             if segment_term != '~' {
                 clean = clean.replace(segment_term, "~");
             }
