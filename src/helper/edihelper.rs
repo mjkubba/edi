@@ -19,7 +19,7 @@ pub fn build_segment(elements: &[&str]) -> String {
     format!("{}~", trimmed)
 }
 
-pub fn check_if_segement_in_loop(segment: &str, anchor: &str, contents: String) -> bool {
+pub fn check_if_segment_in_loop(segment: &str, anchor: &str, contents: String) -> bool {
     if let (Some(segment_pos), Some(anchor_pos)) = (contents.find(segment), contents.find(anchor)) {
         return segment_pos < anchor_pos;
     }
@@ -268,39 +268,39 @@ mod tests {
     }
 
     #[test]
-    fn test_check_if_segement_in_loop() {
+    fn test_check_if_segment_in_loop() {
         let contents = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~DTM*582****RD8*20120501-20140531~ENT*2~";
 
         // NM1 comes before ENT
-        assert!(check_if_segement_in_loop(
+        assert!(check_if_segment_in_loop(
             "NM1",
             "ENT",
             contents.to_string()
         ));
 
         // REF comes before ENT
-        assert!(check_if_segement_in_loop(
+        assert!(check_if_segment_in_loop(
             "REF",
             "ENT",
             contents.to_string()
         ));
 
         // RMR comes before ENT
-        assert!(check_if_segement_in_loop(
+        assert!(check_if_segment_in_loop(
             "RMR",
             "ENT",
             contents.to_string()
         ));
 
         // DTM comes before ENT
-        assert!(check_if_segement_in_loop(
+        assert!(check_if_segment_in_loop(
             "DTM",
             "ENT",
             contents.to_string()
         ));
 
         // ENT doesn't come before ENT
-        assert!(!check_if_segement_in_loop(
+        assert!(!check_if_segment_in_loop(
             "ENT",
             "ENT",
             contents.to_string()
@@ -308,7 +308,7 @@ mod tests {
 
         // Test with segment at the end (no anchor after it)
         let contents_end = "NM1*IL*1*DOE*JOHN~REF*SY*123456789~RMR*ZZ*APTC**35~";
-        assert!(check_if_segement_in_loop(
+        assert!(check_if_segment_in_loop(
             "RMR",
             "XYZ",
             contents_end.to_string()

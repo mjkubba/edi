@@ -218,8 +218,8 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
 
     // Parse REF segments
     while contents.contains("REF")
-        && check_if_segement_in_loop("REF", "DTM", contents.clone())
-        && check_if_segement_in_loop("REF", "N1", contents.clone())
+        && check_if_segment_in_loop("REF", "DTM", contents.clone())
+        && check_if_segment_in_loop("REF", "N1", contents.clone())
     {
         info!("REF segment found, ");
         let ref_content = get_segment_contents("REF", &contents);
@@ -249,7 +249,7 @@ pub fn get_table1s(mut contents: String) -> (Table1s, String) {
     }
 
     // Parse DTM segments
-    while contents.contains("DTM") && check_if_segement_in_loop("DTM", "N1", contents.clone()) {
+    while contents.contains("DTM") && check_if_segment_in_loop("DTM", "N1", contents.clone()) {
         info!("DTM segment found, ");
         let dtm_content = get_segment_contents("DTM", &contents);
 

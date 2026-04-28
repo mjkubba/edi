@@ -20,7 +20,7 @@ pub struct Table1s {
     pub dtm_segments: DTM,
 }
 
-// fn check_if_segement_in_loop(segment: &str, anchor: &str, contents:String) -> bool {
+// fn check_if_segment_in_loop(segment: &str, anchor: &str, contents:String) -> bool {
 //     let segment_pos = contents.find(&segment);
 //     let anchor_pos = contents.find(&anchor);
 //     if segment_pos < anchor_pos {
@@ -89,7 +89,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, 
     }
 
     if contents.contains("REF") {
-        if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+        if check_if_segment_in_loop("REF", "N1", contents.clone()) {
             info!("REF segment found, ");
             ref_receiver_segments = get_ref(get_segment_contents("REF", &contents));
             info!("REF segment parsed");
@@ -98,7 +98,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, 
     }
 
     if contents.contains("REF") {
-        if check_if_segement_in_loop("REF", "N1", contents.clone()) {
+        if check_if_segment_in_loop("REF", "N1", contents.clone()) {
             info!("REF segment found, ");
             ref_version_segments = get_ref(get_segment_contents("REF", &contents));
             info!("REF segment parsed");
@@ -107,7 +107,7 @@ pub fn get_first_table_header(mut contents: String) -> (ST, BPR, TRN, CUR, REF, 
     }
 
     if contents.contains("DTM") {
-        if check_if_segement_in_loop("DTM", "N1", contents.clone()) {
+        if check_if_segment_in_loop("DTM", "N1", contents.clone()) {
             info!("DTM segment found, ");
             dtm_segments = get_dtm(get_segment_contents("DTM", &contents));
             info!("DTM segment parsed");

@@ -45,10 +45,10 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segement_in_loop("REF", "N3", contents.clone())
-                && check_if_segement_in_loop("REF", "N4", contents.clone())
-                && check_if_segement_in_loop("REF", "PRV", contents.clone())
-                && check_if_segement_in_loop("REF", "NM1", contents.clone())
+                && check_if_segment_in_loop("REF", "N3", contents.clone())
+                && check_if_segment_in_loop("REF", "N4", contents.clone())
+                && check_if_segment_in_loop("REF", "PRV", contents.clone())
+                && check_if_segment_in_loop("REF", "NM1", contents.clone())
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
@@ -60,9 +60,9 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
 
             // Parse N3 segment (address)
             if contents.contains("N3")
-                && check_if_segement_in_loop("N3", "N4", contents.clone())
-                && check_if_segement_in_loop("N3", "PRV", contents.clone())
-                && check_if_segement_in_loop("N3", "NM1", contents.clone())
+                && check_if_segment_in_loop("N3", "N4", contents.clone())
+                && check_if_segment_in_loop("N3", "PRV", contents.clone())
+                && check_if_segment_in_loop("N3", "NM1", contents.clone())
             {
                 info!("N3 segment found, ");
                 let n3_content = get_segment_contents("N3", &contents);
@@ -74,8 +74,8 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
 
             // Parse N4 segment (city, state, zip)
             if contents.contains("N4")
-                && check_if_segement_in_loop("N4", "PRV", contents.clone())
-                && check_if_segement_in_loop("N4", "NM1", contents.clone())
+                && check_if_segment_in_loop("N4", "PRV", contents.clone())
+                && check_if_segment_in_loop("N4", "NM1", contents.clone())
             {
                 info!("N4 segment found, ");
                 let n4_content = get_segment_contents("N4", &contents);
@@ -86,7 +86,7 @@ pub fn get_loop2110e(mut contents: String) -> (Loop2110E, String) {
             }
 
             // Parse PRV segment
-            if contents.contains("PRV") && check_if_segement_in_loop("PRV", "NM1", contents.clone())
+            if contents.contains("PRV") && check_if_segment_in_loop("PRV", "NM1", contents.clone())
             {
                 info!("PRV segment found, ");
                 let prv_content = get_segment_contents("PRV", &contents);

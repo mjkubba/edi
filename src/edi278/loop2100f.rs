@@ -17,8 +17,8 @@ pub fn get_loop2100f(mut contents: String) -> (Loop2100F, String) {
 
     // Parse DTP segments
     while contents.contains("DTP")
-        && check_if_segement_in_loop("DTP", "SV2", contents.clone())
-        && check_if_segement_in_loop("DTP", "NM1", contents.clone())
+        && check_if_segment_in_loop("DTP", "SV2", contents.clone())
+        && check_if_segment_in_loop("DTP", "NM1", contents.clone())
     {
         info!("DTP segment found, ");
         let dtp_segment = get_dtp(get_segment_contents("DTP", &contents));
@@ -29,7 +29,7 @@ pub fn get_loop2100f(mut contents: String) -> (Loop2100F, String) {
     }
 
     // Parse SV2 segment
-    if contents.contains("SV2") && check_if_segement_in_loop("SV2", "NM1", contents.clone()) {
+    if contents.contains("SV2") && check_if_segment_in_loop("SV2", "NM1", contents.clone()) {
         info!("SV2 segment found, ");
         let sv2_content = get_segment_contents("SV2", &contents);
         sv2_segments = Some(get_sv2(sv2_content));

@@ -32,8 +32,8 @@ pub fn get_loop2010c(mut contents: String) -> (Loop2010C, String) {
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segement_in_loop("REF", "DMG", contents.clone())
-                && check_if_segement_in_loop("REF", "HL", contents.clone())
+                && check_if_segment_in_loop("REF", "DMG", contents.clone())
+                && check_if_segment_in_loop("REF", "HL", contents.clone())
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
@@ -44,7 +44,7 @@ pub fn get_loop2010c(mut contents: String) -> (Loop2010C, String) {
             }
 
             // Parse DMG segment
-            if contents.contains("DMG") && check_if_segement_in_loop("DMG", "HL", contents.clone())
+            if contents.contains("DMG") && check_if_segment_in_loop("DMG", "HL", contents.clone())
             {
                 info!("DMG segment found, ");
                 dmg_segments = Some(get_dmg(get_segment_contents("DMG", &contents)));

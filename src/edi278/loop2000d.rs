@@ -29,7 +29,7 @@ pub fn get_loop2000d(mut contents: String) -> (Loop2000D, String) {
 
             // Parse TRN segments
             while contents.contains("TRN")
-                && check_if_segement_in_loop("TRN", "NM1", contents.clone())
+                && check_if_segment_in_loop("TRN", "NM1", contents.clone())
             {
                 info!("TRN segment found, ");
                 let trn_segment = get_trn(get_segment_contents("TRN", &contents));

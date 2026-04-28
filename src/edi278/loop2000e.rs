@@ -32,7 +32,7 @@ pub fn get_loop2000e(mut contents: String) -> (Loop2000E, String) {
 
             // Parse TRN segments
             while contents.contains("TRN")
-                && check_if_segement_in_loop("TRN", "UM", contents.clone())
+                && check_if_segment_in_loop("TRN", "UM", contents.clone())
             {
                 info!("TRN segment found, ");
                 let trn_segment = get_trn(get_segment_contents("TRN", &contents));

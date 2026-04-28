@@ -23,10 +23,10 @@ pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
 
     // Parse DTP segments
     while contents.contains("DTP")
-        && check_if_segement_in_loop("DTP", "HI", contents.clone())
-        && check_if_segement_in_loop("DTP", "HSD", contents.clone())
-        && check_if_segement_in_loop("DTP", "CL1", contents.clone())
-        && check_if_segement_in_loop("DTP", "NM1", contents.clone())
+        && check_if_segment_in_loop("DTP", "HI", contents.clone())
+        && check_if_segment_in_loop("DTP", "HSD", contents.clone())
+        && check_if_segment_in_loop("DTP", "CL1", contents.clone())
+        && check_if_segment_in_loop("DTP", "NM1", contents.clone())
     {
         info!("DTP segment found, ");
         let dtp_segment = get_dtp(get_segment_contents("DTP", &contents));
@@ -38,9 +38,9 @@ pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
 
     // Parse HI segment
     if contents.contains("HI")
-        && check_if_segement_in_loop("HI", "HSD", contents.clone())
-        && check_if_segement_in_loop("HI", "CL1", contents.clone())
-        && check_if_segement_in_loop("HI", "NM1", contents.clone())
+        && check_if_segment_in_loop("HI", "HSD", contents.clone())
+        && check_if_segment_in_loop("HI", "CL1", contents.clone())
+        && check_if_segment_in_loop("HI", "NM1", contents.clone())
     {
         info!("HI segment found, ");
         hi_segments = Some(get_hi(get_segment_contents("HI", &contents)));
@@ -51,8 +51,8 @@ pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
 
     // Parse HSD segment
     if contents.contains("HSD")
-        && check_if_segement_in_loop("HSD", "CL1", contents.clone())
-        && check_if_segement_in_loop("HSD", "NM1", contents.clone())
+        && check_if_segment_in_loop("HSD", "CL1", contents.clone())
+        && check_if_segment_in_loop("HSD", "NM1", contents.clone())
     {
         info!("HSD segment found, ");
         hsd_segments = Some(get_hsd(get_segment_contents("HSD", &contents)));
@@ -62,7 +62,7 @@ pub fn get_loop2100e(mut contents: String) -> (Loop2100E, String) {
     }
 
     // Parse CL1 segment
-    if contents.contains("CL1") && check_if_segement_in_loop("CL1", "NM1", contents.clone()) {
+    if contents.contains("CL1") && check_if_segment_in_loop("CL1", "NM1", contents.clone()) {
         info!("CL1 segment found, ");
         cl1_segments = Some(get_cl1(get_segment_contents("CL1", &contents)));
         info!("CL1 segment parsed");

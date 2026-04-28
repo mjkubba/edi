@@ -90,10 +90,10 @@ pub fn get_1000bs(mut contents: String) -> (Loop1000bs, String) {
 
             // Parse N3 segment (address)
             if contents.contains("N3")
-                && check_if_segement_in_loop("N3", "N4", contents.clone())
-                && check_if_segement_in_loop("N3", "REF", contents.clone())
-                && check_if_segement_in_loop("N3", "PER", contents.clone())
-                && check_if_segement_in_loop("N3", "ENT", contents.clone())
+                && check_if_segment_in_loop("N3", "N4", contents.clone())
+                && check_if_segment_in_loop("N3", "REF", contents.clone())
+                && check_if_segment_in_loop("N3", "PER", contents.clone())
+                && check_if_segment_in_loop("N3", "ENT", contents.clone())
             {
                 info!("N3 segment found, ");
                 let n3_content = get_segment_contents("N3", &contents);
@@ -118,9 +118,9 @@ pub fn get_1000bs(mut contents: String) -> (Loop1000bs, String) {
 
             // Parse N4 segment (city, state, zip)
             if contents.contains("N4")
-                && check_if_segement_in_loop("N4", "REF", contents.clone())
-                && check_if_segement_in_loop("N4", "PER", contents.clone())
-                && check_if_segement_in_loop("N4", "ENT", contents.clone())
+                && check_if_segment_in_loop("N4", "REF", contents.clone())
+                && check_if_segment_in_loop("N4", "PER", contents.clone())
+                && check_if_segment_in_loop("N4", "ENT", contents.clone())
             {
                 info!("N4 segment found, ");
                 let n4_content = get_segment_contents("N4", &contents);
@@ -165,8 +165,8 @@ pub fn get_1000bs(mut contents: String) -> (Loop1000bs, String) {
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segement_in_loop("REF", "PER", contents.clone())
-                && check_if_segement_in_loop("REF", "ENT", contents.clone())
+                && check_if_segment_in_loop("REF", "PER", contents.clone())
+                && check_if_segment_in_loop("REF", "ENT", contents.clone())
             {
                 info!("REF segment found, ");
                 let ref_content = get_segment_contents("REF", &contents);
@@ -198,7 +198,7 @@ pub fn get_1000bs(mut contents: String) -> (Loop1000bs, String) {
 
             // Parse PER segments
             while contents.contains("PER")
-                && check_if_segement_in_loop("PER", "ENT", contents.clone())
+                && check_if_segment_in_loop("PER", "ENT", contents.clone())
             {
                 info!("PER segment found, ");
                 let per_content = get_segment_contents("PER", &contents);

@@ -117,7 +117,7 @@ pub fn get_loop_2100(
     if contents.contains("CAS") {
         let cas_count = contents.matches("CAS").count();
         for _ in 0..cas_count {
-            if check_if_segement_in_loop("CAS", "NM1", contents.clone()) {
+            if check_if_segment_in_loop("CAS", "NM1", contents.clone()) {
                 let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
                 info!("CAS segment found, ");
                 cas_segments.push(cas_tmp);

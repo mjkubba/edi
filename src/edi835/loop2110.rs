@@ -89,7 +89,7 @@ pub fn get_loop_2110(
             let cas_tmp = get_cas(get_segment_contents("CAS", &contents));
             if check_for_expected_codes(
                 "CO,OA,PI,PR",
-                cas_tmp.cas01_claim_adjustsment_group_code.clone(),
+                cas_tmp.cas01_claim_adjustment_group_code.clone(),
             ) {
                 info!("CAS segment found, ");
                 cas_segments.push(cas_tmp);
@@ -320,7 +320,7 @@ mod tests {
         assert_eq!(contents, "SE*22*35681~GE*1*1~IEA*1*000000905~");
         assert_eq!(svc.svc01_1_product_or_service_is_qualifier, "HC|99213");
         assert_eq!(dtm[0].date_time_qualifier, "472");
-        assert_eq!(cas[0].cas01_claim_adjustsment_group_code, "OA");
+        assert_eq!(cas[0].cas01_claim_adjustment_group_code, "OA");
         assert_eq!(ref_service_identification.len(), 1);
         assert_eq!(
             ref_service_identification[0].reference_id_number_qualifier,

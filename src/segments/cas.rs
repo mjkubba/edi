@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, PartialEq, Clone, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct CAS {
-    pub cas01_claim_adjustsment_group_code: String,
-    pub cas02_adjustsment_reason_code: String,
-    pub cas03_adjustsment_amt: String,
-    pub cas04_adjustsment_qty: String,
+    pub cas01_claim_adjustment_group_code: String,
+    pub cas02_adjustment_reason_code: String,
+    pub cas03_adjustment_amt: String,
+    pub cas04_adjustment_qty: String,
     pub cas05_adjustment_reason_code: String,
     pub cas06_adjustment_amt: String,
     pub cas07_adjustment_qty: String,
@@ -27,7 +27,7 @@ pub struct CAS {
 
 pub fn get_cas(cas_content: String) -> CAS {
     let cas_parts: Vec<&str> = cas_content.split("*").collect();
-    let mut cas04_adjustsment_qty: String = "".to_string();
+    let mut cas04_adjustment_qty: String = "".to_string();
     let mut cas05_adjustment_reason_code: String = "".to_string();
     let mut cas06_adjustment_amt: String = "".to_string();
     let mut cas07_adjustment_qty: String = "".to_string();
@@ -45,7 +45,7 @@ pub fn get_cas(cas_content: String) -> CAS {
     let mut cas19_adjustment_qty: String = "".to_string();
 
     if cas_parts.get(3).is_some() {
-        cas04_adjustsment_qty = cas_parts[3].to_string();
+        cas04_adjustment_qty = cas_parts[3].to_string();
     }
     if cas_parts.get(4).is_some() {
         cas05_adjustment_reason_code = cas_parts[4].to_string();
@@ -93,10 +93,10 @@ pub fn get_cas(cas_content: String) -> CAS {
         cas19_adjustment_qty = cas_parts[18].to_string();
     }
     CAS {
-        cas01_claim_adjustsment_group_code: cas_parts[0].to_string(),
-        cas02_adjustsment_reason_code: cas_parts[1].to_string(),
-        cas03_adjustsment_amt: cas_parts[2].to_string(),
-        cas04_adjustsment_qty,
+        cas01_claim_adjustment_group_code: cas_parts[0].to_string(),
+        cas02_adjustment_reason_code: cas_parts[1].to_string(),
+        cas03_adjustment_amt: cas_parts[2].to_string(),
+        cas04_adjustment_qty,
         cas05_adjustment_reason_code,
         cas06_adjustment_amt,
         cas07_adjustment_qty,
@@ -116,17 +116,17 @@ pub fn get_cas(cas_content: String) -> CAS {
 }
 
 pub fn write_cas(cas: CAS) -> String {
-    if cas.cas01_claim_adjustsment_group_code.is_empty() {
+    if cas.cas01_claim_adjustment_group_code.is_empty() {
         return String::new();
     }
     let mut cas_content = String::new();
     cas_content.push_str("CAS*");
-    cas_content.push_str(&cas.cas01_claim_adjustsment_group_code);
+    cas_content.push_str(&cas.cas01_claim_adjustment_group_code);
     cas_content.push_str("*");
-    cas_content.push_str(&cas.cas02_adjustsment_reason_code);
+    cas_content.push_str(&cas.cas02_adjustment_reason_code);
     cas_content.push_str("*");
-    cas_content.push_str(&cas.cas03_adjustsment_amt);
-    cas_content.push_str(&stiuational_element(cas.cas04_adjustsment_qty));
+    cas_content.push_str(&cas.cas03_adjustment_amt);
+    cas_content.push_str(&stiuational_element(cas.cas04_adjustment_qty));
     cas_content.push_str(&stiuational_element(cas.cas05_adjustment_reason_code));
     cas_content.push_str(&stiuational_element(cas.cas06_adjustment_amt));
     cas_content.push_str(&stiuational_element(cas.cas07_adjustment_qty));
@@ -156,10 +156,10 @@ mod tests {
     fn test_get_cas() {
         let cas_content = "CAS*P*1*10.00*1*20.00*2*30.00*3*40.00*4*50.00*5*60.00*6*70.00*7*80.00*8*90.00*9*100.00*10*110.00*11*120.00*12*130.00*13*140.00*14*150.00*15*160.00*16*170.00*17*180.00*18*190.00*19*200.00".to_string();
         let cas = get_cas(cas_content);
-        assert_eq!(cas.cas01_claim_adjustsment_group_code, "CAS".to_string());
-        assert_eq!(cas.cas02_adjustsment_reason_code, "P".to_string());
-        assert_eq!(cas.cas03_adjustsment_amt, "1".to_string());
-        assert_eq!(cas.cas04_adjustsment_qty, "10.00".to_string());
+        assert_eq!(cas.cas01_claim_adjustment_group_code, "CAS".to_string());
+        assert_eq!(cas.cas02_adjustment_reason_code, "P".to_string());
+        assert_eq!(cas.cas03_adjustment_amt, "1".to_string());
+        assert_eq!(cas.cas04_adjustment_qty, "10.00".to_string());
         assert_eq!(cas.cas05_adjustment_reason_code, "1".to_string());
     }
 }

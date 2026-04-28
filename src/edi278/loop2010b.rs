@@ -32,7 +32,7 @@ pub fn get_loop2010b(mut contents: String) -> (Loop2010B, String) {
 
             // Parse PER segments
             while contents.contains("PER")
-                && check_if_segement_in_loop("PER", "HL", contents.clone())
+                && check_if_segment_in_loop("PER", "HL", contents.clone())
             {
                 info!("PER segment found, ");
                 let per_segment = get_per(get_segment_contents("PER", &contents));
@@ -44,7 +44,7 @@ pub fn get_loop2010b(mut contents: String) -> (Loop2010B, String) {
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segement_in_loop("REF", "HL", contents.clone())
+                && check_if_segment_in_loop("REF", "HL", contents.clone())
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));

@@ -32,9 +32,9 @@ pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
 
             // Parse REF segments
             while contents.contains("REF")
-                && check_if_segement_in_loop("REF", "PRV", contents.clone())
-                && check_if_segement_in_loop("REF", "HL", contents.clone())
-                && check_if_segement_in_loop("REF", "SE", contents.clone())
+                && check_if_segment_in_loop("REF", "PRV", contents.clone())
+                && check_if_segment_in_loop("REF", "HL", contents.clone())
+                && check_if_segment_in_loop("REF", "SE", contents.clone())
             {
                 info!("REF segment found, ");
                 let ref_segment = get_ref(get_segment_contents("REF", &contents));
@@ -46,8 +46,8 @@ pub fn get_loop2010f(mut contents: String) -> (Loop2010F, String) {
 
             // Parse PRV segment
             if contents.contains("PRV")
-                && check_if_segement_in_loop("PRV", "HL", contents.clone())
-                && check_if_segement_in_loop("PRV", "SE", contents.clone())
+                && check_if_segment_in_loop("PRV", "HL", contents.clone())
+                && check_if_segment_in_loop("PRV", "SE", contents.clone())
             {
                 info!("PRV segment found, ");
                 let prv_content = get_segment_contents("PRV", &contents);

@@ -56,7 +56,7 @@ pub fn get_loop_1000_b(mut contents: String) -> (N1, N3, N4, Vec<REF>, RDM, Stri
     if contents.contains("REF") {
         let ref_count = contents.matches("REF").count();
         for _ in 0..ref_count {
-            if check_if_segement_in_loop("REF", "CLP", contents.clone()) {
+            if check_if_segment_in_loop("REF", "CLP", contents.clone()) {
                 info!("REF segment found, ");
                 ref_segments.push(get_ref(get_segment_contents("REF", &contents)));
                 info!("REF segment parsed");
